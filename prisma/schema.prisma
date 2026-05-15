@@ -1,0 +1,536 @@
+// ============================================================
+// AryTrano — Prisma schema
+// Scope : v0 (live) + stubs v0.5 / v1 / v2 (not yet wired up).
+// Conventions :
+//   - cuid() for ids (collision-safe, non-enumerable)
+//   - Decimal(12,2) for money (MGA / Ar)
+//   - Decimal(9,6) for lat/lng
+//   - Soft-delete via *Status enums, never DELETE rows
+//   - Encrypted PII (CIN) : stored as Bytes (ciphertext + iv)
+// ============================================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// Prisma 7: connection URL lives in prisma.config.ts, not here.
+datasource db {
+  provider = "postgresql"
+}
+
+// ============================================================
+// AUTH — Auth.js v5 Prisma adapter shape
+// ============================================================
+
+model User {
+  id            String     @id @default(cuid())
+  email         String     @unique
+  emailVerified DateTime?
+  name          String?
+  image         String?
+  phone         String?    // E.164, e.g. +261341234567
+  passwordHash  String?    // credentials provider; null for OAuth-only users
+  role          UserRole   @default(STUDENT)
+  locale        Locale     @default(FR_MG)
+  status        UserStatus @default(ACTIVE)
+  // Incremented on password change/reset and OAuth unlink so existing JWT
+  // mobile tokens (still valid until expiry) are invalidated immediately.
+  tokenVersion  Int        @default(0)
+
+  // TOTP 2FA — encrypted shared secret + activation timestamp. When
+  // `totpEnabledAt` is non-null, the credentials sign-in flow demands a
+  // step-2 6-digit code (or a one-time recovery code).
+  totpSecret      String?
+  totpEnabledAt   DateTime?
+
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  accounts      Account[]
+  sessions      Session[]
+  ownerProfile  OwnerProfile?
+  listings      Listing[]
+  reports       Report[]
+  reviews         Review[]
+  reviewReactions ReviewReaction[]
+  favorites       Favorite[]
+  savedSearches   SavedSearch[]
+  payments        Payment[]
+  loginEvents     LoginEvent[]
+  recoveryCodes   RecoveryCode[]
+
+  @@index([status, role])
+}
+
+/**
+ * Single-use TOTP recovery codes. Hashed (bcrypt) so a DB dump can't
+ * harvest plaintext codes. `usedAt` flags consumed codes.
+ */
+model RecoveryCode {
+  id        String    @id @default(cuid())
+  userId    String
+  codeHash  String
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, usedAt])
+}
+
+enum UserRole {
+  STUDENT
+  OWNER
+  ADMIN
+}
+
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
+  DELETED
+}
+
+enum Locale {
+  FR_MG
+  MG
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// ============================================================
+// LOGIN EVENTS — audit trail per user, shown in /dashboard/settings
+// ============================================================
+
+model LoginEvent {
+  id          String          @id @default(cuid())
+  userId      String
+  occurredAt  DateTime        @default(now())
+  authMethod  LoginAuthMethod
+  ipHash      String?         // SHA-256(ip + AUTH_SECRET), no raw IP
+  userAgent   String?         @db.Text
+  browser     String?         // "Chrome"
+  os          String?         // "Windows"
+  deviceType  String?         // "desktop" | "mobile" | "tablet"
+  isMobileApp Boolean         @default(false)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, occurredAt(sort: Desc)])
+}
+
+enum LoginAuthMethod {
+  CREDENTIALS
+  GOOGLE
+  FACEBOOK
+  MAGIC_LINK
+  MOBILE_JWT
+}
+
+// ============================================================
+// OWNER PROFILE — v0.5 (owner verification, encrypted CIN)
+// ============================================================
+
+model OwnerProfile {
+  id            String    @id @default(cuid())
+  userId        String    @unique
+  cinCiphertext Bytes?    // encrypted CIN at rest
+  cinIv         Bytes?    // AES-GCM IV
+  verifiedAt    DateTime?
+  verifiedBy    String?   // admin userId
+  notes         String?   @db.Text
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// ============================================================
+// GEO — v0
+// ============================================================
+
+model City {
+  id        String   @id @default(cuid())
+  slug      String   @unique // "fianarantsoa"
+  nameFr    String
+  nameMg    String
+  lat       Decimal  @db.Decimal(9, 6)
+  lng       Decimal  @db.Decimal(9, 6)
+  createdAt DateTime @default(now())
+
+  neighborhoods Neighborhood[]
+  listings      Listing[]
+}
+
+model Neighborhood {
+  id        String   @id @default(cuid())
+  cityId    String
+  slug      String   // "andrainjato"
+  nameFr    String
+  nameMg    String
+  lat       Decimal  @db.Decimal(9, 6)
+  lng       Decimal  @db.Decimal(9, 6)
+  createdAt DateTime @default(now())
+
+  city     City      @relation(fields: [cityId], references: [id], onDelete: Restrict)
+  listings Listing[]
+
+  @@unique([cityId, slug])
+  @@index([cityId])
+}
+
+// ============================================================
+// LISTINGS — v0 (core)
+// ============================================================
+
+model Listing {
+  id              String        @id @default(cuid())
+  ownerId         String
+  cityId          String
+  neighborhoodId  String
+
+  title           String
+  slug            String        // SEO slug, computed from title + suffix of id
+  description     String        @db.Text
+  type            ListingType
+  priceMonthlyMGA Decimal       @db.Decimal(12, 2)
+  surfaceM2       Int?
+  bedrooms        Int?
+  bathrooms       Int?
+  furnished       Boolean       @default(false)
+  // Amenities — Postgres enum array, defaults to empty so existing rows
+  // stay valid without a backfill.
+  amenities       Amenity[]     @default([])
+  // Owner-defined amenities (free-form labels). Each entry max 60 chars
+  // — validated at the schema layer. Use sparingly: well-known equipment
+  // belongs in the `Amenity` enum so it benefits from i18n + icons.
+  customAmenities String[]      @default([])
+
+  // geo (optional — falls back to neighborhood centroid)
+  lat             Decimal?      @db.Decimal(9, 6)
+  lng             Decimal?      @db.Decimal(9, 6)
+
+  status          ListingStatus @default(DRAFT)
+  publishedAt     DateTime?
+
+  // admin moderation (when suspended)
+  suspendedReason String?
+  suspendedAt     DateTime?
+  suspendedBy     String?
+
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  owner         User           @relation(fields: [ownerId], references: [id], onDelete: Restrict)
+  city          City           @relation(fields: [cityId], references: [id], onDelete: Restrict)
+  neighborhood  Neighborhood   @relation(fields: [neighborhoodId], references: [id], onDelete: Restrict)
+  photos        ListingPhoto[]
+  contactEvents ContactEvent[]
+  reports       Report[]
+  reviews       Review[]
+  favorites     Favorite[]
+  payments      Payment[]
+
+  @@unique([slug])
+  @@index([status, cityId, neighborhoodId])
+  @@index([status, publishedAt(sort: Desc)])
+  @@index([status, priceMonthlyMGA])
+  @@index([ownerId, status])
+}
+
+enum ListingType {
+  ROOM
+  STUDIO
+  APARTMENT
+  HOUSE
+}
+
+// Amenities offered by a listing — fixed catalog v0; admin can request
+// additions as new student needs come up. Values are stable identifiers
+// (i18n labels + icons live in code), so renaming a label here is safe.
+enum Amenity {
+  WIFI                  // Internet WiFi inclus
+  PARKING               // Parking voiture
+  MOTO_PARKING          // Parking moto / vélo
+  HOT_WATER             // Eau chaude
+  WATER_TANK            // Citerne / réserve d'eau
+  GENERATOR             // Groupe électrogène
+  AIR_CONDITIONING      // Climatisation
+  KITCHEN_EQUIPPED      // Cuisine équipée (frigo, gazinière)
+  WASHING_MACHINE       // Machine à laver
+  GUARD                 // Gardiennage 24/7
+  SECURITY_GATE         // Portail fermé / clôture
+  TERRACE               // Terrasse / balcon
+  GARDEN                // Jardin
+  STUDY_DESK            // Bureau / coin étude
+  CLOSE_TO_UNIVERSITY   // Proche université
+  CLOSE_TO_MARKET       // Proche marché
+  PUBLIC_TRANSPORT      // Transport en commun proche
+}
+
+enum ListingStatus {
+  DRAFT
+  PUBLISHED
+  UNAVAILABLE
+  SUSPENDED
+  DELETED
+}
+
+model ListingPhoto {
+  id           String   @id @default(cuid())
+  listingId    String
+  url          String   // Cloudinary delivery URL
+  cloudinaryId String   // Cloudinary public ID (for deletion / transforms)
+  width        Int
+  height       Int
+  blurhash     String?
+  altFr        String?
+  altMg        String?
+  position     Int      @default(0)
+  createdAt    DateTime @default(now())
+
+  listing Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+
+  @@unique([listingId, position])
+  @@index([listingId])
+}
+
+// ============================================================
+// CONTACT — v0 (basic analytics, no PII)
+// ============================================================
+
+model ContactEvent {
+  id        String         @id @default(cuid())
+  listingId String
+  channel   ContactChannel
+  ipHash    String         // SHA-256(ip + secret), no raw IP
+  uaHash    String?        // SHA-256(user agent + secret)
+  createdAt DateTime       @default(now())
+
+  listing Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+
+  @@index([listingId, createdAt])
+}
+
+enum ContactChannel {
+  WHATSAPP
+  PHONE
+}
+
+// ============================================================
+// REPORTS — v0 (signalements)
+// ============================================================
+
+model Report {
+  id         String       @id @default(cuid())
+  listingId  String
+  reporterId String?      // null = anonymous (rate-limited by IP server-side)
+  reason     ReportReason
+  details    String?      @db.Text  // free text from the reporter
+  status     ReportStatus @default(OPEN)
+  /// Visible to the reporter (email) + the listing owner (dashboard).
+  /// Captured when admin resolves / dismisses — explains the decision.
+  /// NOT for internal-only notes.
+  adminNote  String?      @db.Text
+  resolvedAt DateTime?
+  resolvedBy String?      // admin userId
+  createdAt  DateTime     @default(now())
+
+  listing  Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  reporter User?   @relation(fields: [reporterId], references: [id], onDelete: SetNull)
+
+  @@index([status, createdAt])
+  @@index([listingId])
+}
+
+enum ReportReason {
+  SCAM
+  STOLEN_PHOTOS
+  WRONG_INFO
+  INAPPROPRIATE
+  ALREADY_RENTED
+  OTHER
+}
+
+enum ReportStatus {
+  OPEN
+  IN_REVIEW
+  RESOLVED
+  DISMISSED
+}
+
+// ============================================================
+// REVIEWS — v0.5 (stub — not wired up in v0)
+// ============================================================
+
+model Review {
+  id            String       @id @default(cuid())
+  listingId     String
+  authorId      String
+  rating        Int          // 1..5 (validated server-side)
+  body          String       @db.Text
+  verifiedStay  Boolean      @default(false) // set true if linked to a verified contact event / payment
+  ownerResponse String?      @db.Text
+  status        ReviewStatus @default(PUBLISHED)
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  listing   Listing          @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  author    User             @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  reactions ReviewReaction[]
+
+  @@unique([listingId, authorId])
+  @@index([listingId, status, createdAt(sort: Desc)])
+}
+
+enum ReviewStatus {
+  PUBLISHED
+  HIDDEN
+  DELETED
+}
+
+// Single-reaction-per-user model: LIKE or DISLIKE, never both. The PK
+// `(reviewId, userId)` enforces uniqueness; updating the row flips kind.
+model ReviewReaction {
+  reviewId  String
+  userId    String
+  kind      ReactionKind
+  createdAt DateTime     @default(now())
+
+  review Review @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([reviewId, userId])
+  @@index([reviewId, kind])
+  @@index([userId])
+}
+
+enum ReactionKind {
+  LIKE
+  DISLIKE
+}
+
+// ============================================================
+// FAVORITES — v1 (stub)
+// ============================================================
+
+model Favorite {
+  userId    String
+  listingId String
+  createdAt DateTime @default(now())
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  listing Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+
+  @@id([userId, listingId])
+  @@index([userId, createdAt(sort: Desc)])
+}
+
+// ============================================================
+// SAVED SEARCHES — v1 (stub)
+// ============================================================
+
+model SavedSearch {
+  id          String    @id @default(cuid())
+  userId      String
+  name        String
+  filters     Json      // serialized search criteria (validated via Zod app-side)
+  alertsOn    Boolean   @default(false)
+  lastFiredAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+// ============================================================
+// PAYMENTS — v2 (stub, GoalPay)
+// PaymentEvent is an immutable audit trail: INSERT only.
+// ============================================================
+
+model Payment {
+  id             String           @id @default(cuid())
+  userId         String
+  listingId      String?
+  idempotencyKey String           @unique
+  provider       PaymentProviderName
+  providerTxId   String?
+  amountMGA      Decimal          @db.Decimal(12, 2)
+  purpose        PaymentPurpose
+  status         PaymentStatus    @default(INITIATED)
+  payerPhone     String?          // E.164
+  createdAt      DateTime         @default(now())
+
+  user    User           @relation(fields: [userId], references: [id], onDelete: Restrict)
+  listing Listing?       @relation(fields: [listingId], references: [id], onDelete: SetNull)
+  events  PaymentEvent[]
+
+  @@index([userId, createdAt(sort: Desc)])
+  @@index([providerTxId])
+  @@index([status, createdAt])
+}
+
+enum PaymentProviderName {
+  GOALPAY
+}
+
+enum PaymentPurpose {
+  PREMIUM_LISTING
+  FEATURED_PLACEMENT
+  // future: DEPOSIT, FIRST_MONTH (à valider légalement)
+}
+
+enum PaymentStatus {
+  INITIATED
+  PENDING
+  CONFIRMED
+  FAILED
+  REFUNDED
+}
+
+model PaymentEvent {
+  id         String        @id @default(cuid())
+  paymentId  String
+  status     PaymentStatus
+  rawPayload Json          // raw provider response (kept for disputes)
+  occurredAt DateTime      @default(now())
+
+  payment Payment @relation(fields: [paymentId], references: [id], onDelete: Cascade)
+
+  @@index([paymentId, occurredAt])
+}

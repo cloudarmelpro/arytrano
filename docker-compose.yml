@@ -1,0 +1,21 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: arytrano-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: arytrano
+      POSTGRES_PASSWORD: arytrano_dev
+      POSTGRES_DB: arytrano
+    ports:
+      - "5432:5432"
+    volumes:
+      - arytrano_pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U arytrano -d arytrano"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  arytrano_pg_data:
