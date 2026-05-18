@@ -47,6 +47,7 @@ export async function listUserFavorites(
           title: true,
           type: true,
           priceMonthlyMGA: true,
+          verifiedAt: true,
           city: { select: { slug: true, nameFr: true } },
           neighborhood: { select: { slug: true, nameFr: true } },
           photos: {
@@ -77,6 +78,7 @@ export async function listUserFavorites(
       title: r.listing.title,
       type: r.listing.type,
       priceMonthlyMGA: r.listing.priceMonthlyMGA,
+      verifiedAt: r.listing.verifiedAt,
       city: r.listing.city,
       neighborhood: r.listing.neighborhood,
       photo: r.listing.photos[0] ?? null,

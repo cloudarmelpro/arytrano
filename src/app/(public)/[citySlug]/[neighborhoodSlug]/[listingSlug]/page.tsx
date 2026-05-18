@@ -21,6 +21,7 @@ import { ShareButton } from '@/features/listings/components/ShareButton'
 import { ListingMapClient } from '@/features/listings/components/ListingMapClient'
 import { AMENITY_CATALOG, AmenityIcon } from '@/features/listings/amenities'
 import { PublicListingCard } from '@/features/listings/components/PublicListingCard'
+import { VerifiedListingBadge } from '@/features/listings/components/VerifiedListingBadge'
 import { ReportButton } from '@/features/reports/components/ReportButton'
 import { FavoriteButton } from '@/features/favorites'
 import { getFavoritedListingIds } from '@/features/favorites/queries/get-favorited-listing-ids'
@@ -175,9 +176,12 @@ export default async function PublicListingDetailPage({
         {/* Title block — above the gallery (Airbnb-style) */}
         <header className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div className="flex flex-col gap-1.5">
-            <h1 className="text-2xl font-semibold leading-tight text-foreground sm:text-3xl">
-              {listing.title}
-            </h1>
+            <div className="flex flex-wrap items-center gap-3">
+              <h1 className="text-2xl font-semibold leading-tight text-foreground sm:text-3xl">
+                {listing.title}
+              </h1>
+              {listing.verifiedAt && <VerifiedListingBadge />}
+            </div>
             <p className="flex flex-wrap items-center gap-1.5 text-sm text-muted-foreground">
               {reviewStats.average !== null && (
                 <>

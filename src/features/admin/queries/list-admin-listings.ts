@@ -43,6 +43,8 @@ export type AdminListingRow = {
   thumbnailUrl: string | null
   reportCount: number
   publishedAt: Date | null
+  /** When set, drives the "Annonce vérifiée" badge + admin toggle. */
+  verifiedAt: Date | null
   createdAt: Date
   updatedAt: Date
 }
@@ -80,6 +82,7 @@ export async function listAdminListings(
       status: true,
       priceMonthlyMGA: true,
       publishedAt: true,
+      verifiedAt: true,
       createdAt: true,
       updatedAt: true,
       city: { select: { nameFr: true, slug: true } },
@@ -109,6 +112,7 @@ export async function listAdminListings(
       thumbnailUrl: r.photos[0]?.url ?? null,
       reportCount: r._count.reports,
       publishedAt: r.publishedAt,
+      verifiedAt: r.verifiedAt,
       createdAt: r.createdAt,
       updatedAt: r.updatedAt,
     })),

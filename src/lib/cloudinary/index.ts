@@ -65,6 +65,14 @@ export async function uploadBuffer(
         // Critical: blocks SVG (script-XSS), TIFF, raw, PDF, video disguised
         // under a faked `image/jpeg` Content-Type.
         allowed_formats: [...SAFE_RASTER_FORMATS],
+        // EXIF strip — audit M1. Cloudinary's web-optimised pipeline drops
+        // most metadata by default, but we set both flags explicitly so the
+        // promise we make in the UI ("EXIF retiré") is enforced at the
+        // contract level. `image_metadata: false` is the property-bag
+        // toggle; `exif: false` is belt-and-braces on the EXIF section
+        // specifically (covers vendors that re-encode source images).
+        image_metadata: false,
+        exif: false,
         transformation: opts.transformation,
         overwrite: true,
         invalidate: true,

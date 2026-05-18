@@ -119,8 +119,17 @@ export function ReviewRow({
               </span>
             )}
           </p>
-          <p className="text-xs text-muted-foreground">
-            {dateFmt.format(review.createdAt)}
+          <p className="flex items-center gap-2 text-xs text-muted-foreground">
+            <span>{dateFmt.format(review.createdAt)}</span>
+            {review.verifiedStay && (
+              <span
+                title={t('reviews.verifiedStay.tooltip')}
+                className="inline-flex items-center gap-1 rounded-md bg-success/10 px-1.5 py-0.5 text-[10px] font-medium text-success"
+              >
+                <VerifiedStayIcon />
+                {t('reviews.verifiedStay.label')}
+              </span>
+            )}
           </p>
         </div>
       </header>
@@ -285,5 +294,24 @@ export function ReviewRow({
         </Dialog.Portal>
       </Dialog.Root>
     </li>
+  )
+}
+
+function VerifiedStayIcon() {
+  return (
+    <svg
+      width="10"
+      height="10"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+      <polyline points="22 4 12 14.01 9 11.01" />
+    </svg>
   )
 }

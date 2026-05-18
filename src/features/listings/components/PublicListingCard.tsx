@@ -4,6 +4,7 @@ import { FavoriteButton, FavoriteSignInPrompt } from '@/features/favorites'
 import { formatAriary } from '@/lib/format/currency'
 import type { Translator } from '@/lib/i18n/translate'
 import type { PublicListingCard as PublicListingCardData } from '../queries/list-public-listings'
+import { VerifiedListingBadge } from './VerifiedListingBadge'
 
 /**
  * Server-rendered card for the public /annonces listing grid. Uses
@@ -71,6 +72,14 @@ export function PublicListingCard({
           ) : (
             <div className="flex h-full w-full items-center justify-center text-xs text-muted-foreground">
               {t('card.noPhoto')}
+            </div>
+          )}
+          {/* Trust badge — bottom-left overlay so it doesn't clash with the
+             heart at top-right or the LCP hero focus. Only renders when
+             an admin has flagged the listing as verified (T-033). */}
+          {listing.verifiedAt && (
+            <div className="absolute bottom-3 left-3 z-10">
+              <VerifiedListingBadge variant="overlay" />
             </div>
           )}
         </div>

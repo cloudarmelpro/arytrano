@@ -4,6 +4,7 @@ import { headers } from 'next/headers'
 import { ZodError } from 'zod'
 import { ApiError } from '@/lib/api/errors'
 import { extractRequestInfo } from '@/lib/auth/request-info'
+import { auth } from '@/features/auth'
 import { recordContactClick } from '../services/record-contact-click'
 import { recordContactClickSchema } from '../schemas/contact'
 
@@ -41,7 +42,7 @@ export async function revealContactAction(
     throw err
   }
 
-  const h = await headers()
+  const [h, session] = await Promise.all([headers(), auth()])
   const { ipHash, userAgent } = extractRequestInfo(h)
 
   try {
@@ -50,6 +51,7 @@ export async function revealContactAction(
       channel: input.channel,
       ipHash,
       userAgent,
+      viewerId: session?.user?.id ?? null,
     })
     return {
       ok: true,

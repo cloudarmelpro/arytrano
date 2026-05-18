@@ -43,6 +43,7 @@ export async function listRelatedListings(input: {
       title: true,
       type: true,
       priceMonthlyMGA: true,
+      verifiedAt: true,
       city: { select: { slug: true, nameFr: true } },
       neighborhood: { select: { slug: true, nameFr: true } },
       photos: {
@@ -65,6 +66,7 @@ export async function listRelatedListings(input: {
     title: r.title,
     type: r.type,
     priceMonthlyMGA: r.priceMonthlyMGA,
+    verifiedAt: r.verifiedAt,
     city: r.city,
     neighborhood: r.neighborhood,
     photo: r.photos[0] ?? null,

@@ -33,6 +33,8 @@ export type PublicListingDetail = {
   amenities: Amenity[]
   customAmenities: string[]
   publishedAt: Date | null
+  /** When set, drives the "Annonce vérifiée" badge on the detail page (T-033). */
+  verifiedAt: Date | null
   /** Coordinates: listing.lat || neighborhood.lat || city.lat. Always present. */
   lat: string
   lng: string
@@ -94,6 +96,7 @@ export async function getPublicListing(
       amenities: true,
       customAmenities: true,
       publishedAt: true,
+      verifiedAt: true,
       lat: true,
       lng: true,
       city: {
@@ -145,6 +148,7 @@ export async function getPublicListing(
     amenities: row.amenities,
     customAmenities: row.customAmenities,
     publishedAt: row.publishedAt,
+    verifiedAt: row.verifiedAt,
     lat: lat.toString(),
     lng: lng.toString(),
     city: {

@@ -82,6 +82,15 @@ const contactByIpListing = makeLimiter('contact-ip-listing', { requests: 30, win
 const signInEmailByEmail = makeLimiter('signin-email-email', { requests: 3, window: '1 h' })
 const signInEmailByIp = makeLimiter('signin-email-ip', { requests: 10, window: '1 h' })
 
+// Transactional emails (T-034) — cap per-user per-event-type to prevent
+// storms if a service retry loop or webhook double-fires. 10/h is enough
+// for healthy activity (multiple publishes/reviews per hour shouldn't
+// be silently dropped) and tight enough to bound damage.
+const transactionalEmailLimiter = makeLimiter('email-transactional', {
+  requests: 10,
+  window: '1 h',
+})
+
 type RateLimitResult = { success: boolean; remaining?: number; reset?: number }
 
 async function check(
@@ -141,4 +150,8 @@ export const rateLimiters = {
     if (!byEmail.success) return byEmail
     return check(signInEmailByIp, ipHash)
   },
+
+  /** Transactional email — 10/h per (userId, eventType). Fail-soft caller. */
+  transactionalEmail: (userId: string, eventType: string) =>
+    check(transactionalEmailLimiter, `${userId}:${eventType}`),
 }

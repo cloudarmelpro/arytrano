@@ -7,6 +7,7 @@ import {
   listAdminListingsQuerySchema,
 } from '@/features/admin/queries/list-admin-listings'
 import { SuspendListingButton } from '@/features/admin/components/SuspendListingButton'
+import { VerifyListingButton } from '@/features/admin/components/VerifyListingButton'
 import { ListingStatusBadge } from '@/features/listings/components/ListingStatusBadge'
 import { formatAriary } from '@/lib/format/currency'
 import { getLocale } from '@/lib/i18n/get-locale'
@@ -204,12 +205,18 @@ function AdminListingCard({
             </Link>
           )}
           {listing.status !== 'SUSPENDED' && listing.status !== 'DELETED' && (
-            <div className="ml-auto">
-              <SuspendListingButton
+            <>
+              <VerifyListingButton
                 listingId={listing.id}
-                listingTitle={listing.title}
+                verifiedAt={listing.verifiedAt}
               />
-            </div>
+              <div className="ml-auto">
+                <SuspendListingButton
+                  listingId={listing.id}
+                  listingTitle={listing.title}
+                />
+              </div>
+            </>
           )}
         </div>
       </div>

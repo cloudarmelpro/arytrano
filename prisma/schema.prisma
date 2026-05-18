@@ -58,6 +58,7 @@ model User {
   payments        Payment[]
   loginEvents     LoginEvent[]
   recoveryCodes   RecoveryCode[]
+  contactEvents   ContactEvent[]
 
   @@index([status, role])
 }
@@ -254,6 +255,14 @@ model Listing {
   suspendedAt     DateTime?
   suspendedBy     String?
 
+  // admin trust marker — set by an admin via verifyListing(). Powers the
+  // "Annonce vérifiée" badge on the public card + detail. Cleared by
+  // unverifyListing(). `verifiedBy` is a soft FK (admin user id) kept
+  // even after re-verification cycles for audit, not modelled as a
+  // hard relation to survive admin deletion gracefully.
+  verifiedAt      DateTime?
+  verifiedBy      String?
+
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt
 
@@ -341,14 +350,21 @@ model ListingPhoto {
 model ContactEvent {
   id        String         @id @default(cuid())
   listingId String
+  // Signed-in viewer's userId when known. Null for anonymous reveals.
+  // Powers `Review.verifiedStay` (T-031) — a review is "verified" when
+  // its author has at least one prior ContactEvent on the listing.
+  // SetNull on user delete so the event row survives account anonymisation.
+  viewerId  String?
   channel   ContactChannel
   ipHash    String         // SHA-256(ip + secret), no raw IP
   uaHash    String?        // SHA-256(user agent + secret)
   createdAt DateTime       @default(now())
 
   listing Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  viewer  User?   @relation(fields: [viewerId], references: [id], onDelete: SetNull)
 
   @@index([listingId, createdAt])
+  @@index([listingId, viewerId])
 }
 
 enum ContactChannel {

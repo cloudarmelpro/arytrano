@@ -254,17 +254,92 @@ Objectif : un étudiant peut chercher une chambre à Fianarantsoa, voir les anno
 
 ---
 
-## 🌱 v0.5 — Confiance & médias (épics)
+## 🌱 v0.5 — Confiance & médias
 
-Objectif : crédibiliser la plateforme.
+Objectif : crédibiliser la plateforme. Découpage en phases — Phase A
+(quick wins indépendants) puis Phase B (emails transverses). Les phases
+C/D/E sont planifiées mais non détaillées ici.
 
-- **E-T01** — Avis avec preuve de séjour (`Review.verifiedStay`)
-- **E-T02** — Vérification propriétaire légère (CIN scannée, chiffrée au repos)
-- **E-T03** — EXIF strip systématique + watermark optionnel sur photos
-- **E-T04** — Optimisation bande passante : `srcset` 320/640/1024/1600, blurhash, lazy-load
-- **E-T05** — Badges de confiance ("Propriétaire vérifié", "Annonce vérifiée", "Séjour confirmé")
-- **E-T06** — Notifications email transactionnelles (publication, signalement reçu, etc.)
+### Phase A — Trust signals indépendants
 
+#### T-031 · Avis avec preuve de séjour (`Review.verifiedStay`)
+**En tant que** visiteur étudiant
+**Je veux** voir un badge "Séjour confirmé" sur les avis fiables
+**Afin de** distinguer les vrais témoignages des avis fabriqués
+**Acceptance** :
+- Schema : `Review.verifiedStay Boolean @default(false)` + migration
+- Le flag est calculé **au submit** (`submitReview` service), pas à la lecture (évite N+1 + figeage de l'évaluation au moment du témoignage)
+- Critère MVP v0.5 : présence d'au moins **un** `ContactEvent` avec `(userId === authorId, listingId === review.listingId, createdAt < review.createdAt)`. Proxy raisonnable : "l'étudiant a contacté le proprio via la plateforme avant d'écrire son avis"
+- **Limite documentée** : contact off-platform (WhatsApp direct, in-person) ne déclenche pas le flag → faux-négatif accepté en v0.5
+- UI : badge `"Séjour confirmé"` (icône check + `text-success bg-success/10 rounded-md h-7 px-2.5 text-xs font-medium`) sur `ReviewRow` quand `verifiedStay === true`
+- i18n FR : `reviews.verifiedStay.label`, `.tooltip` ; idem MG
+- Tests : unit sur la logique de détermination (avec/sans ContactEvent antérieur, edge cases timing)
+- Backfill : skip (4 listings actuels, accept stale `false`)
+**Priorité** : P1 · **Statut** : 📋 todo
+
+#### T-032 · EXIF strip explicite Cloudinary (audit M1)
+**En tant qu'**équipe sécurité
+**Je veux** retirer explicitement les EXIF (GPS notamment) avant Cloudinary
+**Afin de** garantir la promesse UI "EXIF retiré" sans dépendre du comportement par défaut
+**Acceptance** :
+- `cloudinary.uploader.upload_stream` reçoit `{ image_metadata: false, exif: false }` dans **tous** les appels (avatar + listing photos)
+- `lib/cloudinary/index.ts` mis à jour, pas de changement d'API publique
+- Test manuel documenté : upload photo avec GPS → `exiftool` sur l'URL Cloudinary doit ne rien retourner
+- Memory : créer `feedback_exif_strip_explicit.md`
+**Priorité** : P1 · **Statut** : 📋 todo
+
+#### T-033 · Badge "Annonce vérifiée" (admin marker)
+**En tant qu'**admin
+**Je veux** marquer manuellement une annonce comme "vérifiée"
+**Afin de** récompenser les bons propriétaires et signaler aux étudiants
+**Acceptance** :
+- Schema : `Listing.verifiedAt DateTime?` + `Listing.verifiedBy String?` (FK soft, pas de cascade — résiste à la suppression de l'admin)
+- Service `verifyListing(adminId, listingId)` + `unverifyListing(adminId, listingId)` avec `requireAdmin()` guard
+- UI admin : bouton "Vérifier" / "Retirer la vérif" sur `/admin/listings` cards, distinct de Suspendre
+- UI public : badge `"Annonce vérifiée"` (icône shield + `text-primary bg-primary/10 rounded-md`) sur :
+  - `PublicListingCard` (overlay top-left, prioritaire sur le status DRAFT/etc — ou aligné dessous)
+  - Page détail (à côté du titre, niveau visuel = status)
+- Email owner sur **première** vérification → consomme T-034 (Phase B). Si T-034 pas encore mergé : log + TODO, pas de blocking
+- Audit trail : la transition non-vérifié → vérifié écrit `verifiedAt` + `verifiedBy` ; retirer la vérif passe `verifiedAt = null` mais on garde `verifiedBy` en historique facultatif (à décider à l'impl)
+- i18n FR/MG : `listing.badge.verified.label`, `admin.listings.verify.cta`, `admin.listings.unverify.cta`, `admin.listings.verify.confirm`
+**Priorité** : P1 · **Statut** : 📋 todo
+
+### Phase B — Email transactionnels (transverse)
+
+#### T-034 · Notifications email transactionnelles (batch 1)
+**En tant qu'**utilisateur (owner/étudiant)
+**Je veux** être notifié par email des events qui me concernent
+**Afin de** rester engagé sans avoir à revenir manuellement
+**Acceptance** :
+- 3 templates dans ce batch :
+  1. **"Annonce publiée"** → owner — déclenché par `publishListing` service
+  2. **"Avis reçu sur ton annonce"** → owner — déclenché par `submitReview` service
+  3. **"Ton annonce est vérifiée"** → owner — déclenché par `verifyListing` service (T-033)
+- Localization : chaque template a une variante FR + MG ; locale lue depuis `User.locale`
+- Architecture : `lib/email/templates/<event>.ts` exporte `subject(locale, data)` + `html(locale, data)` + `text(locale, data)`
+- Sécurité : `escapeHtml()` systématique sur tout user content interpolé (cf memory `feedback_email_header_injection`)
+- Rate-limit dédié par-event-par-userId (e.g. 10/h pour éviter spam si retry-loop)
+- Liens cliquables pointent vers la page concernée (`/dashboard/listings/${id}/edit` ou page détail publique selon contexte)
+- Tests : 1 unit test par template (escape HTML + variable interpolation)
+**Priorité** : P1 · **Statut** : 📋 todo
+
+### Reportés à phases ultérieures v0.5
+
+- **Phase C — Bande passante** (E-T04) : génération `blurhash` au upload (lib `blurhash` côté serveur depuis le Buffer), stockage `Photo.blurhash`, `placeholder="blur"` systémique, script de backfill. ~1 jour.
+- **Phase D — Watermark** (suite E-T03) : Cloudinary transformation overlay AryTrano sur photos listing, opt-in/opt-out à décider. ~1 jour.
+- **E-T06 templates suivants** : "Signalement reçu" (owner), "Réponse à ton avis" (étudiant), "Demande de vérification CIN reçue/approuvée/rejetée" (owner, dépend E-T02 dégelée).
+- **E-T05 badge "Propriétaire vérifié"** : bloqué par E-T02 (frozen).
+
+### 🧊 Gel légal
+
+#### E-T02 · Vérification propriétaire CIN
+**Pourquoi gelé** : stocker une carte d'identité, même chiffrée AES-GCM, soulève des questions de protection des données personnelles à Madagascar qu'on n'a pas tranchées. Le badge "Propriétaire vérifié" reste verrouillé tant que cet épic n'est pas dégelé.
+**Plan technique préparé** (à dégeler quand légalement OK) :
+- Schema OwnerProfile : `cinCiphertext Bytes?`, `cinIvHex String?`, `cinAuthTagHex String?`, `cinKeyVersion Int?`, `cinUploadedAt/VerifiedAt DateTime?`, `cinVerifiedBy String?`, `cinRejectionReason String?`
+- Crypto : AES-256-GCM via `lib/auth/totp.ts` pattern + `env.PII_ENCRYPTION_KEY` déjà déclaré
+- Workflow : upload → magic-bytes sniff → chiffre en RAM → store ciphertext → admin queue → approve/reject → email owner
+- Alternative à considérer : externaliser à un service KYC tiers (Sumsub) — pas dans le scope v0.5
+**Statut** : 🧊 frozen (validation légale Madagascar requise)
 ---
 
 ## 🏗️ v1 — Échelle (épics)

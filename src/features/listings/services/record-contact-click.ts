@@ -28,6 +28,12 @@ export async function recordContactClick(input: {
   channel: ContactChannel
   ipHash: string | null
   userAgent: string | null
+  /**
+   * Signed-in viewer's id, when present. Stamped onto the ContactEvent
+   * so `Review.verifiedStay` (T-031) can confirm the reviewer actually
+   * reached out before writing their avis. Null for anonymous reveals.
+   */
+  viewerId: string | null
 }): Promise<RecordContactClickResult> {
   // Fail-CLOSED on null IP — bucket all unattributable reveals together
   // so a missing X-Forwarded-For header can't be used to bypass the cap.
@@ -66,6 +72,7 @@ export async function recordContactClick(input: {
       channel: input.channel,
       ipHash: input.ipHash ?? 'unknown',
       uaHash,
+      viewerId: input.viewerId,
     },
   })
 
