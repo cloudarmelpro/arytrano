@@ -77,6 +77,14 @@ export const createListingSchema = z.object({
     .max(10, '10 équipements personnalisés maximum')
     .optional()
     .default([]),
+  // T-036 watermark opt-in — owner explicitly enables a Cloudinary text
+  // overlay on public photo URLs. Off by default to avoid surprising
+  // existing owners who haven't asked for it.
+  watermarkOptIn: z
+    .union([z.literal('true'), z.literal('false'), z.boolean()])
+    .transform((v) => v === true || v === 'true')
+    .optional()
+    .default(false),
 })
 
 export type CreateListingInput = z.infer<typeof createListingSchema>

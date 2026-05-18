@@ -413,6 +413,8 @@ export const mg: Record<MessageKey, string> = {
   'listingForm.bedrooms.label': 'Efitra fatoriana',
   'listingForm.bathrooms.label': 'Efitrano fandroana',
   'listingForm.furnished.label': 'Misy fanaka',
+  'listingForm.watermark.label': 'Hampidirana marika « AryTrano » amin’ny sary',
+  'listingForm.watermark.hint': 'Soratra somary mangarahara any ambany ankavanana hisakanana ny fampiasana ny sary amin’ny tranonkala hafa.',
   'listingForm.submit.create': 'Hamorona volavolan-kevitra',
   'listingForm.submit.update': 'Tehirizo ny fanovana',
   'listingForm.submit.saving': 'Mitahiry…',

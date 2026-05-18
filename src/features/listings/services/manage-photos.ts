@@ -4,6 +4,7 @@ import { prisma } from '@/lib/db'
 import { errors } from '@/lib/api/errors'
 import { uploadBuffer, deleteAsset } from '@/lib/cloudinary'
 import { sniffImage } from '@/lib/images/sniff'
+import { computeBlurDataURL } from '@/lib/images/blur-data-url'
 import { parseListingPhotoFile, MAX_PHOTOS_PER_LISTING } from '../schemas'
 
 async function requireOwnerListing(ownerId: string, listingId: string) {
@@ -50,10 +51,24 @@ export async function addListingPhoto(
     throw errors.validation('Fichier non reconnu comme image (JPG, PNG, WebP ou HEIC)')
   }
 
-  const uploaded = await uploadBuffer(buffer, {
-    folder: `arytrano/listings/${listingId}`,
-    transformation: [{ width: 1600, height: 1200, crop: 'limit', quality: 'auto' }],
-  })
+  // Compute the LQIP (low-quality image placeholder) in parallel with the
+  // Cloudinary upload — both operate on the same buffer, neither modifies
+  // it, so we get the wall-clock saving without correctness risk.
+  // The blur computation is best-effort: a failure here shouldn't block
+  // the upload (the consumer falls back to `placeholder="empty"`).
+  const [uploaded, blurDataURL] = await Promise.all([
+    uploadBuffer(buffer, {
+      folder: `arytrano/listings/${listingId}`,
+      transformation: [{ width: 1600, height: 1200, crop: 'limit', quality: 'auto' }],
+    }),
+    computeBlurDataURL(buffer).catch((err) => {
+      console.warn('[add-photo] blurhash compute failed', {
+        listingId,
+        err: err instanceof Error ? err.message : String(err),
+      })
+      return null
+    }),
+  ])
 
   try {
     return await prisma.$transaction(async (tx) => {
@@ -70,6 +85,7 @@ export async function addListingPhoto(
           cloudinaryId: uploaded.publicId,
           width: uploaded.width,
           height: uploaded.height,
+          blurhash: blurDataURL,
           position: count,
         },
         select: {

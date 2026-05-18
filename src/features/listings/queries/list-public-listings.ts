@@ -1,4 +1,5 @@
 import 'server-only'
+import { maybeWatermark } from '@/lib/cloudinary/watermark'
 import { z } from 'zod'
 import type { Amenity, ListingType, Prisma } from '@prisma/client'
 import { prisma } from '@/lib/db'
@@ -150,6 +151,7 @@ export async function listPublicListings(
       type: true,
       priceMonthlyMGA: true,
       verifiedAt: true,
+      watermarkOptIn: true,
       city: { select: { slug: true, nameFr: true } },
       neighborhood: { select: { slug: true, nameFr: true } },
       photos: {
@@ -181,7 +183,12 @@ export async function listPublicListings(
       verifiedAt: r.verifiedAt,
       city: r.city,
       neighborhood: r.neighborhood,
-      photo: r.photos[0] ?? null,
+      photo: r.photos[0]
+        ? {
+            ...r.photos[0],
+            url: maybeWatermark(r.photos[0].url, r.watermarkOptIn),
+          }
+        : null,
     })),
     nextCursor,
     hasMore,

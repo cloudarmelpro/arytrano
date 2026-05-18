@@ -406,6 +406,8 @@ export const frMG = {
   'listingForm.bedrooms.label': 'Chambres',
   'listingForm.bathrooms.label': 'Salles de bains',
   'listingForm.furnished.label': 'Meublé',
+  'listingForm.watermark.label': 'Ajouter un filigrane « AryTrano » sur les photos',
+  'listingForm.watermark.hint': 'Un texte semi-transparent en bas-droite décourage la réutilisation des photos sur d’autres sites.',
   'listingForm.submit.create': 'Créer le brouillon',
   'listingForm.submit.update': 'Enregistrer les modifications',
   'listingForm.submit.saving': 'Enregistrement…',

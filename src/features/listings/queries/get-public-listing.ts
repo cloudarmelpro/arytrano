@@ -1,6 +1,7 @@
 import 'server-only'
 import type { Amenity, ListingType } from '@prisma/client'
 import { prisma } from '@/lib/db'
+import { maybeWatermark } from '@/lib/cloudinary/watermark'
 
 /**
  * Public listing detail — `/[citySlug]/[neighborhoodSlug]/[listingSlug]` (T-013).
@@ -97,6 +98,7 @@ export async function getPublicListing(
       customAmenities: true,
       publishedAt: true,
       verifiedAt: true,
+      watermarkOptIn: true,
       lat: true,
       lng: true,
       city: {
@@ -168,6 +170,9 @@ export async function getPublicListing(
       image: row.owner.image,
       hasPhone: Boolean(row.owner.phone?.trim()),
     },
-    photos: row.photos,
+    photos: row.photos.map((p) => ({
+      ...p,
+      url: maybeWatermark(p.url, row.watermarkOptIn),
+    })),
   }
 }

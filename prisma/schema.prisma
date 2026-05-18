@@ -263,6 +263,12 @@ model Listing {
   verifiedAt      DateTime?
   verifiedBy      String?
 
+  // Owner opt-in watermark (T-036). When true, public-facing photo URLs
+  // get an "AryTrano" Cloudinary text overlay (bottom-right, ~40% opacity).
+  // Default off — zero disruption for existing listings; owner enables
+  // explicitly in the listing edit form to protect against photo re-use.
+  watermarkOptIn  Boolean       @default(false)
+
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt
 

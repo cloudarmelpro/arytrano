@@ -74,6 +74,7 @@ export function ListingForm(props: ListingFormProps) {
             furnished: false,
             amenities: [],
             customAmenities: [],
+            watermarkOptIn: false,
           },
   })
 
@@ -96,6 +97,7 @@ export function ListingForm(props: ListingFormProps) {
       if (values.bedrooms !== undefined) fd.append('bedrooms', String(values.bedrooms))
       if (values.bathrooms !== undefined) fd.append('bathrooms', String(values.bathrooms))
       fd.append('furnished', values.furnished ? 'true' : 'false')
+      fd.append('watermarkOptIn', values.watermarkOptIn ? 'true' : 'false')
       // Amenities: append one entry per checked value so `formData.getAll('amenities')`
       // on the server returns the full string[]. Always send (even empty) so an
       // edit that unchecks the last amenity actually clears the field server-side.
@@ -367,6 +369,28 @@ export function ListingForm(props: ListingFormProps) {
                   onCheckedChange={(c) => field.onChange(c)}
                 />
                 <span>{t('listingForm.furnished.label')}</span>
+              </Label>
+            </Field>
+          )}
+        />
+
+        <Controller
+          name="watermarkOptIn"
+          control={form.control}
+          render={({ field }) => (
+            <Field>
+              <Label className="items-start font-normal">
+                <Checkbox
+                  checked={field.value === true || field.value === 'true'}
+                  onCheckedChange={(c) => field.onChange(c)}
+                  className="mt-0.5"
+                />
+                <span className="flex flex-col gap-0.5">
+                  <span>{t('listingForm.watermark.label')}</span>
+                  <span className="text-xs text-muted-foreground">
+                    {t('listingForm.watermark.hint')}
+                  </span>
+                </span>
               </Label>
             </Field>
           )}

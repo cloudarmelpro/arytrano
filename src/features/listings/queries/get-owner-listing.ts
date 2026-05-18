@@ -18,6 +18,7 @@ export type OwnerListingDetail = {
   furnished: boolean
   amenities: Amenity[]
   customAmenities: string[]
+  watermarkOptIn: boolean
   cityId: string
   neighborhoodId: string
   city: { id: string; slug: string; nameFr: string }
@@ -62,6 +63,7 @@ export async function getOwnerListing(
       furnished: true,
       amenities: true,
       customAmenities: true,
+      watermarkOptIn: true,
       cityId: true,
       neighborhoodId: true,
       publishedAt: true,
