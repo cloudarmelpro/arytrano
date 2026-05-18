@@ -317,6 +317,7 @@ export const frMG = {
   'favorites.page.next': 'Page suivante',
   'favorites.page.pagination': 'Pagination des favoris',
   'sidebar.myListings': 'Mes annonces',
+  'sidebar.verifyOwner': 'Vérification d’identité',
   'sidebar.profile': 'Profil',
   'sidebar.security': 'Sécurité',
   'sidebar.signOut': 'Déconnexion',
@@ -796,6 +797,60 @@ export const frMG = {
   'twofa.disable.submitting': 'Désactivation…',
   'twofa.toast.enabled': 'Le 2FA est activé. Sauvegarde tes codes de récupération.',
   'twofa.toast.disabled': 'Le 2FA est désactivé.',
+
+  // Owner verified badge (T-040)
+  'owner.badge.verified.label': 'Propriétaire vérifié',
+  'owner.badge.verified.tooltip': 'L’identité du propriétaire a été vérifiée par AryTrano.',
+
+  // Admin · CIN review queue (T-039)
+  'admin.cin.title': 'Vérifications d’identité',
+  'admin.cin.lead':
+    'Propriétaires en attente de vérification CIN. Approuver débloque le badge « Propriétaire vérifié » sur leurs annonces.',
+  'admin.cin.empty.title': 'Aucune CIN à examiner.',
+  'admin.cin.empty.lead': 'La file est vide — tout est traité.',
+  'admin.cin.submittedAt': 'Envoyée le {date}',
+  'admin.cin.openImage': 'Voir l’image',
+  'admin.cin.openPdf': 'Voir le PDF',
+  'admin.cin.approve.cta': 'Approuver',
+  'admin.cin.approve.toast.ok': 'Identité confirmée.',
+  'admin.cin.approve.toast.error': 'Impossible d’approuver pour le moment.',
+  'admin.cin.reject.cta': 'Rejeter',
+  'admin.cin.reject.confirm': 'Confirmer le rejet',
+  'admin.cin.reject.cancel': 'Annuler',
+  'admin.cin.reject.reasonPlaceholder':
+    'Motif lisible par le propriétaire (ex : photo floue, recto manquant, document expiré…)',
+  'admin.cin.reject.reasonAria': 'Motif du rejet',
+  'admin.cin.reject.reasonHint': 'De 5 à 500 caractères. Sera affiché au propriétaire.',
+  'admin.cin.reject.tooShort': 'Motif trop court (5 caractères minimum).',
+  'admin.cin.reject.toast.ok': 'Rejet enregistré, le propriétaire est notifié.',
+  'admin.cin.reject.toast.error': 'Impossible de rejeter pour le moment.',
+  'admin.cin.legal.notice':
+    'Chaque ouverture de CIN est journalisée (admin id + date) pour audit. Ne télécharger les bytes hors de cette console est strictement interdit.',
+  'admin.nav.cinQueue': 'Vérifications CIN',
+
+  // Owner CIN verification (T-038/T-039)
+  'verifyOwner.title': 'Vérification d’identité',
+  'verifyOwner.lead':
+    'Envoie une photo nette de ta CIN ou un scan PDF. Un admin vérifie ton identité — cela débloque le badge « Propriétaire vérifié » sur tes annonces.',
+  'verifyOwner.status.none':
+    'Tu n’as pas encore envoyé ta CIN.',
+  'verifyOwner.status.pending.title': 'CIN en cours de vérification',
+  'verifyOwner.status.pending.lead':
+    'Un admin va l’examiner sous quelques jours. Tu seras notifié par email.',
+  'verifyOwner.status.verified.title': 'Identité vérifiée',
+  'verifyOwner.status.verified.lead':
+    'Ton identité est confirmée. Le badge « Propriétaire vérifié » apparaît sur tes annonces.',
+  'verifyOwner.status.rejected.title': 'Vérification refusée',
+  'verifyOwner.status.rejected.lead':
+    'Tu peux renvoyer une nouvelle photo / un nouveau scan en suivant les recommandations.',
+  'verifyOwner.upload.placeholder': 'Clique pour choisir un fichier',
+  'verifyOwner.upload.hint':
+    'JPG, PNG, WebP, HEIC ou PDF. Max 5 Mo. Le document est chiffré avant stockage.',
+  'verifyOwner.upload.submit': 'Envoyer pour vérification',
+  'verifyOwner.upload.resubmit': 'Renvoyer un nouveau document',
+  'verifyOwner.upload.submitting': 'Envoi en cours…',
+  'verifyOwner.legal.notice':
+    'Le document est chiffré au repos (AES-256-GCM) et n’est consulté que par l’équipe modération. Tu peux demander sa suppression à tout moment via le support. Politique de conservation : 6 mois après vérification.',
 } as const
 
 export type MessageKey = keyof typeof frMG

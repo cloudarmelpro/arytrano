@@ -22,6 +22,7 @@ import { ListingMapClient } from '@/features/listings/components/ListingMapClien
 import { AMENITY_CATALOG, AmenityIcon } from '@/features/listings/amenities'
 import { PublicListingCard } from '@/features/listings/components/PublicListingCard'
 import { VerifiedListingBadge } from '@/features/listings/components/VerifiedListingBadge'
+import { VerifiedOwnerBadge } from '@/features/auth/components/VerifiedOwnerBadge'
 import { ReportButton } from '@/features/reports/components/ReportButton'
 import { FavoriteButton } from '@/features/favorites'
 import { getFavoritedListingIds } from '@/features/favorites/queries/get-favorited-listing-ids'
@@ -222,11 +223,12 @@ export default async function PublicListingDetailPage({
           <article className="flex flex-col gap-10">
             {/* Owner card + features (Airbnb-style "Hosted by" + feature highlights) */}
             <section className="flex flex-col gap-6 border-b border-border pb-8">
-              <header className="flex items-center justify-between gap-4">
-                <div>
+              <header className="flex flex-wrap items-center justify-between gap-4">
+                <div className="flex flex-wrap items-center gap-3">
                   <h2 className="text-lg font-semibold text-foreground">
                     {t('detail.owner.hostedBy', { name: listing.owner.displayName })}
                   </h2>
+                  {listing.owner.verifiedAt && <VerifiedOwnerBadge />}
                 </div>
               </header>
 

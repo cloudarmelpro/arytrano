@@ -324,6 +324,7 @@ export const mg: Record<MessageKey, string> = {
   'favorites.page.next': 'Pejy manaraka',
   'favorites.page.pagination': 'Pejy ireo tiana',
   'sidebar.myListings': 'Ny tranoko',
+  'sidebar.verifyOwner': 'Fanamarinana maha-ianao',
   'sidebar.profile': 'Mombamomba',
   'sidebar.security': 'Filaminana',
   'sidebar.signOut': 'Hivoaka',
@@ -803,4 +804,58 @@ export const mg: Record<MessageKey, string> = {
   'twofa.disable.submitting': 'Atsahatra…',
   'twofa.toast.enabled': 'Mihodina ny 2FA. Tehirizo ny kaody famerenana.',
   'twofa.toast.disabled': 'Voatsahatra ny 2FA.',
+
+  // Owner verified badge (T-040)
+  'owner.badge.verified.label': 'Tompo voamarina',
+  'owner.badge.verified.tooltip': 'Nohamarinin’ny AryTrano ny maha-tompony.',
+
+  // Admin · CIN review queue (T-039)
+  'admin.cin.title': 'Fanamarinana maha-olona',
+  'admin.cin.lead':
+    'Tompon-trano miandry fanamarinana CIN. Manamarina dia mamoaka ny marika « Tompo voamarina » amin’ireo filazana.',
+  'admin.cin.empty.title': 'Tsy misy CIN tokony jerena.',
+  'admin.cin.empty.lead': 'Foana ny filaharana — vita ny rehetra.',
+  'admin.cin.submittedAt': 'Nalefa tamin’ny {date}',
+  'admin.cin.openImage': 'Jereo ny sary',
+  'admin.cin.openPdf': 'Jereo ny PDF',
+  'admin.cin.approve.cta': 'Hamarino',
+  'admin.cin.approve.toast.ok': 'Voamarina ny maha-olona.',
+  'admin.cin.approve.toast.error': 'Tsy nahomby ny fanamarinana.',
+  'admin.cin.reject.cta': 'Lavina',
+  'admin.cin.reject.confirm': 'Hamafiso ny fandavana',
+  'admin.cin.reject.cancel': 'Hanafoana',
+  'admin.cin.reject.reasonPlaceholder':
+    'Antony hojeren’ny tompony (ohatra : sary tsy mazava, tsy ampy lafiny, lasa daty…)',
+  'admin.cin.reject.reasonAria': 'Antony nandavana',
+  'admin.cin.reject.reasonHint': 'Eo amin’ny 5 ka hatramin’ny 500 litera. Hiseho amin’ny tompony.',
+  'admin.cin.reject.tooShort': 'Antony fohy loatra (5 litera farafahakeliny).',
+  'admin.cin.reject.toast.ok': 'Voarakitra ny fandavana, voafampahafantatra ny tompony.',
+  'admin.cin.reject.toast.error': 'Tsy nahomby ny fandavana.',
+  'admin.cin.legal.notice':
+    'Voarakitra (admin id + daty) isaky ny manokatra CIN ho an’ny fanara-maso. Tsy azo entina mihitsy ny tahirin-kevitra eo ivelan’ity sehatra ity.',
+  'admin.nav.cinQueue': 'Fanamarinana CIN',
+
+  // Owner CIN verification (T-038/T-039)
+  'verifyOwner.title': 'Fanamarinana ny maha-ianao',
+  'verifyOwner.lead':
+    'Andefaso sary mazava na PDF an’ny CIN-nao. Manamarina ny mpitantana, ary hihoma-batsy ny marika « Tompo voamarina » amin’ireo filazanao.',
+  'verifyOwner.status.none':
+    'Mbola tsy nandefa ny CIN-nao ianao.',
+  'verifyOwner.status.pending.title': 'CIN miandry fanamarinana',
+  'verifyOwner.status.pending.lead':
+    'Hojeren’ny mpitantana izany ato anatin’ny andro vitsivitsy. Holazaina aminao amin’ny mailaka.',
+  'verifyOwner.status.verified.title': 'Voamarina ny maha-ianao',
+  'verifyOwner.status.verified.lead':
+    'Voamarina ny maha-ianao. Hiseho amin’ireo filazanao ny marika « Tompo voamarina ».',
+  'verifyOwner.status.rejected.title': 'Tsy ekena ny fanamarinana',
+  'verifyOwner.status.rejected.lead':
+    'Afaka mandefa sary na PDF vaovao ianao araka ny torohevitra.',
+  'verifyOwner.upload.placeholder': 'Tsindrio hisafidianana rakitra',
+  'verifyOwner.upload.hint':
+    'JPG, PNG, WebP, HEIC na PDF. 5 Mo no farany. Voafonosina alohan’ny fitehirizana ny tahirin-kevitra.',
+  'verifyOwner.upload.submit': 'Alefa hijerena',
+  'verifyOwner.upload.resubmit': 'Andefasana indray ny tahirin-kevitra',
+  'verifyOwner.upload.submitting': 'Mandefa…',
+  'verifyOwner.legal.notice':
+    'Voafonosina (AES-256-GCM) ny tahirin-kevitra ary ny ekipa moderasiona ihany no afaka mijery. Afaka mangataka ny famafana izy io amin’ny alalan’ny support. Maharitra 6 volana taorian’ny fanamarinana ny fitehirizana.',
 }

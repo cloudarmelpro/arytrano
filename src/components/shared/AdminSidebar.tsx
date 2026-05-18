@@ -73,6 +73,17 @@ function IconFlag() {
   )
 }
 
+function IconIdCard() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <rect x="2" y="5" width="20" height="14" rx="2" />
+      <circle cx="8" cy="12" r="2.5" />
+      <line x1="14" y1="10" x2="19" y2="10" />
+      <line x1="14" y1="14" x2="17" y2="14" />
+    </svg>
+  )
+}
+
 /**
  * Top-level section roots (e.g. `/admin`, `/dashboard`) match only on
  * exact pathname — otherwise their prefix swallows every sub-route and
@@ -100,6 +111,11 @@ const buildSections = (openReports: number): Section[] => [
         labelKey: 'admin.nav.reports',
         icon: <IconFlag />,
         badge: openReports,
+      },
+      {
+        href: '/admin/owner-verifications',
+        labelKey: 'admin.nav.cinQueue',
+        icon: <IconIdCard />,
       },
     ],
   },

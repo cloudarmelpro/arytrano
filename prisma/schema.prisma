@@ -166,15 +166,34 @@ enum LoginAuthMethod {
 // ============================================================
 
 model OwnerProfile {
-  id            String    @id @default(cuid())
-  userId        String    @unique
-  cinCiphertext Bytes?    // encrypted CIN at rest
-  cinIv         Bytes?    // AES-GCM IV
-  verifiedAt    DateTime?
-  verifiedBy    String?   // admin userId
-  notes         String?   @db.Text
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  id                  String    @id @default(cuid())
+  userId              String    @unique
+  // CIN (national ID) — encrypted at rest with AES-256-GCM, key derived
+  // from `env.PII_ENCRYPTION_KEY`. NEVER decrypt outside the admin
+  // verification flow. The DB rows are useless without the env key.
+  cinCiphertext       Bytes?
+  cinIv               Bytes?
+  cinAuthTag          Bytes?
+  // Key version — bumped on rotation so old ciphertext can be decrypted
+  // with the previous key while new uploads use the current one.
+  cinKeyVersion       Int       @default(1)
+  // Stored alongside the ciphertext so the admin viewer can serve the
+  // right Content-Type when displaying the decrypted image.
+  cinMimeType         String?
+  cinUploadedAt       DateTime?
+  // Admin verification outcome (T-039). `verifiedAt` is set on approve;
+  // `cinRejectionReason` is set on reject (user-facing message). The two
+  // are mutually exclusive — an admin re-review clears the previous
+  // outcome before writing the new one.
+  verifiedAt          DateTime?
+  verifiedBy          String?   // admin userId who approved
+  cinRejectionReason  String?   @db.Text
+  cinRejectedAt       DateTime?
+  cinRejectedBy       String?   // admin userId who rejected
+  // Admin-internal annotations — not shown to the owner.
+  notes               String?   @db.Text
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

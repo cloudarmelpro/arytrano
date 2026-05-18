@@ -8,6 +8,8 @@ export type TransactionalEventType =
   | 'listing-verified'
   | 'report-received'
   | 'review-replied'
+  | 'cin-approved'
+  | 'cin-rejected'
 
 /**
  * Wrap `sendEmail` with per-user-per-event rate limiting (T-034). Used by

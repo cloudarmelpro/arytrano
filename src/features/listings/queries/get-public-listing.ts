@@ -58,6 +58,8 @@ export type PublicListingDetail = {
     image: string | null
     /** True if the owner has a phone on file (for the contact buttons UI). */
     hasPhone: boolean
+    /** Truthy when the owner's CIN has been admin-verified (T-040). */
+    verifiedAt: Date | null
   }
   photos: Array<{
     id: string
@@ -107,7 +109,14 @@ export async function getPublicListing(
       neighborhood: {
         select: { id: true, slug: true, nameFr: true, nameMg: true, lat: true, lng: true },
       },
-      owner: { select: { name: true, image: true, phone: true } },
+      owner: {
+        select: {
+          name: true,
+          image: true,
+          phone: true,
+          ownerProfile: { select: { verifiedAt: true } },
+        },
+      },
       photos: {
         orderBy: { position: 'asc' },
         select: {
@@ -169,6 +178,7 @@ export async function getPublicListing(
       displayName,
       image: row.owner.image,
       hasPhone: Boolean(row.owner.phone?.trim()),
+      verifiedAt: row.owner.ownerProfile?.verifiedAt ?? null,
     },
     photos: row.photos.map((p) => ({
       ...p,

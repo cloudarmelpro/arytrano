@@ -20,6 +20,13 @@ export {
   type AvatarFileInput,
 } from './avatar'
 export {
+  cinFileSchema,
+  parseCinFile,
+  CIN_MAX_BYTES,
+  CIN_ACCEPTED_TYPES,
+  type CinFileInput,
+} from './cin'
+export {
   listLoginEventsQuerySchema,
   type ListLoginEventsQuery,
 } from './list-login-events'

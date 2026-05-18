@@ -165,6 +165,11 @@ const SECTIONS: Section[] = [
         labelKey: 'sidebar.myListings',
         icon: <IconHome />,
       },
+      {
+        href: '/dashboard/verify-owner',
+        labelKey: 'sidebar.verifyOwner',
+        icon: <IconShield />,
+      },
     ],
   },
   {
