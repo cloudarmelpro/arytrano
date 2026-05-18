@@ -1,6 +1,6 @@
 'use server'
 
-import { cookies } from 'next/headers'
+import { cookies, headers } from 'next/headers'
 import { z } from 'zod'
 import { env } from '@/lib/env'
 import { signIn } from '../auth'
@@ -17,10 +17,37 @@ import { oauthProviderSchema, type OAuthProvider } from '../schemas'
  */
 const intendedRoleSchema = z.enum(['STUDENT', 'OWNER']).optional()
 
+/**
+ * Defence-in-depth same-origin check for the role-cookie write. Next.js
+ * Server Actions already enforce same-origin on the action POST, but a
+ * second explicit check here protects against future framework changes
+ * and against a misconfigured reverse proxy stripping the Origin header.
+ *
+ * Allowed origins: the AUTH_URL host plus dev localhost.
+ */
+async function assertSameOrigin() {
+  const h = await headers()
+  const origin = h.get('origin')
+  if (!origin) return // some legitimate clients omit it — Next's CSRF guard is the primary check
+  let originHost: string
+  try {
+    originHost = new URL(origin).host
+  } catch {
+    throw new Error('Origine invalide.')
+  }
+  const expectedHost = new URL(env.AUTH_URL).host
+  const isDev = env.NODE_ENV !== 'production'
+  const okDev = isDev && (originHost === 'localhost:3000' || originHost.startsWith('127.0.0.1'))
+  if (originHost !== expectedHost && !okDev) {
+    throw new Error('Origine non autorisée.')
+  }
+}
+
 export async function signInWithProvider(
   provider: OAuthProvider,
   intendedRole?: 'STUDENT' | 'OWNER',
 ) {
+  await assertSameOrigin()
   const parsedProvider = oauthProviderSchema.parse(provider)
   const parsedRole = intendedRoleSchema.parse(intendedRole)
 

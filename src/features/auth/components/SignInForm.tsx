@@ -102,11 +102,12 @@ export function SignInForm({
               onChange={(e) => setTotpCode(e.target.value.slice(0, 20))}
               maxLength={20}
               aria-invalid={!!totpError}
+              aria-describedby={totpError ? 'sign-in-totp-error sign-in-totp-hint' : 'sign-in-totp-hint'}
               disabled={pending}
               className="h-10 font-mono tracking-widest"
             />
-            <FieldDescription>{t('signIn.twofa.code.hint')}</FieldDescription>
-            {totpError && <FieldError errors={[{ message: totpError }]} />}
+            <FieldDescription id="sign-in-totp-hint">{t('signIn.twofa.code.hint')}</FieldDescription>
+            {totpError && <FieldError id="sign-in-totp-error" errors={[{ message: totpError }]} />}
           </Field>
 
           <div className="flex flex-col gap-2 sm:flex-row sm:justify-end">
@@ -157,10 +158,13 @@ export function SignInForm({
                 autoComplete="email"
                 placeholder={t('signIn.email.placeholder')}
                 aria-invalid={fieldState.invalid}
+                aria-describedby={fieldState.invalid ? 'sign-in-email-error' : undefined}
                 disabled={pending}
                 className='h-10'
               />
-              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+              {fieldState.invalid && (
+                <FieldError id="sign-in-email-error" errors={[fieldState.error]} />
+              )}
             </Field>
           )}
         />
@@ -188,6 +192,7 @@ export function SignInForm({
                 type={showPassword ? 'text' : 'password'}
                 autoComplete="current-password"
                 aria-invalid={fieldState.invalid}
+                aria-describedby={fieldState.invalid ? 'sign-in-password-error' : undefined}
                 placeholder='********'
                 disabled={pending}
                 className='h-10'
@@ -197,7 +202,9 @@ export function SignInForm({
                   {t('signIn.forgot')}
                 </Link>
               </FieldDescription>
-              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+              {fieldState.invalid && (
+                <FieldError id="sign-in-password-error" errors={[fieldState.error]} />
+              )}
             </Field>
           )}
         />

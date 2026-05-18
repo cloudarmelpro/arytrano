@@ -13,7 +13,7 @@ import { buildOtpAuthUrl } from '@/lib/auth/totp'
 
 const codeSchema = z.string().trim().min(6).max(10)
 
-export type TotpSetupState =
+type TotpSetupState =
   | { ok: false; message: string }
   | {
       ok: true
@@ -53,7 +53,7 @@ const enableSchema = z.object({
   code: z.string().regex(/^\d{6}$/, 'Code à 6 chiffres'),
 })
 
-export type EnableTotpState =
+type EnableTotpState =
   | { ok: false; message: string }
   | { ok: true; recoveryCodes: string[] }
 
@@ -91,7 +91,7 @@ export async function enableTotpAction(input: {
   }
 }
 
-export type DisableTotpState = { ok: boolean; message?: string }
+type DisableTotpState = { ok: boolean; message?: string }
 
 export async function disableTotpAction(code: string): Promise<DisableTotpState> {
   const session = await auth()

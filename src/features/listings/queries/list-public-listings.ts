@@ -78,7 +78,7 @@ export type PublicListingCard = {
   slug: string
   title: string
   type: ListingType
-  priceMonthlyMGA: string // Decimal serialized to string
+  priceMonthlyMGA: number
   city: { slug: string; nameFr: string }
   neighborhood: { slug: string; nameFr: string }
   photo: {
@@ -174,7 +174,7 @@ export async function listPublicListings(
       slug: r.slug,
       title: r.title,
       type: r.type,
-      priceMonthlyMGA: r.priceMonthlyMGA.toString(),
+      priceMonthlyMGA: r.priceMonthlyMGA,
       city: r.city,
       neighborhood: r.neighborhood,
       photo: r.photos[0] ?? null,

@@ -73,7 +73,8 @@ export default async function FavoritesPage({
                 key={l.id}
                 listing={l}
                 t={t}
-                // All cards on this page are favorited by definition.
+                // Page is auth-gated and every card here is favorited.
+                authenticated
                 initialFavorited
               />
             ))}

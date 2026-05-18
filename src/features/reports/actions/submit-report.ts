@@ -9,7 +9,7 @@ import { auth } from '@/features/auth'
 import { createReport } from '../services/create-report'
 import { createReportSchema } from '../schemas/create-report'
 
-export type SubmitReportState = {
+type SubmitReportState = {
   ok: boolean
   message?: string
 }

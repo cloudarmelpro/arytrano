@@ -191,3 +191,12 @@ async function consumeRecoveryCode(input: {
 export async function countActiveRecoveryCodes(userId: string): Promise<number> {
   return prisma.recoveryCode.count({ where: { userId, usedAt: null } })
 }
+
+/** Whether the user has TOTP 2FA enabled — read from settings page. */
+export async function isTotpEnabled(userId: string): Promise<boolean> {
+  const row = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { totpEnabledAt: true },
+  })
+  return Boolean(row?.totpEnabledAt)
+}

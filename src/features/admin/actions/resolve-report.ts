@@ -4,9 +4,9 @@ import { revalidatePath } from 'next/cache'
 import { ApiError } from '@/lib/api/errors'
 import { resolveReportSchema } from '../schemas/resolve-report'
 import { resolveReport } from '../services/resolve-report'
-import { requireAdmin } from './require-admin'
+import { requireAdmin } from '../services/require-admin'
 
-export type ResolveReportState = { ok: boolean; message?: string }
+type ResolveReportState = { ok: boolean; message?: string }
 
 /**
  * Server Action wrapper around `resolveReport` (admin moderation).

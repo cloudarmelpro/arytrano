@@ -7,7 +7,7 @@ import { auth } from '@/features/auth'
 import { respondToReviewSchema } from '../schemas/create-review'
 import { respondToReview } from '../services/respond-to-review'
 
-export type RespondToReviewState = {
+type RespondToReviewState = {
   ok: boolean
   message?: string
 }

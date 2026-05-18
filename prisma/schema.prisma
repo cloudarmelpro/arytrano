@@ -226,7 +226,10 @@ model Listing {
   slug            String        // SEO slug, computed from title + suffix of id
   description     String        @db.Text
   type            ListingType
-  priceMonthlyMGA Decimal       @db.Decimal(12, 2)
+  // Ariary has no subunit (the iraimbilanja is defunct). Integer storage
+  // saves bytes, avoids Decimal/string interop bugs in JS, and matches
+  // the Zod schema that already validates the input as a positive int.
+  priceMonthlyMGA Int
   surfaceM2       Int?
   bedrooms        Int?
   bathrooms       Int?
@@ -264,7 +267,10 @@ model Listing {
   favorites     Favorite[]
   payments      Payment[]
 
-  @@unique([slug])
+  // Slug is unique PER neighborhood (matches the URL path
+  // /[city]/[neighborhood]/[slug]) so the same slug can recur across
+  // different neighborhoods without forcing ugly suffixes.
+  @@unique([neighborhoodId, slug])
   @@index([status, cityId, neighborhoodId])
   @@index([status, publishedAt(sort: Desc)])
   @@index([status, priceMonthlyMGA])

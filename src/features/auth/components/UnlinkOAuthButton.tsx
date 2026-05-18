@@ -1,7 +1,11 @@
 'use client'
 
 import { useActionState } from 'react'
-import { unlinkOAuthAction, type UnlinkActionState } from '../actions/unlink-oauth'
+import { unlinkOAuthAction } from '../actions/unlink-oauth'
+
+// Derive the state type from the action so the action file can keep its
+// `'use server'` exports-only-async-functions invariant.
+type UnlinkActionState = Awaited<ReturnType<typeof unlinkOAuthAction>>
 
 const initial: UnlinkActionState = { ok: false }
 

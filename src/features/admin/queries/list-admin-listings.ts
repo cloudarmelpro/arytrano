@@ -36,7 +36,7 @@ export type AdminListingRow = {
   title: string
   type: ListingType
   status: ListingStatus
-  priceMonthlyMGA: string
+  priceMonthlyMGA: number
   city: { nameFr: string; slug: string }
   neighborhood: { nameFr: string; slug: string }
   owner: { id: string; name: string | null; email: string }
@@ -102,7 +102,7 @@ export async function listAdminListings(
       title: r.title,
       type: r.type,
       status: r.status,
-      priceMonthlyMGA: r.priceMonthlyMGA.toString(),
+      priceMonthlyMGA: r.priceMonthlyMGA,
       city: r.city,
       neighborhood: r.neighborhood,
       owner: r.owner,

@@ -1,5 +1,5 @@
 import 'server-only'
-import { cookies } from 'next/headers'
+import { cookies, headers } from 'next/headers'
 import NextAuth, { type NextAuthConfig } from 'next-auth'
 import Credentials from 'next-auth/providers/credentials'
 import Google from 'next-auth/providers/google'
@@ -122,6 +122,37 @@ if (env.GMAIL_USER && env.GMAIL_APP_PASSWORD) {
         auth: { user: env.GMAIL_USER, pass: env.GMAIL_APP_PASSWORD },
       },
       from: env.EMAIL_FROM ?? env.GMAIL_USER,
+      // Rate-limit BEFORE sending so an attacker cannot spam arbitrary
+      // inboxes via our Gmail relay (DoS + Gmail-rep damage). 3/email/h
+      // + 10/IP/h matches the forgot-password ceiling — both are
+      // outbound-email actions reachable without authentication.
+      async sendVerificationRequest({ identifier, url, provider }) {
+        const h = await headers()
+        const { ipHash } = extractRequestInfo(h)
+        // Fail-CLOSED on missing IP: bucket all no-IP traffic together so
+        // an absent x-forwarded-for header can't grant unlimited sends.
+        const rl = await rateLimiters.signInEmail(
+          identifier,
+          ipHash ?? 'noip:signin-email',
+        )
+        if (!rl.success) {
+          throw new Error('Trop de tentatives. Réessaie dans une heure.')
+        }
+        const nodemailer = await import('nodemailer')
+        const transport = nodemailer.createTransport(provider.server)
+        await transport.sendMail({
+          to: identifier,
+          from: provider.from,
+          subject: 'Connexion à AryTrano',
+          text: `Bonjour,\n\nClique sur ce lien pour te connecter à AryTrano :\n${url}\n\nSi tu n'as pas demandé ce lien, ignore cet email.\n`,
+          html: `
+            <p>Bonjour,</p>
+            <p>Clique sur ce lien pour te connecter à AryTrano :</p>
+            <p><a href="${url}">${url}</a></p>
+            <p style="color:#666;font-size:12px">Si tu n'as pas demandé ce lien, ignore cet email.</p>
+          `,
+        })
+      },
     }),
   )
 }

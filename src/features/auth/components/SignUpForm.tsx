@@ -81,10 +81,13 @@ export function SignUpForm({
                 autoComplete="name"
                 placeholder={t('signUp.name.placeholder')}
                 aria-invalid={fieldState.invalid}
+                aria-describedby={fieldState.invalid ? 'sign-up-name-error' : undefined}
                 disabled={pending}
                 className='h-10'
               />
-              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+              {fieldState.invalid && (
+                <FieldError id="sign-up-name-error" errors={[fieldState.error]} />
+              )}
             </Field>
           )}
         />
@@ -102,10 +105,13 @@ export function SignUpForm({
                 autoComplete="email"
                 placeholder={t('signUp.email.placeholder')}
                 aria-invalid={fieldState.invalid}
+                aria-describedby={fieldState.invalid ? 'sign-up-email-error' : undefined}
                 disabled={pending}
                 className='h-10'
               />
-              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+              {fieldState.invalid && (
+                <FieldError id="sign-up-email-error" errors={[fieldState.error]} />
+              )}
             </Field>
           )}
         />
@@ -134,11 +140,14 @@ export function SignUpForm({
                 autoComplete="new-password"
                 minLength={8}
                 aria-invalid={fieldState.invalid}
+                aria-describedby={fieldState.invalid ? 'sign-up-password-error' : undefined}
                 disabled={pending}
                 className='h-10'
               />
               <PasswordStrengthMeter value={password} />
-              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+              {fieldState.invalid && (
+                <FieldError id="sign-up-password-error" errors={[fieldState.error]} />
+              )}
             </Field>
           )}
         />

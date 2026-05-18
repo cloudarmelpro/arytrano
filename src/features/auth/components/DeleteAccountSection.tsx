@@ -121,8 +121,11 @@ export function DeleteAccountSection() {
                 disabled={pending}
                 className="focus-visible:ring-destructive"
                 aria-invalid={fieldState.invalid}
+                aria-describedby={fieldState.invalid ? 'delete-confirm-error' : undefined}
               />
-              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+              {fieldState.invalid && (
+                <FieldError id="delete-confirm-error" errors={[fieldState.error]} />
+              )}
             </Field>
           )}
         />

@@ -3,18 +3,10 @@
 import { useMemo, useTransition } from 'react'
 import { useRouter, useSearchParams, usePathname } from 'next/navigation'
 import { Button } from '@/components/ui/button'
-import { Field, FieldGroup, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
 import { useT } from '@/lib/i18n/client'
 
-const STATUSES = ['', 'DRAFT', 'PUBLISHED', 'UNAVAILABLE', 'SUSPENDED', 'DELETED'] as const
+type StatusTab = { value: '' | 'DRAFT' | 'PUBLISHED' | 'UNAVAILABLE' | 'SUSPENDED' | 'DELETED'; label: string }
 
 export function AdminListingsFilters() {
   const router = useRouter()
@@ -26,7 +18,7 @@ export function AdminListingsFilters() {
   const currentStatus = params.get('status') ?? ''
   const currentQ = params.get('q') ?? ''
 
-  const statusItems = useMemo(
+  const tabs = useMemo<StatusTab[]>(
     () => [
       { value: '', label: t('admin.listings.filter.status.all') },
       { value: 'DRAFT', label: t('status.DRAFT') },
@@ -58,52 +50,52 @@ export function AdminListingsFilters() {
   const hasFilter = Boolean(currentStatus || currentQ)
 
   return (
-    <div>
-      <FieldGroup className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end">
-        <Field className="sm:w-48">
-          <FieldLabel htmlFor="admin-filter-status">
-            {t('admin.listings.filter.status')}
-          </FieldLabel>
-          <Select
-            value={currentStatus}
-            onValueChange={(v) => update('status', v ?? '')}
-            items={statusItems}
-            disabled={pending}
-          >
-            <SelectTrigger id="admin-filter-status" className="h-10 w-full">
-              <SelectValue placeholder={t('admin.listings.filter.status.all')} />
-            </SelectTrigger>
-            <SelectContent>
-              {statusItems.map((it) => (
-                <SelectItem key={it.value || 'all'} value={it.value}>
-                  {it.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </Field>
+    <div className="flex flex-col gap-4">
+      {/* Status filter — buttons row, mirrors /admin/reports tab pattern */}
+      <nav
+        className="flex flex-wrap gap-2"
+        aria-label={t('admin.listings.filter.status')}
+      >
+        {tabs.map((tab) => {
+          const active = currentStatus === tab.value
+          return (
+            <button
+              key={tab.value || 'all'}
+              type="button"
+              onClick={() => update('status', tab.value)}
+              disabled={pending}
+              aria-pressed={active}
+              className={`inline-flex h-8 cursor-pointer items-center rounded-md px-3 text-xs font-medium transition disabled:cursor-not-allowed disabled:opacity-60 ${
+                active
+                  ? 'bg-primary/10 text-primary'
+                  : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+              }`}
+            >
+              {tab.label}
+            </button>
+          )
+        })}
+      </nav>
 
-        <Field className="flex-1 sm:max-w-md">
-          <FieldLabel htmlFor="admin-filter-q">
-            {t('admin.listings.search.label')}
-          </FieldLabel>
-          <Input
-            key={`q-${currentQ}`}
-            id="admin-filter-q"
-            type="search"
-            defaultValue={currentQ}
-            placeholder={t('admin.listings.search.placeholder')}
-            onBlur={(e) => update('q', e.target.value.trim())}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') {
-                e.preventDefault()
-                update('q', e.currentTarget.value.trim())
-              }
-            }}
-            disabled={pending}
-            className="h-10"
-          />
-        </Field>
+      {/* Search + reset */}
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+        <Input
+          key={`q-${currentQ}`}
+          id="admin-filter-q"
+          type="search"
+          defaultValue={currentQ}
+          placeholder={t('admin.listings.search.placeholder')}
+          aria-label={t('admin.listings.search.label')}
+          onBlur={(e) => update('q', e.target.value.trim())}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              e.preventDefault()
+              update('q', e.currentTarget.value.trim())
+            }
+          }}
+          disabled={pending}
+          className="h-10 sm:max-w-md"
+        />
 
         {hasFilter && (
           <Button
@@ -112,12 +104,11 @@ export function AdminListingsFilters() {
             size="default"
             onClick={reset}
             disabled={pending}
-            className="self-end"
           >
             {t('filters.reset')}
           </Button>
         )}
-      </FieldGroup>
+      </div>
     </div>
   )
 }

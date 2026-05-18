@@ -97,8 +97,12 @@
   --accent: oklch(0.94 0.040 277);
   --accent-foreground: var(--brand-midnight);
 
-  --destructive: oklch(0.577 0.215 27.5);
-  --success: oklch(0.66 0.16 145);
+  /* Darker variants so `text-destructive` / `text-success` at text-xs over
+     near-white surfaces (bg-X/10, bg-card) clear WCAG 4.5:1. The old values
+     (0.577 / 0.66 lightness) were ~4.1:1 and ~3.7:1 — borderline + fail
+     respectively for body text. */
+  --destructive: oklch(0.45 0.21 27.5);
+  --success: oklch(0.42 0.14 145);
   --success-foreground: oklch(0.99 0 0);
 
   --border: oklch(0.92 0.008 256);
@@ -177,5 +181,21 @@
   h1 {
     font-weight: 600;
     letter-spacing: -0.01em;
+  }
+}
+
+/* Respect users who request reduced motion — vestibular safety + battery
+   on low-end Madagascar Android devices. Spinners and Dialog animations
+   (Base UI + tw-animate-css) all opt out via near-zero durations rather
+   than `animation: none` so transitions still fire their `end` events
+   the layout code relies on. WCAG 2.3.3. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }

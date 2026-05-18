@@ -7,3 +7,4 @@
  */
 export { toggleFavoriteAction } from './actions/toggle-favorite'
 export { FavoriteButton } from './components/FavoriteButton'
+export { FavoriteSignInPrompt } from './components/FavoriteSignInPrompt'

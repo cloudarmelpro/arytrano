@@ -6,9 +6,9 @@ import { ApiError } from '@/lib/api/errors'
 import { zodIssuesToFields } from '@/lib/forms/zod-fields'
 import { suspendListing } from '../services/suspend-listing'
 import { suspendListingSchema } from '../schemas/suspend-listing'
-import { requireAdmin } from './require-admin'
+import { requireAdmin } from '../services/require-admin'
 
-export type SuspendListingActionState = {
+type SuspendListingActionState = {
   ok: boolean
   message?: string
   fields?: Record<string, string[]>

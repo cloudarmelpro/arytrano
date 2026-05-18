@@ -8,7 +8,7 @@ import { toggleListingAvailability } from '../services/toggle-availability'
 import { deleteListing } from '../services/delete-listing'
 import { listingIdSchema } from '../schemas'
 
-export type ListingActionState = { ok: boolean; message?: string }
+type ListingActionState = { ok: boolean; message?: string }
 
 async function requireOwner(): Promise<
   { ok: true; userId: string } | { ok: false; error: ListingActionState }

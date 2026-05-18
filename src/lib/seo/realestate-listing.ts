@@ -10,7 +10,7 @@ export type RealEstateListingForLd = {
   slug: string
   lat: string
   lng: string
-  priceMonthlyMGA: string
+  priceMonthlyMGA: number
   surfaceM2: number | null
   bedrooms: number | null
   bathrooms: number | null
@@ -24,9 +24,10 @@ export type RealEstateListingForLd = {
  * Schema.org BreadcrumbList for the listing detail page. Google uses this
  * to render the breadcrumb trail in SERP snippets (CTR boost for local search).
  *
- * Note: the city + neighborhood crumbs currently link to /annonces (we don't
- * have dedicated city/neighborhood landing pages yet — T-017 era plan). When
- * those land, swap the `item` values to the dedicated URLs.
+ * Note: the city-level crumb is intentionally omitted until a dedicated
+ * city landing page exists (T-015 v0.5). Emitting it now would duplicate
+ * position 1's URL and fail Rich Results validation, costing the breadcrumb
+ * snippet entirely. We restore the 4-item trail once /[city]/ lands.
  */
 export function buildBreadcrumbListLd(
   listing: RealEstateListingForLd,
@@ -46,21 +47,12 @@ export function buildBreadcrumbListLd(
       {
         '@type': 'ListItem',
         position: 2,
-        name: listing.city.nameFr,
-        // City-level page doesn't exist yet (T-015 v0.5 — dedicated city
-        // landing). Point to `/annonces` (unfiltered) until then so the
-        // crumb doesn't share the same URL as position 3.
-        item: `${baseUrl}/annonces`,
-      },
-      {
-        '@type': 'ListItem',
-        position: 3,
         name: listing.neighborhood.nameFr,
         item: `${baseUrl}/annonces?neighborhood=${listing.neighborhood.slug}`,
       },
       {
         '@type': 'ListItem',
-        position: 4,
+        position: 3,
         name: listing.title,
         item: detailUrl,
       },
@@ -91,10 +83,11 @@ export function buildRealEstateListingLd(
   const url = `${baseUrl}/${listing.city.slug}/${listing.neighborhood.slug}/${listing.slug}`
 
   // Google's RichResults validator flags coordinates and prices when they
-  // arrive as strings — parse the Decimal-derived strings back to numbers.
+  // arrive as strings — coordinates still come in as Decimal-serialized
+  // strings, so parse those; price is now a plain integer (Ariary).
   const latitude = parseFloat(listing.lat)
   const longitude = parseFloat(listing.lng)
-  const price = parseFloat(listing.priceMonthlyMGA)
+  const price = listing.priceMonthlyMGA
 
   return {
     '@context': 'https://schema.org',
@@ -102,7 +95,10 @@ export function buildRealEstateListingLd(
     name: listing.title,
     description: listing.description.slice(0, 500),
     url,
-    ...(listing.publishedAt && { datePublished: listing.publishedAt.toISOString() }),
+    // `datePosted` is the canonical property for classified-style content
+    // (jobs, real estate, vehicles) per Google's rich-results guide for
+    // RealEstateListing. `datePublished` is silently ignored in that context.
+    ...(listing.publishedAt && { datePosted: listing.publishedAt.toISOString() }),
     ...(listing.photos.length > 0 && { image: listing.photos.map((p) => p.url) }),
     geo: {
       '@type': 'GeoCoordinates',
@@ -138,10 +134,11 @@ export function buildRealEstateListingLd(
         unitCode: 'MTK', // ISO 8601: square meters
       },
     }),
-    // Google's local-real-estate signal — match the "X pièces" search phrasing.
-    // We map bedrooms → numberOfRooms (closest semantic match given our schema).
+    // `numberOfBedrooms` is the precise property; `numberOfRooms` (total
+    // rooms incl. living/dining/etc.) is dropped because we only have
+    // bedroom count — setting it to `bedrooms` would mis-signal a studio
+    // as a 1-piece dwelling.
     ...(typeof listing.bedrooms === 'number' && {
-      numberOfRooms: listing.bedrooms,
       numberOfBedrooms: listing.bedrooms,
     }),
     ...(typeof listing.bathrooms === 'number' && {

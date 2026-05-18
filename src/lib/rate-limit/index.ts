@@ -74,6 +74,14 @@ const reportByIpListing = makeLimiter('report-ip-listing', { requests: 3, window
 // phone in the catalog by clicking through listings.
 const contactByIpListing = makeLimiter('contact-ip-listing', { requests: 30, window: '1 h' })
 
+// Magic-link sign-in email — closes the SMTP-relay abuse vector. Without
+// this an attacker could spam any victim's inbox via our Gmail relay
+// (reputation damage + Gmail's daily send cap as collateral DoS). 3/email/h
+// and 10/IP/h match the forgot-password shape since both paths trigger
+// an outbound email.
+const signInEmailByEmail = makeLimiter('signin-email-email', { requests: 3, window: '1 h' })
+const signInEmailByIp = makeLimiter('signin-email-ip', { requests: 10, window: '1 h' })
+
 type RateLimitResult = { success: boolean; remaining?: number; reset?: number }
 
 async function check(
@@ -126,4 +134,11 @@ export const rateLimiters = {
   /** Contact reveal — 30 / 1h / (IP, listing). Caps a single IP from harvesting every owner phone. */
   contactReveal: (ipHash: string, listingId: string) =>
     check(contactByIpListing, `${ipHash}:${listingId}`),
+
+  /** Magic-link send — 3/email/h + 10/IP/h. Returns success only if BOTH pass. */
+  signInEmail: async (email: string, ipHash: string): Promise<RateLimitResult> => {
+    const byEmail = await check(signInEmailByEmail, email.toLowerCase())
+    if (!byEmail.success) return byEmail
+    return check(signInEmailByIp, ipHash)
+  },
 }

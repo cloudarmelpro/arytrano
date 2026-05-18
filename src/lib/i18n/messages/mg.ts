@@ -424,6 +424,7 @@ export const mg: Record<MessageKey, string> = {
   'listingActions.toast.ok': 'OK',
   'listingActions.toast.error': 'Nisy olana.',
   'listingActions.menuAria': 'Asa amin’ny filazana',
+  'listingActions.confirmInput.aria': 'Soraty SUPPRIMER mba hanamafisana',
 
   // Photo manager
   'photoManager.counter': '{current} / {max} sary · sintony-aroso hanavaozana ny filaharany.',

@@ -11,7 +11,7 @@ import {
 } from '../services/manage-photos'
 import { listingIdSchema, listingPhotoIdSchema } from '../schemas'
 
-export type PhotoActionState = { ok: boolean; message?: string; photoId?: string; url?: string }
+type PhotoActionState = { ok: boolean; message?: string; photoId?: string; url?: string }
 
 async function requireUser(): Promise<
   { ok: true; userId: string } | { ok: false; error: PhotoActionState }

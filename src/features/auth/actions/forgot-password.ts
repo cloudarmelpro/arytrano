@@ -8,7 +8,7 @@ import { rateLimiters } from '@/lib/rate-limit'
 import { requestPasswordReset } from '../services/request-password-reset'
 import { forgotPasswordSchema } from '../schemas'
 
-export type ForgotPasswordActionState = {
+type ForgotPasswordActionState = {
   ok: boolean
   message?: string
   fields?: Record<string, string[]>

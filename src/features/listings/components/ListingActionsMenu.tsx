@@ -81,6 +81,7 @@ export function ListingActionsMenu({
           value={confirm}
           onChange={(e) => setConfirm(e.target.value)}
           disabled={pending}
+          aria-label={t('listingActions.confirmInput.aria')}
           className="h-8 w-28"
           autoComplete="off"
         />

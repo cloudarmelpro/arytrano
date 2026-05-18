@@ -8,7 +8,7 @@ import { auth } from '@/features/auth'
 import { updateListing } from '../services/update-listing'
 import { updateListingSchema, listingIdSchema } from '../schemas'
 
-export type UpdateListingActionState = {
+type UpdateListingActionState = {
   ok: boolean
   message?: string
   fields?: Record<string, string[]>

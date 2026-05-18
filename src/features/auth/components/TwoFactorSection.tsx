@@ -162,8 +162,11 @@ export function TwoFactorSection({
             disabled={pending}
             className="h-10 font-mono tracking-widest"
             aria-invalid={!!phase.error}
+            aria-describedby={phase.error ? 'twofa-setup-code-error' : undefined}
           />
-          {phase.error && <FieldError errors={[{ message: phase.error }]} />}
+          {phase.error && (
+            <FieldError id="twofa-setup-code-error" errors={[{ message: phase.error }]} />
+          )}
         </Field>
 
         <div className="flex justify-end gap-2">
@@ -209,8 +212,11 @@ export function TwoFactorSection({
             disabled={pending}
             className="h-10 font-mono"
             aria-invalid={!!phase.error}
+            aria-describedby={phase.error ? 'twofa-disable-code-error' : undefined}
           />
-          {phase.error && <FieldError errors={[{ message: phase.error }]} />}
+          {phase.error && (
+            <FieldError id="twofa-disable-code-error" errors={[{ message: phase.error }]} />
+          )}
         </Field>
         <div className="flex justify-end gap-2">
           <Button type="button" variant="outline" size="default" onClick={() => setPhase({ kind: 'idle' })} disabled={pending}>

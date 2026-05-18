@@ -160,10 +160,13 @@ export function ProfileForm({ defaultValues }: ProfileFormProps) {
                     autoComplete="name"
                     placeholder={t('profileForm.name.placeholder')}
                     aria-invalid={fieldState.invalid}
+                    aria-describedby={fieldState.invalid ? 'profile-name-error' : undefined}
                     disabled={busy}
                     className='h-10'
                   />
-                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                  {fieldState.invalid && (
+                    <FieldError id="profile-name-error" errors={[fieldState.error]} />
+                  )}
                 </Field>
               )}
             />
@@ -192,11 +195,14 @@ export function ProfileForm({ defaultValues }: ProfileFormProps) {
                     type="tel"
                     placeholder={t('profileForm.phone.placeholder')}
                     aria-invalid={fieldState.invalid}
+                    aria-describedby={fieldState.invalid ? 'profile-phone-error profile-phone-hint' : 'profile-phone-hint'}
                     disabled={busy}
                     className='h-10'
                   />
-                  <FieldDescription>{t('profileForm.phone.hint')}</FieldDescription>
-                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                  <FieldDescription id="profile-phone-hint">{t('profileForm.phone.hint')}</FieldDescription>
+                  {fieldState.invalid && (
+                    <FieldError id="profile-phone-error" errors={[fieldState.error]} />
+                  )}
                 </Field>
               )}
             />

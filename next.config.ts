@@ -36,6 +36,13 @@ const nextConfig: NextConfig = {
         pathname: '/**',
       },
     ],
+    // AVIF first (~20-30% smaller than WebP on supported browsers — Chrome
+    // Android is the bulk of our Madagascar traffic), WebP fallback.
+    formats: ['image/avif', 'image/webp'],
+    // Cloudinary URLs are content-addressed (URL changes when the asset
+    // changes), so the Next image-optimization layer can cache aggressively.
+    // 1 year = browser/CDN won't re-request unless we rebuild.
+    minimumCacheTTL: 31536000,
   },
   async headers() {
     return [

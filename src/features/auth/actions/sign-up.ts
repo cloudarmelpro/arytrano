@@ -7,7 +7,7 @@ import { signIn } from '../auth'
 import { registerUser } from '../services/register-user'
 import { signUpSchema } from '../schemas'
 
-export type SignUpActionState = {
+type SignUpActionState = {
   ok: boolean
   message?: string
   fields?: Record<string, string[]>

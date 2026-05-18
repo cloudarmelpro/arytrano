@@ -94,10 +94,11 @@ export function ReviewForm({ listingId }: { listingId: string }) {
             maxLength={2000}
             placeholder={t('reviews.form.body.placeholder')}
             aria-invalid={!!error}
+            aria-describedby={error ? 'review-body-error review-body-hint' : 'review-body-hint'}
             className="min-h-24 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-60"
           />
-          <FieldDescription>{t('reviews.form.body.hint')}</FieldDescription>
-          {error && <FieldError errors={[{ message: error }]} />}
+          <FieldDescription id="review-body-hint">{t('reviews.form.body.hint')}</FieldDescription>
+          {error && <FieldError id="review-body-error" errors={[{ message: error }]} />}
         </Field>
 
         <div className="flex justify-end">

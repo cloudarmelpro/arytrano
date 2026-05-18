@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { useT } from '@/lib/i18n/client'
 import type { MessageKey } from '@/lib/i18n/messages'
@@ -9,6 +10,12 @@ import type { MessageKey } from '@/lib/i18n/messages'
 // index also re-exports `auth` / `signIn` which depend on `next/headers`
 // and would poison this Client Component bundle.
 import { signOutAction } from '@/features/auth/actions/sign-out'
+
+export type AdminSidebarUser = {
+  name: string | null
+  email: string
+  image: string | null
+}
 
 type Item = {
   href: string
@@ -98,16 +105,44 @@ const buildSections = (openReports: number): Section[] => [
   },
 ]
 
-export function AdminSidebar({ openReports = 0 }: { openReports?: number }) {
+export function AdminSidebar({
+  openReports = 0,
+  user,
+}: {
+  openReports?: number
+  user: AdminSidebarUser
+}) {
   const pathname = usePathname()
   const t = useT()
   const sections = buildSections(openReports)
+  const firstName = user.name?.trim().split(/\s+/)[0] ?? null
+  const initial =
+    user.name?.[0]?.toUpperCase() ?? user.email[0]?.toUpperCase() ?? 'A'
 
   return (
     <aside className="md:w-60">
-      <p className="mb-5 px-3 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-        {t('admin.console')}
-      </p>
+      {/* User-info card — mirrors AccountSidebar so the admin sidebar aligns
+         vertically with the right-column hero on every admin page. The
+         small "ADMIN" badge replaces the old standalone CONSOLE ADMIN
+         header without re-adding a separate title row. */}
+      <div className="mb-6 flex items-center gap-3 rounded-md px-2 py-2">
+        <Avatar className="h-10 w-10 ring-1 ring-border">
+          {user.image && <AvatarImage src={user.image} alt={user.name ?? user.email} />}
+          <AvatarFallback className="text-sm font-semibold text-primary">
+            {initial}
+          </AvatarFallback>
+        </Avatar>
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-sm font-semibold text-foreground">
+            {firstName ?? user.email.split('@')[0]}
+          </p>
+          <p className="truncate text-xs text-muted-foreground">{user.email}</p>
+        </div>
+        <span className="inline-flex items-center rounded-md bg-primary/10 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-primary">
+          {t('role.ADMIN')}
+        </span>
+      </div>
+
       <nav aria-label={t('admin.console')} className="flex flex-col gap-6">
         {sections.map((section) => (
           <div key={section.labelKey} className="flex flex-col gap-2">
@@ -144,6 +179,7 @@ export function AdminSidebar({ openReports = 0 }: { openReports?: number }) {
                           className="ml-auto bg-destructive/10 text-destructive text-[10px]"
                         >
                           {it.badge}
+                          <span className="sr-only"> signalements ouverts</span>
                         </Badge>
                       )}
                     </Link>

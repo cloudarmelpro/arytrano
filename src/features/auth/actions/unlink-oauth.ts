@@ -8,7 +8,7 @@ import { auth } from '../auth'
 import { unlinkOAuth } from '../services/unlink-oauth'
 import { oauthProviderSchema } from '../schemas'
 
-export type UnlinkActionState = {
+type UnlinkActionState = {
   ok: boolean
   message?: string
   fields?: Record<string, string[]>

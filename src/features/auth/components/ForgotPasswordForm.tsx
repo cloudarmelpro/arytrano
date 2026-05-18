@@ -66,11 +66,14 @@ export function ForgotPasswordForm() {
                 autoComplete="email"
                 placeholder={t('forgot.email.placeholder')}
                 aria-invalid={fieldState.invalid}
+                aria-describedby={fieldState.invalid ? 'forgot-email-error forgot-email-hint' : 'forgot-email-hint'}
                 disabled={pending}
                 className='h-10'
               />
-              <FieldDescription>{t('forgot.email.hint')}</FieldDescription>
-              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+              <FieldDescription id="forgot-email-hint">{t('forgot.email.hint')}</FieldDescription>
+              {fieldState.invalid && (
+                <FieldError id="forgot-email-error" errors={[fieldState.error]} />
+              )}
             </Field>
           )}
         />

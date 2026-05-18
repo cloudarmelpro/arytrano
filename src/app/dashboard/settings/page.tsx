@@ -9,8 +9,7 @@ import { OAuthConnectionsSection } from '@/features/auth/components/OAuthConnect
 import { DeleteAccountSection } from '@/features/auth/components/DeleteAccountSection'
 import { LoginEventsSection } from '@/features/auth/components/LoginEventsSection'
 import { TwoFactorSection } from '@/features/auth/components/TwoFactorSection'
-import { countActiveRecoveryCodes } from '@/features/auth/services/totp'
-import { prisma } from '@/lib/db'
+import { countActiveRecoveryCodes, isTotpEnabled } from '@/features/auth/services/totp'
 import { getLocale } from '@/lib/i18n/get-locale'
 import { getT } from '@/lib/i18n/translate'
 
@@ -24,20 +23,16 @@ export default async function SettingsPage() {
   if (!session?.user) redirect('/sign-in')
 
   const userId = session.user.id
-  const [connections, methods, loginEvents, locale, twofa, recoveryCount] =
+  const [connections, methods, loginEvents, locale, twofaEnabled, recoveryCount] =
     await Promise.all([
       listConnections(userId),
       countAuthMethods(userId),
       listLoginEvents(userId, 10),
       getLocale(),
-      prisma.user.findUnique({
-        where: { id: userId },
-        select: { totpEnabledAt: true },
-      }),
+      isTotpEnabled(userId),
       countActiveRecoveryCodes(userId),
     ])
   const t = getT(locale)
-  const twofaEnabled = Boolean(twofa?.totpEnabledAt)
 
   const googleEnabled = Boolean(env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET)
   const facebookEnabled = Boolean(env.FACEBOOK_CLIENT_ID && env.FACEBOOK_CLIENT_SECRET)

@@ -7,7 +7,7 @@ import { auth } from '@/features/auth'
 import { toggleFavoriteSchema } from '../schemas/toggle-favorite'
 import { toggleFavorite } from '../services/toggle-favorite'
 
-export type ToggleFavoriteState = {
+type ToggleFavoriteState = {
   ok: boolean
   /** New state after the toggle (only set when `ok` is true). */
   favorited?: boolean

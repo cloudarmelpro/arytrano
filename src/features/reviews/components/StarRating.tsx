@@ -1,10 +1,21 @@
 'use client'
 
+import { useRef } from 'react'
+
 /**
  * Star rating widget — display + interactive modes.
  *
  * Display: pass `value` only; renders 5 stars filled up to `value`.
  * Interactive: pass `onChange` to make it clickable + keyboard-navigable.
+ *
+ * Keyboard (interactive):
+ *  - Tab focuses the active star (or first if none chosen yet) — single
+ *    tab stop per WAI-ARIA radiogroup pattern.
+ *  - ArrowLeft / ArrowDown: decrement (wraps 1 → 5).
+ *  - ArrowRight / ArrowUp: increment (wraps 5 → 1).
+ *  - Home / End: jump to 1 / 5.
+ *  - Space / Enter: commit the focused value (already committed on focus
+ *    via onChange so this is a no-op convenience).
  *
  * Visuals match the brand: indigo fill, muted outline.
  */
@@ -21,6 +32,7 @@ export function StarRating({
 }) {
   const interactive = typeof onChange === 'function'
   const stars = [1, 2, 3, 4, 5]
+  const containerRef = useRef<HTMLSpanElement>(null)
   if (!interactive) {
     return (
       <span
@@ -34,21 +46,62 @@ export function StarRating({
       </span>
     )
   }
+
+  function focusStar(n: number) {
+    const btn = containerRef.current?.querySelector<HTMLButtonElement>(
+      `[data-star="${n}"]`,
+    )
+    btn?.focus()
+  }
+
+  function onKeyDown(e: React.KeyboardEvent<HTMLSpanElement>) {
+    let next: number | null = null
+    switch (e.key) {
+      case 'ArrowRight':
+      case 'ArrowUp':
+        next = value >= 5 ? 1 : value + 1
+        break
+      case 'ArrowLeft':
+      case 'ArrowDown':
+        next = value <= 1 ? 5 : value - 1
+        break
+      case 'Home':
+        next = 1
+        break
+      case 'End':
+        next = 5
+        break
+    }
+    if (next !== null) {
+      e.preventDefault()
+      onChange?.(next)
+      focusStar(next)
+    }
+  }
+
+  // Single-tab-stop: the active star (or 1 if none yet) holds tabIndex=0,
+  // every other star is tabIndex=-1 — the WAI-ARIA radiogroup convention.
+  const focusIndex = value || 1
   return (
     <span
+      ref={containerRef}
       role="radiogroup"
       aria-label={ariaLabel ?? 'Note'}
+      onKeyDown={onKeyDown}
       className="inline-flex items-center gap-0.5"
     >
       {stars.map((n) => {
         const filled = n <= value
+        const checked = value === n
         return (
           <button
             key={n}
+            data-star={n}
             type="button"
             role="radio"
-            aria-checked={value === n}
+            aria-checked={checked}
             aria-label={`${n} / 5`}
+            tabIndex={n === focusIndex ? 0 : -1}
             onClick={() => onChange?.(n)}
             className="inline-flex items-center justify-center rounded transition hover:scale-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >

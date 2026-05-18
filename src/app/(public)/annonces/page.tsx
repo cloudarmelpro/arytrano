@@ -154,6 +154,7 @@ export default async function PublicListingsPage({
                     listing={l}
                     t={t}
                     priority={i === 0 && !sp.cursor}
+                    authenticated={Boolean(session?.user)}
                     initialFavorited={favoritedIds.has(l.id)}
                   />
                 ))}

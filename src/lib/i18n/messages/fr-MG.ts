@@ -417,6 +417,7 @@ export const frMG = {
   'listingActions.toast.ok': 'OK',
   'listingActions.toast.error': 'Une erreur est survenue.',
   'listingActions.menuAria': 'Actions sur l’annonce',
+  'listingActions.confirmInput.aria': 'Tape SUPPRIMER pour confirmer',
 
   // Photo manager
   'photoManager.counter': '{current} / {max} photos · glisser-déposer pour réordonner.',

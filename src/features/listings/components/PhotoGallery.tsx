@@ -115,6 +115,11 @@ export function PhotoGallery({
                       src={p.url}
                       alt={p.altFr || `${altFallback} — photo ${index + 1}`}
                       fill
+                      // Hidden on mobile (`hidden sm:grid` on parent) — these
+                      // never contribute to mobile LCP. Lazy keeps them out
+                      // of the critical-path image queue on desktop too,
+                      // letting the hero priority image win bandwidth.
+                      loading="lazy"
                       sizes="(min-width: 1024px) 25vw, 50vw"
                       className="object-cover"
                       placeholder={p.blurhash ? 'blur' : 'empty'}

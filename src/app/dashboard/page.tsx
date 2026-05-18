@@ -2,7 +2,8 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { auth } from '@/features/auth'
-import { prisma } from '@/lib/db'
+import { countOwnerListings } from '@/features/listings/queries/count-owner-listings'
+import { countUserPublishedFavorites } from '@/features/favorites/queries/count-user-favorites'
 import { getLocale } from '@/lib/i18n/get-locale'
 import { getT, type Translator } from '@/lib/i18n/translate'
 
@@ -21,22 +22,15 @@ export default async function DashboardPage() {
   const isOwner = user.role === 'OWNER' || user.role === 'ADMIN'
 
   // Lightweight stats — only the counts the user cares about on their
-  // landing page. Three parallel queries; trivial cost.
-  const [listingsCount, favoritesCount, publishedCount] = await Promise.all([
+  // landing page. Skip owner-only queries for students.
+  const [ownerCounts, favoritesCount] = await Promise.all([
     isOwner
-      ? prisma.listing.count({
-          where: { ownerId: user.id, status: { not: 'DELETED' } },
-        })
-      : Promise.resolve(0),
-    prisma.favorite.count({
-      where: { userId: user.id, listing: { status: 'PUBLISHED' } },
-    }),
-    isOwner
-      ? prisma.listing.count({
-          where: { ownerId: user.id, status: 'PUBLISHED' },
-        })
-      : Promise.resolve(0),
+      ? countOwnerListings(user.id)
+      : Promise.resolve({ total: 0, published: 0 }),
+    countUserPublishedFavorites(user.id),
   ])
+  const listingsCount = ownerCounts.total
+  const publishedCount = ownerCounts.published
 
   return (
     <div className="flex flex-col gap-10">

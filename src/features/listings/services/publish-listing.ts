@@ -40,7 +40,7 @@ export async function publishListing(ownerId: string, listingId: string): Promis
   if (!listing.description || listing.description.length < 20) {
     throw errors.validation('Description manquante ou trop courte')
   }
-  if (Number(listing.priceMonthlyMGA) <= 0) {
+  if (listing.priceMonthlyMGA <= 0) {
     throw errors.validation('Prix invalide')
   }
   if (listing._count.photos < 1) {

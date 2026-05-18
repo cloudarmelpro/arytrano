@@ -8,7 +8,7 @@ import { verifyPassword } from '@/lib/auth/password'
 import { signIn } from '../auth'
 import { loginSchema } from '../schemas'
 
-export type SignInActionState = {
+type SignInActionState = {
   ok: boolean
   message?: string
   fields?: Record<string, string[]>

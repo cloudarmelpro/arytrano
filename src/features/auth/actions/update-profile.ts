@@ -7,7 +7,7 @@ import { auth } from '../auth'
 import { updateProfile } from '../services/update-profile'
 import { updateProfileSchema } from '../schemas'
 
-export type UpdateProfileActionState = {
+type UpdateProfileActionState = {
   ok: boolean
   message?: string
   fields?: Record<string, string[]>

@@ -9,7 +9,7 @@ import { auth } from '@/features/auth'
 import { createListing } from '../services/create-listing'
 import { createListingSchema } from '../schemas'
 
-export type CreateListingActionState = {
+type CreateListingActionState = {
   ok: boolean
   message?: string
   fields?: Record<string, string[]>

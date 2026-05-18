@@ -7,7 +7,7 @@ import { auth } from '@/features/auth'
 import { createReviewSchema } from '../schemas/create-review'
 import { createReview } from '../services/create-review'
 
-export type SubmitReviewState = {
+type SubmitReviewState = {
   ok: boolean
   message?: string
   needsAuth?: boolean

@@ -42,6 +42,13 @@ export function LocaleSwitcher() {
     startTransition(async () => {
       const result = await setLocaleAction(next)
       if (!result.ok) return
+      // Sync `<html lang>` immediately so AT pronunciation matches the
+      // newly active locale before the soft navigation completes. SSR
+      // sets it on the next request; without this, screen readers read
+      // the next page in the OLD language. WCAG 3.1.1.
+      if (typeof document !== 'undefined') {
+        document.documentElement.lang = next
+      }
       // Replace the URL so the prefix matches the chosen locale. The
       // proxy will sync the cookie again on the next request — using
       // `replace` keeps the back button predictable.

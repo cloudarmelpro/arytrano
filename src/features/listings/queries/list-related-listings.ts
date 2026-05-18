@@ -64,7 +64,7 @@ export async function listRelatedListings(input: {
     slug: r.slug,
     title: r.title,
     type: r.type,
-    priceMonthlyMGA: r.priceMonthlyMGA.toString(),
+    priceMonthlyMGA: r.priceMonthlyMGA,
     city: r.city,
     neighborhood: r.neighborhood,
     photo: r.photos[0] ?? null,

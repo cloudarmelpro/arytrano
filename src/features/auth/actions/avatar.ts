@@ -5,7 +5,7 @@ import { ApiError } from '@/lib/api/errors'
 import { auth } from '../auth'
 import { updateAvatar, removeAvatar } from '../services/update-avatar'
 
-export type AvatarActionState = { ok: boolean; message?: string; url?: string }
+type AvatarActionState = { ok: boolean; message?: string; url?: string }
 
 export async function uploadAvatarAction(
   _prev: AvatarActionState,

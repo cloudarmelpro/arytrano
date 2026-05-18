@@ -8,7 +8,7 @@ export type OwnerListingItem = {
   slug: string
   status: ListingStatus
   type: ListingType
-  priceMonthlyMGA: string
+  priceMonthlyMGA: number
   city: { slug: string; nameFr: string }
   neighborhood: { slug: string; nameFr: string }
   photoCount: number
@@ -61,7 +61,7 @@ export async function listOwnerListings(ownerId: string): Promise<OwnerListingIt
     slug: r.slug,
     status: r.status,
     type: r.type,
-    priceMonthlyMGA: r.priceMonthlyMGA.toString(),
+    priceMonthlyMGA: r.priceMonthlyMGA,
     city: r.city,
     neighborhood: r.neighborhood,
     photoCount: r._count.photos,

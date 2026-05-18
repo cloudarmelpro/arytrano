@@ -7,7 +7,7 @@ import { signIn } from '../auth'
 import { resetPassword } from '../services/reset-password'
 import { resetPasswordSchema } from '../schemas'
 
-export type ResetPasswordActionState = {
+type ResetPasswordActionState = {
   ok: boolean
   message?: string
   fields?: Record<string, string[]>

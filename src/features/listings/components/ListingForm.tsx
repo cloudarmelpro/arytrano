@@ -135,8 +135,9 @@ export function ListingForm(props: ListingFormProps) {
                 placeholder={t('listingForm.title.placeholder')}
                 className="h-10"
                 aria-invalid={fieldState.invalid}
+                aria-describedby={fieldState.invalid ? 'listing-title-error' : undefined}
               />
-              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+              {fieldState.invalid && <FieldError id="listing-title-error" errors={[fieldState.error]} />}
             </Field>
           )}
         />
@@ -153,10 +154,11 @@ export function ListingForm(props: ListingFormProps) {
                 rows={5}
                 placeholder={t('listingForm.description.placeholder')}
                 aria-invalid={fieldState.invalid}
+                aria-describedby={fieldState.invalid ? 'listing-desc-error' : undefined}
                 className="min-h-24 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               />
               <FieldDescription>{t('listingForm.description.hint')}</FieldDescription>
-              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+              {fieldState.invalid && <FieldError id="listing-desc-error" errors={[fieldState.error]} />}
             </Field>
           )}
         />
@@ -185,7 +187,7 @@ export function ListingForm(props: ListingFormProps) {
                     ))}
                   </SelectContent>
                 </Select>
-                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                {fieldState.invalid && <FieldError id="listing-type-error" errors={[fieldState.error]} />}
               </Field>
             )}
           />
@@ -211,7 +213,7 @@ export function ListingForm(props: ListingFormProps) {
                   onBlur={field.onBlur}
                   aria-invalid={fieldState.invalid}
                 />
-                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                {fieldState.invalid && <FieldError id="listing-price-error" errors={[fieldState.error]} />}
               </Field>
             )}
           />
@@ -244,7 +246,7 @@ export function ListingForm(props: ListingFormProps) {
                     ))}
                   </SelectContent>
                 </Select>
-                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                {fieldState.invalid && <FieldError id="listing-city-error" errors={[fieldState.error]} />}
               </Field>
             )}
           />
@@ -274,7 +276,7 @@ export function ListingForm(props: ListingFormProps) {
                     ))}
                   </SelectContent>
                 </Select>
-                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                {fieldState.invalid && <FieldError id="listing-neighborhood-error" errors={[fieldState.error]} />}
               </Field>
             )}
           />
@@ -300,7 +302,7 @@ export function ListingForm(props: ListingFormProps) {
                   }
                   onBlur={field.onBlur}
                 />
-                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                {fieldState.invalid && <FieldError id="listing-surface-error" errors={[fieldState.error]} />}
               </Field>
             )}
           />
@@ -324,7 +326,7 @@ export function ListingForm(props: ListingFormProps) {
                   }
                   onBlur={field.onBlur}
                 />
-                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                {fieldState.invalid && <FieldError id="listing-bedrooms-error" errors={[fieldState.error]} />}
               </Field>
             )}
           />
@@ -348,7 +350,7 @@ export function ListingForm(props: ListingFormProps) {
                   }
                   onBlur={field.onBlur}
                 />
-                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                {fieldState.invalid && <FieldError id="listing-bathrooms-error" errors={[fieldState.error]} />}
               </Field>
             )}
           />
@@ -431,7 +433,9 @@ export function ListingForm(props: ListingFormProps) {
                 onChange={(next) => field.onChange(next)}
                 t={t}
               />
-              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+              {fieldState.invalid && (
+                <FieldError id="listing-customAmenities-error" errors={[fieldState.error]} />
+              )}
             </Field>
           )}
         />

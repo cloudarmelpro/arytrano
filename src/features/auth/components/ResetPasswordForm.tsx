@@ -69,11 +69,14 @@ export function ResetPasswordForm({ token }: { token: string }) {
                 autoComplete="new-password"
                 minLength={8}
                 aria-invalid={fieldState.invalid}
+                aria-describedby={fieldState.invalid ? 'reset-password-error' : undefined}
                 disabled={pending}
                 className='h-10'
               />
               <PasswordStrengthMeter value={password} />
-              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+              {fieldState.invalid && (
+                <FieldError id="reset-password-error" errors={[fieldState.error]} />
+              )}
             </Field>
           )}
         />
@@ -91,10 +94,13 @@ export function ResetPasswordForm({ token }: { token: string }) {
                 autoComplete="new-password"
                 minLength={8}
                 aria-invalid={fieldState.invalid}
+                aria-describedby={fieldState.invalid ? 'reset-confirm-error' : undefined}
                 disabled={pending}
                 className='h-10'
               />
-              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+              {fieldState.invalid && (
+                <FieldError id="reset-confirm-error" errors={[fieldState.error]} />
+              )}
             </Field>
           )}
         />

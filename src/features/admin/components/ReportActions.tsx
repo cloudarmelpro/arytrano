@@ -125,12 +125,19 @@ export function ReportActions({ reportId }: { reportId: string }) {
                 maxLength={500}
                 placeholder={t('admin.reports.dialog.note.placeholder')}
                 aria-invalid={!!error}
+                aria-describedby={
+                  error
+                    ? 'report-admin-note-error report-admin-note-hint'
+                    : 'report-admin-note-hint'
+                }
                 className="min-h-24 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-60"
               />
-              <p className="text-xs text-muted-foreground">
+              <p id="report-admin-note-hint" className="text-xs text-muted-foreground">
                 {t('admin.reports.dialog.note.hint')}
               </p>
-              {error && <FieldError errors={[{ message: error }]} />}
+              {error && (
+                <FieldError id="report-admin-note-error" errors={[{ message: error }]} />
+              )}
             </Field>
           </div>
 

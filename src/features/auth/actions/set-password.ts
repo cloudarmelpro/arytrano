@@ -8,7 +8,7 @@ import { auth } from '../auth'
 import { setPassword, changePassword } from '../services/set-password'
 import { setPasswordSchema, changePasswordSchema } from '../schemas'
 
-export type PasswordActionState = {
+type PasswordActionState = {
   ok: boolean
   message?: string
   fields?: Record<string, string[]>

@@ -6,7 +6,7 @@ import { auth } from '@/features/auth'
 import { reactToReviewSchema } from '../schemas/react-review'
 import { reactToReview, type ReactionState } from '../services/react-to-review'
 
-export type ReactToReviewActionState = {
+type ReactToReviewActionState = {
   ok: boolean
   /** Snapshot after the toggle — client uses it to update its UI in place. */
   state?: ReactionState

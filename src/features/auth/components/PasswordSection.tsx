@@ -68,8 +68,11 @@ function AddPassword() {
                 autoComplete="new-password"
                 minLength={8}
                 aria-invalid={fieldState.invalid}
+                aria-describedby={fieldState.invalid ? 'add-password-error' : undefined}
               />
-              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+              {fieldState.invalid && (
+                <FieldError id="add-password-error" errors={[fieldState.error]} />
+              )}
             </Field>
           )}
         />
@@ -124,6 +127,8 @@ function ChangePassword() {
         <button
           type="button"
           onClick={() => setOpen(true)}
+          aria-expanded={open}
+          aria-controls="change-password-form"
           className="rounded-md border border-border px-4 py-1.5 text-sm font-medium hover:bg-muted"
         >
           {t('password.change.edit')}
@@ -133,7 +138,7 @@ function ChangePassword() {
   }
 
   return (
-    <form onSubmit={form.handleSubmit(onSubmit)}>
+    <form id="change-password-form" onSubmit={form.handleSubmit(onSubmit)}>
       <fieldset disabled={pending} className="contents">
       <FieldGroup>
         <Controller
@@ -148,8 +153,11 @@ function ChangePassword() {
                 type="password"
                 autoComplete="current-password"
                 aria-invalid={fieldState.invalid}
+                aria-describedby={fieldState.invalid ? 'current-password-error' : undefined}
               />
-              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+              {fieldState.invalid && (
+                <FieldError id="current-password-error" errors={[fieldState.error]} />
+              )}
             </Field>
           )}
         />
@@ -166,8 +174,11 @@ function ChangePassword() {
                 autoComplete="new-password"
                 minLength={8}
                 aria-invalid={fieldState.invalid}
+                aria-describedby={fieldState.invalid ? 'new-password-change-error' : undefined}
               />
-              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+              {fieldState.invalid && (
+                <FieldError id="new-password-change-error" errors={[fieldState.error]} />
+              )}
             </Field>
           )}
         />

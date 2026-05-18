@@ -76,7 +76,7 @@ export async function listUserFavorites(
       slug: r.listing.slug,
       title: r.listing.title,
       type: r.listing.type,
-      priceMonthlyMGA: r.listing.priceMonthlyMGA.toString(),
+      priceMonthlyMGA: r.listing.priceMonthlyMGA,
       city: r.listing.city,
       neighborhood: r.listing.neighborhood,
       photo: r.listing.photos[0] ?? null,

@@ -167,10 +167,19 @@ export function ReviewRow({
                 rows={4}
                 maxLength={2000}
                 aria-invalid={!!error}
+                aria-describedby={
+                  error
+                    ? `edit-body-${review.id}-error edit-body-${review.id}-hint`
+                    : `edit-body-${review.id}-hint`
+                }
                 className="min-h-24 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-60"
               />
-              <FieldDescription>{t('reviews.form.body.hint')}</FieldDescription>
-              {error && <FieldError errors={[{ message: error }]} />}
+              <FieldDescription id={`edit-body-${review.id}-hint`}>
+                {t('reviews.form.body.hint')}
+              </FieldDescription>
+              {error && (
+                <FieldError id={`edit-body-${review.id}-error`} errors={[{ message: error }]} />
+              )}
             </Field>
             <div className="flex justify-end gap-2">
               <Button

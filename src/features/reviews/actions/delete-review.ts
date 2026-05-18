@@ -7,7 +7,7 @@ import { auth } from '@/features/auth'
 import { deleteReviewSchema } from '../schemas/create-review'
 import { deleteReview } from '../services/delete-review'
 
-export type DeleteReviewState = {
+type DeleteReviewState = {
   ok: boolean
   message?: string
 }

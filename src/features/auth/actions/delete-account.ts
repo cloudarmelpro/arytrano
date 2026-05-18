@@ -7,7 +7,7 @@ import { auth, signOut } from '../auth'
 import { deleteAccount } from '../services/delete-account'
 import { deleteAccountSchema } from '../schemas'
 
-export type DeleteAccountActionState = { ok: boolean; message?: string }
+type DeleteAccountActionState = { ok: boolean; message?: string }
 
 export async function deleteAccountAction(
   _prev: DeleteAccountActionState,

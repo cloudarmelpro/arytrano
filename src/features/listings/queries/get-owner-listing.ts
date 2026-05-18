@@ -11,7 +11,7 @@ export type OwnerListingDetail = {
   description: string
   type: ListingType
   status: ListingStatus
-  priceMonthlyMGA: string
+  priceMonthlyMGA: number
   surfaceM2: number | null
   bedrooms: number | null
   bathrooms: number | null
@@ -87,6 +87,6 @@ export async function getOwnerListing(
 
   return {
     ...listing,
-    priceMonthlyMGA: listing.priceMonthlyMGA.toString(),
+    priceMonthlyMGA: listing.priceMonthlyMGA,
   }
 }

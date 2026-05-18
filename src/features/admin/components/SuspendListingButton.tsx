@@ -81,9 +81,10 @@ export function SuspendListingButton({
                 maxLength={500}
                 placeholder={t('admin.suspend.reason.placeholder')}
                 aria-invalid={!!error}
+                aria-describedby={error ? 'suspend-reason-error' : undefined}
                 className="min-h-24 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-60"
               />
-              {error && <FieldError errors={[{ message: error }]} />}
+              {error && <FieldError id="suspend-reason-error" errors={[{ message: error }]} />}
             </Field>
           </div>
 

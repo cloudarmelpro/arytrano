@@ -7,7 +7,7 @@ import { extractRequestInfo } from '@/lib/auth/request-info'
 import { recordContactClick } from '../services/record-contact-click'
 import { recordContactClickSchema } from '../schemas/contact'
 
-export type RevealContactState = {
+type RevealContactState = {
   ok: boolean
   message?: string
   phoneE164?: string

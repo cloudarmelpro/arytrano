@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { headers } from 'next/headers'
-import { notFound } from 'next/navigation'
+import { notFound, permanentRedirect } from 'next/navigation'
 import { env } from '@/lib/env'
 import { formatAriary } from '@/lib/format/currency'
 import { getLocale } from '@/lib/i18n/get-locale'
@@ -13,11 +13,12 @@ import {
 import { safeJsonLd } from '@/lib/seo/safe-json-ld'
 import { localeAlternates } from '@/lib/seo/alternates'
 import { getPublicListing } from '@/features/listings/queries/get-public-listing'
+import { getListingStatusBySlug } from '@/features/listings/queries/get-listing-status-by-slug'
 import { listRelatedListings } from '@/features/listings/queries/list-related-listings'
 import { PhotoGallery } from '@/features/listings/components/PhotoGallery'
 import { ContactButtons } from '@/features/listings/components/ContactButtons'
 import { ShareButton } from '@/features/listings/components/ShareButton'
-import { ListingMap } from '@/features/listings/components/ListingMap'
+import { ListingMapClient } from '@/features/listings/components/ListingMapClient'
 import { AMENITY_CATALOG, AmenityIcon } from '@/features/listings/amenities'
 import { PublicListingCard } from '@/features/listings/components/PublicListingCard'
 import { ReportButton } from '@/features/reports/components/ReportButton'
@@ -52,7 +53,13 @@ export async function generateMetadata({
   ])
   const t = getT(locale)
   if (!listing) {
-    return { title: t('detail.notFound') }
+    // Even when the page returns 404, Search Console occasionally
+    // surfaces the "title" of the response — explicit noindex stops
+    // the not-found shell from briefly polluting brand snippets.
+    return {
+      title: t('detail.notFound'),
+      robots: { index: false, follow: false },
+    }
   }
   const typeLabel = t(`listing.type.${listing.type}` as const)
   // Title kept short — root template " — AryTrano" eats ~12 chars.
@@ -93,7 +100,24 @@ export default async function PublicListingDetailPage({
     getLocale(),
     auth(),
   ])
-  if (!listing) notFound()
+  // SEO B1: distinguish "never existed" (404) from "temporarily off-market"
+  // (permanent redirect → /annonces, which Google treats as 301) and
+  // "permanently gone" (404 today; ideally 410 once we host a custom
+  // status response — App Router pages can't yet set 410 directly).
+  if (!listing) {
+    const status = await getListingStatusBySlug(
+      citySlug,
+      neighborhoodSlug,
+      listingSlug,
+    )
+    if (status === 'UNAVAILABLE') {
+      // 308 — Google treats it equivalently to 301 for indexing decisions.
+      // Hand the visitor back to the catalog so they don't bounce off a
+      // dead URL while the owner is between tenants.
+      permanentRedirect('/annonces')
+    }
+    notFound()
+  }
 
   const t = getT(locale)
   const typeLabel = t(`listing.type.${listing.type}` as const)
@@ -287,7 +311,7 @@ export default async function PublicListingDetailPage({
               <p className="text-sm text-muted-foreground">
                 {listing.neighborhood.nameFr}, {listing.city.nameFr}
               </p>
-              <ListingMap
+              <ListingMapClient
                 lat={parseFloat(listing.lat)}
                 lng={parseFloat(listing.lng)}
                 ariaLabel={t('detail.location.mapAria', {
@@ -388,6 +412,7 @@ export default async function PublicListingDetailPage({
           neighborhoodId={listing.neighborhood.id}
           cityId={listing.city.id}
           t={t}
+          authenticated={Boolean(session?.user)}
         />
       </div>
     </>
@@ -399,11 +424,13 @@ async function RelatedListingsSection({
   neighborhoodId,
   cityId,
   t,
+  authenticated,
 }: {
   excludeId: string
   neighborhoodId: string
   cityId: string
   t: ReturnType<typeof getT>
+  authenticated: boolean
 }) {
   const related = await listRelatedListings({ excludeId, neighborhoodId, cityId, take: 4 })
   if (related.length === 0) return null
@@ -417,7 +444,7 @@ async function RelatedListingsSection({
       </header>
       <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {related.map((l) => (
-          <PublicListingCard key={l.id} listing={l} t={t} />
+          <PublicListingCard key={l.id} listing={l} t={t} authenticated={authenticated} />
         ))}
       </ul>
     </section>

@@ -25,7 +25,7 @@ export type PublicListingDetail = {
   title: string
   description: string
   type: ListingType
-  priceMonthlyMGA: string
+  priceMonthlyMGA: number
   surfaceM2: number | null
   bedrooms: number | null
   bathrooms: number | null
@@ -137,7 +137,7 @@ export async function getPublicListing(
     title: row.title,
     description: row.description,
     type: row.type,
-    priceMonthlyMGA: row.priceMonthlyMGA.toString(),
+    priceMonthlyMGA: row.priceMonthlyMGA,
     surfaceM2: row.surfaceM2,
     bedrooms: row.bedrooms,
     bathrooms: row.bathrooms,

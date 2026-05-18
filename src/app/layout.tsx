@@ -11,6 +11,11 @@ import './globals.css'
 const dmSans = DM_Sans({
   variable: '--font-dm-sans',
   subsets: ['latin'],
+  // `swap` avoids invisible-text-during-font-load on 2G/3G — fallback
+  // shows immediately, DM Sans swaps in once downloaded. `optional`
+  // would silently skip the custom font on slow connections; on a brand
+  // site we prefer the brief FOIT-to-FOUT swap.
+  display: 'swap',
 })
 
 const baseUrl = env.AUTH_URL.replace(/\/$/, '')
