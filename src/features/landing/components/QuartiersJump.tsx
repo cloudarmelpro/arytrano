@@ -9,8 +9,9 @@ export function QuartiersJump({
   quartiers: QuartierRow[]
 }) {
   return (
-    <section className="mx-auto max-w-6xl px-4 pb-12 sm:px-6">
-      <div className="flex flex-wrap gap-2">
+    <section className="bg-background pb-12">
+      <div className="mx-auto max-w-[1280px] px-6 lg:px-10">
+        <div className="flex flex-wrap gap-2">
         {quartiers.map((q) => {
           const name = locale === 'mg' ? q.nameMg : q.nameFr
           return (
@@ -26,6 +27,7 @@ export function QuartiersJump({
             </a>
           )
         })}
+        </div>
       </div>
     </section>
   )

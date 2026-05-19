@@ -22,8 +22,9 @@ export function QuartiersMap({
 }) {
   const t = getT(locale)
   return (
-    <section className="mx-auto max-w-6xl px-4 pb-8 sm:px-6">
-      <div className="relative aspect-[16/7] w-full overflow-hidden rounded-[20px] border border-border bg-[repeating-linear-gradient(135deg,oklch(0.95_0.012_130)_0_16px,oklch(0.97_0.008_130)_16px_32px)] max-[720px]:aspect-[4/3]">
+    <section className="bg-background pb-8">
+      <div className="mx-auto max-w-[1280px] px-6 lg:px-10">
+        <div className="relative aspect-[16/7] w-full overflow-hidden rounded-[20px] border border-border bg-[repeating-linear-gradient(135deg,oklch(0.95_0.012_130)_0_16px,oklch(0.97_0.008_130)_16px_32px)] max-[720px]:aspect-[4/3]">
         <span className="pointer-events-none absolute bottom-2.5 right-4 font-mono text-[11px] text-muted-foreground">
           {t('quartiers.map.placeholder')}
         </span>
@@ -45,6 +46,7 @@ export function QuartiersMap({
             </a>
           )
         })}
+        </div>
       </div>
     </section>
   )

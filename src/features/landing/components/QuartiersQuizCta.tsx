@@ -5,8 +5,9 @@ import { getT } from '@/lib/i18n/translate'
 export function QuartiersQuizCta({ locale }: { locale: Locale }) {
   const t = getT(locale)
   return (
-    <section className="border-y border-border bg-muted/40">
-      <div className="mx-auto max-w-[800px] px-4 py-16 text-center sm:px-6 sm:py-20">
+    <section className="border-y border-border bg-muted/40 py-16 lg:py-20">
+      <div className="mx-auto max-w-[1280px] px-6 lg:px-10">
+        <div className="mx-auto max-w-[800px] text-center">
         <span className="text-[12px] font-semibold uppercase tracking-[0.14em] text-primary">
           {t('quartiers.cta.eyebrow')}
         </span>
@@ -34,6 +35,7 @@ export function QuartiersQuizCta({ locale }: { locale: Locale }) {
           >
             {t('quartiers.cta.secondary')}
           </Link>
+        </div>
         </div>
       </div>
     </section>

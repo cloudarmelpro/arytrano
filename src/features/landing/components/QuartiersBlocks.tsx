@@ -106,23 +106,25 @@ export function QuartiersBlocks({
 }) {
   const t = getT(locale)
   return (
-    <section className="mx-auto max-w-6xl px-4 pb-24 sm:px-6">
-      <div className="flex flex-col gap-12">
-        {quartiers.map((q, i) => {
-          const descriptor = DESCRIPTORS[q.slug]
-          if (!descriptor) return null
-          return (
-            <QuartierBlock
-              key={q.slug}
-              t={t}
-              locale={locale}
-              quartier={q}
-              descriptor={descriptor}
-              tone={TONES_BY_INDEX[i % TONES_BY_INDEX.length] ?? 'warm'}
-              reverse={i % 2 === 1}
-            />
-          )
-        })}
+    <section className="bg-background pb-24">
+      <div className="mx-auto max-w-[1280px] px-6 lg:px-10">
+        <div className="flex flex-col gap-12">
+          {quartiers.map((q, i) => {
+            const descriptor = DESCRIPTORS[q.slug]
+            if (!descriptor) return null
+            return (
+              <QuartierBlock
+                key={q.slug}
+                t={t}
+                locale={locale}
+                quartier={q}
+                descriptor={descriptor}
+                tone={TONES_BY_INDEX[i % TONES_BY_INDEX.length] ?? 'warm'}
+                reverse={i % 2 === 1}
+              />
+            )
+          })}
+        </div>
       </div>
     </section>
   )

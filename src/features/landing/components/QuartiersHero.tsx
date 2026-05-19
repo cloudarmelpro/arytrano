@@ -12,25 +12,27 @@ export function QuartiersHero({
 }) {
   const t = getT(locale)
   return (
-    <section className="mx-auto grid max-w-6xl items-end gap-12 px-4 pt-16 pb-10 sm:px-6 sm:pt-20 sm:pb-12 lg:grid-cols-[1.5fr_1fr]">
-      <div>
-        <span className="text-[12px] font-semibold uppercase tracking-[0.14em] text-primary">
-          {t('quartiers.eyebrow')}
-        </span>
-        <h1 className="mt-3.5 font-serif text-[clamp(36px,4.2vw,56px)] font-normal leading-[1.05] tracking-[-0.02em] text-foreground">
-          {t('quartiers.h1')}
-        </h1>
-        <p className="mt-4 max-w-[540px] text-[17px] leading-[1.55] text-foreground/70">
-          {t('quartiers.lead')}
-        </p>
-      </div>
-      <div className="flex flex-wrap gap-10">
-        <Stat n={String(quartiersCount)} label={t('quartiers.stats.quartiers.label')} />
-        <Stat n={String(totalListings)} label={t('quartiers.stats.listings.label')} />
-        <Stat
-          n={t('quartiers.stats.priceRange.value')}
-          label={t('quartiers.stats.priceRange.label')}
-        />
+    <section className="bg-background pt-16 pb-10 lg:pt-20 lg:pb-12">
+      <div className="mx-auto grid max-w-[1280px] items-end gap-12 px-6 lg:grid-cols-[1.5fr_1fr] lg:px-10">
+        <div>
+          <span className="text-[12px] font-semibold uppercase tracking-[0.14em] text-primary">
+            {t('quartiers.eyebrow')}
+          </span>
+          <h1 className="mt-3.5 font-serif text-[clamp(36px,4.2vw,56px)] font-normal leading-[1.05] tracking-[-0.02em] text-foreground">
+            {t('quartiers.h1')}
+          </h1>
+          <p className="mt-4 max-w-[540px] text-[17px] leading-[1.55] text-foreground/70">
+            {t('quartiers.lead')}
+          </p>
+        </div>
+        <div className="flex flex-wrap gap-10">
+          <Stat n={String(quartiersCount)} label={t('quartiers.stats.quartiers.label')} />
+          <Stat n={String(totalListings)} label={t('quartiers.stats.listings.label')} />
+          <Stat
+            n={t('quartiers.stats.priceRange.value')}
+            label={t('quartiers.stats.priceRange.label')}
+          />
+        </div>
       </div>
     </section>
   )
