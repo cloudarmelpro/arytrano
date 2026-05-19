@@ -10,10 +10,18 @@ export async function generateMetadata(): Promise<Metadata> {
   return { title: t('signUp.title') }
 }
 
-export default async function SignUpPage() {
-  const t = getT(await getLocale())
+type SearchParams = Promise<{ role?: string }>
+
+export default async function SignUpPage({
+  searchParams,
+}: {
+  searchParams: SearchParams
+}) {
+  const [locale, sp] = await Promise.all([getLocale(), searchParams])
+  const t = getT(locale)
   const googleEnabled = Boolean(env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET)
   const facebookEnabled = Boolean(env.FACEBOOK_CLIENT_ID && env.FACEBOOK_CLIENT_SECRET)
+  const initialRole = sp.role === 'OWNER' ? 'OWNER' : 'STUDENT'
 
   return (
     <AuthPageShell
@@ -26,7 +34,11 @@ export default async function SignUpPage() {
         />
       }
     >
-      <SignUpClient googleEnabled={googleEnabled} facebookEnabled={facebookEnabled} />
+      <SignUpClient
+        googleEnabled={googleEnabled}
+        facebookEnabled={facebookEnabled}
+        initialRole={initialRole}
+      />
     </AuthPageShell>
   )
 }

@@ -41,12 +41,14 @@ const ROLES: Array<{
 export function SignUpClient({
   googleEnabled,
   facebookEnabled,
+  initialRole = 'STUDENT',
 }: {
   googleEnabled: boolean
   facebookEnabled: boolean
+  initialRole?: SignUpRole
 }) {
   const t = useT()
-  const [role, setRole] = useState<SignUpRole>('STUDENT')
+  const [role, setRole] = useState<SignUpRole>(initialRole)
   const [formPending, setFormPending] = useState(false)
   const [oauthPending, setOauthPending] = useState(false)
   const busy = formPending || oauthPending
