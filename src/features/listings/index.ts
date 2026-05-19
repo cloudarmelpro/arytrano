@@ -13,3 +13,17 @@ export {
 // `'server-only'` query module.
 export type { PublicListingCard as PublicListingCardData } from './queries/list-public-listings'
 export { PublicListingCard } from './components/PublicListingCard'
+// Client-safe component re-exports for consumers in app/ + cross-feature.
+export { PhotoGallery } from './components/PhotoGallery'
+export { PhotoManager } from './components/PhotoManager'
+export { ContactButtons } from './components/ContactButtons'
+export { ShareButton } from './components/ShareButton'
+export { ListingMapClient } from './components/ListingMapClient'
+export { VerifiedListingBadge } from './components/VerifiedListingBadge'
+export { ListingStatusBadge } from './components/ListingStatusBadge'
+export { ListingForm } from './components/ListingForm'
+export { ListingActions } from './components/ListingActions'
+export { ListingActionsMenu } from './components/ListingActionsMenu'
+export { ListingFiltersSidebar } from './components/ListingFiltersSidebar'
+export { ListingSearchToolbar } from './components/ListingSearchToolbar'
+export { AMENITY_CATALOG, AmenityIcon } from './amenities'

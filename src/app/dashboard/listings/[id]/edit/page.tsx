@@ -3,12 +3,14 @@ import Link from 'next/link'
 import { notFound, redirect } from 'next/navigation'
 import { auth } from '@/features/auth'
 import { listCitiesWithNeighborhoods } from '@/features/geo'
-import { getOwnerListing } from '@/features/listings/queries/get-owner-listing'
-import { ListingForm } from '@/features/listings/components/ListingForm'
-import { ListingStatusBadge } from '@/features/listings/components/ListingStatusBadge'
-import { ListingActions } from '@/features/listings/components/ListingActions'
-import { PhotoManager } from '@/features/listings/components/PhotoManager'
-import { listListingReportsForOwner } from '@/features/reports/queries/list-listing-reports'
+import {
+  ListingForm,
+  ListingStatusBadge,
+  ListingActions,
+  PhotoManager,
+} from '@/features/listings'
+import { getOwnerListing } from '@/features/listings/server'
+import { listListingReportsForOwner } from '@/features/reports/server'
 import { ApiError } from '@/lib/api/errors'
 import { getLocale } from '@/lib/i18n/get-locale'
 import { getT, type Translator } from '@/lib/i18n/translate'

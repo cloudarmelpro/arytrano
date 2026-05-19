@@ -12,28 +12,32 @@ import {
 } from '@/lib/seo/realestate-listing'
 import { safeJsonLd } from '@/lib/seo/safe-json-ld'
 import { localeAlternates } from '@/lib/seo/alternates'
-import { getPublicListing } from '@/features/listings/queries/get-public-listing'
-import { getListingStatusBySlug } from '@/features/listings/queries/get-listing-status-by-slug'
-import { listRelatedListings } from '@/features/listings/server'
-import { PhotoGallery } from '@/features/listings/components/PhotoGallery'
-import { ContactButtons } from '@/features/listings/components/ContactButtons'
-import { ShareButton } from '@/features/listings/components/ShareButton'
-import { ListingMapClient } from '@/features/listings/components/ListingMapClient'
-import { AMENITY_CATALOG, AmenityIcon } from '@/features/listings/amenities'
-import { PublicListingCard } from '@/features/listings/components/PublicListingCard'
-import { VerifiedListingBadge } from '@/features/listings/components/VerifiedListingBadge'
-import { VerifiedOwnerBadge } from '@/features/auth/components/VerifiedOwnerBadge'
-import { ReportButton } from '@/features/reports/components/ReportButton'
+import {
+  PhotoGallery,
+  ContactButtons,
+  ShareButton,
+  ListingMapClient,
+  PublicListingCard,
+  VerifiedListingBadge,
+  AMENITY_CATALOG,
+  AmenityIcon,
+} from '@/features/listings'
+import {
+  getPublicListing,
+  getListingStatusBySlug,
+  listRelatedListings,
+} from '@/features/listings/server'
+import { auth, VerifiedOwnerBadge } from '@/features/auth'
+import { ReportButton } from '@/features/reports'
 import { FavoriteButton } from '@/features/favorites'
 import { getFavoritedListingIds } from '@/features/favorites/server'
-import { auth } from '@/features/auth'
 import { ReviewForm, ReviewList, StarRating } from '@/features/reviews'
-import { listListingReviews } from '@/features/reviews/queries/list-listing-reviews'
 import {
+  listListingReviews,
   getReviewStats,
   hasUserReviewed,
-} from '@/features/reviews/queries/get-review-stats'
-import { getReviewReactionsForList } from '@/features/reviews/queries/get-review-reactions'
+  getReviewReactionsForList,
+} from '@/features/reviews/server'
 
 type Params = Promise<{
   citySlug: string

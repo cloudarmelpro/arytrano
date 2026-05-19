@@ -1,6 +1,6 @@
 import type { MetadataRoute } from 'next'
 import { env } from '@/lib/env'
-import { listSitemapListings } from '@/features/listings/queries/list-sitemap-listings'
+import { listSitemapListings } from '@/features/listings/server'
 
 export const revalidate = 3600 // regenerate hourly
 

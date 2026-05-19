@@ -5,7 +5,7 @@ import { Header } from '@/components/shared/Header'
 import { Footer } from '@/components/shared/Footer'
 import { AccountSidebar } from '@/components/shared/AccountSidebar'
 import { auth } from '@/features/auth'
-import { getProfile } from '@/features/auth/services/update-profile'
+import { getProfile } from '@/features/auth/server'
 
 export const metadata: Metadata = {
   robots: { index: false, follow: false },

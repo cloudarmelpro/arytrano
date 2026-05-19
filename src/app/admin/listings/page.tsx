@@ -1,14 +1,13 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
-import type { AdminListingRow } from '@/features/admin/queries/list-admin-listings'
+import { SuspendListingButton, VerifyListingButton } from '@/features/admin'
 import {
   listAdminListings,
   listAdminListingsQuerySchema,
-} from '@/features/admin/queries/list-admin-listings'
-import { SuspendListingButton } from '@/features/admin/components/SuspendListingButton'
-import { VerifyListingButton } from '@/features/admin/components/VerifyListingButton'
-import { ListingStatusBadge } from '@/features/listings/components/ListingStatusBadge'
+  type AdminListingRow,
+} from '@/features/admin/server'
+import { ListingStatusBadge } from '@/features/listings'
 import { formatAriary } from '@/lib/format/currency'
 import { getLocale } from '@/lib/i18n/get-locale'
 import { getT, type Translator } from '@/lib/i18n/translate'

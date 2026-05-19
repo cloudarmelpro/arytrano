@@ -9,3 +9,4 @@
  */
 export { getFavoritedListingIds } from './queries/get-favorited-listing-ids'
 export { listUserFavorites } from './queries/list-user-favorites'
+export { countUserPublishedFavorites } from './queries/count-user-favorites'

@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server'
 import { auth } from '@/features/auth'
-import { requireAdmin } from '@/features/admin/services/require-admin'
-import { decryptOwnerCin } from '@/features/admin/services/review-cin'
+import { requireAdmin, decryptOwnerCin } from '@/features/admin/server'
 import { ApiError } from '@/lib/api/errors'
 
 type Ctx = { params: Promise<{ ownerId: string }> }

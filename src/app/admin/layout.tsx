@@ -5,7 +5,7 @@ import { Header } from '@/components/shared/Header'
 import { Footer } from '@/components/shared/Footer'
 import { AdminSidebar } from '@/components/shared/AdminSidebar'
 import { auth } from '@/features/auth'
-import { getAdminContext } from '@/features/admin/queries/get-admin-context'
+import { getAdminContext } from '@/features/admin/server'
 
 export const metadata: Metadata = {
   robots: { index: false, follow: false },

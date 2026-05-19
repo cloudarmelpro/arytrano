@@ -1,8 +1,8 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import type { ReportReason, ReportStatus } from '@prisma/client'
-import { listReports, listReportsQuerySchema } from '@/features/admin/queries/list-reports'
-import { ReportActions } from '@/features/admin/components/ReportActions'
+import { listReports, listReportsQuerySchema } from '@/features/admin/server'
+import { ReportActions } from '@/features/admin'
 import { getLocale } from '@/lib/i18n/get-locale'
 import { getT, type Translator } from '@/lib/i18n/translate'
 

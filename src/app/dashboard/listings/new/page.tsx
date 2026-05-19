@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { auth } from '@/features/auth'
 import { listCitiesWithNeighborhoods } from '@/features/geo'
-import { ListingForm } from '@/features/listings/components/ListingForm'
+import { ListingForm } from '@/features/listings'
 import { getLocale } from '@/lib/i18n/get-locale'
 import { getT } from '@/lib/i18n/translate'
 

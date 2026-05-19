@@ -1,8 +1,7 @@
 import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
-import { auth } from '@/features/auth'
-import { getCinStatus } from '@/features/auth/services/submit-cin'
-import { CinUploadForm } from '@/features/auth/components/CinUploadForm'
+import { auth, CinUploadForm } from '@/features/auth'
+import { getCinStatus } from '@/features/auth/server'
 import { getLocale } from '@/lib/i18n/get-locale'
 import { getT } from '@/lib/i18n/translate'
 

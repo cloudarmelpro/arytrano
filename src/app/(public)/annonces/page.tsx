@@ -5,8 +5,10 @@ import {
   listPublicListingsQuerySchema,
 } from '@/features/listings/server'
 import { PublicListingCard } from '@/features/listings'
-import { ListingFiltersSidebar } from '@/features/listings/components/ListingFiltersSidebar'
-import { ListingSearchToolbar } from '@/features/listings/components/ListingSearchToolbar'
+import {
+  ListingFiltersSidebar,
+  ListingSearchToolbar,
+} from '@/features/listings'
 import { listCitiesWithNeighborhoods } from '@/features/geo'
 import { getFavoritedListingIds } from '@/features/favorites/server'
 import { auth } from '@/features/auth'

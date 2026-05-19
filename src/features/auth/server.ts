@@ -10,3 +10,20 @@
  * stay on the main `@/features/auth` index.
  */
 export { getProfile } from './services/update-profile'
+export {
+  listConnections,
+  countAuthMethods,
+  type ConnectionSummary,
+} from './services/connections'
+export {
+  listLoginEvents,
+  type LoginEventView,
+} from './services/list-login-events'
+export {
+  countActiveRecoveryCodes,
+  isTotpEnabled,
+} from './services/totp'
+export {
+  getCinStatus,
+  type CinStatus,
+} from './services/submit-cin'

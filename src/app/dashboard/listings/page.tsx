@@ -3,9 +3,11 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { auth } from '@/features/auth'
-import { listOwnerListings } from '@/features/listings/queries/list-owner-listings'
-import { ListingStatusBadge } from '@/features/listings/components/ListingStatusBadge'
-import { ListingActionsMenu } from '@/features/listings/components/ListingActionsMenu'
+import {
+  ListingStatusBadge,
+  ListingActionsMenu,
+} from '@/features/listings'
+import { listOwnerListings } from '@/features/listings/server'
 import { formatAriary } from '@/lib/format/currency'
 import { getLocale } from '@/lib/i18n/get-locale'
 import { getT, type Translator } from '@/lib/i18n/translate'

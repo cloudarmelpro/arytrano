@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
-import { listCinQueue } from '@/features/admin/queries/list-cin-queue'
-import { CinReviewRow } from '@/features/admin/components/CinReviewRow'
+import { listCinQueue } from '@/features/admin/server'
+import { CinReviewRow } from '@/features/admin'
 import { getLocale } from '@/lib/i18n/get-locale'
 import { getT } from '@/lib/i18n/translate'
 

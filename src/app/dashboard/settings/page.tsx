@@ -1,15 +1,21 @@
 import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
-import { auth } from '@/features/auth'
+import {
+  auth,
+  PasswordSection,
+  OAuthConnectionsSection,
+  DeleteAccountSection,
+  LoginEventsSection,
+  TwoFactorSection,
+} from '@/features/auth'
+import {
+  listConnections,
+  countAuthMethods,
+  listLoginEvents,
+  countActiveRecoveryCodes,
+  isTotpEnabled,
+} from '@/features/auth/server'
 import { env } from '@/lib/env'
-import { listConnections, countAuthMethods } from '@/features/auth/services/connections'
-import { listLoginEvents } from '@/features/auth/services/list-login-events'
-import { PasswordSection } from '@/features/auth/components/PasswordSection'
-import { OAuthConnectionsSection } from '@/features/auth/components/OAuthConnectionsSection'
-import { DeleteAccountSection } from '@/features/auth/components/DeleteAccountSection'
-import { LoginEventsSection } from '@/features/auth/components/LoginEventsSection'
-import { TwoFactorSection } from '@/features/auth/components/TwoFactorSection'
-import { countActiveRecoveryCodes, isTotpEnabled } from '@/features/auth/services/totp'
 import { getLocale } from '@/lib/i18n/get-locale'
 import { getT } from '@/lib/i18n/translate'
 
