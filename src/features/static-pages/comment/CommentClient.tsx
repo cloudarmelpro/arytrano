@@ -109,29 +109,19 @@ export function CommentClient() {
 
   return (
     <>
-      <section className="bg-background pt-16 pb-12 text-center lg:pt-20 lg:pb-14">
+      <section className="bg-background pb-12 text-center lg:pb-14">
         <div className="mx-auto max-w-[920px] px-6 lg:px-10">
-          <span className="text-[12px] font-semibold uppercase tracking-[0.14em] text-primary">
-            {t('comment.eyebrow')}
-          </span>
-          <h1 className="mt-3.5 mb-5 font-serif text-[clamp(36px,4.6vw,64px)] font-normal leading-[1.05] tracking-[-0.025em] text-foreground">
-            {t('comment.h1.lead')}{' '}
-            <em className="font-serif italic text-primary">
-              {t('comment.h1.accent')}
-            </em>
-          </h1>
-          <p className="mx-auto max-w-[720px] text-[16px] leading-[1.55] text-foreground/70 sm:text-[17px]">
-            {t('comment.sub')}
-          </p>
           <div
             role="tablist"
             aria-label={t('comment.eyebrow')}
-            className="mt-7 inline-flex rounded-full border border-border bg-muted/40 p-1"
+            className="inline-flex rounded-full border border-border bg-muted/40 p-1"
           >
             <button
               type="button"
               role="tab"
+              id="comment-tab-student"
               aria-selected={audience === 'student'}
+              aria-controls="comment-panel"
               onClick={() => setAudience('student')}
               className={`inline-flex h-10 cursor-pointer items-center gap-2 rounded-full px-4 text-[13.5px] font-semibold transition ${
                 audience === 'student'
@@ -144,7 +134,9 @@ export function CommentClient() {
             <button
               type="button"
               role="tab"
+              id="comment-tab-owner"
               aria-selected={audience === 'owner'}
+              aria-controls="comment-panel"
               onClick={() => setAudience('owner')}
               className={`inline-flex h-10 cursor-pointer items-center gap-2 rounded-full px-4 text-[13.5px] font-semibold transition ${
                 audience === 'owner'
@@ -158,7 +150,14 @@ export function CommentClient() {
         </div>
       </section>
 
-      <section className="bg-background py-12 lg:py-16">
+      <section
+        role="tabpanel"
+        id="comment-panel"
+        aria-labelledby={
+          audience === 'student' ? 'comment-tab-student' : 'comment-tab-owner'
+        }
+        className="bg-background py-12 lg:py-16"
+      >
         <ol className="mx-auto flex max-w-[1280px] flex-col gap-8 px-6 lg:px-10">
           {steps.map((s, i) => (
             <li key={s.n}>

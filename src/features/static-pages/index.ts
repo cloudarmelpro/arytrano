@@ -6,6 +6,7 @@
  * `/proprietaires` (single composite RSC).
  */
 export { CommentClient } from './comment/CommentClient'
+export { CommentHero } from './comment/CommentHero'
 export {
   CommentWhy,
   CommentVerif,

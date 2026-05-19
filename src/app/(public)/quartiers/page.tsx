@@ -10,6 +10,7 @@ import { getQuartiersData } from '@/features/landing/server'
 import { getLocale } from '@/lib/i18n/get-locale'
 import { getT } from '@/lib/i18n/translate'
 import { localeAlternates } from '@/lib/seo/alternates'
+import { BreadcrumbJsonLd } from '@/lib/seo/breadcrumb'
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getLocale()
@@ -29,8 +30,13 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function QuartiersPage() {
   const [locale, data] = await Promise.all([getLocale(), getQuartiersData()])
+  const t = getT(locale)
   return (
     <>
+      <BreadcrumbJsonLd
+        homeLabel={t('common.home')}
+        trail={[{ name: t('quartiers.meta.title'), href: '/quartiers' }]}
+      />
       <QuartiersHero
         locale={locale}
         quartiersCount={data.quartiers.length}
