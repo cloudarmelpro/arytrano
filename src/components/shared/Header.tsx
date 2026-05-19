@@ -27,7 +27,14 @@ const NAV: NavEntry[] = [
   { id: 'owners', href: '/proprietaires', labelKey: 'header.nav.owners', icon: 'building' },
 ]
 
-function activeId(pathname: string): string | null {
+function activeId(rawPathname: string): string | null {
+  // Strip `/mg` prefix — proxy forwards the user-visible URL (incl. locale),
+  // but our nav targets the canonical FR paths.
+  const pathname = rawPathname.startsWith('/mg/')
+    ? rawPathname.slice('/mg'.length)
+    : rawPathname === '/mg'
+      ? '/'
+      : rawPathname
   if (pathname === '/' || pathname === '') return null
   if (pathname.startsWith('/annonces')) return 'annonces'
   if (pathname.startsWith('/quartiers')) return 'quartiers'
@@ -187,7 +194,7 @@ function PrimaryNav({
               key={n.id}
               href={n.href}
               data-active={isActive}
-              className={`relative inline-flex shrink-0 items-center gap-2 whitespace-nowrap border-b-2 px-0 py-3.5 mr-5 text-[14px] tracking-[-0.005em] transition ${
+              className={`relative -mb-px inline-flex shrink-0 items-center gap-2 whitespace-nowrap border-b-2 pl-0 pr-[18px] py-3.5 mr-[22px] last:mr-0 text-[14px] tracking-[-0.005em] transition ${
                 isActive
                   ? 'border-white font-semibold text-white'
                   : 'border-transparent font-medium text-white/80 hover:text-white'
