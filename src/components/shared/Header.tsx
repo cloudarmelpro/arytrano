@@ -1,5 +1,4 @@
 import Link from 'next/link'
-import { headers } from 'next/headers'
 import { auth } from '@/features/auth'
 import { getProfile } from '@/features/auth/services/update-profile'
 import { getLocale } from '@/lib/i18n/get-locale'
@@ -8,8 +7,9 @@ import type { Locale } from '@/lib/i18n/config'
 import { LocaleSwitcher } from './LocaleSwitcher'
 import { HeaderAvatarMenu } from './HeaderAvatarMenu'
 import { Icon, type IconName } from './Icon'
+import { HeaderPrimaryNav, type NavEntry } from './HeaderPrimaryNav'
 
-type NavEntry = {
+type NavConfig = {
   id: string
   href: string
   labelKey:
@@ -20,40 +20,24 @@ type NavEntry = {
   icon: IconName
 }
 
-const NAV: NavEntry[] = [
+const NAV_CONFIG: NavConfig[] = [
   { id: 'annonces', href: '/annonces', labelKey: 'header.nav.listings', icon: 'home-heart' },
   { id: 'quartiers', href: '/quartiers', labelKey: 'header.nav.quartiers', icon: 'pin' },
   { id: 'how', href: '/comment-ca-marche', labelKey: 'header.nav.howItWorks', icon: 'help' },
   { id: 'owners', href: '/proprietaires', labelKey: 'header.nav.owners', icon: 'building' },
 ]
 
-function activeId(rawPathname: string): string | null {
-  // Strip `/mg` prefix — proxy forwards the user-visible URL (incl. locale),
-  // but our nav targets the canonical FR paths.
-  const pathname = rawPathname.startsWith('/mg/')
-    ? rawPathname.slice('/mg'.length)
-    : rawPathname === '/mg'
-      ? '/'
-      : rawPathname
-  if (pathname === '/' || pathname === '') return null
-  if (pathname.startsWith('/annonces')) return 'annonces'
-  if (pathname.startsWith('/quartiers')) return 'quartiers'
-  if (pathname.startsWith('/comment-ca-marche')) return 'how'
-  if (pathname.startsWith('/proprietaires')) return 'owners'
-  return null
-}
-
 export async function Header() {
-  const [session, locale, headerList] = await Promise.all([
-    auth(),
-    getLocale(),
-    headers(),
-  ])
+  const [session, locale] = await Promise.all([auth(), getLocale()])
   const t = getT(locale)
   const user = session?.user
   const profile = user ? await getProfile(user.id) : null
-  const pathname = headerList.get('x-pathname') ?? ''
-  const current = activeId(pathname)
+  const navItems: NavEntry[] = NAV_CONFIG.map((n) => ({
+    id: n.id,
+    href: n.href,
+    label: t(n.labelKey),
+    icon: n.icon,
+  }))
 
   return (
     <header className="relative z-10">
@@ -72,7 +56,7 @@ export async function Header() {
             : null
         }
       />
-      <PrimaryNav t={t} current={current} />
+      <HeaderPrimaryNav items={navItems} />
     </header>
   )
 }
@@ -174,44 +158,3 @@ function BrandRow({
   )
 }
 
-function PrimaryNav({
-  t,
-  current,
-}: {
-  t: Translator
-  current: string | null
-}) {
-  return (
-    <nav
-      aria-label="Navigation principale"
-      className="border-t border-white/10 bg-primary"
-    >
-      <div className="no-scrollbar mx-auto flex max-w-[1280px] items-stretch gap-1 overflow-x-auto px-6 lg:px-10">
-        {NAV.map((n) => {
-          const isActive = current === n.id
-          return (
-            <Link
-              key={n.id}
-              href={n.href}
-              data-active={isActive}
-              className={`relative -mb-px inline-flex shrink-0 items-center gap-2 whitespace-nowrap border-b-2 pl-0 pr-[18px] py-3.5 mr-[22px] last:mr-0 text-[14px] tracking-[-0.005em] transition ${
-                isActive
-                  ? 'border-white font-semibold text-white'
-                  : 'border-transparent font-medium text-white/80 hover:text-white'
-              }`}
-            >
-              <span
-                className={`inline-flex items-center justify-center transition ${
-                  isActive ? 'text-white' : 'text-white/70'
-                }`}
-              >
-                <Icon name={n.icon} size={15} />
-              </span>
-              {t(n.labelKey)}
-            </Link>
-          )
-        })}
-      </div>
-    </nav>
-  )
-}
