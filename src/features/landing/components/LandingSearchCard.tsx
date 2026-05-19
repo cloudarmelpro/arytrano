@@ -7,12 +7,21 @@ import { Icon, type IconName } from '@/components/shared/Icon'
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
+  SelectLabel,
   SelectTrigger,
 } from '@/components/ui/select'
 
 const LISTING_TYPES = ['ROOM', 'STUDIO', 'APARTMENT', 'HOUSE'] as const
 type ListingType = (typeof LISTING_TYPES)[number]
+
+const TYPE_ICON: Record<ListingType, IconName> = {
+  ROOM: 'bed',
+  STUDIO: 'house',
+  APARTMENT: 'building',
+  HOUSE: 'home-heart',
+}
 
 export type NeighborhoodOption = {
   slug: string
@@ -94,12 +103,25 @@ export function LandingSearchCard({
           placeholder={t('landing.hero.search.quartier.placeholder')}
           value={quartierLabel}
         />
-        <SelectContent className="bg-white text-foreground">
-          {neighborhoodItems.map((o) => (
-            <SelectItem key={o.value} value={o.value}>
-              {o.label}
-            </SelectItem>
-          ))}
+        <SelectContent className="min-w-[280px] bg-white p-1 text-foreground">
+          <SelectGroup className="p-0">
+            <SelectLabel className="px-3 pt-3 pb-2 text-[12px] font-semibold uppercase tracking-[0.06em] text-foreground">
+              {t('landing.hero.search.quartier.groupLabel')}
+            </SelectLabel>
+            {neighborhoodItems.map((o) => (
+              <SelectItem
+                key={o.value}
+                value={o.value}
+                className="cursor-pointer rounded-md px-3 py-2.5"
+              >
+                <Row
+                  icon="pin"
+                  label={o.label}
+                  subtitle={t('landing.hero.search.quartier.itemSubtitle')}
+                />
+              </SelectItem>
+            ))}
+          </SelectGroup>
         </SelectContent>
       </Select>
 
@@ -115,12 +137,24 @@ export function LandingSearchCard({
           placeholder={t('landing.hero.search.type.placeholder')}
           value={typeLabel}
         />
-        <SelectContent className="bg-white text-foreground">
-          {typeItems.map((o) => (
-            <SelectItem key={o.value} value={o.value}>
-              {o.label}
-            </SelectItem>
-          ))}
+        <SelectContent className="min-w-[260px] bg-white p-1 text-foreground">
+          <SelectGroup className="p-0">
+            <SelectLabel className="px-3 pt-3 pb-2 text-[12px] font-semibold uppercase tracking-[0.06em] text-foreground">
+              {t('landing.hero.search.type.groupLabel')}
+            </SelectLabel>
+            {typeItems.map((o) => (
+              <SelectItem
+                key={o.value}
+                value={o.value}
+                className="cursor-pointer rounded-md px-3 py-2.5"
+              >
+                <Row
+                  icon={TYPE_ICON[o.value as ListingType]}
+                  label={o.label}
+                />
+              </SelectItem>
+            ))}
+          </SelectGroup>
         </SelectContent>
       </Select>
 
@@ -218,5 +252,38 @@ function FieldTrigger({
         </span>
       </span>
     </SelectTrigger>
+  )
+}
+
+/**
+ * Booking-style dropdown row: outlined pin/icon + bold name on top
+ * line, subtitle below. Used for both Quartier ("Andrainjato" /
+ * "Fianarantsoa") and Type ("Studio" with bed icon).
+ */
+function Row({
+  icon,
+  label,
+  subtitle,
+}: {
+  icon: IconName
+  label: string
+  subtitle?: string
+}) {
+  return (
+    <span className="flex items-center gap-3">
+      <span className="inline-flex h-7 w-7 shrink-0 items-center justify-center text-foreground/70">
+        <Icon name={icon} size={20} stroke={1.6} />
+      </span>
+      <span className="flex flex-col leading-tight">
+        <span className="text-[14px] font-semibold text-foreground">
+          {label}
+        </span>
+        {subtitle && (
+          <span className="mt-0.5 text-[12px] font-medium text-muted-foreground">
+            {subtitle}
+          </span>
+        )}
+      </span>
+    </span>
   )
 }

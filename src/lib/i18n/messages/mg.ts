@@ -433,6 +433,9 @@ export const mg: Record<MessageKey, string> = {
   'landing.hero.search.submit.one': 'Hijery ny doka',
   'landing.hero.search.submit.other': 'Hijery ireo doka {count}',
   'landing.hero.search.formAria': 'Mitady trano ho an’ny mpianatra ao Fianarantsoa',
+  'landing.hero.search.quartier.groupLabel': 'Faritra malaza',
+  'landing.hero.search.quartier.itemSubtitle': 'Fianarantsoa',
+  'landing.hero.search.type.groupLabel': 'Karazana trano',
   'landing.hero.microStats': 'Doka {count} · {verified} tompony voamarina',
 
   // Trust strip — title + sous-titre

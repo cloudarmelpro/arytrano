@@ -429,6 +429,9 @@ export const frMG = {
   'landing.hero.search.submit.one': 'Voir l’annonce',
   'landing.hero.search.submit.other': 'Voir les {count} annonces',
   'landing.hero.search.formAria': 'Rechercher un logement étudiant à Fianarantsoa',
+  'landing.hero.search.quartier.groupLabel': 'Quartiers populaires',
+  'landing.hero.search.quartier.itemSubtitle': 'Fianarantsoa',
+  'landing.hero.search.type.groupLabel': 'Type de logement',
   'landing.hero.microStats': '{count} annonces · {verified} proprios vérif.',
 
   // Trust strip — titre + sous-titre court
