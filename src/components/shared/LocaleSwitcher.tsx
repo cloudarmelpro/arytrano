@@ -5,6 +5,12 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { useLocale } from '@/lib/i18n/client'
 import { LOCALES, LOCALE_LABEL, type Locale } from '@/lib/i18n/config'
 import { setLocaleAction } from '@/features/i18n'
+import { Icon, type IconName } from './Icon'
+
+const FLAG_BY_LOCALE: Record<Locale, IconName> = {
+  'fr-MG': 'flag-fr',
+  mg: 'flag-mg',
+}
 
 /**
  * Functional locale switcher (T-020).
@@ -74,7 +80,7 @@ export function LocaleSwitcher({ dark = false }: { dark?: boolean } = {}) {
             onClick={() => onSelect(l)}
             aria-pressed={active}
             disabled={pending}
-            className={`min-w-[2rem] rounded-md px-3 py-1 transition-colors disabled:cursor-not-allowed disabled:opacity-60 ${
+            className={`inline-flex min-w-[2rem] items-center gap-1.5 rounded-md px-2.5 py-1 transition-colors disabled:cursor-not-allowed disabled:opacity-60 ${
               active
                 ? dark
                   ? 'bg-white/25 text-white shadow-sm'
@@ -84,6 +90,7 @@ export function LocaleSwitcher({ dark = false }: { dark?: boolean } = {}) {
                   : 'text-muted-foreground hover:text-foreground'
             }`}
           >
+            <Icon name={FLAG_BY_LOCALE[l]} size={12} />
             {LOCALE_LABEL[l]}
           </button>
         )
