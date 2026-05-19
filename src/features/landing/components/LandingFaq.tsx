@@ -3,6 +3,7 @@ import { getT } from '@/lib/i18n/translate'
 import { safeJsonLd } from '@/lib/seo/safe-json-ld'
 import type { MessageKey } from '@/lib/i18n/messages'
 import { Icon } from '@/components/shared/Icon'
+import { LandingFaqAccordion } from './LandingFaqAccordion'
 
 const QUESTIONS: Array<{ q: MessageKey; a: MessageKey }> = [
   { q: 'landing.faq.q1.question', a: 'landing.faq.q1.answer' },
@@ -62,41 +63,7 @@ export function LandingFaq({ locale }: { locale: Locale }) {
           </a>
         </aside>
 
-        <div className="flex flex-col gap-2">
-          {items.map((it, i) => (
-            <details
-              key={i}
-              // `name=` makes the 5 details form an exclusive group:
-              // opening one auto-closes any other (native HTML spec).
-              name="landing-faq"
-              className="group rounded-2xl border border-border bg-background p-5 transition-colors hover:border-primary/40 open:border-primary/60 open:bg-muted/30"
-            >
-              <summary className="flex cursor-pointer list-none items-start gap-5">
-                <span className="shrink-0 font-mono text-[12px] font-semibold tracking-[0.06em] text-primary">
-                  Q{String(i + 1).padStart(2, '0')}
-                </span>
-                <span className="flex-1 text-[16px] font-semibold leading-[1.4] text-foreground">
-                  {it.question}
-                </span>
-                <span
-                  aria-hidden
-                  className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-muted text-muted-foreground transition-[transform,background-color,color] duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] group-open:rotate-45 group-open:bg-primary group-open:text-primary-foreground"
-                >
-                  <Icon name="plus" size={16} />
-                </span>
-              </summary>
-              {/* grid-rows from 0fr → 1fr animates content height smoothly
-                  without needing JS or `interpolate-size` (good fallback
-                  for older Chrome / Firefox). The inner overflow-hidden
-                  clips the answer while the row collapses. */}
-              <div className="grid grid-rows-[0fr] transition-[grid-template-rows] duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] group-open:grid-rows-[1fr]">
-                <p className="overflow-hidden whitespace-pre-wrap pl-12 text-[14px] leading-[1.6] text-foreground/70">
-                  <span className="block pt-3">{it.answer}</span>
-                </p>
-              </div>
-            </details>
-          ))}
-        </div>
+        <LandingFaqAccordion items={items} />
       </div>
 
       <script
