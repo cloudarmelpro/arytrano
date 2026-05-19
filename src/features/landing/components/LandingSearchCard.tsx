@@ -2,6 +2,7 @@
 
 import { useMemo, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
+import { Combobox } from '@base-ui/react/combobox'
 import { useT } from '@/lib/i18n/client'
 import { Icon, type IconName } from '@/components/shared/Icon'
 import {
@@ -40,6 +41,9 @@ export function LandingSearchCard({
   const [pending, startTransition] = useTransition()
 
   const [quartier, setQuartier] = useState('')
+  // Free-text typed in the Quartier autocomplete input. Set by the user
+  // when typing; reset to the matching label when an item is picked.
+  const [quartierText, setQuartierText] = useState('')
   const [type, setType] = useState<ListingType | ''>('')
   const [priceMax, setPriceMax] = useState('')
 
@@ -91,39 +95,63 @@ export function LandingSearchCard({
       aria-label={t('landing.hero.search.formAria' as const)}
       className="grid gap-3 sm:grid-cols-2 lg:grid-cols-[1.15fr_1.35fr_1.1fr_auto] lg:gap-3"
     >
-      <Select
-        value={quartier}
-        onValueChange={(v) => setQuartier(v ?? '')}
-        disabled={pending}
+      <Combobox.Root
         items={neighborhoodItems}
+        inputValue={quartierText}
+        onInputValueChange={(v) => {
+          setQuartierText(v)
+          // Free typing clears any previously-selected slug — submitting now
+          // means "no quartier filter" until the user picks one from the list.
+          if (quartier) setQuartier('')
+        }}
       >
-        <FieldTrigger
-          icon="pin"
-          label={t('landing.hero.search.quartier.label')}
-          placeholder={t('landing.hero.search.quartier.placeholder')}
-          value={quartierLabel}
-        />
-        <SelectContent className="min-w-[280px] bg-white p-1 text-foreground">
-          <SelectGroup className="p-0">
-            <SelectLabel className="px-3 pt-3 pb-2 text-[12px] font-semibold uppercase tracking-[0.06em] text-foreground">
+        <label className="flex min-h-16 items-center gap-3.5 rounded-xl border-[1.5px] border-white/50 px-3.5 py-3 text-left text-white transition focus-within:border-white focus-within:bg-white/[0.06] hover:border-white hover:bg-white/[0.06]">
+          <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-[9px] bg-white/15 text-white">
+            <Icon name="pin" size={18} />
+          </span>
+          <span className="flex min-w-0 flex-1 flex-col gap-1">
+            <span className="text-[10.5px] font-semibold uppercase leading-none tracking-[0.1em] text-white/70">
+              {t('landing.hero.search.quartier.label')}
+            </span>
+            <Combobox.Input
+              placeholder={t('landing.hero.search.quartier.placeholder')}
+              disabled={pending}
+              className="w-full bg-transparent text-[15.5px] font-bold leading-[1.1] tracking-[-0.01em] text-white outline-none placeholder:font-medium placeholder:text-white/55 disabled:opacity-60"
+            />
+          </span>
+        </label>
+        <Combobox.Portal>
+          <Combobox.Positioner sideOffset={6} align="start" className="z-50">
+            <Combobox.Popup className="min-w-(--anchor-width) max-h-(--available-height) overflow-y-auto rounded-lg bg-white p-1 text-foreground shadow-lg ring-1 ring-foreground/10 data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0">
+            <div className="px-3 pt-3 pb-2 text-[12px] font-semibold uppercase tracking-[0.06em] text-foreground">
               {t('landing.hero.search.quartier.groupLabel')}
-            </SelectLabel>
-            {neighborhoodItems.map((o) => (
-              <SelectItem
-                key={o.value}
-                value={o.value}
-                className="cursor-pointer rounded-md px-3 py-2.5"
-              >
-                <Row
-                  icon="pin"
-                  label={o.label}
-                  subtitle={t('landing.hero.search.quartier.itemSubtitle')}
-                />
-              </SelectItem>
-            ))}
-          </SelectGroup>
-        </SelectContent>
-      </Select>
+            </div>
+            <Combobox.Empty className="px-3 py-4 text-center text-[13px] text-muted-foreground">
+              {t('landing.hero.search.quartier.noResults' as const)}
+            </Combobox.Empty>
+            <Combobox.List className="flex flex-col">
+              {(o: { value: string; label: string }) => (
+                <Combobox.Item
+                  key={o.value}
+                  value={o}
+                  onClick={() => {
+                    setQuartier(o.value)
+                    setQuartierText(o.label)
+                  }}
+                  className="cursor-pointer rounded-md px-3 py-2.5 outline-none data-highlighted:bg-primary/10 data-highlighted:text-foreground"
+                >
+                  <Row
+                    icon="pin"
+                    label={o.label}
+                    subtitle={t('landing.hero.search.quartier.itemSubtitle')}
+                  />
+                </Combobox.Item>
+              )}
+            </Combobox.List>
+            </Combobox.Popup>
+          </Combobox.Positioner>
+        </Combobox.Portal>
+      </Combobox.Root>
 
       <Select
         value={type}
@@ -178,13 +206,14 @@ export function LandingSearchCard({
         aria-busy={pending}
         className="inline-flex min-h-16 min-w-[170px] items-center justify-center gap-2 rounded-xl border-[1.5px] border-white bg-white px-7 text-[15px] font-bold leading-none tracking-[-0.005em] text-primary transition hover:bg-[oklch(0.97_0.012_90)] active:translate-y-px disabled:cursor-not-allowed disabled:opacity-60 max-lg:col-span-full"
       >
-        {pending && (
+        {pending ? (
           <span
             aria-hidden
             className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-primary/30 border-t-primary"
           />
+        ) : (
+          <Icon name="search" size={17} />
         )}
-        <Icon name="search" size={17} />
         {submitLabel}
       </button>
     </form>
@@ -244,9 +273,8 @@ function FieldTrigger({
           {label}
         </span>
         <span
-          className={`truncate text-[15.5px] font-bold leading-[1.1] tracking-[-0.01em] ${
-            value ? 'text-white' : 'text-white/55 font-medium'
-          }`}
+          className={`truncate text-[15.5px] font-bold leading-[1.1] tracking-[-0.01em] ${value ? 'text-white' : 'text-white/55 font-medium'
+            }`}
         >
           {value || placeholder}
         </span>

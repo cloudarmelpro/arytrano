@@ -435,6 +435,7 @@ export const mg: Record<MessageKey, string> = {
   'landing.hero.search.formAria': 'Mitady trano ho an’ny mpianatra ao Fianarantsoa',
   'landing.hero.search.quartier.groupLabel': 'Faritra malaza',
   'landing.hero.search.quartier.itemSubtitle': 'Fianarantsoa',
+  'landing.hero.search.quartier.noResults': 'Tsy misy faritra mifanaraka.',
   'landing.hero.search.type.groupLabel': 'Karazana trano',
   'landing.hero.microStats': 'Doka {count} · {verified} tompony voamarina',
 

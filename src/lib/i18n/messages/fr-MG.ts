@@ -431,6 +431,7 @@ export const frMG = {
   'landing.hero.search.formAria': 'Rechercher un logement étudiant à Fianarantsoa',
   'landing.hero.search.quartier.groupLabel': 'Quartiers populaires',
   'landing.hero.search.quartier.itemSubtitle': 'Fianarantsoa',
+  'landing.hero.search.quartier.noResults': 'Aucun quartier ne correspond.',
   'landing.hero.search.type.groupLabel': 'Type de logement',
   'landing.hero.microStats': '{count} annonces · {verified} proprios vérif.',
 

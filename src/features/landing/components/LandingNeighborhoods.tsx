@@ -51,9 +51,9 @@ export function LandingNeighborhoods({
           </div>
           <Link
             href="/quartiers"
-            className="inline-flex h-11 items-center gap-1.5 rounded-[10px] border border-border bg-background px-4 text-[14px] font-semibold text-foreground transition hover:bg-muted"
+            className="inline-flex h-11 items-center rounded-xl border border-border bg-background px-6 text-[14px] font-medium text-foreground transition hover:bg-muted"
           >
-            {t('landing.neighborhoods.viewAll')} <Icon name="arrow-right" size={14} />
+            {t('landing.neighborhoods.viewAll')}
           </Link>
         </header>
 
@@ -101,18 +101,16 @@ export function LandingNeighborhoods({
                   </div>
                   <div>
                     <div
-                      className={`tracking-[-0.02em] ${
-                        span.feature
-                          ? 'text-[32px] font-bold leading-none'
-                          : 'text-[18px] font-bold leading-[1.1]'
-                      }`}
+                      className={`tracking-[-0.02em] ${span.feature
+                        ? 'text-[32px] font-bold leading-none'
+                        : 'text-[18px] font-bold leading-[1.1]'
+                        }`}
                     >
                       {label}
                     </div>
                     <div
-                      className={`mt-1.5 font-medium opacity-80 ${
-                        span.feature ? 'text-[14px]' : 'text-[12.5px]'
-                      }`}
+                      className={`mt-1.5 font-medium opacity-80 ${span.feature ? 'text-[14px]' : 'text-[12.5px]'
+                        }`}
                     >
                       {descriptor ? t(descriptor.tagline) : ''}
                     </div>
