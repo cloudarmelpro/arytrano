@@ -16,7 +16,7 @@ import { setLocaleAction } from '@/features/i18n'
  * to the equivalent URL — otherwise the cookie says MG but the URL still
  * shows the FR path (or vice versa), confusing both the user and Google.
  */
-export function LocaleSwitcher() {
+export function LocaleSwitcher({ dark = false }: { dark?: boolean } = {}) {
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
@@ -61,7 +61,9 @@ export function LocaleSwitcher() {
       role="group"
       aria-label={t('locale.switcher.aria')}
       aria-busy={pending}
-      className="inline-flex items-center rounded-md bg-muted p-0.5 text-xs font-medium"
+      className={`inline-flex items-center rounded-md p-0.5 text-xs font-medium ${
+        dark ? 'bg-white/15' : 'bg-muted'
+      }`}
     >
       {LOCALES.map((l) => {
         const active = locale === l
@@ -74,8 +76,12 @@ export function LocaleSwitcher() {
             disabled={pending}
             className={`min-w-[2rem] rounded-md px-3 py-1 transition-colors disabled:cursor-not-allowed disabled:opacity-60 ${
               active
-                ? 'bg-primary text-primary-foreground shadow-sm'
-                : 'text-muted-foreground hover:text-foreground'
+                ? dark
+                  ? 'bg-white/25 text-white shadow-sm'
+                  : 'bg-primary text-primary-foreground shadow-sm'
+                : dark
+                  ? 'text-white/75 hover:text-white'
+                  : 'text-muted-foreground hover:text-foreground'
             }`}
           >
             {LOCALE_LABEL[l]}

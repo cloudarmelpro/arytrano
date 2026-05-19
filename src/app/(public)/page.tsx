@@ -2,15 +2,15 @@ import type { Metadata } from 'next'
 import { auth } from '@/features/auth'
 import { listCitiesWithNeighborhoods } from '@/features/geo'
 import {
-  LandingTopBar,
   LandingHero,
   LandingTrustStrip,
   LandingHowItWorks,
   LandingNeighborhoods,
   LandingFeatured,
+  LandingStudents,
   LandingOwnerBlock,
-  LandingTestimonials,
   LandingFaq,
+  LandingFinalCta,
   getLandingStats,
   listNeighborhoodsWithCounts,
   type NeighborhoodOption,
@@ -73,7 +73,6 @@ export default async function HomePage() {
 
   return (
     <>
-      <LandingTopBar locale={locale} role={session?.user?.role ?? null} />
       <LandingHero
         locale={locale}
         neighborhoods={neighborhoods}
@@ -93,13 +92,14 @@ export default async function HomePage() {
       <div id="how-it-works">
         <LandingHowItWorks locale={locale} />
       </div>
+      <LandingStudents locale={locale} />
       <div id="owner">
         <LandingOwnerBlock locale={locale} role={session?.user?.role ?? null} />
       </div>
-      <LandingTestimonials locale={locale} />
       <div id="faq">
         <LandingFaq locale={locale} />
       </div>
+      <LandingFinalCta locale={locale} />
     </>
   )
 }

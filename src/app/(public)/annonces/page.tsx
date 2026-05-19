@@ -13,6 +13,7 @@ import { auth } from '@/features/auth'
 import { getLocale } from '@/lib/i18n/get-locale'
 import { getT } from '@/lib/i18n/translate'
 import { localeAlternates } from '@/lib/seo/alternates'
+import { Icon } from '@/components/shared/Icon'
 
 type SearchParams = Promise<{
   cursor?: string
@@ -108,29 +109,38 @@ export default async function PublicListingsPage({
   }
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-12">
-      <header className="mb-8 flex flex-col gap-2">
-        <h1 className="text-3xl font-semibold text-primary">{t('annonces.title')}</h1>
-        <p className="max-w-2xl text-sm text-muted-foreground">{t('annonces.lead')}</p>
+    <div className="mx-auto max-w-[1280px] px-6 py-12 lg:px-10">
+      <header className="mb-8 flex flex-col gap-3">
+        <nav
+          aria-label="Breadcrumb"
+          className="flex items-center gap-2 text-[12px] font-medium text-muted-foreground"
+        >
+          <Link href="/" className="transition hover:text-foreground">
+            {t('common.appName')}
+          </Link>
+          <Icon name="arrow-right" size={11} />
+          <span className="text-foreground">{t('annonces.title')}</span>
+        </nav>
+        <h1 className="font-serif text-[clamp(32px,3.8vw,52px)] font-normal leading-[1.05] tracking-[-0.025em] text-foreground">
+          {t('annonces.title')}
+        </h1>
+        <p className="max-w-2xl text-[14.5px] text-foreground/70">
+          <strong className="text-foreground">{items.length}</strong>{' '}
+          {t(items.length <= 1 ? 'annonces.count.one' : 'annonces.count.other', {
+            count: items.length,
+          })}{' '}
+          {filterActive ? null : t('annonces.lead')}
+        </p>
       </header>
 
       {/* Top toolbar — neighborhood autocomplete on the left, sort on the right */}
       <ListingSearchToolbar neighborhoods={neighborhoods} />
 
       {/* Two-column layout: filters sidebar + results main */}
-      <div className="grid gap-6 lg:grid-cols-[16rem_1fr] lg:gap-8">
+      <div className="grid gap-8 lg:grid-cols-[18rem_1fr]">
         <ListingFiltersSidebar />
 
-        <main className="min-w-0 flex flex-col gap-4">
-          {items.length > 0 && (
-            <p className="text-sm text-muted-foreground">
-              {t(items.length <= 1 ? 'annonces.count.one' : 'annonces.count.other', {
-                count: items.length,
-              })}
-              {hasMore && ` ${t('annonces.count.hasMore')}`}
-            </p>
-          )}
-
+        <main className="flex min-w-0 flex-col gap-4">
           {items.length === 0 ? (
             <div className="rounded-md border border-dashed border-border bg-muted/30 p-12 text-center">
               <p className="text-base font-medium">

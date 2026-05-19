@@ -185,6 +185,9 @@
   }
 }
 
+.no-scrollbar { scrollbar-width: none; -ms-overflow-style: none; }
+.no-scrollbar::-webkit-scrollbar { display: none; }
+
 /* Respect users who request reduced motion — vestibular safety + battery
    on low-end Madagascar Android devices. Spinners and Dialog animations
    (Base UI + tw-animate-css) all opt out via near-zero durations rather

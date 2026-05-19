@@ -5,15 +5,6 @@ import {
   type NeighborhoodOption,
 } from './LandingSearchCard'
 
-/**
- * Hero block (T-041) — full-width gradient placeholder (a real photo can
- * later replace the background div via a single change) with the brand
- * eyebrow, H1, lead, then the white search card overlaid below it.
- *
- * The gradient uses our brand primary fading into a darker indigo to
- * mimic the depth a real Fianarantsoa shot would give — perceived
- * quality stays high even without an actual photo asset.
- */
 export function LandingHero({
   locale,
   neighborhoods,
@@ -27,42 +18,30 @@ export function LandingHero({
 }) {
   const t = getT(locale)
   return (
-    <section className="relative overflow-hidden">
+    <section className="relative isolate overflow-hidden bg-primary px-6 pt-16 pb-24 text-white lg:px-10 lg:pt-20 lg:pb-28">
       <div
         aria-hidden
-        className="absolute inset-0 -z-10 bg-gradient-to-br from-primary via-primary/90 to-primary/70"
+        className="pointer-events-none absolute -right-[12%] -top-[10%] -z-10 h-[720px] w-[720px] rounded-full bg-[radial-gradient(circle_at_center,oklch(0.62_0.22_290_/_0.5)_0%,transparent_60%)]"
       />
-      <div
-        aria-hidden
-        className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_top_right,rgba(255,255,255,0.15),transparent_60%)]"
-      />
+      <div className="relative z-10 mx-auto max-w-[1280px]">
+        <h1 className="m-0 max-w-[1040px] font-serif text-[clamp(36px,5.4vw,76px)] font-normal leading-[1.05] tracking-[-0.015em] text-balance">
+          {t('landing.hero.title')}
+        </h1>
+        <p className="mt-5 mb-9 max-w-[720px] font-serif text-[clamp(17px,1.6vw,22px)] font-normal italic leading-[1.4] text-white/85">
+          {t(
+            publishedListings <= 1
+              ? 'landing.hero.lead.one'
+              : 'landing.hero.lead.other',
+            { count: publishedListings },
+          )}
+        </p>
 
-      <div className="mx-auto flex max-w-6xl flex-col gap-6 px-4 pt-16 pb-20 text-primary-foreground sm:px-6 sm:pt-20 sm:pb-24 md:pt-28 md:pb-32">
-        <div className="flex flex-col gap-4 max-w-3xl">
-          <span className="inline-flex w-fit items-center rounded-full bg-white/15 px-3 py-1 text-[11px] font-medium uppercase tracking-wider text-white backdrop-blur-sm">
-            {t('landing.hero.eyebrow')}
-          </span>
-          <h1 className="text-3xl font-semibold leading-tight tracking-tight sm:text-4xl md:text-5xl">
-            {t('landing.hero.title')}
-          </h1>
-          <p className="max-w-2xl text-base text-white/85 sm:text-lg">
-            {t(
-              publishedListings <= 1
-                ? 'landing.hero.lead.one'
-                : 'landing.hero.lead.other',
-              { count: publishedListings },
-            )}
-          </p>
-        </div>
+        <LandingSearchCard
+          neighborhoods={neighborhoods}
+          publishedListings={publishedListings}
+        />
 
-        <div className="mt-2 max-w-4xl">
-          <LandingSearchCard
-            neighborhoods={neighborhoods}
-            publishedListings={publishedListings}
-          />
-        </div>
-
-        <p className="mt-1 text-xs text-white/70 sm:text-sm">
+        <p className="mt-5 text-[13px] text-white/70">
           {t('landing.hero.microStats', {
             count: publishedListings,
             verified: verifiedOwners,
