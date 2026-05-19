@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 import { useT } from '@/lib/i18n/client'
 import { Icon, type IconName } from '@/components/shared/Icon'
 import type { MessageKey } from '@/lib/i18n/messages'
@@ -220,12 +221,12 @@ function FinalCta({ audience }: { audience: Audience }) {
           <p className="mx-auto mb-6 mt-3 max-w-[560px] text-[15.5px] leading-[1.55] text-white/80">
             {t(leadKey)}
           </p>
-          <a
+          <Link
             href={href}
             className="inline-flex h-13 items-center gap-2 rounded-xl bg-white px-6 text-[15px] font-semibold text-primary transition hover:bg-[oklch(0.97_0.012_90)]"
           >
             {t(ctaKey)} <Icon name="arrow-right" size={16} />
-          </a>
+          </Link>
         </div>
       </div>
     </section>

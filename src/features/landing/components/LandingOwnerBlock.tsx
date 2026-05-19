@@ -101,7 +101,9 @@ export function LandingOwnerBlock({
 
 function DashboardMock({ t }: { t: ReturnType<typeof getT> }) {
   return (
-    <div className="relative">
+    // Decorative owner-dashboard preview — no real controls inside.
+    // `aria-hidden` + `inert` keep it out of the SR + keyboard tour.
+    <div aria-hidden inert className="relative select-none">
       <div className="absolute -top-3 right-4 z-10 flex items-center gap-2.5 rounded-xl border border-border bg-white px-3 py-2.5 shadow-md">
         <span className="h-2 w-2 shrink-0 rounded-full bg-emerald-500" />
         <div className="min-w-0">

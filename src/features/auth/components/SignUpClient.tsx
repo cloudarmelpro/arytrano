@@ -54,11 +54,23 @@ export function SignUpClient({
   const busy = formPending || oauthPending
   const hasOAuth = googleEnabled || facebookEnabled
 
+  function onRoleKeyDown(e: React.KeyboardEvent<HTMLDivElement>) {
+    if (e.key !== 'ArrowRight' && e.key !== 'ArrowDown' && e.key !== 'ArrowLeft' && e.key !== 'ArrowUp') {
+      return
+    }
+    e.preventDefault()
+    const idx = ROLES.findIndex((r) => r.value === role)
+    const next = e.key === 'ArrowRight' || e.key === 'ArrowDown' ? (idx + 1) % ROLES.length : (idx - 1 + ROLES.length) % ROLES.length
+    const nextRole = ROLES[next]?.value
+    if (nextRole) setRole(nextRole)
+  }
+
   return (
     <div className="flex flex-col gap-6">
       <div
         role="radiogroup"
         aria-label={t('signUp.roleSelector.ariaLabel')}
+        onKeyDown={onRoleKeyDown}
         className="grid grid-cols-2 gap-2.5 max-sm:grid-cols-1"
       >
         {ROLES.map((r) => {
@@ -69,6 +81,7 @@ export function SignUpClient({
               type="button"
               role="radio"
               aria-checked={active}
+              tabIndex={active ? 0 : -1}
               disabled={busy}
               onClick={() => setRole(r.value)}
               data-active={active}

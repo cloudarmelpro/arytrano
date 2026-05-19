@@ -142,7 +142,7 @@ function MainGrid({ t }: { t: Translator }) {
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/logo/arytrano-mark.svg"
-            alt=""
+            alt="AryTrano"
             width={32}
             height={32}
             className="h-8 w-8"

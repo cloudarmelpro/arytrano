@@ -78,7 +78,8 @@ export function LandingSearchCard({
   return (
     <form
       onSubmit={onSubmit}
-      aria-label={submitLabel}
+      role="search"
+      aria-label={t('landing.hero.search.formAria' as const)}
       className="grid gap-3 sm:grid-cols-2 lg:grid-cols-[1.15fr_1.35fr_1.1fr_auto] lg:gap-3"
     >
       <Select

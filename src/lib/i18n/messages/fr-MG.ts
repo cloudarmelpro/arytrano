@@ -343,6 +343,7 @@ export const frMG = {
   'landing.hero.search.priceMax.placeholder': 'Ariary / mois',
   'landing.hero.search.submit.one': 'Voir l’annonce',
   'landing.hero.search.submit.other': 'Voir les {count} annonces',
+  'landing.hero.search.formAria': 'Rechercher un logement étudiant à Fianarantsoa',
   'landing.hero.microStats': '{count} annonces · {verified} proprios vérif.',
 
   // Trust strip — titre + sous-titre court
@@ -616,7 +617,7 @@ export const frMG = {
     '· 64 annonces actives · 168 propriétaires vérifiés · 8 quartiers couverts',
 
   // ── /comment-ca-marche page ──
-  'comment.meta.title': 'Comment ça marche',
+  'comment.meta.title': 'Comment ça marche à Fianarantsoa',
   'comment.meta.description':
     'Comment AryTrano fonctionne : process étudiant et propriétaire, vérification, sécurité, modèle économique.',
   'comment.eyebrow': 'Comment ça marche',
@@ -781,7 +782,7 @@ export const frMG = {
   'comment.finalCta.owner.cta': 'Publier mon annonce',
 
   // ── /proprietaires page ──
-  'proprietaires.meta.title': 'Propriétaires',
+  'proprietaires.meta.title': 'Publier une annonce à Fianarantsoa',
   'proprietaires.meta.description':
     'Publie ton annonce en 5 minutes. Gratuit, à vie. Vérification 24-48h, contact WhatsApp direct, aucune commission.',
   'proprietaires.hero.eyebrow': 'Pour les propriétaires',

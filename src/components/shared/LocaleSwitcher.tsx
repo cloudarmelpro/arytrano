@@ -64,7 +64,7 @@ export function LocaleSwitcher({ dark = false }: { dark?: boolean } = {}) {
 
   return (
     <div
-      role="group"
+      role="radiogroup"
       aria-label={t('locale.switcher.aria')}
       aria-busy={pending}
       className={`inline-flex items-center rounded-md p-0.5 text-xs font-medium ${
@@ -77,10 +77,11 @@ export function LocaleSwitcher({ dark = false }: { dark?: boolean } = {}) {
           <button
             key={l}
             type="button"
+            role="radio"
             onClick={() => onSelect(l)}
-            aria-pressed={active}
-            disabled={pending}
-            className={`inline-flex min-w-[2rem] items-center gap-1.5 rounded-md px-2.5 py-1 transition-colors disabled:cursor-not-allowed disabled:opacity-60 ${
+            aria-checked={active}
+            aria-disabled={pending}
+            className={`inline-flex min-w-[2rem] items-center gap-1.5 rounded-md px-2.5 py-1 transition-colors aria-disabled:cursor-not-allowed aria-disabled:opacity-60 ${
               active
                 ? dark
                   ? 'bg-white/25 text-white shadow-sm'

@@ -86,17 +86,19 @@ function Hero({ t }: { t: Translator }) {
             </Link>
           </div>
           <div className="mt-8 grid grid-cols-3 gap-6 max-sm:grid-cols-1">
-            {[
-              { n: 'proprietaires.hero.stat1.n', l: 'proprietaires.hero.stat1.label' },
-              { n: 'proprietaires.hero.stat2.n', l: 'proprietaires.hero.stat2.label' },
-              { n: 'proprietaires.hero.stat3.n', l: 'proprietaires.hero.stat3.label' },
-            ].map((s) => (
+            {(
+              [
+                { n: 'proprietaires.hero.stat1.n', l: 'proprietaires.hero.stat1.label' },
+                { n: 'proprietaires.hero.stat2.n', l: 'proprietaires.hero.stat2.label' },
+                { n: 'proprietaires.hero.stat3.n', l: 'proprietaires.hero.stat3.label' },
+              ] satisfies Array<{ n: MessageKey; l: MessageKey }>
+            ).map((s) => (
               <div key={s.l}>
                 <div className="text-[28px] font-bold tracking-[-0.02em] text-foreground">
-                  {t(s.n as MessageKey)}
+                  {t(s.n)}
                 </div>
                 <div className="mt-1 text-[12.5px] font-medium uppercase tracking-[0.06em] text-muted-foreground">
-                  {t(s.l as MessageKey)}
+                  {t(s.l)}
                 </div>
               </div>
             ))}
@@ -110,7 +112,13 @@ function Hero({ t }: { t: Translator }) {
 
 function PublishPreview({ t }: { t: Translator }) {
   return (
-    <div className="overflow-hidden rounded-2xl border border-border bg-background shadow-lg">
+    <div
+      // Decorative wizard mock — buttons inside are not interactive.
+      // `aria-hidden` keeps SR + keyboard users from landing on dead controls.
+      aria-hidden
+      inert
+      className="overflow-hidden rounded-2xl border border-border bg-background shadow-lg select-none"
+    >
       <div className="flex items-center gap-3 border-b border-border px-5 py-3.5">
         <span className="h-2 w-2 rounded-full bg-[oklch(0.75_0.18_25)]" />
         <span className="h-2 w-2 rounded-full bg-[oklch(0.85_0.15_90)]" />
@@ -130,21 +138,23 @@ function PublishPreview({ t }: { t: Translator }) {
           <div className="h-full w-3/4 bg-primary" />
         </div>
         <div className="mt-6 grid grid-cols-2 gap-3">
-          {[
-            ['proprietaires.preview.field.type', 'proprietaires.preview.field.typeV'],
-            ['proprietaires.preview.field.quartier', 'proprietaires.preview.field.quartierV'],
-            ['proprietaires.preview.field.surface', 'proprietaires.preview.field.surfaceV'],
-            ['proprietaires.preview.field.price', 'proprietaires.preview.field.priceV'],
-          ].map(([labelKey, valueKey]) => (
+          {(
+            [
+              ['proprietaires.preview.field.type', 'proprietaires.preview.field.typeV'],
+              ['proprietaires.preview.field.quartier', 'proprietaires.preview.field.quartierV'],
+              ['proprietaires.preview.field.surface', 'proprietaires.preview.field.surfaceV'],
+              ['proprietaires.preview.field.price', 'proprietaires.preview.field.priceV'],
+            ] satisfies Array<readonly [MessageKey, MessageKey]>
+          ).map(([labelKey, valueKey]) => (
             <div
               key={labelKey}
               className="rounded-lg border border-border bg-background px-3 py-2.5"
             >
               <div className="text-[10.5px] font-semibold uppercase tracking-[0.05em] text-muted-foreground">
-                {t(labelKey as MessageKey)}
+                {t(labelKey)}
               </div>
               <div className="mt-0.5 text-[14px] font-semibold text-foreground">
-                {t(valueKey as MessageKey)}
+                {t(valueKey)}
               </div>
             </div>
           ))}
@@ -281,17 +291,19 @@ function VerifCard({ t }: { t: Translator }) {
         </span>
       </div>
       <div className="grid grid-cols-[auto_1fr] gap-x-[18px] gap-y-2.5 text-[13.5px]">
-        {[
-          ['proprietaires.verif.card.row.cin', 'proprietaires.verif.card.row.cinV'],
-          ['proprietaires.verif.card.row.acte', 'proprietaires.verif.card.row.acteV'],
-          ['proprietaires.verif.card.row.phone', 'proprietaires.verif.card.row.phoneV'],
-          ['proprietaires.verif.card.row.active', 'proprietaires.verif.card.row.activeV'],
-          ['proprietaires.verif.card.row.response', 'proprietaires.verif.card.row.responseV'],
-          ['proprietaires.verif.card.row.rating', 'proprietaires.verif.card.row.ratingV'],
-        ].map(([k, v]) => (
+        {(
+          [
+            ['proprietaires.verif.card.row.cin', 'proprietaires.verif.card.row.cinV'],
+            ['proprietaires.verif.card.row.acte', 'proprietaires.verif.card.row.acteV'],
+            ['proprietaires.verif.card.row.phone', 'proprietaires.verif.card.row.phoneV'],
+            ['proprietaires.verif.card.row.active', 'proprietaires.verif.card.row.activeV'],
+            ['proprietaires.verif.card.row.response', 'proprietaires.verif.card.row.responseV'],
+            ['proprietaires.verif.card.row.rating', 'proprietaires.verif.card.row.ratingV'],
+          ] satisfies Array<readonly [MessageKey, MessageKey]>
+        ).map(([k, v]) => (
           <div key={k} className="contents">
-            <span className="font-medium text-muted-foreground">{t(k as MessageKey)}</span>
-            <span className="font-semibold text-foreground">{t(v as MessageKey)}</span>
+            <span className="font-medium text-muted-foreground">{t(k)}</span>
+            <span className="font-semibold text-foreground">{t(v)}</span>
           </div>
         ))}
       </div>

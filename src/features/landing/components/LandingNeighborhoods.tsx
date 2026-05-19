@@ -4,41 +4,7 @@ import { getT } from '@/lib/i18n/translate'
 import type { MessageKey } from '@/lib/i18n/messages'
 import { Icon } from '@/components/shared/Icon'
 import type { NeighborhoodRow } from '../queries/list-neighborhoods-with-counts'
-
-const DESCRIPTORS: Record<string, { tagline: MessageKey; landmark: MessageKey }> = {
-  andrainjato: {
-    tagline: 'landing.neighborhoods.andrainjato.tagline',
-    landmark: 'landing.neighborhoods.andrainjato.landmark',
-  },
-  antarandolo: {
-    tagline: 'landing.neighborhoods.antarandolo.tagline',
-    landmark: 'landing.neighborhoods.antarandolo.landmark',
-  },
-  tsianolondroa: {
-    tagline: 'landing.neighborhoods.tsianolondroa.tagline',
-    landmark: 'landing.neighborhoods.tsianolondroa.landmark',
-  },
-  mahamanina: {
-    tagline: 'landing.neighborhoods.mahamanina.tagline',
-    landmark: 'landing.neighborhoods.mahamanina.landmark',
-  },
-  anjoma: {
-    tagline: 'landing.neighborhoods.anjoma.tagline',
-    landmark: 'landing.neighborhoods.anjoma.landmark',
-  },
-  ankidona: {
-    tagline: 'landing.neighborhoods.ankidona.tagline',
-    landmark: 'landing.neighborhoods.ankidona.landmark',
-  },
-  ambalavato: {
-    tagline: 'landing.neighborhoods.ambalavato.tagline',
-    landmark: 'landing.neighborhoods.ambalavato.landmark',
-  },
-  mahasoabe: {
-    tagline: 'landing.neighborhoods.mahasoabe.tagline',
-    landmark: 'landing.neighborhoods.mahasoabe.landmark',
-  },
-}
+import { QUARTIER_DESCRIPTORS } from '../quartier-descriptors'
 
 type Palette = { bg: string; fg: string }
 const PALETTES: Palette[] = [
@@ -95,7 +61,7 @@ export function LandingNeighborhoods({
           {rows.slice(0, 8).map((n, i) => {
             const span = SPANS[i] ?? { col: 1, row: 1 }
             const palette = PALETTES[i % PALETTES.length] ?? PALETTES[0]!
-            const descriptor = DESCRIPTORS[n.slug]
+            const descriptor = QUARTIER_DESCRIPTORS[n.slug]
             const label = locale === 'mg' ? n.nameMg : n.nameFr
             return (
               <li

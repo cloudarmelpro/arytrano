@@ -2,12 +2,15 @@ import Image from 'next/image'
 import Link from 'next/link'
 import type { Locale } from '@/lib/i18n/config'
 import { getT, type Translator } from '@/lib/i18n/translate'
-import type { MessageKey } from '@/lib/i18n/messages'
 import { formatAriary } from '@/lib/format/currency'
 import type {
   QuartierRow,
   QuartierSampleListing,
 } from '../queries/get-quartiers-data'
+import {
+  QUARTIER_DESCRIPTORS,
+  type QuartierFullDescriptor,
+} from '../quartier-descriptors'
 
 type Tone = 'warm' | 'olive' | 'terracotta' | 'indigo'
 
@@ -39,63 +42,6 @@ const TONES_BY_INDEX: Tone[] = [
   'indigo',
 ]
 
-type Descriptor = {
-  ambiance: MessageKey
-  walk: MessageKey
-  transport: MessageKey
-  distance: MessageKey
-}
-
-const DESCRIPTORS: Record<string, Descriptor> = {
-  andrainjato: {
-    ambiance: 'quartiers.andrainjato.ambiance',
-    walk: 'quartiers.andrainjato.walk',
-    transport: 'quartiers.andrainjato.transport',
-    distance: 'quartiers.andrainjato.distance',
-  },
-  antarandolo: {
-    ambiance: 'quartiers.antarandolo.ambiance',
-    walk: 'quartiers.antarandolo.walk',
-    transport: 'quartiers.antarandolo.transport',
-    distance: 'quartiers.antarandolo.distance',
-  },
-  tsianolondroa: {
-    ambiance: 'quartiers.tsianolondroa.ambiance',
-    walk: 'quartiers.tsianolondroa.walk',
-    transport: 'quartiers.tsianolondroa.transport',
-    distance: 'quartiers.tsianolondroa.distance',
-  },
-  mahamanina: {
-    ambiance: 'quartiers.mahamanina.ambiance',
-    walk: 'quartiers.mahamanina.walk',
-    transport: 'quartiers.mahamanina.transport',
-    distance: 'quartiers.mahamanina.distance',
-  },
-  anjoma: {
-    ambiance: 'quartiers.anjoma.ambiance',
-    walk: 'quartiers.anjoma.walk',
-    transport: 'quartiers.anjoma.transport',
-    distance: 'quartiers.anjoma.distance',
-  },
-  ankidona: {
-    ambiance: 'quartiers.ankidona.ambiance',
-    walk: 'quartiers.ankidona.walk',
-    transport: 'quartiers.ankidona.transport',
-    distance: 'quartiers.ankidona.distance',
-  },
-  ambalavato: {
-    ambiance: 'quartiers.ambalavato.ambiance',
-    walk: 'quartiers.ambalavato.walk',
-    transport: 'quartiers.ambalavato.transport',
-    distance: 'quartiers.ambalavato.distance',
-  },
-  mahasoabe: {
-    ambiance: 'quartiers.mahasoabe.ambiance',
-    walk: 'quartiers.mahasoabe.walk',
-    transport: 'quartiers.mahasoabe.transport',
-    distance: 'quartiers.mahasoabe.distance',
-  },
-}
 
 export function QuartiersBlocks({
   locale,
@@ -110,7 +56,7 @@ export function QuartiersBlocks({
       <div className="mx-auto max-w-[1280px] px-6 lg:px-10">
         <div className="flex flex-col gap-12">
           {quartiers.map((q, i) => {
-            const descriptor = DESCRIPTORS[q.slug]
+            const descriptor = QUARTIER_DESCRIPTORS[q.slug]
             if (!descriptor) return null
             return (
               <QuartierBlock
@@ -141,7 +87,7 @@ function QuartierBlock({
   t: Translator
   locale: Locale
   quartier: QuartierRow
-  descriptor: Descriptor
+  descriptor: QuartierFullDescriptor
   tone: Tone
   reverse: boolean
 }) {

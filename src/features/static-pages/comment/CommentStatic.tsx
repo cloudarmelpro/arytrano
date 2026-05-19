@@ -251,6 +251,7 @@ function MoneyArrow({
           struck ? 'text-muted-foreground line-through' : 'text-foreground'
         }`}
       >
+        {struck && <span className="sr-only">Annulé : </span>}
         {bigLabel}
       </div>
       <div className="text-center text-[12px] font-medium text-muted-foreground">

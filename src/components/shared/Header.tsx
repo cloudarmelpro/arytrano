@@ -111,7 +111,7 @@ function BrandRow({
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/logo/arytrano-mark-light.svg"
-            alt=""
+            alt="AryTrano"
             width={38}
             height={38}
             className="h-[38px] w-[38px]"

@@ -347,6 +347,7 @@ export const mg: Record<MessageKey, string> = {
   'landing.hero.search.priceMax.placeholder': 'Ariary / volana',
   'landing.hero.search.submit.one': 'Hijery ny doka',
   'landing.hero.search.submit.other': 'Hijery ireo doka {count}',
+  'landing.hero.search.formAria': 'Mitady trano ho an’ny mpianatra ao Fianarantsoa',
   'landing.hero.microStats': 'Doka {count} · {verified} tompony voamarina',
 
   // Trust strip — title + sous-titre
@@ -627,7 +628,7 @@ export const mg: Record<MessageKey, string> = {
     '· filazana mavitrika 64 · tompon-trano voamarina 168 · faritra 8',
 
   // ── /comment-ca-marche ──
-  'comment.meta.title': 'Ahoana ny fomba',
+  'comment.meta.title': 'Ahoana ny fomba ao Fianarantsoa',
   'comment.meta.description':
     'Ahoana no fiasan’i AryTrano : process mpianatra sy tompon-trano, fanamarinana, fiarovana, modely ara-toekarena.',
   'comment.eyebrow': 'Ahoana ny fomba',
@@ -797,7 +798,7 @@ export const mg: Record<MessageKey, string> = {
   'comment.finalCta.owner.cta': 'Hamoaka ny filazako',
 
   // ── /proprietaires ──
-  'proprietaires.meta.title': 'Tompon-trano',
+  'proprietaires.meta.title': 'Hamoaka filazana ao Fianarantsoa',
   'proprietaires.meta.description':
     'Hamoaha ny filazanao ao anatin’ny 5 mn. Maimaim-poana, mandritra ny androm-piainana. Fanamarinana 24-48 ora.',
   'proprietaires.hero.eyebrow': 'Ho an’ny tompon-trano',
