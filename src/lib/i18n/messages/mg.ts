@@ -267,7 +267,203 @@ export const mg: Record<MessageKey, string> = {
   'locale.switcher.fr-MG.aria': 'Passer en français',
   'locale.switcher.mg.aria': 'Mividy amin\'ny teny malagasy',
 
-  // Home page
+  // Landing page (T-041 → T-051)
+
+  // Meta
+  'landing.meta.title': 'AryTrano — Trano voamarina ho an\'ny mpianatra ao Fianarantsoa',
+  'landing.meta.description':
+    'Tadiavo trano ho mpianatra ao Fianarantsoa amin\'ny dokam-barotra voamarina. Fifandraisana mivantana amin\'ny tompon-trano amin\'ny WhatsApp. Vidiny Ariary.',
+
+  // Top bar
+  'landing.topBar.ownerCta': 'Tompon-trano ve ianao ? Apetraho maimaim-poana →',
+
+  // Hero
+  'landing.hero.eyebrow': 'Faritra rehetra · Fianarantsoa',
+  'landing.hero.title':
+    'Tadiavo ny tranonao ho mpianatra. Voamarina, tsotra, amin\'ny Ariary.',
+  'landing.hero.lead.one':
+    'Doka {count} ao Fianarantsoa, voajery avy amin\'ny ekipanay. Fifandraisana mivantana amin\'ny tompony amin\'ny WhatsApp.',
+  'landing.hero.lead.other':
+    'Doka {count} ao Fianarantsoa, voajery tsirairay avy amin\'ny ekipanay. Fifandraisana mivantana amin\'ny tompony amin\'ny WhatsApp.',
+  'landing.hero.search.quartier.label': 'Faritra',
+  'landing.hero.search.quartier.placeholder': 'Faritra rehetra',
+  'landing.hero.search.type.label': 'Karazana trano',
+  'landing.hero.search.type.placeholder': 'Karazana rehetra',
+  'landing.hero.search.priceMax.label': 'Tetibola isam-bolana',
+  'landing.hero.search.priceMax.placeholder': 'Ariary / volana',
+  'landing.hero.search.submit.one': 'Hijery ny doka',
+  'landing.hero.search.submit.other': 'Hijery ireo doka {count}',
+  'landing.hero.microStats': 'Doka {count} · {verified} tompony voamarina',
+
+  // Trust strip — title + sous-titre
+  'landing.trust.verified.title': 'Fanamarinana ataon\'olona',
+  'landing.trust.verified.subtitle': 'Karatra + acte voasivana',
+  'landing.trust.photos.title': 'Sary voaaro',
+  'landing.trust.photos.subtitle': 'Watermark + EXIF voasaringitra',
+  'landing.trust.contact.title': 'Fifandraisana mivantana',
+  'landing.trust.contact.subtitle': 'WhatsApp, tsy misy sarany',
+  'landing.trust.price.title': 'Vidiny Ariary',
+  'landing.trust.price.subtitle': 'Mazava, tsy misy fanahy ratsy',
+
+  // Neighborhoods
+  'landing.neighborhoods.title': 'Faritra ao Fianarantsoa',
+  'landing.neighborhoods.lead':
+    'Avy amin\'ny ivon-tanàna velona ka hatramin\'ny tendrombohitra mangina — faritra 8 voarakitra.',
+  'landing.neighborhoods.viewAll': 'Hijery ny doka rehetra →',
+  'landing.neighborhoods.count.one': 'doka {count}',
+  'landing.neighborhoods.count.other': 'doka {count}',
+  'landing.neighborhoods.soon': 'Tsy ho ela',
+  // Descripteurs par quartier
+  'landing.neighborhoods.andrainjato.tagline': 'Centre, velona',
+  'landing.neighborhoods.andrainjato.landmark':
+    'Akaikin\'ny lisea Andrianampoinimerina',
+  'landing.neighborhoods.antarandolo.tagline': 'Mangina, fonenana',
+  'landing.neighborhoods.antarandolo.landmark': 'Akaikin\'ny fac Siansa',
+  'landing.neighborhoods.tsianolondroa.tagline': 'Centre, tsena',
+  'landing.neighborhoods.tsianolondroa.landmark': 'Foiben\'ny tantara',
+  'landing.neighborhoods.mahamanina.tagline': 'Tendrombohitra, panorama',
+  'landing.neighborhoods.mahamanina.landmark': 'Sehatra ambony',
+  'landing.neighborhoods.anjoma.tagline': 'Gara, varotra',
+  'landing.neighborhoods.anjoma.landmark': 'Taxi-be & tsena',
+  'landing.neighborhoods.ankidona.tagline': 'Mpianatra, velona',
+  'landing.neighborhoods.ankidona.landmark': 'Akaikin\'ny INSPC',
+  'landing.neighborhoods.ambalavato.tagline': 'Milamina, fianakaviana',
+  'landing.neighborhoods.ambalavato.landmark': 'Sekoly & fiangonana',
+  'landing.neighborhoods.mahasoabe.tagline': 'Manodidina, milamina',
+  'landing.neighborhoods.mahasoabe.landmark': 'Tendrombohitra atsimo',
+
+  // Featured listings
+  'landing.featured.title': 'Doka amin\'izao',
+  'landing.featured.lead': 'Ireo trano vao nampiana farany.',
+  'landing.featured.viewAll.one': 'Hijery ny doka',
+  'landing.featured.viewAll.other': 'Hijery ireo doka {count}',
+  'landing.featured.viewMap': 'Sari-tany feno',
+  'landing.featured.tab.all': 'Rehetra',
+  'landing.featured.tab.STUDIO': 'Studio',
+  'landing.featured.tab.ROOM': 'Efitra',
+  'landing.featured.tab.APARTMENT': 'Trano',
+  'landing.featured.tab.HOUSE': 'Trano feno',
+  'landing.featured.tab.empty': 'Mbola tsy misy doka ato — averina jerena.',
+  'landing.featured.badge.new': 'Vaovao',
+  'landing.featured.relativeTime.today': 'androany',
+  'landing.featured.relativeTime.daysAgo.one': '{count} andro lasa',
+  'landing.featured.relativeTime.daysAgo.other': '{count} andro lasa',
+
+  // How it works
+  'landing.how.title': 'Dingana telo.',
+  'landing.how.lead':
+    'Mitady, mifandray, mitsidika. Tsotra. Tsy mety mametraka tena eo aminareo sy ny tompony mihitsy AryTrano.',
+  'landing.how.step1.title': 'Tadiavo amin\'ny faritra na vola',
+  'landing.how.step1.body':
+    'Sivana haingana, sary, vidiny Ariary, marika « voamarina » hita avy hatrany.',
+  'landing.how.step2.title': 'Mifandraisa amin\'ny WhatsApp anatin\'ny click iray',
+  'landing.how.step2.body':
+    'Hafatra efa misy referansy ny doka. Valiny avy amin\'ny tompony anatin\'ny 24h.',
+  'landing.how.step3.title': 'Tsidiho ary manaova sonia',
+  'landing.how.step3.body':
+    'Tsidiho mivantana, ifampiraharaha, manao sonia ny fifanarahana. Tsy misy commission AryTrano.',
+
+  // Owner block
+  'landing.ownerBlock.eyebrow': 'Tompon-trano ve ianao?',
+  'landing.ownerBlock.title':
+    'Lavo haingana kokoa. Tsy misy sarany. Tsy misy mpanofa sandoka.',
+  'landing.ownerBlock.lead':
+    'Apetraho ny dokanao anatin\'ny 5 minitra, mahaza fangatahana avy amin\'ny mpianatra voamarina, tantano ny WhatsApp avy amin\'ny dashboard.',
+  'landing.ownerBlock.bullet1': 'Doka maimaim-poana 100%, mandritra ny fotoana',
+  'landing.ownerBlock.bullet2':
+    'Fanamarinana maha-mpianatra tafiditra ao',
+  'landing.ownerBlock.bullet3':
+    'Mamaly amin\'ny WhatsApp avy amin\'ny dashboard',
+  'landing.ownerBlock.bullet4':
+    'Stats fijerena sy tiana amin\'ny fotoana hahitanao',
+  'landing.ownerBlock.cta': 'Hapetraka doka',
+  'landing.ownerBlock.ctaSecondary': 'Hijery ohatra',
+
+  // Testimonials
+  'landing.testimonials.title': 'Manantena anay izy ireo',
+  'landing.testimonials.lead':
+    'Mpianatra sy tompon-trano nahita tamin\'ny AryTrano.',
+  'landing.testimonials.role.student': 'Mpianatra',
+  'landing.testimonials.role.owner': 'Tompon-trano',
+  'landing.testimonials.t1.name': 'Ramatoa Rasoa',
+  'landing.testimonials.t1.area': 'Andrainjato',
+  'landing.testimonials.t1.role': 'owner',
+  'landing.testimonials.t1.quote':
+    'Anatin\'ny 3 andro, fangatahana 5 lasa marina. Niova ny zavatra noho ny fanamarinana AryTrano — tsy misy intsony fotoana very.',
+  'landing.testimonials.t2.name': 'Andriamatoa Heriniaina',
+  'landing.testimonials.t2.area': 'Antarandolo',
+  'landing.testimonials.t2.role': 'student',
+  'landing.testimonials.t2.quote':
+    'Nila studio akaikin\'ny fac aho, tsy misy hosoka. Nataon\'ny AryTrano nifandray mivantana tamin\'ny tompony aho tao anatin\'ny click 2.',
+  'landing.testimonials.t3.name': 'Ramatoa Bao',
+  'landing.testimonials.t3.area': 'Mahamanina',
+  'landing.testimonials.t3.role': 'owner',
+  'landing.testimonials.t3.quote':
+    'Tiako ilay marika « Tompo voamarina » mampisokatra ahy amin\'ireo doka tsy mazava ao Facebook.',
+  'landing.testimonials.t4.name': 'Andriamatoa Rakoto',
+  'landing.testimonials.t4.area': 'Tsianolondroa',
+  'landing.testimonials.t4.role': 'student',
+  'landing.testimonials.t4.quote':
+    'WhatsApp mivantana amin\'ny tompony, hafatra efa misy, mahafinaritra. Nitsidika ny ampitso, nanao sonia ny bail tamin\'ny herinandro.',
+  'landing.testimonials.t5.name': 'Fianakaviana Andry',
+  'landing.testimonials.t5.area': 'Anjoma',
+  'landing.testimonials.t5.role': 'owner',
+  'landing.testimonials.t5.quote':
+    'Manana trano 3 hofainay. Manampy anay hahafantatra hoe iza ny doka tokony ho ampian\'ny dashboard.',
+  'landing.testimonials.t6.name': 'Andriamatoa Tahina',
+  'landing.testimonials.t6.area': 'Ankidona',
+  'landing.testimonials.t6.role': 'student',
+  'landing.testimonials.t6.quote':
+    'Vidiny mazava amin\'ny Ariary, sary marina (watermark AryTrano), nanao sonia tsy nila nitsidika tamin\'ny tsy fahalalana.',
+
+  // FAQ
+  'landing.faq.title': 'Fanontaniana matetika',
+  'landing.faq.lead': 'Izay rehetra anontaniana anay, amin\'ny mazava.',
+  'landing.faq.q1.question':
+    'Ahoana no anamarinan\'ny AryTrano ny tompon-trano?',
+  'landing.faq.q1.answer':
+    'Manamarina ny karatra fanondrom-pirenena sy ny porofo ny mpitantana (acte na facture) ny ekipanay alohan\'ny hanomezana ny marika « Tompo voamarina ». Tsy misy doka mitondra ity marika ity raha tsy avy amin\'ny olona izany fanamarinana izany.',
+  'landing.faq.q2.question':
+    'Ahoana no ahafantarana fa azo antoka ny doka iray?',
+  'landing.faq.q2.answer':
+    'Tadiavo ny marika maitso « Filazana voamarina » — manamarina fa voajery ny adiresy, ny vidiny, sy ny visit. Ny sary misy watermark AryTrano dia manamarina fa tsy nangalarina avy any an-kafa.',
+  'landing.faq.q3.question': 'Ahoana no ifandraisako amin\'ny tompony?',
+  'landing.faq.q3.answer':
+    'Click amin\'ny « Mifandraisa » dia misokatra mivantana ny WhatsApp miaraka amin\'ny hafatra efa misy. Tsy misy mpampifandray, tsy misy commission — miresaka mivantana amin\'ny tompony ianao, tsy misy sarany.',
+  'landing.faq.q4.question': 'Ohatrinona ny sarany ho an\'ny mpianatra?',
+  'landing.faq.q4.answer':
+    'Maimaim-poana 100%. Afaka mitady, mifandray, mitsidika sy manao sonia ny bail-nao tsy misy Ariary aloa amin\'ny AryTrano.',
+  'landing.faq.q5.question': 'Tompon-trano aho, ahoana no fametrahana?',
+  'landing.faq.q5.answer':
+    'Manaova kaonty tompon-trano (maimaim-poana), alefaso ny karatra fanondrom-pirenenanao sy ny acte na facture an\'ny trano. Manamarina anatin\'ny 24–48h ny ekipanay, ary afaka mampahatonga doka rehetra tianao ianao.',
+
+  // Footer — 4 colonnes
+  'landing.footer.tagline':
+    'Trano ho mpianatra voamarina ao Fianarantsoa. Doka azo antoka, fifandraisana mivantana, tsy misy sarany miafina.',
+  'landing.footer.section.product': 'Vokatra',
+  'landing.footer.section.owners': 'Tompon-trano',
+  'landing.footer.section.resources': 'Loharanon-kevitra',
+  'landing.footer.section.legal': 'Lalàna',
+  'landing.footer.link.listings': 'Dokam-barotra',
+  'landing.footer.link.howItWorks': 'Ahoana no fiasany',
+  'landing.footer.link.faq': 'Fanontaniana matetika',
+  'landing.footer.link.neighborhoods': 'Faritra',
+  'landing.footer.link.publishListing': 'Hapetraka doka',
+  'landing.footer.link.verification': 'Fanamarinana',
+  'landing.footer.link.pricing': 'Sarany (maimaim-poana)',
+  'landing.footer.link.about': 'Mombamomba',
+  'landing.footer.link.blog': 'Blog',
+  'landing.footer.link.careers': 'Asa',
+  'landing.footer.link.press': 'Mpanao gazety',
+  'landing.footer.link.security': 'Filaminana',
+  'landing.footer.link.status': 'Statut',
+  'landing.footer.link.contact': 'Fifandraisana',
+  'landing.footer.link.terms': 'Fepetra',
+  'landing.footer.link.privacy': 'Fiarovana',
+  'landing.footer.link.cookies': 'Cookies',
+  'landing.footer.copyright': '© {year} AryTrano · Fianarantsoa, Madagasikara',
+
+  // Home page (legacy, dropped after T-051)
   'home.metaTitle': 'Trano ho an\'ny mpianatra ao Madagasikara',
   'home.metaDescription':
     'Tadiavo ny efitra na apartemà ao Fianarantsoa. Tompon-trano voamarina, vidiny amin\'ny Ariary, fifandraisana mivantana amin\'ny WhatsApp.',

@@ -14,17 +14,18 @@
 const UPLOAD_MARKER = '/image/upload/'
 
 // Cloudinary text layer syntax — bottom-right placement, white at 40%
-// opacity, Open Sans bold 30px. The font is part of Cloudinary's default
-// font catalogue (no asset upload needed).
+// opacity, Arial bold 30px. Arial is part of Cloudinary's default
+// font catalogue (always available, no asset upload needed). `Open Sans`
+// requires an explicit font asset upload on the cloud account.
 const WATERMARK_TRANSFORM =
-  'l_text:Open%20Sans_30_bold:AryTrano,co_white,o_40,g_south_east,x_20,y_20'
+  'l_text:Arial_30_bold:AryTrano,co_white,o_40,g_south_east,x_20,y_20'
 
 export function applyCloudinaryWatermark(url: string): string {
   // Only handle the canonical Cloudinary delivery shape; foreign URLs
   // (or already-watermarked ones) pass through untouched.
   const idx = url.indexOf(UPLOAD_MARKER)
   if (idx === -1) return url
-  if (url.includes('l_text:Open%20Sans_30_bold:AryTrano')) return url
+  if (url.includes('l_text:Arial_30_bold:AryTrano')) return url
 
   const head = url.slice(0, idx + UPLOAD_MARKER.length)
   const tail = url.slice(idx + UPLOAD_MARKER.length)

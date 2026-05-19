@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&amp;display=swap');
+      .at { font-family: 'Playfair Display', 'Times New Roman', serif; font-weight: 700; }
+    </style>
+  </defs>
+  <rect width="1024" height="1024" rx="184" ry="184" fill="oklch(0.524 0.241 277)" />
+  <g transform="translate(152 152)">
+    <svg viewBox="0 0 240 240" width="720" height="720">
+      <text x="108" y="208" text-anchor="end"   class="at" font-size="244" letter-spacing="-12" fill="#ffffff">A</text>
+      <text x="132" y="208" text-anchor="start" class="at" font-size="244" fill="#ffffff">T</text>
+    </svg>
+  </g>
+</svg>

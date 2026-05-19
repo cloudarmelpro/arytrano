@@ -80,6 +80,7 @@ export type PublicListingCard = {
   title: string
   type: ListingType
   priceMonthlyMGA: number
+  publishedAt: Date | null
   /** Truthy when an admin has marked the listing as verified (T-033). */
   verifiedAt: Date | null
   city: { slug: string; nameFr: string }
@@ -150,6 +151,7 @@ export async function listPublicListings(
       title: true,
       type: true,
       priceMonthlyMGA: true,
+      publishedAt: true,
       verifiedAt: true,
       watermarkOptIn: true,
       city: { select: { slug: true, nameFr: true } },
@@ -180,6 +182,7 @@ export async function listPublicListings(
       title: r.title,
       type: r.type,
       priceMonthlyMGA: r.priceMonthlyMGA,
+      publishedAt: r.publishedAt,
       verifiedAt: r.verifiedAt,
       city: r.city,
       neighborhood: r.neighborhood,

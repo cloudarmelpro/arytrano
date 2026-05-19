@@ -261,7 +261,202 @@ export const frMG = {
   'locale.switcher.fr-MG.aria': 'Passer en français',
   'locale.switcher.mg.aria': 'Mividy amin\'ny teny malagasy',
 
-  // Home page
+  // Landing page (T-041 → T-051) — replaces the v0 minimalist home page
+  // with a Booking-inspired structure: top bar + hero search + trust strip
+  // + featured listings + neighborhoods + how-it-works + owner CTA + FAQ.
+
+  // Meta
+  'landing.meta.title': 'AryTrano — Logement étudiant vérifié à Fianarantsoa',
+  'landing.meta.description':
+    'Trouve un logement étudiant à Fianarantsoa parmi des annonces vérifiées. Contact direct propriétaire en WhatsApp. Prix en Ariary.',
+
+  // Top bar
+  'landing.topBar.ownerCta': 'Tu es propriétaire ? Publie gratuitement →',
+
+  // Hero (v2 — design "Marketplace local moderne")
+  'landing.hero.eyebrow': 'Tous quartiers · Fianarantsoa',
+  'landing.hero.title':
+    'Trouve ton logement étudiant. Vérifié, simple, en Ariary.',
+  'landing.hero.lead.one':
+    '{count} annonce à Fianarantsoa, contrôlée par notre équipe. Contact propriétaire direct via WhatsApp.',
+  'landing.hero.lead.other':
+    '{count} annonces à Fianarantsoa, contrôlées une par une par notre équipe. Contact propriétaire direct via WhatsApp.',
+  'landing.hero.search.quartier.label': 'Quartier',
+  'landing.hero.search.quartier.placeholder': 'Tous les quartiers',
+  'landing.hero.search.type.label': 'Type de logement',
+  'landing.hero.search.type.placeholder': 'Tous les types',
+  'landing.hero.search.priceMax.label': 'Budget mensuel',
+  'landing.hero.search.priceMax.placeholder': 'Ariary / mois',
+  'landing.hero.search.submit.one': 'Voir l’annonce',
+  'landing.hero.search.submit.other': 'Voir les {count} annonces',
+  'landing.hero.microStats': '{count} annonces · {verified} proprios vérif.',
+
+  // Trust strip — titre + sous-titre court
+  'landing.trust.verified.title': 'Vérification humaine',
+  'landing.trust.verified.subtitle': 'Pièce + acte contrôlés',
+  'landing.trust.photos.title': 'Photos protégées',
+  'landing.trust.photos.subtitle': 'Watermark + EXIF strippé',
+  'landing.trust.contact.title': 'Contact direct',
+  'landing.trust.contact.subtitle': 'WhatsApp, zéro frais',
+  'landing.trust.price.title': 'Prix en Ariary',
+  'landing.trust.price.subtitle': 'Net, sans surprise',
+
+  // Neighborhoods
+  'landing.neighborhoods.title': 'Quartiers de Fianarantsoa',
+  'landing.neighborhoods.lead':
+    'Du centre animé aux hauteurs calmes — 8 quartiers couverts.',
+  'landing.neighborhoods.viewAll': 'Voir toutes les annonces →',
+  'landing.neighborhoods.count.one': '{count} annonce',
+  'landing.neighborhoods.count.other': '{count} annonces',
+  'landing.neighborhoods.soon': 'Bientôt',
+  // Quartier descriptors (slug-keyed) — 1 tagline d'ambiance + 1 landmark
+  'landing.neighborhoods.andrainjato.tagline': 'Centre, animé',
+  'landing.neighborhoods.andrainjato.landmark':
+    'Près lycée Andrianampoinimerina',
+  'landing.neighborhoods.antarandolo.tagline': 'Calme, résidentiel',
+  'landing.neighborhoods.antarandolo.landmark': 'Proche fac de Sciences',
+  'landing.neighborhoods.tsianolondroa.tagline': 'Centre, marchés',
+  'landing.neighborhoods.tsianolondroa.landmark': 'Cœur historique',
+  'landing.neighborhoods.mahamanina.tagline': 'Hauteurs, panorama',
+  'landing.neighborhoods.mahamanina.landmark': 'Vue colline',
+  'landing.neighborhoods.anjoma.tagline': 'Gare routière, commerces',
+  'landing.neighborhoods.anjoma.landmark': 'Taxi-be & marchés',
+  'landing.neighborhoods.ankidona.tagline': 'Étudiant, vivant',
+  'landing.neighborhoods.ankidona.landmark': 'Proche INSPC',
+  'landing.neighborhoods.ambalavato.tagline': 'Tranquille, familial',
+  'landing.neighborhoods.ambalavato.landmark': 'Écoles & paroisses',
+  'landing.neighborhoods.mahasoabe.tagline': 'Périphérie, paisible',
+  'landing.neighborhoods.mahasoabe.landmark': 'Hauteurs sud',
+
+  // Featured listings — tabs + métadonnées card
+  'landing.featured.title': 'Annonces du moment',
+  'landing.featured.lead': 'Les derniers logements ajoutés.',
+  'landing.featured.viewAll.one': 'Voir l’annonce',
+  'landing.featured.viewAll.other': 'Voir les {count} annonces',
+  'landing.featured.viewMap': 'Carte complète',
+  'landing.featured.tab.all': 'Tous',
+  'landing.featured.tab.STUDIO': 'Studio',
+  'landing.featured.tab.ROOM': 'Chambre',
+  'landing.featured.tab.APARTMENT': 'Appartement',
+  'landing.featured.tab.HOUSE': 'Maison',
+  'landing.featured.tab.empty':
+    'Pas encore d’annonce dans cette catégorie — reviens bientôt.',
+  'landing.featured.badge.new': 'Nouveau',
+  'landing.featured.relativeTime.today': 'aujourd’hui',
+  'landing.featured.relativeTime.daysAgo.one': 'il y a {count} j',
+  'landing.featured.relativeTime.daysAgo.other': 'il y a {count} j',
+
+  // How it works
+  'landing.how.title': 'Trois étapes.',
+  'landing.how.lead':
+    'Tu cherches, tu contactes, tu visites. C’est tout. AryTrano ne se met jamais entre toi et le propriétaire.',
+  'landing.how.step1.title': 'Cherche par quartier ou budget',
+  'landing.how.step1.body':
+    'Filtres rapides, photos, prix en Ariary, badge « vérifié » visible en un coup d’œil.',
+  'landing.how.step2.title': 'Contacte en 1 clic sur WhatsApp',
+  'landing.how.step2.body':
+    'Message pré-rempli avec la référence de l’annonce. Réponse propriétaire sous 24h en moyenne.',
+  'landing.how.step3.title': 'Visite et signe ton bail',
+  'landing.how.step3.body':
+    'Tu visites en personne, tu négocies direct, tu signes ton contrat. Aucune commission AryTrano.',
+
+  // Owner block — 4 bullets, 2 CTAs
+  'landing.ownerBlock.eyebrow': 'Tu es propriétaire ?',
+  'landing.ownerBlock.title':
+    'Loue plus vite. Sans frais. Sans faux locataires.',
+  'landing.ownerBlock.lead':
+    'Publie ton annonce en 5 minutes, reçois des demandes d’étudiants vérifiés, gère tes messages WhatsApp depuis ton dashboard.',
+  'landing.ownerBlock.bullet1': 'Annonce 100% gratuite, à vie',
+  'landing.ownerBlock.bullet2': 'Vérification d’identité étudiante incluse',
+  'landing.ownerBlock.bullet3': 'Réponds en WhatsApp depuis le dashboard',
+  'landing.ownerBlock.bullet4': 'Stats de vues et favoris en temps réel',
+  'landing.ownerBlock.cta': 'Publier une annonce',
+  'landing.ownerBlock.ctaSecondary': 'Voir un exemple',
+
+  // Testimonials (placeholder data — to replace once we ship real ones)
+  'landing.testimonials.title': 'Ils nous font confiance',
+  'landing.testimonials.lead':
+    'Étudiants et propriétaires qui ont trouvé via AryTrano.',
+  'landing.testimonials.role.student': 'Étudiant·e',
+  'landing.testimonials.role.owner': 'Propriétaire',
+  'landing.testimonials.t1.name': 'Mme Rasoa',
+  'landing.testimonials.t1.area': 'Andrainjato',
+  'landing.testimonials.t1.role': 'owner',
+  'landing.testimonials.t1.quote':
+    'En 3 jours, 5 demandes sérieuses. La vérif AryTrano change tout — fini les pertes de temps avec des faux candidats.',
+  'landing.testimonials.t2.name': 'M. Heriniaina',
+  'landing.testimonials.t2.area': 'Antarandolo',
+  'landing.testimonials.t2.role': 'student',
+  'landing.testimonials.t2.quote':
+    'Je voulais un studio proche de la fac sans arnaque. AryTrano m’a mis en contact direct avec le proprio en 2 clics.',
+  'landing.testimonials.t3.name': 'Mme Bao',
+  'landing.testimonials.t3.area': 'Mahamanina',
+  'landing.testimonials.t3.role': 'owner',
+  'landing.testimonials.t3.quote':
+    'Ce que j’aime : le badge « Propriétaire vérifié » me distingue des annonces douteuses sur Facebook.',
+  'landing.testimonials.t4.name': 'M. Rakoto',
+  'landing.testimonials.t4.area': 'Tsianolondroa',
+  'landing.testimonials.t4.role': 'student',
+  'landing.testimonials.t4.quote':
+    'WhatsApp direct avec le proprio, message pré-rempli, super pratique. Visite le lendemain, bail signé la semaine d’après.',
+  'landing.testimonials.t5.name': 'Famille Andry',
+  'landing.testimonials.t5.area': 'Anjoma',
+  'landing.testimonials.t5.role': 'owner',
+  'landing.testimonials.t5.quote':
+    'On a 3 logements à louer. Le dashboard avec stats de vues + favoris nous aide à savoir quelle annonce booster.',
+  'landing.testimonials.t6.name': 'M. Tahina',
+  'landing.testimonials.t6.area': 'Ankidona',
+  'landing.testimonials.t6.role': 'student',
+  'landing.testimonials.t6.quote':
+    'Prix clairs en Ariary, photos honnêtes (watermark AryTrano), j’ai signé sans visiter à l’aveugle.',
+
+  // FAQ — answers refreshed to match design's tone
+  'landing.faq.title': 'Questions fréquentes',
+  'landing.faq.lead': 'Tout ce qu’on nous demande, en clair.',
+  'landing.faq.q1.question': 'Comment AryTrano vérifie les propriétaires ?',
+  'landing.faq.q1.answer':
+    'Notre équipe vérifie la pièce d’identité et un justificatif de propriété (acte ou facture) avant d’attribuer le badge « Propriétaire vérifié ». Aucune annonce ne porte ce badge sans vérification humaine.',
+  'landing.faq.q2.question': 'Comment savoir si une annonce est fiable ?',
+  'landing.faq.q2.answer':
+    'Cherche le badge vert « Annonce vérifiée » — il certifie que la visite, l’adresse et le prix ont été confirmés. Les photos avec watermark AryTrano garantissent qu’elles n’ont pas été volées ailleurs.',
+  'landing.faq.q3.question': 'Comment je contacte un propriétaire ?',
+  'landing.faq.q3.answer':
+    'Un clic sur « Contacter » ouvre directement WhatsApp avec un message pré-rempli. Aucun intermédiaire, aucune commission — tu parles au propriétaire sans frais.',
+  'landing.faq.q4.question': 'Combien coûte AryTrano pour les étudiants ?',
+  'landing.faq.q4.answer':
+    'C’est 100% gratuit. Tu peux chercher, contacter, visiter et signer ton bail sans payer un seul Ariary à AryTrano.',
+  'landing.faq.q5.question': 'Je suis propriétaire, comment publier ?',
+  'landing.faq.q5.answer':
+    'Crée un compte propriétaire (gratuit), envoie ta pièce d’identité et l’acte ou la facture du logement. Notre équipe valide sous 24–48h et tu peux publier autant d’annonces que tu veux.',
+
+  // Footer — 4 colonnes (Produit / Propriétaires / Ressources / Légal)
+  'landing.footer.tagline':
+    'Logement étudiant vérifié à Fianarantsoa. Annonces fiables, contact direct, sans frais cachés.',
+  'landing.footer.section.product': 'Produit',
+  'landing.footer.section.owners': 'Propriétaires',
+  'landing.footer.section.resources': 'Ressources',
+  'landing.footer.section.legal': 'Légal',
+  'landing.footer.link.listings': 'Annonces',
+  'landing.footer.link.howItWorks': 'Comment ça marche',
+  'landing.footer.link.faq': 'Questions fréquentes',
+  'landing.footer.link.neighborhoods': 'Quartiers',
+  'landing.footer.link.publishListing': 'Publier une annonce',
+  'landing.footer.link.verification': 'Vérification',
+  'landing.footer.link.pricing': 'Tarifs (gratuit)',
+  'landing.footer.link.about': 'À propos',
+  'landing.footer.link.blog': 'Blog',
+  'landing.footer.link.careers': 'Recrutement',
+  'landing.footer.link.press': 'Presse',
+  'landing.footer.link.security': 'Sécurité',
+  'landing.footer.link.status': 'Statut',
+  'landing.footer.link.contact': 'Contact',
+  'landing.footer.link.terms': 'Mentions',
+  'landing.footer.link.privacy': 'Confidentialité',
+  'landing.footer.link.cookies': 'Cookies',
+  'landing.footer.copyright': '© {year} AryTrano · Fianarantsoa, Madagascar',
+
+  // Legacy `home.*` keys kept for backward-compat / tests until the
+  // landing rewrite is fully merged. Drop after T-051.
   'home.metaTitle': 'Logement étudiant à Madagascar',
   'home.metaDescription':
     'Trouve ta chambre ou ton appartement à Fianarantsoa. Propriétaires vérifiés, prix en Ariary, contact WhatsApp direct.',

@@ -374,27 +374,13 @@ export function ListingForm(props: ListingFormProps) {
           )}
         />
 
-        <Controller
-          name="watermarkOptIn"
-          control={form.control}
-          render={({ field }) => (
-            <Field>
-              <Label className="items-start font-normal">
-                <Checkbox
-                  checked={field.value === true || field.value === 'true'}
-                  onCheckedChange={(c) => field.onChange(c)}
-                  className="mt-0.5"
-                />
-                <span className="flex flex-col gap-0.5">
-                  <span>{t('listingForm.watermark.label')}</span>
-                  <span className="text-xs text-muted-foreground">
-                    {t('listingForm.watermark.hint')}
-                  </span>
-                </span>
-              </Label>
-            </Field>
-          )}
-        />
+        {/*
+          T-036 watermark toggle — hidden in UI pending Cloudinary strict-
+          transformations resolution. The schema column + the
+          `maybeWatermark` helper + the public-query wiring all remain in
+          place so re-enabling is a one-line restore once the Cloudinary
+          account is unblocked. See `docs/todo-watermark.md`.
+        */}
 
         {/* Amenity multi-select — bound to an Amenity[] array. */}
         <Controller

@@ -1,6 +1,24 @@
 import type { Metadata } from 'next'
-import Link from 'next/link'
 import { auth } from '@/features/auth'
+import { listCitiesWithNeighborhoods } from '@/features/geo'
+import {
+  LandingTopBar,
+  LandingHero,
+  LandingTrustStrip,
+  LandingHowItWorks,
+  LandingNeighborhoods,
+  LandingFeatured,
+  LandingOwnerBlock,
+  LandingTestimonials,
+  LandingFaq,
+  getLandingStats,
+  listNeighborhoodsWithCounts,
+  type NeighborhoodOption,
+} from '@/features/landing'
+import {
+  listPublicListings,
+} from '@/features/listings/queries/list-public-listings'
+import { getFavoritedListingIds } from '@/features/favorites/queries/get-favorited-listing-ids'
 import { getLocale } from '@/lib/i18n/get-locale'
 import { getT } from '@/lib/i18n/translate'
 import { localeAlternates } from '@/lib/seo/alternates'
@@ -9,82 +27,79 @@ export async function generateMetadata(): Promise<Metadata> {
   const locale = await getLocale()
   const t = getT(locale)
   return {
-    title: t('home.metaTitle'),
-    description: t('home.metaDescription'),
+    title: t('landing.meta.title'),
+    description: t('landing.meta.description'),
     alternates: await localeAlternates('/'),
     openGraph: {
-      title: `${t('common.appName')} — ${t('home.metaTitle')}`,
-      description: t('home.metaDescription'),
+      title: t('landing.meta.title'),
+      description: t('landing.meta.description'),
       url: '/',
       type: 'website',
     },
   }
 }
 
+const FEATURED_LIMIT = 6
+
 export default async function HomePage() {
-  const [session, locale] = await Promise.all([auth(), getLocale()])
-  const t = getT(locale)
+  const [session, locale, cities, stats, neighborhoodsRows, featured] =
+    await Promise.all([
+      auth(),
+      getLocale(),
+      listCitiesWithNeighborhoods(),
+      getLandingStats(),
+      listNeighborhoodsWithCounts(),
+      // Tap the existing public-list query — defaults to newest-first +
+      // PUBLISHED-only + watermark-aware. We just cap at 6 for the
+      // landing's "Featured" rail; pagination is irrelevant here.
+      listPublicListings({}),
+    ])
+
+  const featuredItems = featured.items.slice(0, FEATURED_LIMIT)
+  const favoritedIds = await getFavoritedListingIds(
+    session?.user?.id ?? null,
+    featuredItems.map((l) => l.id),
+  )
+
+  // v0.5 — only Fianarantsoa is seeded. Flatten its neighborhoods for the
+  // hero search card. When multi-city ships, swap this for a city tab UI
+  // or a city select in the search card itself.
+  const neighborhoods: NeighborhoodOption[] = (cities[0]?.neighborhoods ?? []).map(
+    (n) => ({
+      slug: n.slug,
+      label: locale === 'mg' ? n.nameMg : n.nameFr,
+    }),
+  )
+
   return (
-    <div>
-      <section className="mx-auto flex max-w-6xl flex-col items-start gap-6 px-4 py-20 sm:px-6 lg:py-28">
-        <span className="rounded-full bg-secondary px-3 py-1 text-xs font-medium uppercase tracking-wide text-secondary-foreground">
-          {t('home.eyebrow')}
-        </span>
-        <h1 className="max-w-3xl text-4xl leading-tight text-primary sm:text-5xl">
-          {t('home.heroTitle')}
-        </h1>
-        <p className="max-w-2xl text-lg text-foreground/80">{t('home.heroLead')}</p>
-
-        <div className="flex flex-col gap-3 sm:flex-row">
-          {session?.user ? (
-            <Link
-              href="/dashboard"
-              className="inline-flex items-center justify-center rounded-md bg-primary px-5 py-2.5 font-medium text-primary-foreground hover:opacity-90"
-            >
-              {t('home.cta.dashboard')}
-            </Link>
-          ) : (
-            <>
-              <Link
-                href="/sign-up"
-                className="inline-flex items-center justify-center rounded-md bg-primary px-5 py-2.5 font-medium text-primary-foreground hover:opacity-90"
-              >
-                {t('home.cta.signUp')}
-              </Link>
-              <Link
-                href="/sign-in"
-                className="inline-flex items-center justify-center rounded-md border border-border px-5 py-2.5 font-medium text-foreground hover:bg-muted"
-              >
-                {t('home.cta.signIn')}
-              </Link>
-            </>
-          )}
-        </div>
-      </section>
-
-      <section className="border-t border-border bg-muted/40">
-        <div className="mx-auto grid max-w-6xl gap-8 px-4 py-16 sm:grid-cols-3 sm:px-6">
-          {[
-            {
-              title: t('home.feature.verified.title'),
-              body: t('home.feature.verified.body'),
-            },
-            {
-              title: t('home.feature.price.title'),
-              body: t('home.feature.price.body'),
-            },
-            {
-              title: t('home.feature.contact.title'),
-              body: t('home.feature.contact.body'),
-            },
-          ].map((f) => (
-            <article key={f.title} className="flex flex-col gap-2">
-              <h2 className="text-lg font-semibold text-primary">{f.title}</h2>
-              <p className="text-sm text-muted-foreground">{f.body}</p>
-            </article>
-          ))}
-        </div>
-      </section>
-    </div>
+    <>
+      <LandingTopBar locale={locale} role={session?.user?.role ?? null} />
+      <LandingHero
+        locale={locale}
+        neighborhoods={neighborhoods}
+        publishedListings={stats.publishedListings}
+        verifiedOwners={stats.verifiedOwners}
+      />
+      <LandingTrustStrip locale={locale} />
+      <div id="neighborhoods">
+        <LandingNeighborhoods locale={locale} rows={neighborhoodsRows} />
+      </div>
+      <LandingFeatured
+        listings={featuredItems}
+        totalPublished={stats.publishedListings}
+        authenticated={Boolean(session?.user)}
+        favoritedIds={favoritedIds}
+      />
+      <div id="how-it-works">
+        <LandingHowItWorks locale={locale} />
+      </div>
+      <div id="owner">
+        <LandingOwnerBlock locale={locale} role={session?.user?.role ?? null} />
+      </div>
+      <LandingTestimonials locale={locale} />
+      <div id="faq">
+        <LandingFaq locale={locale} />
+      </div>
+    </>
   )
 }

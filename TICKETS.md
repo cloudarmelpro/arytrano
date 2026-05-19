@@ -323,6 +323,12 @@ C/D/E sont planifiées mais non détaillées ici.
 - Tests : 1 unit test par template (escape HTML + variable interpolation)
 **Priorité** : P1 · **Statut** : 📋 todo
 
+#### T-036 · Watermark Cloudinary
+**Statut** : 🚧 in-progress — code en place mais UI cachée. Bloqué par
+Strict Transformations sur le compte Cloudinary. Plan de reprise dans
+`docs/todo-watermark.md`. ~30 min de travail restant une fois le
+compte Cloudinary débloqué (Settings → Security → Strict transformations).
+
 ### Reportés à phases ultérieures v0.5
 
 - **Phase C — Bande passante** (E-T04) : génération `blurhash` au upload (lib `blurhash` côté serveur depuis le Buffer), stockage `Photo.blurhash`, `placeholder="blur"` systémique, script de backfill. ~1 jour.
