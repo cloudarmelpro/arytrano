@@ -70,10 +70,10 @@ export function SignUpClient({
               disabled={busy}
               onClick={() => setRole(r.value)}
               data-active={active}
-              className={`group grid grid-cols-[40px_1fr_18px] items-center gap-3.5 rounded-xl p-4 pl-3.5 text-left transition disabled:cursor-not-allowed disabled:opacity-60 ${
+              className={`group grid grid-cols-[40px_1fr_18px] items-center gap-3.5 rounded-xl border p-4 pl-3.5 text-left transition disabled:cursor-not-allowed disabled:opacity-60 ${
                 active
-                  ? 'bg-primary/5 text-foreground outline-2 outline-primary'
-                  : 'bg-muted/60 text-foreground/70 hover:bg-muted hover:text-foreground'
+                  ? 'border-primary bg-primary/5 text-foreground'
+                  : 'border-transparent bg-muted/60 text-foreground/70 hover:bg-muted hover:text-foreground'
               }`}
             >
               <span
