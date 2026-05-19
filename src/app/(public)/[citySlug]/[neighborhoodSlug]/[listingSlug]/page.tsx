@@ -75,7 +75,7 @@ export async function generateMetadata({
   // never let Next.js silently bubble up to the root layout's image (the
   // generic AryTrano card could get cached by WhatsApp/Facebook before the
   // owner uploads photos, locking in the wrong share preview).
-  const ogImage = listing.photos[0]?.url ?? `${baseUrl()}/images/arytrano.png`
+  const ogImage = listing.photos[0]?.url ?? `${baseUrl()}/images/arytrano.webp`
 
   return {
     title,

@@ -1,4 +1,5 @@
 import 'server-only'
+import { unstable_cache } from 'next/cache'
 import { prisma } from '@/lib/db'
 
 export type NeighborhoodRow = {
@@ -17,33 +18,39 @@ export type NeighborhoodRow = {
  * still render with a "Bientôt" badge so the territorial coverage is
  * visible (also nudges owners in those quartiers to publish).
  *
- * One round-trip via Prisma `_count` — no N+1.
+ * Cached for 5 min — listing-publication freshness is welcome but not
+ * critical for the mosaic on the homepage. Tag `neighborhoods-counts`
+ * can be revalidated by publish/unpublish actions if needed.
  */
-export async function listNeighborhoodsWithCounts(): Promise<NeighborhoodRow[]> {
-  const rows = await prisma.neighborhood.findMany({
-    select: {
-      id: true,
-      slug: true,
-      nameFr: true,
-      nameMg: true,
-      city: { select: { slug: true } },
-      _count: { select: { listings: { where: { status: 'PUBLISHED' } } } },
-    },
-  })
-
-  return rows
-    .map((r) => ({
-      id: r.id,
-      slug: r.slug,
-      nameFr: r.nameFr,
-      nameMg: r.nameMg,
-      citySlug: r.city.slug,
-      publishedListings: r._count.listings,
-    }))
-    .sort((a, b) => {
-      if (b.publishedListings !== a.publishedListings) {
-        return b.publishedListings - a.publishedListings
-      }
-      return a.nameFr.localeCompare(b.nameFr)
+export const listNeighborhoodsWithCounts = unstable_cache(
+  async (): Promise<NeighborhoodRow[]> => {
+    const rows = await prisma.neighborhood.findMany({
+      select: {
+        id: true,
+        slug: true,
+        nameFr: true,
+        nameMg: true,
+        city: { select: { slug: true } },
+        _count: { select: { listings: { where: { status: 'PUBLISHED' } } } },
+      },
     })
-}
+
+    return rows
+      .map((r) => ({
+        id: r.id,
+        slug: r.slug,
+        nameFr: r.nameFr,
+        nameMg: r.nameMg,
+        citySlug: r.city.slug,
+        publishedListings: r._count.listings,
+      }))
+      .sort((a, b) => {
+        if (b.publishedListings !== a.publishedListings) {
+          return b.publishedListings - a.publishedListings
+        }
+        return a.nameFr.localeCompare(b.nameFr)
+      })
+  },
+  ['neighborhoods-counts-v1'],
+  { revalidate: 300, tags: ['neighborhoods-counts'] },
+)

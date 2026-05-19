@@ -309,6 +309,14 @@ model Listing {
   @@index([status, publishedAt(sort: Desc)])
   @@index([status, priceMonthlyMGA])
   @@index([ownerId, status])
+  // Covers public list queries that filter by quartier + status and sort
+  // by recency — `/annonces?neighborhood=X` + the per-quartier rail on
+  // the landing. The composite (status, cityId, neighborhoodId) above
+  // doesn't cover the sort, forcing a heap re-sort on every page.
+  @@index([status, neighborhoodId, publishedAt(sort: Desc)])
+  // `Listing.amenities` `hasEvery` filter on the public list page does
+  // an array containment scan — GIN turns it from O(rows) into O(log n).
+  @@index([amenities], type: Gin)
 }
 
 enum ListingType {
