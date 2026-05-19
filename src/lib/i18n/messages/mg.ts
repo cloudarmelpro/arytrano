@@ -15,6 +15,7 @@ export const mg: Record<MessageKey, string> = {
   // Common
   'common.appName': 'AryTrano',
   'common.home': 'Fandraisana',
+  'common.perMonth': '/volana',
   'common.loading': 'Miandry…',
   'common.back': 'Hiverina',
   'common.close': 'Hidio',

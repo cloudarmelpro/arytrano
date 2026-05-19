@@ -51,7 +51,6 @@ export function proxy(request: NextRequest) {
   const requestHeaders = new Headers(request.headers)
   requestHeaders.set('x-nonce', nonce)
   requestHeaders.set('x-locale', locale)
-  requestHeaders.set('x-pathname', pathname)
   requestHeaders.set('Content-Security-Policy', cspHeader)
 
   // ─── 4. Rewrite /mg/* → /* internally ──────────────────────────────
@@ -76,6 +75,7 @@ export function proxy(request: NextRequest) {
       maxAge: 60 * 60 * 24 * 365,
       path: '/',
       sameSite: 'lax',
+      secure: process.env.NODE_ENV === 'production',
     })
   }
   response.headers.set('Content-Security-Policy', cspHeader)

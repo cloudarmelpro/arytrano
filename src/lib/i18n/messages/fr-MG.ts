@@ -9,6 +9,7 @@ export const frMG = {
   // Common / shared
   'common.appName': 'AryTrano',
   'common.home': 'Accueil',
+  'common.perMonth': '/mois',
   'common.loading': 'Chargement…',
   'common.back': 'Retour',
   'common.close': 'Fermer',

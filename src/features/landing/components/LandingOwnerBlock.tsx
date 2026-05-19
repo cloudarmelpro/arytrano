@@ -176,7 +176,7 @@ function DashboardMock({ t }: { t: ReturnType<typeof getT> }) {
                   {t(`landing.ownerBlock.dashboard.l${i}.price` as MessageKey)}
                 </div>
                 <div className="text-[11px] font-medium text-muted-foreground">
-                  /mois
+                  {t('common.perMonth')}
                 </div>
               </div>
             </div>

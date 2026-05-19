@@ -89,9 +89,13 @@ export function LandingNeighborhoods({
                           : { background: 'rgba(255,255,255,0.85)', color: palette.fg }
                       }
                       className="inline-flex h-6 items-center rounded-full px-2.5 text-[11.5px] font-semibold"
-                      aria-label={`${n.publishedListings} annonces`}
                     >
-                      {n.publishedListings} ann.
+                      {t(
+                        n.publishedListings <= 1
+                          ? 'landing.neighborhoods.count.one'
+                          : 'landing.neighborhoods.count.other',
+                        { count: n.publishedListings },
+                      )}
                     </span>
                     <Icon name="arrow-up-right" size={span.feature ? 22 : 16} />
                   </div>
