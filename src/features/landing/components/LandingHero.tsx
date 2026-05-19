@@ -27,7 +27,7 @@ export function LandingHero({
         <h1 className="m-0 max-w-[1040px] font-serif text-[clamp(36px,5.4vw,76px)] font-normal leading-[1.05] tracking-[-0.015em] text-balance">
           {t('landing.hero.title')}
         </h1>
-        <p className="mt-5 mb-9 max-w-[720px] text-[clamp(17px,1.6vw,22px)] font-medium leading-[1.4] text-white/85">
+        <p className="mt-5 mb-9 max-w-[720px] text-[clamp(17px,1.6vw,20px)] font-medium leading-[1.4] text-white/85">
           {t(
             publishedListings <= 1
               ? 'landing.hero.lead.one'

@@ -104,7 +104,7 @@ export function LandingFeatured({
           </ul>
         )}
 
-        <div className="flex justify-center">
+        <div className="flex justify-end">
           <Link
             href="/annonces"
             className="inline-flex h-11 items-center rounded-xl bg-primary px-6 text-sm font-semibold text-primary-foreground shadow-sm transition hover:opacity-95"
