@@ -80,7 +80,7 @@ export function LandingFaq({ locale }: { locale: Locale }) {
                 </span>
                 <span
                   aria-hidden
-                  className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-muted text-muted-foreground transition-[transform,background-color,color] duration-200 group-open:rotate-45 group-open:bg-primary group-open:text-primary-foreground"
+                  className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-muted text-muted-foreground transition-[transform,background-color,color] duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] group-open:rotate-45 group-open:bg-primary group-open:text-primary-foreground"
                 >
                   <Icon name="plus" size={16} />
                 </span>
@@ -89,7 +89,7 @@ export function LandingFaq({ locale }: { locale: Locale }) {
                   without needing JS or `interpolate-size` (good fallback
                   for older Chrome / Firefox). The inner overflow-hidden
                   clips the answer while the row collapses. */}
-              <div className="grid grid-rows-[0fr] transition-[grid-template-rows] duration-300 ease-out group-open:grid-rows-[1fr]">
+              <div className="grid grid-rows-[0fr] transition-[grid-template-rows] duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] group-open:grid-rows-[1fr]">
                 <p className="overflow-hidden whitespace-pre-wrap pl-12 text-[14px] leading-[1.6] text-foreground/70">
                   <span className="block pt-3">{it.answer}</span>
                 </p>
