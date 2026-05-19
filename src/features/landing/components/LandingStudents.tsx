@@ -48,7 +48,7 @@ const CARDS: Array<{
 export function LandingStudents({ locale }: { locale: Locale }) {
   const t = getT(locale)
   return (
-    <section className="bg-[oklch(0.18_0.02_277)] py-20 text-white lg:py-24">
+    <section className="bg-[oklch(0.16_0.025_281)] py-20 text-white lg:py-24">
       <div className="mx-auto max-w-[1280px] px-6 lg:px-10">
         <header className="mb-10 grid items-end gap-8 lg:grid-cols-[1.5fr_1fr]">
           <div>

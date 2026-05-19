@@ -74,11 +74,10 @@ export function LandingFeatured({
                 role="tab"
                 aria-selected={isActive}
                 onClick={() => setTab(tabKey)}
-                className={`inline-flex h-9 cursor-pointer items-center rounded-full px-4 text-sm font-medium transition ${
-                  isActive
-                    ? 'bg-foreground text-background'
-                    : 'bg-muted text-foreground hover:bg-muted/80'
-                }`}
+                className={`inline-flex h-9 cursor-pointer items-center rounded-full px-4 text-sm font-medium transition ${isActive
+                  ? 'bg-foreground text-background'
+                  : 'bg-muted text-foreground hover:bg-muted/80'
+                  }`}
               >
                 {t(labelKey)}
               </button>
@@ -107,7 +106,7 @@ export function LandingFeatured({
         <div className="flex justify-end">
           <Link
             href="/annonces"
-            className="inline-flex h-11 items-center rounded-xl bg-primary px-6 text-sm font-semibold text-primary-foreground shadow-sm transition hover:opacity-95"
+            className="inline-flex h-10 items-center rounded-xl bg-primary px-6 text-sm text-primary-foreground shadow-sm transition hover:opacity-95"
           >
             {t(viewAllKey, { count: totalPublished })}
           </Link>
