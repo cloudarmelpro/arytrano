@@ -66,7 +66,10 @@ export function LandingFaq({ locale }: { locale: Locale }) {
           {items.map((it, i) => (
             <details
               key={i}
-              className="group rounded-2xl border border-border bg-background p-5 transition hover:border-primary/40 open:border-primary/60 open:bg-muted/30"
+              // `name=` makes the 5 details form an exclusive group:
+              // opening one auto-closes any other (native HTML spec).
+              name="landing-faq"
+              className="group rounded-2xl border border-border bg-background p-5 transition-colors hover:border-primary/40 open:border-primary/60 open:bg-muted/30"
             >
               <summary className="flex cursor-pointer list-none items-start gap-5">
                 <span className="shrink-0 font-mono text-[12px] font-semibold tracking-[0.06em] text-primary">
@@ -77,14 +80,20 @@ export function LandingFaq({ locale }: { locale: Locale }) {
                 </span>
                 <span
                   aria-hidden
-                  className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-muted text-muted-foreground transition group-open:rotate-45 group-open:bg-primary group-open:text-primary-foreground"
+                  className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-muted text-muted-foreground transition-[transform,background-color,color] duration-200 group-open:rotate-45 group-open:bg-primary group-open:text-primary-foreground"
                 >
                   <Icon name="plus" size={16} />
                 </span>
               </summary>
-              <p className="mt-3 whitespace-pre-wrap pl-12 text-[14px] leading-[1.6] text-foreground/70">
-                {it.answer}
-              </p>
+              {/* grid-rows from 0fr → 1fr animates content height smoothly
+                  without needing JS or `interpolate-size` (good fallback
+                  for older Chrome / Firefox). The inner overflow-hidden
+                  clips the answer while the row collapses. */}
+              <div className="grid grid-rows-[0fr] transition-[grid-template-rows] duration-300 ease-out group-open:grid-rows-[1fr]">
+                <p className="overflow-hidden whitespace-pre-wrap pl-12 text-[14px] leading-[1.6] text-foreground/70">
+                  <span className="block pt-3">{it.answer}</span>
+                </p>
+              </div>
             </details>
           ))}
         </div>
