@@ -124,10 +124,12 @@ export function LandingSearchCard({
             anchor={quartierAnchorRef}
             sideOffset={6}
             align="start"
+            side="bottom"
+            collisionAvoidance={{ side: 'none' }}
             className="z-50"
           >
             <Combobox.Popup className="w-(--anchor-width) max-h-(--available-height) overflow-y-auto rounded-xl bg-white p-1 text-foreground shadow-lg ring-1 ring-foreground/10 data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0">
-            <div className="px-3 pt-2 pb-1 text-[11.5px] font-semibold uppercase tracking-[0.06em] text-foreground">
+            <div className="px-3 pt-2 pb-0 text-[11.5px] font-semibold uppercase leading-none tracking-[0.06em] text-foreground">
               {t('landing.hero.search.quartier.groupLabel')}
             </div>
             <Combobox.Empty className="px-3 py-4 text-center text-[13px] text-muted-foreground">
@@ -188,10 +190,12 @@ export function LandingSearchCard({
             anchor={typeAnchorRef}
             sideOffset={6}
             align="start"
+            side="bottom"
+            collisionAvoidance={{ side: 'none' }}
             className="z-50"
           >
             <Combobox.Popup className="w-(--anchor-width) max-h-(--available-height) overflow-y-auto rounded-xl bg-white p-1 text-foreground shadow-lg ring-1 ring-foreground/10 data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0">
-            <div className="px-3 pt-2 pb-1 text-[11.5px] font-semibold uppercase tracking-[0.06em] text-foreground">
+            <div className="px-3 pt-2 pb-0 text-[11.5px] font-semibold uppercase leading-none tracking-[0.06em] text-foreground">
               {t('landing.hero.search.type.groupLabel')}
             </div>
             <Combobox.Empty className="px-3 py-4 text-center text-[13px] text-muted-foreground">
