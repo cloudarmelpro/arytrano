@@ -129,28 +129,28 @@ export function LandingSearchCard({
             className="z-50"
           >
             <Combobox.Popup className="w-(--anchor-width) max-h-(--available-height) overflow-y-auto rounded-xl bg-white p-1 text-foreground shadow-lg ring-1 ring-foreground/10 data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0">
-            <Combobox.Empty className="px-3 py-4 text-center text-[13px] text-muted-foreground">
-              {t('landing.hero.search.quartier.noResults' as const)}
-            </Combobox.Empty>
-            <Combobox.List className="flex flex-col">
-              {(o: { value: string; label: string }) => (
-                <Combobox.Item
-                  key={o.value}
-                  value={o}
-                  onClick={() => {
-                    setQuartier(o.value)
-                    setQuartierText(o.label)
-                  }}
-                  className="cursor-pointer rounded-md px-3 py-2.5 outline-none data-highlighted:bg-primary/10 data-highlighted:text-foreground"
-                >
-                  <Row
-                    icon="pin"
-                    label={o.label}
-                    subtitle={t('landing.hero.search.quartier.itemSubtitle')}
-                  />
-                </Combobox.Item>
-              )}
-            </Combobox.List>
+              <Combobox.Empty className="empty:p-0 px-3 py-4 text-center text-[13px] text-muted-foreground">
+                {t('landing.hero.search.quartier.noResults' as const)}
+              </Combobox.Empty>
+              <Combobox.List className="flex flex-col">
+                {(o: { value: string; label: string }) => (
+                  <Combobox.Item
+                    key={o.value}
+                    value={o}
+                    onClick={() => {
+                      setQuartier(o.value)
+                      setQuartierText(o.label)
+                    }}
+                    className="cursor-pointer rounded-md px-3 py-2.5 outline-none data-highlighted:bg-primary/10 data-highlighted:text-foreground"
+                  >
+                    <Row
+                      icon="pin"
+                      label={o.label}
+                      subtitle={t('landing.hero.search.quartier.itemSubtitle')}
+                    />
+                  </Combobox.Item>
+                )}
+              </Combobox.List>
             </Combobox.Popup>
           </Combobox.Positioner>
         </Combobox.Portal>
@@ -192,27 +192,27 @@ export function LandingSearchCard({
             className="z-50"
           >
             <Combobox.Popup className="w-(--anchor-width) max-h-(--available-height) overflow-y-auto rounded-xl bg-white p-1 text-foreground shadow-lg ring-1 ring-foreground/10 data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0">
-            <Combobox.Empty className="px-3 py-4 text-center text-[13px] text-muted-foreground">
-              {t('landing.hero.search.type.noResults' as const)}
-            </Combobox.Empty>
-            <Combobox.List className="flex flex-col">
-              {(o: { value: ListingType; label: string }) => (
-                <Combobox.Item
-                  key={o.value}
-                  value={o}
-                  onClick={() => {
-                    setType(o.value)
-                    setTypeText(o.label)
-                  }}
-                  className="cursor-pointer rounded-md px-3 py-2.5 outline-none data-highlighted:bg-primary/10 data-highlighted:text-foreground"
-                >
-                  <Row
-                    icon={TYPE_ICON[o.value]}
-                    label={o.label}
-                  />
-                </Combobox.Item>
-              )}
-            </Combobox.List>
+              <Combobox.Empty className="empty:p-0 px-3 py-4 text-center text-[13px] text-muted-foreground">
+                {t('landing.hero.search.type.noResults' as const)}
+              </Combobox.Empty>
+              <Combobox.List className="flex flex-col">
+                {(o: { value: ListingType; label: string }) => (
+                  <Combobox.Item
+                    key={o.value}
+                    value={o}
+                    onClick={() => {
+                      setType(o.value)
+                      setTypeText(o.label)
+                    }}
+                    className="cursor-pointer rounded-md px-3 py-2.5 outline-none data-highlighted:bg-primary/10 data-highlighted:text-foreground"
+                  >
+                    <Row
+                      icon={TYPE_ICON[o.value]}
+                      label={o.label}
+                    />
+                  </Combobox.Item>
+                )}
+              </Combobox.List>
             </Combobox.Popup>
           </Combobox.Positioner>
         </Combobox.Portal>
