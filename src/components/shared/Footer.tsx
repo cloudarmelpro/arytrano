@@ -95,7 +95,7 @@ function NewsletterBlock({ t }: { t: Translator }) {
         <div className="text-[11.5px] font-semibold uppercase tracking-[0.1em] text-primary">
           {t('footerV3.newsletter.eyebrow')}
         </div>
-        <h3 className="mt-3.5 max-w-[480px] text-[28px] font-bold leading-[1.15] tracking-[-0.02em] text-foreground max-sm:text-[22px]">
+        <h3 className="mt-3.5 max-w-[480px] font-serif text-[28px] font-normal leading-[1.1] tracking-[-0.02em] text-foreground max-sm:text-[22px]">
           {t('footerV3.newsletter.title')}
         </h3>
         <p className="mt-2 max-w-[460px] text-[14px] leading-[1.55] text-foreground/70">
