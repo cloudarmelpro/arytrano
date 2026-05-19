@@ -5,8 +5,29 @@ import { OAuthButtonsRow } from './OAuthButtonsRow'
 import { SignUpForm } from './SignUpForm'
 import { Separator } from '@/components/ui/separator'
 import { useT } from '@/lib/i18n/client'
+import { Icon, type IconName } from '@/components/shared/Icon'
 
 type SignUpRole = 'STUDENT' | 'OWNER'
+
+const ROLES: Array<{
+  value: SignUpRole
+  icon: IconName
+  nameKey: 'signUp.role.STUDENT' | 'signUp.role.OWNER'
+  subKey: 'auth.role.student.sub' | 'auth.role.owner.sub'
+}> = [
+  {
+    value: 'STUDENT',
+    icon: 'user',
+    nameKey: 'signUp.role.STUDENT',
+    subKey: 'auth.role.student.sub',
+  },
+  {
+    value: 'OWNER',
+    icon: 'building',
+    nameKey: 'signUp.role.OWNER',
+    subKey: 'auth.role.owner.sub',
+  },
+]
 
 /**
  * Wraps the sign-up screen so the role selector can drive BOTH the
@@ -36,26 +57,50 @@ export function SignUpClient({
       <div
         role="radiogroup"
         aria-label={t('signUp.roleSelector.ariaLabel')}
-        className="mx-auto inline-flex items-center rounded-md bg-muted p-1 text-sm font-medium"
+        className="grid grid-cols-2 gap-2.5 max-sm:grid-cols-1"
       >
-        {(['STUDENT', 'OWNER'] as const).map((r) => {
-          const active = role === r
-          const label = r === 'STUDENT' ? t('signUp.role.STUDENT') : t('signUp.role.OWNER')
+        {ROLES.map((r) => {
+          const active = role === r.value
           return (
             <button
-              key={r}
+              key={r.value}
               type="button"
               role="radio"
               aria-checked={active}
               disabled={busy}
-              onClick={() => setRole(r)}
-              className={`rounded-md px-5 py-1.5 transition disabled:cursor-not-allowed disabled:opacity-60 ${
+              onClick={() => setRole(r.value)}
+              data-active={active}
+              className={`group grid grid-cols-[40px_1fr_18px] items-center gap-3.5 rounded-xl p-4 pl-3.5 text-left transition disabled:cursor-not-allowed disabled:opacity-60 ${
                 active
-                  ? 'bg-background text-foreground shadow-sm ring-1 ring-border'
-                  : 'text-muted-foreground hover:text-foreground'
+                  ? 'bg-primary/5 text-foreground outline-2 outline-primary'
+                  : 'bg-muted/60 text-foreground/70 hover:bg-muted hover:text-foreground'
               }`}
             >
-              {label}
+              <span
+                className={`inline-flex h-10 w-10 items-center justify-center rounded-[10px] transition ${
+                  active ? 'bg-primary text-white' : 'bg-background text-foreground/70'
+                }`}
+              >
+                <Icon name={r.icon} size={18} />
+              </span>
+              <span className="flex flex-col">
+                <span className="text-[14.5px] font-semibold leading-[1.2] tracking-[-0.005em] text-foreground">
+                  {t(r.nameKey)}
+                </span>
+                <span className="mt-0.5 text-[12.5px] font-medium leading-[1.3] text-muted-foreground">
+                  {t(r.subKey)}
+                </span>
+              </span>
+              <span
+                aria-hidden
+                className={`inline-flex h-[18px] w-[18px] items-center justify-center rounded-full border-[1.5px] transition ${
+                  active
+                    ? 'border-primary bg-primary text-white'
+                    : 'border-border bg-transparent text-transparent'
+                }`}
+              >
+                <Icon name="check" size={10} stroke={3} />
+              </span>
             </button>
           )
         })}

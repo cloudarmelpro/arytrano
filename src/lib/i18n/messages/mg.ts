@@ -604,6 +604,8 @@ export const mg: Record<MessageKey, string> = {
   'auth.alt.signupLink': 'Hisoratra anarana maimaim-poana',
   'auth.alt.signin': 'Efa manana kaonty ?',
   'auth.alt.signinLink': 'Hiditra',
+  'auth.role.student.sub': 'Mitady trano hipetrahana',
+  'auth.role.owner.sub': 'Mametraka ny tranoko',
 
   // Auth side panel
   'auth.panel.eyebrow': 'Trano ho an’ny mpianatra · Fianarantsoa',

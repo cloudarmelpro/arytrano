@@ -594,6 +594,8 @@ export const frMG = {
   'auth.alt.signupLink': 'Inscris-toi gratuitement',
   'auth.alt.signin': 'Déjà un compte ?',
   'auth.alt.signinLink': 'Connecte-toi',
+  'auth.role.student.sub': 'Je cherche un logement',
+  'auth.role.owner.sub': 'Je publie mon logement',
 
   // Auth side panel
   'auth.panel.eyebrow': 'Logement étudiant · Fianarantsoa',
