@@ -1,6 +1,5 @@
 import 'server-only'
 import { prisma } from '@/lib/db'
-import { maybeWatermark } from '@/lib/cloudinary/watermark'
 import type { PublicListingCard } from './list-public-listings'
 
 /**
@@ -46,7 +45,6 @@ export async function listRelatedListings(input: {
       priceMonthlyMGA: true,
       publishedAt: true,
       verifiedAt: true,
-      watermarkOptIn: true,
       city: { select: { slug: true, nameFr: true } },
       neighborhood: { select: { slug: true, nameFr: true } },
       photos: {
@@ -73,8 +71,6 @@ export async function listRelatedListings(input: {
     verifiedAt: r.verifiedAt,
     city: r.city,
     neighborhood: r.neighborhood,
-    photo: r.photos[0]
-      ? { ...r.photos[0], url: maybeWatermark(r.photos[0].url, r.watermarkOptIn) }
-      : null,
+    photo: r.photos[0] ?? null,
   }))
 }

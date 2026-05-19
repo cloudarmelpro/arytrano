@@ -50,8 +50,8 @@ export default async function HomePage() {
       getLandingStats(),
       listNeighborhoodsWithCounts(),
       // Tap the existing public-list query — defaults to newest-first +
-      // PUBLISHED-only + watermark-aware. We just cap at 6 for the
-      // landing's "Featured" rail; pagination is irrelevant here.
+      // PUBLISHED-only. We just cap at 6 for the landing's "Featured"
+      // rail; pagination is irrelevant here.
       listPublicListings({}),
     ])
 

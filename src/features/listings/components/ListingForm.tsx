@@ -74,7 +74,6 @@ export function ListingForm(props: ListingFormProps) {
             furnished: false,
             amenities: [],
             customAmenities: [],
-            watermarkOptIn: false,
           },
   })
 
@@ -97,7 +96,6 @@ export function ListingForm(props: ListingFormProps) {
       if (values.bedrooms !== undefined) fd.append('bedrooms', String(values.bedrooms))
       if (values.bathrooms !== undefined) fd.append('bathrooms', String(values.bathrooms))
       fd.append('furnished', values.furnished ? 'true' : 'false')
-      fd.append('watermarkOptIn', values.watermarkOptIn ? 'true' : 'false')
       // Amenities: append one entry per checked value so `formData.getAll('amenities')`
       // on the server returns the full string[]. Always send (even empty) so an
       // edit that unchecks the last amenity actually clears the field server-side.
@@ -373,14 +371,6 @@ export function ListingForm(props: ListingFormProps) {
             </Field>
           )}
         />
-
-        {/*
-          T-036 watermark toggle — hidden in UI pending Cloudinary strict-
-          transformations resolution. The schema column + the
-          `maybeWatermark` helper + the public-query wiring all remain in
-          place so re-enabling is a one-line restore once the Cloudinary
-          account is unblocked. See `docs/todo-watermark.md`.
-        */}
 
         {/* Amenity multi-select — bound to an Amenity[] array. */}
         <Controller

@@ -97,7 +97,8 @@
       → traçabilité pour audit CMIL.
 - [ ] Pas de téléchargement permanent : le visualiseur admin affiche
       le déchiffrement **en mémoire** uniquement, pas de fichier
-      téléchargeable. Watermark sur l'aperçu avec adminId + date.
+      téléchargeable. Marquer l'aperçu avec adminId + date pour
+      tracer les fuites éventuelles.
 - [ ] Auto-déconnexion admin après 15 min d'inactivité.
 
 ## 7. Notification de fuite (breach notification)

@@ -50,7 +50,6 @@ export async function updateListing(
     ...(input.customAmenities !== undefined && {
       customAmenities: { set: input.customAmenities },
     }),
-    ...(input.watermarkOptIn !== undefined && { watermarkOptIn: input.watermarkOptIn }),
   }
   if (input.title && input.title !== existing.title) {
     data.slug = buildSlug(input.title, existing.id)

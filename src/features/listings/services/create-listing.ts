@@ -41,7 +41,6 @@ export async function createListing(
         furnished: input.furnished ?? false,
         amenities: input.amenities ?? [],
         customAmenities: input.customAmenities ?? [],
-        watermarkOptIn: input.watermarkOptIn ?? false,
         status: 'DRAFT',
       },
     })

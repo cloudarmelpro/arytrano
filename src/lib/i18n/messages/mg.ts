@@ -439,7 +439,7 @@ export const mg: Record<MessageKey, string> = {
   'landing.trust.verified.title': 'Fanamarinana ataon\'olona',
   'landing.trust.verified.subtitle': 'Karatra + acte voasivana',
   'landing.trust.photos.title': 'Sary voaaro',
-  'landing.trust.photos.subtitle': 'Watermark + EXIF voasaringitra',
+  'landing.trust.photos.subtitle': 'EXIF voasaringitra + jereny an-tanana',
   'landing.trust.contact.title': 'Fifandraisana mivantana',
   'landing.trust.contact.subtitle': 'WhatsApp, tsy misy sarany',
   'landing.trust.price.title': 'Vidiny Ariary',
@@ -554,7 +554,7 @@ export const mg: Record<MessageKey, string> = {
   'landing.testimonials.t6.area': 'Ankidona',
   'landing.testimonials.t6.role': 'student',
   'landing.testimonials.t6.quote':
-    'Vidiny mazava amin\'ny Ariary, sary marina (watermark AryTrano), nanao sonia tsy nila nitsidika tamin\'ny tsy fahalalana.',
+    'Vidiny mazava amin\'ny Ariary, sary marina, nanao sonia tsy nila nitsidika tamin\'ny tsy fahalalana.',
 
   // FAQ
   'landing.faq.title': 'Fanontaniana matetika',
@@ -566,7 +566,7 @@ export const mg: Record<MessageKey, string> = {
   'landing.faq.q2.question':
     'Ahoana no ahafantarana fa azo antoka ny doka iray?',
   'landing.faq.q2.answer':
-    'Tadiavo ny marika maitso « Filazana voamarina » — manamarina fa voajery ny adiresy, ny vidiny, sy ny visit. Ny sary misy watermark AryTrano dia manamarina fa tsy nangalarina avy any an-kafa.',
+    'Tadiavo ny marika maitso « Filazana voamarina » — manamarina fa voajery ny adiresy, ny vidiny, sy ny visit. Manamarina ihany koa ny mpampandeha fa tsy nangalarina avy any an-kafa ny sary alohan’ny famoahana.',
   'landing.faq.q3.question': 'Ahoana no ifandraisako amin\'ny tompony?',
   'landing.faq.q3.answer':
     'Click amin\'ny « Mifandraisa » dia misokatra mivantana ny WhatsApp miaraka amin\'ny hafatra efa misy. Tsy misy mpampifandray, tsy misy commission — miresaka mivantana amin\'ny tompony ianao, tsy misy sarany.',
@@ -819,7 +819,7 @@ export const mg: Record<MessageKey, string> = {
     'Misakana ny « sous-location » sy ny filazana hosoka.',
   'comment.verif.v3.title': 'Sary arovana',
   'comment.verif.v3.desc':
-    'Watermark AryTrano + reverse-image-search Google Vision.',
+    'EXIF voasaringitra + reverse-image-search Google Vision.',
   'comment.verif.v3.why':
     'Misakana ny halatra sary avy any Airbnb, Booking, Facebook.',
   'comment.verif.v4.title': 'Adiresy voamarina',
@@ -941,7 +941,7 @@ export const mg: Record<MessageKey, string> = {
     'Acte de propriété na facture JIRAMA amin’ny anaran’ny tompon-trano.',
   'proprietaires.verif.i3.title': 'Sary arovana',
   'proprietaires.verif.i3.desc':
-    'Watermark AryTrano + reverse-image-search.',
+    'EXIF voasaringitra + reverse-image-search.',
   'proprietaires.verif.i4.title': 'Fanamarinana ny adiresy',
   'proprietaires.verif.i4.desc':
     'Fitsidihana na fiantsoana géolocalisée ho an’ny premium.',
@@ -1252,8 +1252,6 @@ export const mg: Record<MessageKey, string> = {
   'listingForm.bedrooms.label': 'Efitra fatoriana',
   'listingForm.bathrooms.label': 'Efitrano fandroana',
   'listingForm.furnished.label': 'Misy fanaka',
-  'listingForm.watermark.label': 'Hampidirana marika « AryTrano » amin’ny sary',
-  'listingForm.watermark.hint': 'Soratra somary mangarahara any ambany ankavanana hisakanana ny fampiasana ny sary amin’ny tranonkala hafa.',
   'listingForm.submit.create': 'Hamorona volavolan-kevitra',
   'listingForm.submit.update': 'Tehirizo ny fanovana',
   'listingForm.submit.saving': 'Mitahiry…',

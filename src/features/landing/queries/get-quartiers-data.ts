@@ -1,6 +1,5 @@
 import 'server-only'
 import { prisma } from '@/lib/db'
-import { maybeWatermark } from '@/lib/cloudinary/watermark'
 
 export type QuartierSampleListing = {
   id: string
@@ -86,7 +85,6 @@ export async function getQuartiersData(): Promise<QuartiersPageData> {
           title: true,
           type: true,
           priceMonthlyMGA: true,
-          watermarkOptIn: true,
           neighborhoodId: true,
           photos: {
             take: 1,
@@ -124,12 +122,7 @@ export async function getQuartiersData(): Promise<QuartiersPageData> {
         title: l.title,
         type: l.type,
         priceMonthlyMGA: l.priceMonthlyMGA,
-        photo: l.photos[0]
-          ? {
-              ...l.photos[0],
-              url: maybeWatermark(l.photos[0].url, l.watermarkOptIn),
-            }
-          : null,
+        photo: l.photos[0] ?? null,
       })
       samplesByNeighborhood.set(l.neighborhoodId, entry)
     }

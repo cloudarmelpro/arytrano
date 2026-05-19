@@ -435,7 +435,7 @@ export const frMG = {
   'landing.trust.verified.title': 'Vérification humaine',
   'landing.trust.verified.subtitle': 'Pièce + acte contrôlés',
   'landing.trust.photos.title': 'Photos protégées',
-  'landing.trust.photos.subtitle': 'Watermark + EXIF strippé',
+  'landing.trust.photos.subtitle': 'EXIF strippé + revue manuelle',
   'landing.trust.contact.title': 'Contact direct',
   'landing.trust.contact.subtitle': 'WhatsApp, zéro frais',
   'landing.trust.price.title': 'Prix en Ariary',
@@ -548,7 +548,7 @@ export const frMG = {
   'landing.testimonials.t6.area': 'Ankidona',
   'landing.testimonials.t6.role': 'student',
   'landing.testimonials.t6.quote':
-    'Prix clairs en Ariary, photos honnêtes (watermark AryTrano), j’ai signé sans visiter à l’aveugle.',
+    'Prix clairs en Ariary, photos honnêtes, j’ai signé sans visiter à l’aveugle.',
 
   // FAQ — answers refreshed to match design's tone
   'landing.faq.title': 'Questions fréquentes',
@@ -558,7 +558,7 @@ export const frMG = {
     'Notre équipe vérifie la pièce d’identité et un justificatif de propriété (acte ou facture) avant d’attribuer le badge « Propriétaire vérifié ». Aucune annonce ne porte ce badge sans vérification humaine.',
   'landing.faq.q2.question': 'Comment savoir si une annonce est fiable ?',
   'landing.faq.q2.answer':
-    'Cherche le badge vert « Annonce vérifiée » — il certifie que la visite, l’adresse et le prix ont été confirmés. Les photos avec watermark AryTrano garantissent qu’elles n’ont pas été volées ailleurs.',
+    'Cherche le badge vert « Annonce vérifiée » — il certifie que la visite, l’adresse et le prix ont été confirmés. Nos modérateurs vérifient aussi que les photos n’ont pas été volées ailleurs avant publication.',
   'landing.faq.q3.question': 'Comment je contacte un propriétaire ?',
   'landing.faq.q3.answer':
     'Un clic sur « Contacter » ouvre directement WhatsApp avec un message pré-rempli. Aucun intermédiaire, aucune commission — tu parles au propriétaire sans frais.',
@@ -803,7 +803,7 @@ export const frMG = {
     'Empêche la sous-location frauduleuse et les « annonces fantômes ».',
   'comment.verif.v3.title': 'Photos protégées',
   'comment.verif.v3.desc':
-    'Watermark AryTrano à l’upload + reverse-image-search Google Vision. Toute photo trouvée ailleurs déclenche une review manuelle.',
+    'EXIF strippé à l’upload + reverse-image-search Google Vision sur chaque photo. Toute correspondance trouvée ailleurs déclenche une review manuelle.',
   'comment.verif.v3.why':
     'Empêche le vol de photos depuis Airbnb, Booking ou Facebook Marketplace.',
   'comment.verif.v4.title': 'Adresse confirmée',
@@ -925,7 +925,7 @@ export const frMG = {
     'Acte de propriété OU facture JIRAMA récente au nom du propriétaire.',
   'proprietaires.verif.i3.title': 'Photos protégées',
   'proprietaires.verif.i3.desc':
-    'Watermark AryTrano + reverse-image-search auto. Pas de photos volées d’autres sites.',
+    'EXIF strippé + reverse-image-search auto. Pas de photos volées d’autres sites.',
   'proprietaires.verif.i4.title': 'Vérification de l’adresse',
   'proprietaires.verif.i4.desc':
     'Visite physique ou appel vidéo géolocalisé pour les annonces premium.',
@@ -1235,8 +1235,6 @@ export const frMG = {
   'listingForm.bedrooms.label': 'Chambres',
   'listingForm.bathrooms.label': 'Salles de bains',
   'listingForm.furnished.label': 'Meublé',
-  'listingForm.watermark.label': 'Ajouter un filigrane « AryTrano » sur les photos',
-  'listingForm.watermark.hint': 'Un texte semi-transparent en bas-droite décourage la réutilisation des photos sur d’autres sites.',
   'listingForm.submit.create': 'Créer le brouillon',
   'listingForm.submit.update': 'Enregistrer les modifications',
   'listingForm.submit.saving': 'Enregistrement…',

@@ -97,7 +97,6 @@ export default async function EditListingPage({
             furnished: listing.furnished,
             amenities: listing.amenities,
             customAmenities: listing.customAmenities,
-            watermarkOptIn: listing.watermarkOptIn,
           }}
         />
       </section>
