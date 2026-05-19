@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { SignInClient } from '@/features/auth/components/SignInClient'
+import { SignInClient } from '@/features/auth'
 import { AuthPageShell, AuthAltLink } from '@/components/shared/AuthPageShell'
 import { env } from '@/lib/env'
 import { getLocale } from '@/lib/i18n/get-locale'

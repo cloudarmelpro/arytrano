@@ -1,12 +1,12 @@
 import 'server-only'
 import { prisma } from '@/lib/db'
 import { maybeWatermark } from '@/lib/cloudinary/watermark'
-import type { PublicListingCard } from '@/features/listings/queries/list-public-listings'
+import type { PublicListingCardData } from '@/features/listings'
 
 const PAGE_SIZE = 20
 
 export type UserFavoritesPage = {
-  items: PublicListingCard[]
+  items: PublicListingCardData[]
   nextCursor: string | null
   hasMore: boolean
 }

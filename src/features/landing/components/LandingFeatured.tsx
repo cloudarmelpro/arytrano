@@ -3,8 +3,10 @@
 import Link from 'next/link'
 import { useMemo, useState } from 'react'
 import { useT } from '@/lib/i18n/client'
-import { PublicListingCard } from '@/features/listings/components/PublicListingCard'
-import type { PublicListingCard as PublicListingCardData } from '@/features/listings/queries/list-public-listings'
+import {
+  PublicListingCard,
+  type PublicListingCardData,
+} from '@/features/listings'
 
 const MIN_LISTINGS_FOR_SECTION = 3
 const TABS = ['ALL', 'STUDIO', 'ROOM', 'APARTMENT', 'HOUSE'] as const

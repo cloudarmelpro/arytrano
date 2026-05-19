@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { ProprietairesPage } from '@/features/static-pages/proprietaires/ProprietairesPage'
+import { ProprietairesPage } from '@/features/static-pages'
 import { getLocale } from '@/lib/i18n/get-locale'
 import { getT } from '@/lib/i18n/translate'
 import { localeAlternates } from '@/lib/seo/alternates'

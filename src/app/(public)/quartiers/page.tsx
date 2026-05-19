@@ -5,8 +5,8 @@ import {
   QuartiersJump,
   QuartiersBlocks,
   QuartiersQuizCta,
-  getQuartiersData,
 } from '@/features/landing'
+import { getQuartiersData } from '@/features/landing/server'
 import { getLocale } from '@/lib/i18n/get-locale'
 import { getT } from '@/lib/i18n/translate'
 import { localeAlternates } from '@/lib/seo/alternates'

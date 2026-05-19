@@ -1,11 +1,11 @@
 import type { Metadata } from 'next'
-import { CommentClient } from '@/features/static-pages/comment/CommentClient'
 import {
+  CommentClient,
   CommentWhy,
   CommentVerif,
   CommentDont,
   CommentMoney,
-} from '@/features/static-pages/comment/CommentStatic'
+} from '@/features/static-pages'
 import { getLocale } from '@/lib/i18n/get-locale'
 import { getT } from '@/lib/i18n/translate'
 import { localeAlternates } from '@/lib/seo/alternates'

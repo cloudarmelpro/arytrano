@@ -11,14 +11,14 @@ import {
   LandingOwnerBlock,
   LandingFaq,
   LandingFinalCta,
-  getLandingStats,
-  listNeighborhoodsWithCounts,
   type NeighborhoodOption,
 } from '@/features/landing'
 import {
-  listPublicListings,
-} from '@/features/listings/queries/list-public-listings'
-import { getFavoritedListingIds } from '@/features/favorites/queries/get-favorited-listing-ids'
+  getLandingStats,
+  listNeighborhoodsWithCounts,
+} from '@/features/landing/server'
+import { listPublicListings } from '@/features/listings/server'
+import { getFavoritedListingIds } from '@/features/favorites/server'
 import { getLocale } from '@/lib/i18n/get-locale'
 import { getT } from '@/lib/i18n/translate'
 import { localeAlternates } from '@/lib/seo/alternates'

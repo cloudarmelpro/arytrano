@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { ResetPasswordForm } from '@/features/auth/components/ResetPasswordForm'
+import { ResetPasswordForm } from '@/features/auth'
 
 export const metadata = { title: 'Nouveau mot de passe' }
 

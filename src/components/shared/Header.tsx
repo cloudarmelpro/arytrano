@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { auth } from '@/features/auth'
-import { getProfile } from '@/features/auth/services/update-profile'
+import { getProfile } from '@/features/auth/server'
 import { getLocale } from '@/lib/i18n/get-locale'
 import { getT, type Translator } from '@/lib/i18n/translate'
 import type { Locale } from '@/lib/i18n/config'

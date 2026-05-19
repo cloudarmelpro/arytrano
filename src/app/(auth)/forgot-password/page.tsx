@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { ForgotPasswordForm } from '@/features/auth/components/ForgotPasswordForm'
+import { ForgotPasswordForm } from '@/features/auth'
 import { AuthPageShell, AuthAltLink } from '@/components/shared/AuthPageShell'
 import { getLocale } from '@/lib/i18n/get-locale'
 import { getT } from '@/lib/i18n/translate'

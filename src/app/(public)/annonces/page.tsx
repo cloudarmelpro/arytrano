@@ -3,12 +3,12 @@ import Link from 'next/link'
 import {
   listPublicListings,
   listPublicListingsQuerySchema,
-} from '@/features/listings/queries/list-public-listings'
-import { PublicListingCard } from '@/features/listings/components/PublicListingCard'
+} from '@/features/listings/server'
+import { PublicListingCard } from '@/features/listings'
 import { ListingFiltersSidebar } from '@/features/listings/components/ListingFiltersSidebar'
 import { ListingSearchToolbar } from '@/features/listings/components/ListingSearchToolbar'
 import { listCitiesWithNeighborhoods } from '@/features/geo'
-import { getFavoritedListingIds } from '@/features/favorites/queries/get-favorited-listing-ids'
+import { getFavoritedListingIds } from '@/features/favorites/server'
 import { auth } from '@/features/auth'
 import { getLocale } from '@/lib/i18n/get-locale'
 import { getT } from '@/lib/i18n/translate'
