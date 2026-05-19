@@ -26,8 +26,8 @@ export function LandingOwnerBlock({
   if (role === 'OWNER' || role === 'ADMIN') return null
   const t = getT(locale)
   return (
-    <section className="relative overflow-hidden bg-gradient-to-b from-white via-[oklch(0.985_0.007_80)] to-white px-6 py-20 lg:px-10 lg:py-24">
-      <div className="relative mx-auto grid max-w-[1280px] items-center gap-14 lg:grid-cols-[1fr_1.05fr] max-lg:gap-12">
+    <section className="relative overflow-hidden bg-gradient-to-b from-white via-[oklch(0.985_0.007_80)] to-white py-20 lg:py-24">
+      <div className="relative mx-auto grid max-w-[1280px] items-center gap-14 px-6 lg:grid-cols-[1fr_1.05fr] lg:px-10 max-lg:gap-12">
         <div>
           <span className="text-[12px] font-semibold uppercase tracking-[0.14em] text-primary">
             {t('landing.ownerBlock.eyebrow')}

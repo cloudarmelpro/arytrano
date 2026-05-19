@@ -37,8 +37,8 @@ export function LandingFeatured({
       : 'landing.featured.viewAll.other'
 
   return (
-    <section className="border-b border-border bg-background">
-      <div className="mx-auto flex max-w-6xl flex-col gap-6 px-4 py-16 sm:px-6 sm:py-20">
+    <section className="border-b border-border bg-background py-16 lg:py-20">
+      <div className="mx-auto flex max-w-[1280px] flex-col gap-6 px-6 lg:px-10">
         <header className="flex flex-wrap items-end justify-between gap-3">
           <div className="flex flex-col gap-1">
             <h2 className="text-2xl font-semibold text-foreground sm:text-3xl">

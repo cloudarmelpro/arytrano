@@ -6,8 +6,8 @@ import { Icon } from '@/components/shared/Icon'
 export function LandingFinalCta({ locale }: { locale: Locale }) {
   const t = getT(locale)
   return (
-    <section className="bg-background px-6 pb-20 lg:px-10 lg:pb-24">
-      <div className="mx-auto max-w-[1280px]">
+    <section className="bg-background pb-20 lg:pb-24">
+      <div className="mx-auto max-w-[1280px] px-6 lg:px-10">
         <div className="rounded-[28px] bg-[oklch(0.16_0.025_281)] px-8 py-16 text-center text-white sm:px-12 lg:py-20">
           <h2 className="m-0 font-serif text-[clamp(32px,3.8vw,52px)] font-normal leading-[1.05] tracking-[-0.025em]">
             {t('landing.finalCta.title')}

@@ -15,8 +15,8 @@ const STEPS: Array<{
 export function LandingHowItWorks({ locale }: { locale: Locale }) {
   const t = getT(locale)
   return (
-    <section className="bg-[oklch(0.16_0.025_281)] px-6 py-20 text-white lg:px-10 lg:py-24">
-      <div className="mx-auto grid max-w-[1280px] items-start gap-16 lg:grid-cols-[1fr_2fr] max-lg:gap-10">
+    <section className="bg-[oklch(0.16_0.025_281)] py-20 text-white lg:py-24">
+      <div className="mx-auto grid max-w-[1280px] items-start gap-16 px-6 lg:grid-cols-[1fr_2fr] lg:px-10 max-lg:gap-10">
         <div>
           <span className="text-[12px] font-semibold uppercase tracking-[0.14em] text-[oklch(0.85_0.06_277)]">
             {t('landing.how.eyebrow' as MessageKey)}

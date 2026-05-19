@@ -33,8 +33,8 @@ const ITEMS: Array<{
 export function LandingTrustStrip({ locale }: { locale: Locale }) {
   const t = getT(locale)
   return (
-    <section className="border-b border-border bg-background">
-      <div className="mx-auto grid max-w-[1280px] gap-6 px-6 py-10 sm:grid-cols-2 lg:grid-cols-4 lg:px-10 lg:py-12">
+    <section className="border-b border-border bg-background py-10 lg:py-12">
+      <div className="mx-auto grid max-w-[1280px] gap-6 px-6 sm:grid-cols-2 lg:grid-cols-4 lg:px-10">
         {ITEMS.map((it) => (
           <article key={it.title} className="flex items-start gap-3">
             <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">

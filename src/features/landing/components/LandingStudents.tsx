@@ -48,8 +48,8 @@ const CARDS: Array<{
 export function LandingStudents({ locale }: { locale: Locale }) {
   const t = getT(locale)
   return (
-    <section className="bg-[oklch(0.18_0.02_277)] px-6 py-20 text-white lg:px-10 lg:py-24">
-      <div className="mx-auto max-w-[1280px]">
+    <section className="bg-[oklch(0.18_0.02_277)] py-20 text-white lg:py-24">
+      <div className="mx-auto max-w-[1280px] px-6 lg:px-10">
         <header className="mb-10 grid items-end gap-8 lg:grid-cols-[1.5fr_1fr]">
           <div>
             <span className="text-[12px] font-semibold uppercase tracking-[0.14em] text-[oklch(0.85_0.06_277)]">

@@ -18,12 +18,12 @@ export function LandingHero({
 }) {
   const t = getT(locale)
   return (
-    <section className="relative isolate overflow-hidden bg-primary px-6 pt-16 pb-24 text-white lg:px-10 lg:pt-20 lg:pb-28">
+    <section className="relative isolate overflow-hidden bg-primary pt-16 pb-24 text-white lg:pt-20 lg:pb-28">
       <div
         aria-hidden
         className="pointer-events-none absolute -right-[12%] -top-[10%] -z-10 h-[720px] w-[720px] rounded-full bg-[radial-gradient(circle_at_center,oklch(0.62_0.22_290_/_0.5)_0%,transparent_60%)]"
       />
-      <div className="relative z-10 mx-auto max-w-[1280px]">
+      <div className="relative z-10 mx-auto max-w-[1280px] px-6 lg:px-10">
         <h1 className="m-0 max-w-[1040px] font-serif text-[clamp(36px,5.4vw,76px)] font-normal leading-[1.05] tracking-[-0.015em] text-balance">
           {t('landing.hero.title')}
         </h1>

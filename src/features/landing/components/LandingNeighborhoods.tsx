@@ -69,8 +69,8 @@ export function LandingNeighborhoods({
   if (rows.length === 0) return null
   const t = getT(locale)
   return (
-    <section className="bg-background px-6 py-16 lg:px-10 lg:py-20">
-      <div className="mx-auto max-w-[1280px]">
+    <section className="bg-background py-16 lg:py-20">
+      <div className="mx-auto max-w-[1280px] px-6 lg:px-10">
         <header className="mb-8 flex flex-wrap items-end justify-between gap-8">
           <div>
             <span className="text-[12px] font-semibold uppercase tracking-[0.14em] text-primary">
