@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState, useTransition } from 'react'
+import { useMemo, useRef, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { Combobox } from '@base-ui/react/combobox'
 import { useT } from '@/lib/i18n/client'
@@ -41,6 +41,14 @@ export function LandingSearchCard({
   // form submit; `typeText` is what the user sees in the input box.
   const [typeText, setTypeText] = useState('')
   const [priceMax, setPriceMax] = useState('')
+  // Anchor refs — by default Base UI Combobox anchors the positioner on
+  // the `Combobox.Input` (the small <input> inside the field). We want
+  // the popup to span the entire field shell (label box with icon, mini
+  // label and input), so we point the positioner at the wrapping
+  // `<label>` instead. `--anchor-width` then resolves to the label's
+  // width and the popup matches it 1:1, responsively.
+  const quartierAnchorRef = useRef<HTMLLabelElement>(null)
+  const typeAnchorRef = useRef<HTMLLabelElement>(null)
 
   const submitKey =
     publishedListings <= 1
@@ -93,7 +101,10 @@ export function LandingSearchCard({
           if (quartier) setQuartier('')
         }}
       >
-        <label className="flex min-h-16 items-center gap-3.5 rounded-xl border-[1.5px] border-white/50 px-3.5 py-3 text-left text-white transition focus-within:border-white focus-within:bg-white/[0.06] hover:border-white hover:bg-white/[0.06]">
+        <label
+          ref={quartierAnchorRef}
+          className="flex min-h-16 items-center gap-3.5 rounded-xl border-[1.5px] border-white/50 px-3.5 py-3 text-left text-white transition focus-within:border-white focus-within:bg-white/[0.06] hover:border-white hover:bg-white/[0.06]"
+        >
           <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-[9px] bg-white/15 text-white">
             <Icon name="pin" size={18} />
           </span>
@@ -109,9 +120,14 @@ export function LandingSearchCard({
           </span>
         </label>
         <Combobox.Portal>
-          <Combobox.Positioner sideOffset={6} align="start" className="z-50">
+          <Combobox.Positioner
+            anchor={quartierAnchorRef}
+            sideOffset={6}
+            align="start"
+            className="z-50"
+          >
             <Combobox.Popup className="w-(--anchor-width) max-h-(--available-height) overflow-y-auto rounded-xl bg-white p-1 text-foreground shadow-lg ring-1 ring-foreground/10 data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0">
-            <div className="px-3 pt-3 pb-2 text-[12px] font-semibold uppercase tracking-[0.06em] text-foreground">
+            <div className="px-3 pt-2 pb-1 text-[11.5px] font-semibold uppercase tracking-[0.06em] text-foreground">
               {t('landing.hero.search.quartier.groupLabel')}
             </div>
             <Combobox.Empty className="px-3 py-4 text-center text-[13px] text-muted-foreground">
@@ -149,7 +165,10 @@ export function LandingSearchCard({
           if (type) setType('')
         }}
       >
-        <label className="flex min-h-16 items-center gap-3.5 rounded-xl border-[1.5px] border-white/50 px-3.5 py-3 text-left text-white transition focus-within:border-white focus-within:bg-white/[0.06] hover:border-white hover:bg-white/[0.06]">
+        <label
+          ref={typeAnchorRef}
+          className="flex min-h-16 items-center gap-3.5 rounded-xl border-[1.5px] border-white/50 px-3.5 py-3 text-left text-white transition focus-within:border-white focus-within:bg-white/[0.06] hover:border-white hover:bg-white/[0.06]"
+        >
           <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-[9px] bg-white/15 text-white">
             <Icon name="house" size={18} />
           </span>
@@ -165,9 +184,14 @@ export function LandingSearchCard({
           </span>
         </label>
         <Combobox.Portal>
-          <Combobox.Positioner sideOffset={6} align="start" className="z-50">
+          <Combobox.Positioner
+            anchor={typeAnchorRef}
+            sideOffset={6}
+            align="start"
+            className="z-50"
+          >
             <Combobox.Popup className="w-(--anchor-width) max-h-(--available-height) overflow-y-auto rounded-xl bg-white p-1 text-foreground shadow-lg ring-1 ring-foreground/10 data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0">
-            <div className="px-3 pt-3 pb-2 text-[12px] font-semibold uppercase tracking-[0.06em] text-foreground">
+            <div className="px-3 pt-2 pb-1 text-[11.5px] font-semibold uppercase tracking-[0.06em] text-foreground">
               {t('landing.hero.search.type.groupLabel')}
             </div>
             <Combobox.Empty className="px-3 py-4 text-center text-[13px] text-muted-foreground">
