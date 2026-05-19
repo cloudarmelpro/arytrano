@@ -638,12 +638,12 @@ export const frMG = {
   'landing.ownerBlock.stat2.sub': 'min pour publier',
   'landing.ownerBlock.stat3.n': '24-48h',
   'landing.ownerBlock.stat3.sub': 'validation',
-  'landing.ownerBlock.stat4.n': '168',
   'landing.ownerBlock.stat4.sub': 'proprios vérifiés',
   'landing.ownerBlock.quote.body':
     'Mon studio loué en 4 jours. Et zéro paperasse côté AryTrano.',
   'landing.ownerBlock.quote.author':
     'Mme Rasoa · 3 logements vérifiés · Andrainjato',
+  'landing.ownerBlock.dashboard.previewBadge': 'Aperçu',
   'landing.ownerBlock.dashboard.notif.title': 'Nouveau message WhatsApp',
   'landing.ownerBlock.dashboard.notif.sub': 'de Hery · il y a 3 min',
   'landing.ownerBlock.dashboard.author': 'Mme Rasoa',

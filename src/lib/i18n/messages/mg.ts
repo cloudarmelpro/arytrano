@@ -647,12 +647,12 @@ export const mg: Record<MessageKey, string> = {
   'landing.ownerBlock.stat2.sub': 'mn hampoizina',
   'landing.ownerBlock.stat3.n': '24-48h',
   'landing.ownerBlock.stat3.sub': 'fanamarinana',
-  'landing.ownerBlock.stat4.n': '168',
   'landing.ownerBlock.stat4.sub': 'tompon-trano voamarina',
   'landing.ownerBlock.quote.body':
     'Voa-hofa tao anatin’ny 4 andro ny studio-ko. Ary tsy nisy taratasy avy amin’ny AryTrano.',
   'landing.ownerBlock.quote.author':
     'Rmme Rasoa · trano 3 voamarina · Andrainjato',
+  'landing.ownerBlock.dashboard.previewBadge': 'Sary an-tsaina',
   'landing.ownerBlock.dashboard.notif.title': 'Hafatra WhatsApp vaovao',
   'landing.ownerBlock.dashboard.notif.sub': 'avy amin’i Hery · 3 mn lasa',
   'landing.ownerBlock.dashboard.author': 'Rmme Rasoa',

@@ -5,26 +5,41 @@ import { getT } from '@/lib/i18n/translate'
 import type { MessageKey } from '@/lib/i18n/messages'
 import { Icon, type IconName } from '@/components/shared/Icon'
 
-const STATS: Array<{
-  n: MessageKey
+type OwnerStat = {
+  /** Either an i18n key for a hardcoded label, or a literal string (already-resolved real count). */
+  n: MessageKey | string
   sub: MessageKey
   icon: IconName
-}> = [
-  { n: 'landing.ownerBlock.stat1.n', sub: 'landing.ownerBlock.stat1.sub', icon: 'check' },
-  { n: 'landing.ownerBlock.stat2.n', sub: 'landing.ownerBlock.stat2.sub', icon: 'plus' },
-  { n: 'landing.ownerBlock.stat3.n', sub: 'landing.ownerBlock.stat3.sub', icon: 'shield' },
-  { n: 'landing.ownerBlock.stat4.n', sub: 'landing.ownerBlock.stat4.sub', icon: 'house' },
-]
+  /** When true, `n` is a plain string instead of an i18n key (skip `t()`). */
+  literalN?: boolean
+}
 
 export function LandingOwnerBlock({
   locale,
   role,
+  verifiedOwners,
 }: {
   locale: Locale
   role: UserRole | null
+  /** Live count from `getLandingStats()` — replaces the hardcoded "168". */
+  verifiedOwners: number
 }) {
   if (role === 'OWNER' || role === 'ADMIN') return null
   const t = getT(locale)
+
+  // Stat4 is the only live number — the others are marketing claims
+  // (0 commission, 5 min to publish, 24-48h validation SLA).
+  const STATS: OwnerStat[] = [
+    { n: 'landing.ownerBlock.stat1.n', sub: 'landing.ownerBlock.stat1.sub', icon: 'check' },
+    { n: 'landing.ownerBlock.stat2.n', sub: 'landing.ownerBlock.stat2.sub', icon: 'plus' },
+    { n: 'landing.ownerBlock.stat3.n', sub: 'landing.ownerBlock.stat3.sub', icon: 'shield' },
+    {
+      n: String(verifiedOwners),
+      sub: 'landing.ownerBlock.stat4.sub',
+      icon: 'house',
+      literalN: true,
+    },
+  ]
   return (
     <section className="relative overflow-hidden bg-gradient-to-b from-white via-[oklch(0.985_0.007_80)] to-white py-20 lg:py-24">
       <div className="relative mx-auto grid max-w-[1280px] items-center gap-14 px-6 lg:grid-cols-[1fr_1.05fr] lg:px-10 max-lg:gap-12">
@@ -50,7 +65,7 @@ export function LandingOwnerBlock({
                 </span>
                 <div>
                   <div className="text-[18px] font-bold leading-none tracking-[-0.02em] text-foreground">
-                    {t(s.n)}
+                    {s.literalN ? s.n : t(s.n as MessageKey)}
                   </div>
                   <div className="mt-1 text-[11.5px] font-medium text-muted-foreground">
                     {t(s.sub)}
@@ -117,7 +132,14 @@ function DashboardMock({ t }: { t: ReturnType<typeof getT> }) {
         <Icon name="whatsapp" size={16} className="text-primary" />
       </div>
 
-      <div className="rounded-2xl border border-border bg-white p-6 shadow-md">
+      <div className="relative rounded-2xl border border-border bg-white p-6 shadow-md">
+        <span
+          // Explicit "Aperçu" pill so visitors don't read the
+          // 47-views / 12-contacts numbers below as their own stats.
+          className="absolute -top-3 left-4 inline-flex h-6 items-center rounded-full bg-foreground px-2.5 text-[10.5px] font-bold uppercase tracking-[0.08em] text-background"
+        >
+          {t('landing.ownerBlock.dashboard.previewBadge')}
+        </span>
         <div className="mb-5 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             <span

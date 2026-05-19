@@ -94,7 +94,11 @@ export default async function HomePage() {
       </div>
       <LandingStudents locale={locale} />
       <div id="owner">
-        <LandingOwnerBlock locale={locale} role={session?.user?.role ?? null} />
+        <LandingOwnerBlock
+          locale={locale}
+          role={session?.user?.role ?? null}
+          verifiedOwners={stats.verifiedOwners}
+        />
       </div>
       <div id="faq">
         <LandingFaq locale={locale} />
