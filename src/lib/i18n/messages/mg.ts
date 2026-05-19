@@ -586,6 +586,25 @@ export const mg: Record<MessageKey, string> = {
     '64 filazana voamarina, tompon-trano azo itokisana, fifandraisana mivantana amin’ny WhatsApp. Maimaim-poana ho an’ny mpianatra.',
   'landing.finalCta.cta': 'Hijery ny filazana rehetra',
 
+  // Auth page chrome
+  'auth.back.home': 'Hiverina any an-tampony',
+  'auth.eyebrow.signin': 'Tonga soa',
+  'auth.eyebrow.signup': 'Tongasoa',
+  'auth.eyebrow.forgot': 'Teny miafina hadinoina',
+  'auth.h1.signin': 'Tonga soa amin’i AryTrano',
+  'auth.h1.signup': 'Mamorona kaontinao AryTrano',
+  'auth.h1.forgot': 'Hadinoko ny teny miafina ?',
+  'auth.sub.signin':
+    'Tohizo ny fitadiavana, na valio ny tompon-trano.',
+  'auth.sub.signup':
+    'Mitady, mifandray, manao sonia — 100% maimaim-poana ho an’ny mpianatra.',
+  'auth.sub.forgot':
+    'Soraty ny mailaka-nao dia handefasanay rohy hanavaozana azy.',
+  'auth.alt.signup': 'Mbola tsy manana kaonty ?',
+  'auth.alt.signupLink': 'Hisoratra anarana maimaim-poana',
+  'auth.alt.signin': 'Efa manana kaonty ?',
+  'auth.alt.signinLink': 'Hiditra',
+
   // Auth side panel
   'auth.panel.eyebrow': 'Trano ho an’ny mpianatra · Fianarantsoa',
   'auth.panel.title': 'Mirosoa amin’ny tompon-trano voamarina 168 sy mpianatra mavitrika 1 200.',

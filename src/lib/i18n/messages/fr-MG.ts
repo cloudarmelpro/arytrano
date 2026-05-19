@@ -577,6 +577,24 @@ export const frMG = {
     '64 annonces vérifiées, propriétaires de confiance, contact WhatsApp direct. Aucun frais pour les étudiants.',
   'landing.finalCta.cta': 'Voir toutes les annonces',
 
+  // Auth page chrome (eyebrows + back link)
+  'auth.back.home': 'Retour à l’accueil',
+  'auth.eyebrow.signin': 'Bon retour',
+  'auth.eyebrow.signup': 'Bienvenue',
+  'auth.eyebrow.forgot': 'Mot de passe oublié',
+  'auth.h1.signin': 'Bon retour sur AryTrano',
+  'auth.h1.signup': 'Crée ton compte AryTrano',
+  'auth.h1.forgot': 'Mot de passe oublié ?',
+  'auth.sub.signin': 'Continue ta recherche, ou réponds à un propriétaire.',
+  'auth.sub.signup':
+    'Cherche, contacte, signe — 100% gratuit pour les étudiants.',
+  'auth.sub.forgot':
+    'Entre ton email et on t’envoie un lien pour le réinitialiser.',
+  'auth.alt.signup': 'Pas encore de compte ?',
+  'auth.alt.signupLink': 'Inscris-toi gratuitement',
+  'auth.alt.signin': 'Déjà un compte ?',
+  'auth.alt.signinLink': 'Connecte-toi',
+
   // Auth side panel
   'auth.panel.eyebrow': 'Logement étudiant · Fianarantsoa',
   'auth.panel.title': 'Rejoins 168 propriétaires vérifiés et 1 200 étudiants déjà actifs.',
