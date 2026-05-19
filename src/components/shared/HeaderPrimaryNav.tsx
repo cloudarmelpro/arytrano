@@ -33,7 +33,7 @@ export function HeaderPrimaryNav({ items }: { items: NavEntry[] }) {
               key={n.id}
               href={n.href}
               data-active={isActive}
-              className={`relative -mb-px inline-flex shrink-0 items-center gap-2 whitespace-nowrap border-b-2 pl-0 pr-4 py-3.5 mr-4 last:mr-0 text-[14px] tracking-[-0.005em] transition ${
+              className={`relative -mb-px inline-flex shrink-0 items-center gap-2 whitespace-nowrap border-b-2 pl-0 pr-3 py-3.5 mr-3 last:mr-0 text-[14px] tracking-[-0.005em] transition ${
                 isActive
                   ? 'border-white font-semibold text-white'
                   : 'border-transparent font-medium text-white/80 hover:text-white'
