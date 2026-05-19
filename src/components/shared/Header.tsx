@@ -23,14 +23,16 @@ type NavEntry = {
 const NAV: NavEntry[] = [
   { id: 'annonces', href: '/annonces', labelKey: 'header.nav.listings', icon: 'home-heart' },
   { id: 'quartiers', href: '/quartiers', labelKey: 'header.nav.quartiers', icon: 'pin' },
-  { id: 'how', href: '/#how-it-works', labelKey: 'header.nav.howItWorks', icon: 'help' },
-  { id: 'owners', href: '/#owner', labelKey: 'header.nav.owners', icon: 'building' },
+  { id: 'how', href: '/comment-ca-marche', labelKey: 'header.nav.howItWorks', icon: 'help' },
+  { id: 'owners', href: '/proprietaires', labelKey: 'header.nav.owners', icon: 'building' },
 ]
 
 function activeId(pathname: string): string | null {
   if (pathname === '/' || pathname === '') return null
   if (pathname.startsWith('/annonces')) return 'annonces'
   if (pathname.startsWith('/quartiers')) return 'quartiers'
+  if (pathname.startsWith('/comment-ca-marche')) return 'how'
+  if (pathname.startsWith('/proprietaires')) return 'owners'
   return null
 }
 

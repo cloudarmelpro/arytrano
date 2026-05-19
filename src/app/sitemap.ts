@@ -46,6 +46,20 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.8,
       alternates: { languages: languages('/quartiers') },
     },
+    {
+      url: `${baseUrl}/comment-ca-marche`,
+      lastModified: now,
+      changeFrequency: 'monthly',
+      priority: 0.7,
+      alternates: { languages: languages('/comment-ca-marche') },
+    },
+    {
+      url: `${baseUrl}/proprietaires`,
+      lastModified: now,
+      changeFrequency: 'monthly',
+      priority: 0.7,
+      alternates: { languages: languages('/proprietaires') },
+    },
   ]
 
   for (const l of listings) {

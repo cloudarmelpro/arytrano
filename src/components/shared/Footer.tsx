@@ -15,7 +15,7 @@ const COLUMNS: Column[] = [
     head: 'footerV3.col.product',
     items: [
       { label: 'footerV3.link.viewListings', href: '/annonces' },
-      { label: 'footerV3.link.howItWorks', href: '/#how-it-works' },
+      { label: 'footerV3.link.howItWorks', href: '/comment-ca-marche' },
       { label: 'footerV3.link.quartiers', href: '/quartiers' },
       { label: 'footerV3.link.faq', href: '/#faq' },
     ],
@@ -23,9 +23,9 @@ const COLUMNS: Column[] = [
   {
     head: 'footerV3.col.owners',
     items: [
-      { label: 'footerV3.link.publishListing', href: '/sign-up?role=OWNER' },
-      { label: 'footerV3.link.verification', href: '/dashboard/verify-owner' },
-      { label: 'footerV3.link.pricing', href: '/#owner' },
+      { label: 'footerV3.link.publishListing', href: '/proprietaires' },
+      { label: 'footerV3.link.verification', href: '/proprietaires#verif' },
+      { label: 'footerV3.link.pricing', href: '/proprietaires#tarifs' },
       { label: 'footerV3.link.resources', href: '#' },
     ],
   },

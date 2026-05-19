@@ -603,6 +603,307 @@ export const mg: Record<MessageKey, string> = {
   'auth.panel.proof':
     '· filazana mavitrika 64 · tompon-trano voamarina 168 · faritra 8',
 
+  // ── /comment-ca-marche ──
+  'comment.meta.title': 'Ahoana ny fomba',
+  'comment.meta.description':
+    'Ahoana no fiasan’i AryTrano : process mpianatra sy tompon-trano, fanamarinana, fiarovana, modely ara-toekarena.',
+  'comment.eyebrow': 'Ahoana ny fomba',
+  'comment.h1.lead': 'Sehatra iray. Tsy misy mpanelanelana.',
+  'comment.h1.accent': 'Tsy misy commission.',
+  'comment.sub':
+    'Mampifandray mivantana ny mpianatra sy ny tompon-trano ao Fianarantsoa i AryTrano. Hamarinanay ny andaniny avy, arovanay ny sary, ataonay mora ny fifandraisana.',
+  'comment.audience.student': 'Mitady trano aho',
+  'comment.audience.owner': 'Tompon-trano aho',
+
+  'comment.studentFlow.s1.title': 'Mitady arakaraka ny safidinao',
+  'comment.studentFlow.s1.desc':
+    'Sivany faritra, karazana (studio / efitra / T1 / T2), tetibola farafahabetsany, fitaovana (WiFi, rano mafana, voakemba, balcon…).',
+  'comment.studentFlow.s1.example':
+    'Ohatra : « Studio voakemba ao Andrainjato, hatramin’ny 250 000 Ar/volana, misy WiFi »',
+  'comment.studentFlow.s1.time': '2 mn',
+  'comment.studentFlow.s2.title': 'Hitanao ny filazana voamarina',
+  'comment.studentFlow.s2.desc':
+    'Ny baodjy maitso « Voamarina » dia miantoka fa ny ekipanay no nanamarina ny mahaolona, ny taratasy fananana sy ny tena maha-izy ireo ny sary.',
+  'comment.studentFlow.s2.example':
+    'Aelo ny sivana « Voamarina ihany » mba hijery ireo voamarina ihany.',
+  'comment.studentFlow.s2.time': 'avy hatrany',
+  'comment.studentFlow.s3.title': 'Mifandray amin’ny WhatsApp',
+  'comment.studentFlow.s3.desc':
+    'Tsindrio « Mifandray » dia hisokatra ny WhatsApp misy hafatra efa vita. Miresaka mivantana amin’ny tompon-trano ianao.',
+  'comment.studentFlow.s3.example':
+    'Salan’ny famaliana : 2 ora 14 mn.',
+  'comment.studentFlow.s3.time': '< 1 mn',
+  'comment.studentFlow.s4.title': 'Mijery ny trano',
+  'comment.studentFlow.s4.desc':
+    'Mifanao fotoana mivantana amin’ny tompon-trano. Ny adiresy marina dia omena amin’izay fotoana izay. Maimaim-poana.',
+  'comment.studentFlow.s4.example':
+    'Torohevitra : mijery amin’ny atoandro, mangataha hijery trano 2-3 farafahakeliny.',
+  'comment.studentFlow.s4.time': '30-45 mn',
+  'comment.studentFlow.s5.title': 'Manao sonia ny bail',
+  'comment.studentFlow.s5.desc':
+    'Manao sonia mivantana amin’ny tompon-trano. Tsy maka commission AryTrano, tsy miditra amin’ny fifanarahana.',
+  'comment.studentFlow.s5.example':
+    'Mangataha quittance isaky ny volana mba hanana porofo.',
+  'comment.studentFlow.s5.time': '1 ora',
+
+  'comment.ownerFlow.s1.title': 'Mamorona kaonty tompon-trano',
+  'comment.ownerFlow.s1.desc':
+    'Mailaka + laharana WhatsApp. OTP no manamafy ny laharana. Misafidy tenimiafina. Izay ihany.',
+  'comment.ownerFlow.s1.example':
+    'Tsy mila karatra bankaty. Maimaim-poana hatramin’izay.',
+  'comment.ownerFlow.s1.time': '1 mn',
+  'comment.ownerFlow.s2.title': 'Mandefa ny taratasy',
+  'comment.ownerFlow.s2.desc':
+    'Sary CIN + acte na facture JIRAMA. Voapetraka chiffré amin’ny serveur misaraka.',
+  'comment.ownerFlow.s2.example':
+    'Raha mpiara-tompo na mpandova, mety raha misy fanamafisana.',
+  'comment.ownerFlow.s2.time': '3 mn',
+  'comment.ownerFlow.s3.title': 'Mamaritra ny trano',
+  'comment.ownerFlow.s3.desc':
+    'Karazana, refy, hofa, faritra, fitaovana, fanazavana. Sary 5 farafahakeliny.',
+  'comment.ownerFlow.s3.example':
+    'Sary atoandro, tsy misy olona, tsy misy filtre. Ny tena izy no mahatoky ny mpianatra.',
+  'comment.ownerFlow.s3.time': '5 mn',
+  'comment.ownerFlow.s4.title': 'Hanamarina ao anatin’ny 24-48 ora ny ekipanay',
+  'comment.ownerFlow.s4.desc':
+    'Fanaraha-maso ny mahaolona, ny taratasy, ary reverse-image-search amin’ny sarinao.',
+  'comment.ownerFlow.s4.example':
+    'Salany : 18 ora amin’ny herinandro, 36 ora amin’ny faran’ny herinandro.',
+  'comment.ownerFlow.s4.time': '24-48h',
+  'comment.ownerFlow.s5.title': 'Mahazo fangatahana',
+  'comment.ownerFlow.s5.desc':
+    'Tsindrian’ny mpianatra ny « Mifandray » → tonga avy hatrany amin’ny WhatsApp-nao ny hafatra.',
+  'comment.ownerFlow.s5.example':
+    'Hovaina ho « Voa-hofa » amin’ny tsindrina iray.',
+  'comment.ownerFlow.s5.time': 'mitohy',
+
+  'comment.why.eyebrow': 'Nahoana AryTrano',
+  'comment.why.title': 'Nahita mpianatra maro voafitaka izahay.',
+  'comment.why.p1':
+    'Kaonty Facebook hosoka, sary nangalarina avy any Booking sy Airbnb, famindram-bola amin’ny « tompon-trano » manjavona. Ao Fianarantsoa, mpianatra 1 amin’ny 5 voafitaka indray mandeha farafahakeliny.',
+  'comment.why.p2':
+    'Tsy mamoaka raha tsy voamarinin’ny olombelona i AryTrano. Hatrany.',
+  'comment.why.stat1.n': '1 amin’ny 5',
+  'comment.why.stat1.label':
+    'mpianatra voafitaka tao Fianarantsoa talohan’i AryTrano',
+  'comment.why.stat2.n': '800 000 Ar',
+  'comment.why.stat2.label': 'salan’ny fatiantoka noho ny famitahana',
+  'comment.why.stat3.n': '0',
+  'comment.why.stat3.label':
+    'famitahana voatatitra tao AryTrano hatramin’ny niandohany',
+  'comment.why.stat4.n': '100 %',
+  'comment.why.stat4.label':
+    'ny tompon-trano voamarina an-tanana',
+
+  'comment.verif.eyebrow': 'Fanamarinana, dingana isaky ny dingana',
+  'comment.verif.title':
+    'Inona no hamarinanay. Ahoana. Nahoana.',
+  'comment.verif.v1.title': 'Mahaolona ny tompon-trano',
+  'comment.verif.v1.desc':
+    'CIN na passeport voadinika an-tanana amin’ny ekipanay.',
+  'comment.verif.v1.why':
+    'Misakana ny mpanao hosoka tsy fantatra mba tsy hamoaka filazana.',
+  'comment.verif.v2.title': 'Taratasy fananana',
+  'comment.verif.v2.desc':
+    'Acte na facture JIRAMA amin’ny anaran’ny tompon-trano.',
+  'comment.verif.v2.why':
+    'Misakana ny « sous-location » sy ny filazana hosoka.',
+  'comment.verif.v3.title': 'Sary arovana',
+  'comment.verif.v3.desc':
+    'Watermark AryTrano + reverse-image-search Google Vision.',
+  'comment.verif.v3.why':
+    'Misakana ny halatra sary avy any Airbnb, Booking, Facebook.',
+  'comment.verif.v4.title': 'Adiresy voamarina',
+  'comment.verif.v4.desc':
+    'Fitsidihana an-toerana na fiantsoana géolocalisée ho an’ny premium.',
+  'comment.verif.v4.why':
+    'Misakana ny adiresy hosoka ary miaro ny tsiambaratelo.',
+  'comment.verif.v5.title': 'Laharana WhatsApp mavitrika',
+  'comment.verif.v5.desc':
+    'Fanamarinana OTP. Mila ho azo antsoina indray mandeha isan-kerinandro farafahakeliny.',
+  'comment.verif.v5.why':
+    'Miantoka tsy mifandray amin’ny tsy misy ny mpianatra.',
+  'comment.verif.v6.title': 'Hevitry ny mpanofa',
+  'comment.verif.v6.desc':
+    'Aorian’ny fonenana, mametraka hevitra voamarina ny mpianatra.',
+  'comment.verif.v6.why':
+    'Sivanin’ny lava-paritra ny tompon-trano misy olana.',
+
+  'comment.dont.eyebrow': 'Izay tsy ataonay',
+  'comment.dont.title': 'Mba tsy hisalasalana.',
+  'comment.dont.sub':
+    'Mampifandray AryTrano. Ny sisa dia ataonao sy ny tompon-trano.',
+  'comment.dont.i1':
+    'Tsy mandray commission MIHITSY, na amin’ny hofa, na amin’ny caution.',
+  'comment.dont.i2':
+    'TSY mikarakara fitsidihana — ianao mifandahatra mivantana.',
+  'comment.dont.i3':
+    'TSY manoratra bail — eo aminareo no anaovanareo.',
+  'comment.dont.i4':
+    'TSY mitantana fandoavam-bola — virement, mobile money, an-tanana.',
+  'comment.dont.i5':
+    'TSY mitahiry vaovao bankaty — tsy ilainay.',
+  'comment.dont.i6':
+    'TSY mivarotra ny vaovaonao — tsy misy ads, tsy misy profilage.',
+
+  'comment.money.eyebrow': 'Ahoana no ahazoan’i AryTrano vola ?',
+  'comment.money.title': 'Tsy avy aminao.',
+  'comment.money.arrow1.label': 'Hofa isam-bolana',
+  'comment.money.arrow1.amount': '100% ny totaly',
+  'comment.money.arrow1.sub': 'virement na mobile money',
+  'comment.money.arrow2.label': 'Saran’ny mpianatra',
+  'comment.money.arrow2.amount': '0 Ar',
+  'comment.money.arrow2.sub': 'tsy misy saran’asa',
+  'comment.money.arrow3.label': 'Saran’ny tompon-trano',
+  'comment.money.arrow3.amount': '0 Ar',
+  'comment.money.arrow3.sub': 'tsy misy saran’asa',
+  'comment.money.node.student': 'Mpianatra',
+  'comment.money.node.owner': 'Tompon-trano',
+  'comment.money.node.aryt': 'AryTrano',
+  'comment.money.tien.title': 'Ahoana ary no andehananay ?',
+  'comment.money.tien.body':
+    'Fiaraha-miasa miankina amin’ny mpamatsy an-toerana : assurance habitation, mpanaova fivoaham-pitaovana. Mahazo commission izahay rehefa misafidy partenaire ny mpianatra — tsy voatery, foana azo safidiana.',
+
+  'comment.finalCta.student.title': 'Vonona hitady ?',
+  'comment.finalCta.student.lead':
+    'Filazana voamarina 64 · havaozina isan’andro',
+  'comment.finalCta.student.cta': 'Hijery ny filazana',
+  'comment.finalCta.owner.title': 'Vonona hamoaka ?',
+  'comment.finalCta.owner.lead':
+    '5 mn hamoahana · fanamarinana 24-48 ora',
+  'comment.finalCta.owner.cta': 'Hamoaka ny filazako',
+
+  // ── /proprietaires ──
+  'proprietaires.meta.title': 'Tompon-trano',
+  'proprietaires.meta.description':
+    'Hamoaha ny filazanao ao anatin’ny 5 mn. Maimaim-poana, mandritra ny androm-piainana. Fanamarinana 24-48 ora.',
+  'proprietaires.hero.eyebrow': 'Ho an’ny tompon-trano',
+  'proprietaires.hero.title': 'Hofa haingana. Tsy misy saran’asa. Tsy misy mpanofa sandoka.',
+  'proprietaires.hero.sub':
+    'Hamoaha filazana ao anatin’ny 5 mn, mahazo fangatahana avy amin’ny mpianatra voamarina, mitantana ny hafatra WhatsApp avy amin’ny dashboard tokana. Tsy misy commission, na oviana na oviana.',
+  'proprietaires.hero.ctaPrimary': 'Hamoaka filazana',
+  'proprietaires.hero.ctaSecondary': 'Hijery ny sarany',
+  'proprietaires.hero.stat1.n': '168',
+  'proprietaires.hero.stat1.label': 'tompon-trano voamarina',
+  'proprietaires.hero.stat2.n': '64',
+  'proprietaires.hero.stat2.label': 'filazana mavitrika',
+  'proprietaires.hero.stat3.n': '< 24h',
+  'proprietaires.hero.stat3.label': 'fotoana fanamarinana salany',
+
+  'proprietaires.preview.url': 'arytrano.mg/publier',
+  'proprietaires.preview.step': 'Dingana 3/4',
+  'proprietaires.preview.title': 'Faritao ny trano',
+  'proprietaires.preview.field.type': 'Karazana',
+  'proprietaires.preview.field.typeV': 'Studio voakemba',
+  'proprietaires.preview.field.quartier': 'Faritra',
+  'proprietaires.preview.field.quartierV': 'Andrainjato',
+  'proprietaires.preview.field.surface': 'Velarana',
+  'proprietaires.preview.field.surfaceV': '18 m²',
+  'proprietaires.preview.field.price': 'Hofa / volana',
+  'proprietaires.preview.field.priceV': '220 000 Ar',
+  'proprietaires.preview.photos': 'Sary (5 farafahakeliny)',
+  'proprietaires.preview.prev': 'Hiverina',
+  'proprietaires.preview.next': 'Hitohy',
+
+  'proprietaires.steps.eyebrow': 'Ahoana hamoaka',
+  'proprietaires.steps.title': 'Dingana 4. 5 mn. Maimaim-poana.',
+  'proprietaires.steps.s1.title': 'Mamorona kaonty',
+  'proprietaires.steps.s1.desc':
+    'Mailaka + laharana WhatsApp. Izay ihany no hanombohana.',
+  'proprietaires.steps.s2.title': 'Mandefa taratasy',
+  'proprietaires.steps.s2.desc':
+    'Karazana CIN + acte na facture trano. Chiffré.',
+  'proprietaires.steps.s3.title': 'Mamaritra trano',
+  'proprietaires.steps.s3.desc':
+    'Lohateny, sarany, faritra, sary. Validation 24-48 ora.',
+  'proprietaires.steps.s4.title': 'Mahazo fangatahana',
+  'proprietaires.steps.s4.desc':
+    'WhatsApp efa vita amin’ny mpianatra. Mamaly rehefa tianao.',
+
+  'proprietaires.verif.eyebrow': 'Fanamarinana',
+  'proprietaires.verif.title': 'Nahoana no hamarinina ny tompon-trano tsirairay ?',
+  'proprietaires.verif.body':
+    'Satria ny famitahana amin’ny trano ho an’ny mpianatra dia mahatonga ny mpianatra ho very 800 000 Ar amin’ny salany. AryTrano dia tsy mamoaka raha tsy voamarinin’olombelona. Hatrany.',
+  'proprietaires.verif.i1.title': 'Taratasy mahaolona',
+  'proprietaires.verif.i1.desc':
+    'CIN na passeport voadinika amin’ny base d’identifiants fantatra.',
+  'proprietaires.verif.i2.title': 'Taratasy fananana',
+  'proprietaires.verif.i2.desc':
+    'Acte de propriété na facture JIRAMA amin’ny anaran’ny tompon-trano.',
+  'proprietaires.verif.i3.title': 'Sary arovana',
+  'proprietaires.verif.i3.desc':
+    'Watermark AryTrano + reverse-image-search.',
+  'proprietaires.verif.i4.title': 'Fanamarinana ny adiresy',
+  'proprietaires.verif.i4.desc':
+    'Fitsidihana na fiantsoana géolocalisée ho an’ny premium.',
+  'proprietaires.verif.card.author': 'Rmme Rasoa',
+  'proprietaires.verif.card.verifiedAt': 'Voamarina ny 14 martsa 2026',
+  'proprietaires.verif.card.badge': 'Voamarina',
+  'proprietaires.verif.card.row.cin': 'CIN',
+  'proprietaires.verif.card.row.cinV': '✓ Voadinika an-tanana',
+  'proprietaires.verif.card.row.acte': 'Acte fananana',
+  'proprietaires.verif.card.row.acteV': '✓ Voamarina',
+  'proprietaires.verif.card.row.phone': 'Antso',
+  'proprietaires.verif.card.row.phoneV': '✓ +261 34 ** ** 23',
+  'proprietaires.verif.card.row.active': 'Filazana mavitrika',
+  'proprietaires.verif.card.row.activeV': 'Trano 3',
+  'proprietaires.verif.card.row.response': 'Famaliana salany',
+  'proprietaires.verif.card.row.responseV': '2 ora 14 mn',
+  'proprietaires.verif.card.row.rating': 'Naotin’ny mpanofa',
+  'proprietaires.verif.card.row.ratingV': '★★★★★ (avis 12)',
+
+  'proprietaires.pricing.eyebrow': 'Sarany',
+  'proprietaires.pricing.title': 'Maimaim-poana. Maharitra. Marina.',
+  'proprietaires.pricing.lead':
+    'Vola avy amin’ny mpamatsy an-toerana (assurance, déménagement), tsy avy aminao.',
+  'proprietaires.pricing.disclaimer': 'Tsy misy commission amin’ny hofa. Na oviana.',
+  'proprietaires.pricing.standard.name': 'Standard',
+  'proprietaires.pricing.standard.price': '0 Ar',
+  'proprietaires.pricing.standard.sub': 'Mandrakizay',
+  'proprietaires.pricing.standard.f1': 'Famoronana kaonty',
+  'proprietaires.pricing.standard.f2': 'Fanamarinana ny mahaolona',
+  'proprietaires.pricing.standard.f3': 'Filazana 5 hatramin’ny',
+  'proprietaires.pricing.standard.f4': 'Hafatra WhatsApp efa vita',
+  'proprietaires.pricing.standard.f5': 'Stats fijery fototra',
+  'proprietaires.pricing.standard.cta': 'Hanomboka (maimaim-poana)',
+  'proprietaires.pricing.premium.name': 'Premium',
+  'proprietaires.pricing.premium.price': '0 Ar',
+  'proprietaires.pricing.premium.sub': 'Amin’ny fanasana',
+  'proprietaires.pricing.premium.badge': 'Amin’ny fanasana',
+  'proprietaires.pricing.premium.f1': 'Ny Standard rehetra',
+  'proprietaires.pricing.premium.f2': 'Filazana tsy voafetra',
+  'proprietaires.pricing.premium.f3': 'Baodjy « Fanamarinana mafy »',
+  'proprietaires.pricing.premium.f4': 'Aroso amin’ny vokatra',
+  'proprietaires.pricing.premium.f5': 'Stats lalina + export',
+  'proprietaires.pricing.premium.f6': 'Support WhatsApp manandanja',
+  'proprietaires.pricing.premium.cta': 'Hangataka fanasana',
+  'proprietaires.pricing.priceSuffix': '/ volana',
+
+  'proprietaires.faq.eyebrow': 'Fanontaniana avy amin’ny tompon-trano',
+  'proprietaires.faq.title': 'Valianay mivantana ianao.',
+  'proprietaires.faq.q1.q': 'Mahafiriana ny fanamarinana ?',
+  'proprietaires.faq.q1.a':
+    'Amin’ny ankapobeny 24-48 ora. Raha mandefa ny taratasinao alatsinainy maraina, voamarina ny talata.',
+  'proprietaires.faq.q2.q': 'Voaaro ve ny taratasy fanondroana ?',
+  'proprietaires.faq.q2.a':
+    'Eny. Chiffré, voapetraka amin’ny serveur misaraka, azon’ny ekipanay ihany.',
+  'proprietaires.faq.q3.q': 'Filazana firy no azoko avoaka ?',
+  'proprietaires.faq.q3.a':
+    '5 amin’ny Standard, tsy voafetra amin’ny Premium (amin’ny fanasana, maimaim-poana koa).',
+  'proprietaires.faq.q4.q': 'Ahoana no fitantanako ny fangatahana ?',
+  'proprietaires.faq.q4.a':
+    'Tonga amin’ny WhatsApp-nao ny hafatra. Misy stats ihany koa amin’ny dashboard.',
+  'proprietaires.faq.q5.q': 'Inona no hitranga raha mahita mpanofa aho ?',
+  'proprietaires.faq.q5.a':
+    'Hovaina ho « Voa-hofa » ao amin’ny dashboard. Tsy misy commission, tsy misy taratasy.',
+  'proprietaires.faq.q6.q': 'Raha tsy mandoa ny mpanofa ?',
+  'proprietaires.faq.q6.a':
+    'AryTrano tsy mitantana ny fifandraisana bail/fandoavam-bola. Afaka manolotra partenaires anao izahay.',
+
+  'proprietaires.finalCta.title': 'Vonona hamoaka ?',
+  'proprietaires.finalCta.lead': '5 mn. Tsy misy saran’asa. Validation 24-48 ora.',
+  'proprietaires.finalCta.cta': 'Mamorona kaonty tompon-trano',
+
   // ── /quartiers page ──
   'quartiers.meta.title': 'Faritra ao Fianarantsoa',
   'quartiers.meta.description':
