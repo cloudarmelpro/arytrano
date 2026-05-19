@@ -41,7 +41,7 @@ export function LandingFeatured({
       <div className="mx-auto flex max-w-[1280px] flex-col gap-6 px-6 lg:px-10">
         <header className="flex flex-wrap items-end justify-between gap-3">
           <div className="flex flex-col gap-1">
-            <h2 className="text-2xl font-semibold text-foreground sm:text-3xl">
+            <h2 className="font-serif text-[clamp(28px,3vw,40px)] font-normal leading-[1.1] tracking-[-0.018em] text-foreground">
               {t('landing.featured.title')}
             </h2>
             <p className="text-sm text-muted-foreground sm:text-base">
