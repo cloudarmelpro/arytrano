@@ -1,36 +1,42 @@
 import Link from 'next/link'
-import { LogoMark } from './LogoMark'
 
 /**
- * Brand wordmark for AryTrano — icon pill + bicolor type.
+ * Brand wordmark for AryTrano — indigo `AT` square logo + bicolor type.
  *
- * Typography choice: "Ary" in neutral foreground + "Trano" in indigo.
- * "Trano" means "house" in Malagasy, so emphasising it visually
- * communicates the platform's purpose (housing) at first glance —
- * and pairs the typography with the indigo icon pill on the left.
+ * Uses the canonical SVG mark at `/logo/arytrano-mark.svg` (indigo on
+ * white background). For dark/indigo surfaces, use the light variant
+ * `/logo/arytrano-mark-light.svg` directly.
  */
 export function BrandWordmark({
   size = 'md',
   href = '/',
+  variant = 'default',
 }: {
   size?: 'sm' | 'md' | 'lg'
   href?: string
+  /** `light` swaps to the white-bg variant for use on indigo / dark surfaces. */
+  variant?: 'default' | 'light'
 }) {
-  const boxSize =
-    size === 'sm' ? 'h-7 w-7' : size === 'lg' ? 'h-10 w-10' : 'h-8 w-8'
-  const iconSize = size === 'sm' ? 16 : size === 'lg' ? 22 : 18
+  const px = size === 'sm' ? 28 : size === 'lg' ? 40 : 32
   const text = size === 'sm' ? 'text-base' : size === 'lg' ? 'text-2xl' : 'text-xl'
+  const src =
+    variant === 'light'
+      ? '/logo/arytrano-mark-light.svg'
+      : '/logo/arytrano-mark.svg'
   return (
     <Link
       href={href}
       className="inline-flex items-center gap-2"
       aria-label="AryTrano — Accueil"
     >
-      <span
-        className={`${boxSize} inline-flex items-center justify-center rounded-md bg-primary text-primary-foreground`}
-      >
-        <LogoMark size={iconSize} />
-      </span>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={src}
+        alt=""
+        width={px}
+        height={px}
+        style={{ width: px, height: px }}
+      />
       <span className={`${text} font-bold tracking-tight leading-none`}>
         <span className="text-foreground">Ary</span>
         <span className="text-primary">Trano</span>

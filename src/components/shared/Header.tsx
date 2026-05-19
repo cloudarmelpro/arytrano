@@ -108,9 +108,14 @@ function BrandRow({
     <div className="bg-primary text-white">
       <div className="mx-auto flex max-w-[1280px] items-center justify-between gap-6 px-6 pt-4 pb-3.5 lg:px-10">
         <Link href="/" className="inline-flex items-center gap-3 text-white no-underline">
-          <span className="inline-flex h-[38px] w-[38px] items-center justify-center rounded-[9px] bg-white font-extrabold text-[16px] tracking-[-0.06em] text-primary">
-            AT
-          </span>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/logo/arytrano-mark-light.svg"
+            alt=""
+            width={38}
+            height={38}
+            className="h-[38px] w-[38px]"
+          />
           <span className="text-[19px] font-bold tracking-[-0.02em]">AryTrano</span>
         </Link>
         <div className="flex items-center gap-5 max-lg:gap-3">

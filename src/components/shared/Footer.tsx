@@ -125,9 +125,14 @@ function MainGrid({ t }: { t: Translator }) {
           href="/"
           className="inline-flex items-center gap-3 text-foreground no-underline"
         >
-          <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-[15px] font-extrabold tracking-[-0.06em] text-white">
-            AT
-          </span>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/logo/arytrano-mark.svg"
+            alt=""
+            width={32}
+            height={32}
+            className="h-8 w-8"
+          />
           <span className="text-[20px] font-bold tracking-[-0.02em]">AryTrano</span>
         </Link>
         <p className="mt-4 max-w-[280px] text-[13.5px] leading-[1.6] text-foreground/70">
