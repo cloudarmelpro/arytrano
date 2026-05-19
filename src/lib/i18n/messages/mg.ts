@@ -42,6 +42,7 @@ export const mg: Record<MessageKey, string> = {
   'footerV3.newsletter.lead':
     'Safidio ny faritra sy ny tetibolanao — handefa hafatra izahay raha vao misy filazana voamarina mifanaraka. Hanafoanana amin’ny teny iray.',
   'footerV3.newsletter.phonePlaceholder': '34 12 345 67',
+  'footerV3.newsletter.phoneLabel': 'Laharana WhatsApp Madagasikara',
   'footerV3.newsletter.submit': 'Ampandrenesana ahy',
   'footerV3.tagline':
     'Tadiavo ny tranonao ao Fianarantsoa, tsy misy mpanelanelana. Tompon-trano voamarina, fifandraisana mivantana, maimaim-poana ho an’ny mpianatra.',

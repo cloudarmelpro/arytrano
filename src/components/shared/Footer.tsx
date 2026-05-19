@@ -68,9 +68,9 @@ const PAYMENTS: PaymentBrand[] = [
 
 const SOCIAL: Array<{ icon: IconName; label: string; href: string }> = [
   { icon: 'whatsapp', label: 'WhatsApp Channel', href: '#' },
-  { icon: 'globe', label: 'Facebook', href: '#' },
-  { icon: 'message', label: 'Instagram', href: '#' },
-  { icon: 'phone', label: 'TikTok', href: '#' },
+  { icon: 'facebook', label: 'Facebook', href: '#' },
+  { icon: 'instagram', label: 'Instagram', href: '#' },
+  { icon: 'tiktok', label: 'TikTok', href: '#' },
 ]
 
 export async function Footer() {
@@ -109,10 +109,15 @@ function NewsletterBlock({ t }: { t: Translator }) {
         <span className="inline-flex items-center gap-2 border-r border-border px-3 text-[14px] font-semibold text-foreground/80">
           <Icon name="whatsapp" size={16} /> +261
         </span>
+        <label htmlFor="footer-newsletter-phone" className="sr-only">
+          {t('footerV3.newsletter.phoneLabel')}
+        </label>
         <input
+          id="footer-newsletter-phone"
           type="tel"
+          inputMode="tel"
+          autoComplete="tel-national"
           placeholder={t('footerV3.newsletter.phonePlaceholder')}
-          aria-label={t('footerV3.newsletter.eyebrow')}
           className="h-11 min-w-0 flex-1 bg-transparent px-3.5 text-[14.5px] font-medium text-foreground outline-none placeholder:text-muted-foreground"
         />
         <button

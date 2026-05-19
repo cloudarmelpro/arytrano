@@ -74,7 +74,9 @@ export function LandingFeatured({
                 key={tabKey}
                 type="button"
                 role="tab"
+                id={`featured-tab-${tabKey}`}
                 aria-selected={isActive}
+                aria-controls="featured-panel"
                 onClick={() => setTab(tabKey)}
                 className={`inline-flex h-9 cursor-pointer items-center rounded-full px-4 text-sm font-medium transition ${isActive
                   ? 'bg-foreground text-background'
@@ -87,23 +89,29 @@ export function LandingFeatured({
           })}
         </div>
 
-        {filtered.length === 0 ? (
-          <p className="rounded-xl bg-muted/40 px-5 py-8 text-center text-sm text-muted-foreground">
-            {t('landing.featured.tab.empty')}
-          </p>
-        ) : (
-          <ul className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {filtered.map((l) => (
-              <PublicListingCard
-                key={l.id}
-                listing={l}
-                t={t}
-                authenticated={authenticated}
-                initialFavorited={favoritedIds.has(l.id)}
-              />
-            ))}
-          </ul>
-        )}
+        <div
+          role="tabpanel"
+          id="featured-panel"
+          aria-labelledby={`featured-tab-${tab}`}
+        >
+          {filtered.length === 0 ? (
+            <p className="rounded-xl bg-muted/40 px-5 py-8 text-center text-sm text-muted-foreground">
+              {t('landing.featured.tab.empty')}
+            </p>
+          ) : (
+            <ul className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {filtered.map((l) => (
+                <PublicListingCard
+                  key={l.id}
+                  listing={l}
+                  t={t}
+                  authenticated={authenticated}
+                  initialFavorited={favoritedIds.has(l.id)}
+                />
+              ))}
+            </ul>
+          )}
+        </div>
 
         <div className="flex justify-end">
           <Link

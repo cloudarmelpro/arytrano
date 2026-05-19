@@ -114,8 +114,16 @@ export function LandingNeighborhoods({
                 >
                   <div className="flex items-start justify-between">
                     <span
-                      style={{ background: 'rgba(255,255,255,0.7)', color: palette.fg }}
+                      // Palette 3 has white text — use a solid indigo badge
+                      // so the count stays readable. Other palettes get the
+                      // soft frosted-white pill on dark text.
+                      style={
+                        palette.fg === '#ffffff'
+                          ? { background: 'oklch(0.35 0.18 277)', color: '#ffffff' }
+                          : { background: 'rgba(255,255,255,0.85)', color: palette.fg }
+                      }
                       className="inline-flex h-6 items-center rounded-full px-2.5 text-[11.5px] font-semibold"
+                      aria-label={`${n.publishedListings} annonces`}
                     >
                       {n.publishedListings} ann.
                     </span>

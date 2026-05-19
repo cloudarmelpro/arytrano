@@ -32,6 +32,9 @@ export type IconName =
   | 'wallet'
   | 'flag-mg'
   | 'flag-fr'
+  | 'facebook'
+  | 'instagram'
+  | 'tiktok'
 
 type Props = {
   name: IconName
@@ -316,6 +319,40 @@ export function Icon({ name, size = 20, stroke = 1.8, className, ...rest }: Prop
           <rect width="10" height="20" fill="#0055A4" />
           <rect x="10" width="10" height="20" fill="#fff" />
           <rect x="20" width="10" height="20" fill="#EF4135" />
+        </svg>
+      )
+    case 'facebook':
+      return (
+        <svg
+          viewBox="0 0 24 24"
+          width={size}
+          height={size}
+          fill="currentColor"
+          aria-hidden
+          className={className}
+        >
+          <path d="M22 12.06C22 6.5 17.52 2 12 2S2 6.5 2 12.06c0 4.99 3.66 9.13 8.44 9.88v-6.99H7.9v-2.89h2.54V9.85c0-2.51 1.49-3.9 3.78-3.9 1.09 0 2.24.2 2.24.2v2.46h-1.26c-1.24 0-1.63.77-1.63 1.56v1.87h2.78l-.44 2.89h-2.34V22c4.78-.75 8.44-4.89 8.44-9.94Z" />
+        </svg>
+      )
+    case 'instagram':
+      return (
+        <svg {...common}>
+          <rect x="3" y="3" width="18" height="18" rx="5" />
+          <circle cx="12" cy="12" r="4" />
+          <circle cx="17.5" cy="6.5" r="0.6" fill="currentColor" stroke="none" />
+        </svg>
+      )
+    case 'tiktok':
+      return (
+        <svg
+          viewBox="0 0 24 24"
+          width={size}
+          height={size}
+          fill="currentColor"
+          aria-hidden
+          className={className}
+        >
+          <path d="M19.6 6.7a5.7 5.7 0 0 1-3.5-1.2 5.7 5.7 0 0 1-2.2-3.5h-3v13.4a2.5 2.5 0 1 1-2.5-2.5c.3 0 .5 0 .7.1V9.9a5.7 5.7 0 1 0 4.9 5.7V9.4a8.7 8.7 0 0 0 5.6 2V8.5l-.04-1.8Z" />
         </svg>
       )
     default:

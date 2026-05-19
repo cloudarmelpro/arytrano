@@ -36,6 +36,7 @@ export const frMG = {
   'footerV3.newsletter.lead':
     'Choisis tes quartiers et ton budget — on t’envoie un message dès qu’une annonce vérifiée correspond. Désabo en 1 mot.',
   'footerV3.newsletter.phonePlaceholder': '34 12 345 67',
+  'footerV3.newsletter.phoneLabel': 'Numéro WhatsApp Madagascar',
   'footerV3.newsletter.submit': 'M’alerter',
   'footerV3.tagline':
     'Trouve ton logement à Fianarantsoa, sans intermédiaire. Propriétaires vérifiés, contact direct, gratuit pour les étudiants.',
