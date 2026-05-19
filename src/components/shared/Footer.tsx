@@ -51,44 +51,19 @@ const COLUMNS: Column[] = [
 
 type PaymentBrand = {
   key: MessageKey
-  /**
-   * If a logo exists at this path it's used; otherwise we fall back
-   * to a brand-colored text pill. Drop official SVG/PNG files in
-   * `public/payments/` to replace the colored fallbacks.
-   */
+  /** Real brand logo from `/public/payments/`. */
   logo?: string
-  /** Tailwind classes for the colored pill fallback. */
-  fallback?: {
-    bg: string
-    fg: string
-  }
+  /** Logo aspect-driven width when rendered at 24px height. */
+  logoWidth?: number
   icon?: IconName
 }
 
 const PAYMENTS: PaymentBrand[] = [
-  {
-    key: 'footerV3.pay.mvola',
-    logo: '/payments/mvola.svg',
-    fallback: { bg: 'bg-[#E10A1C]', fg: 'text-white' },
-  },
-  {
-    key: 'footerV3.pay.orangeMoney',
-    logo: '/payments/orange-money.svg',
-    fallback: { bg: 'bg-[#FF7900]', fg: 'text-white' },
-  },
-  {
-    key: 'footerV3.pay.airtelMoney',
-    logo: '/payments/airtel-money.svg',
-    fallback: { bg: 'bg-[#ED1C24]', fg: 'text-white' },
-  },
-  {
-    key: 'footerV3.pay.bankTransfer',
-    icon: 'building',
-  },
-  {
-    key: 'footerV3.pay.cash',
-    icon: 'wallet',
-  },
+  { key: 'footerV3.pay.mvola', logo: '/payments/Mvola.svg', logoWidth: 76 },
+  { key: 'footerV3.pay.orangeMoney', logo: '/payments/Orange.svg', logoWidth: 76 },
+  { key: 'footerV3.pay.airtelMoney', logo: '/payments/Airtel.svg', logoWidth: 76 },
+  { key: 'footerV3.pay.bankTransfer', icon: 'building' },
+  { key: 'footerV3.pay.cash', icon: 'wallet' },
 ]
 
 const SOCIAL: Array<{ icon: IconName; label: string; href: string }> = [
@@ -231,20 +206,28 @@ function PaymentsRow({ t }: { t: Translator }) {
       <div className="flex flex-wrap items-center gap-2">
         {PAYMENTS.map((p) => {
           const label = t(p.key)
-          if (p.fallback) {
+          if (p.logo) {
             return (
               <span
                 key={p.key}
-                className={`inline-flex h-7 items-center rounded-md px-3 text-[12px] font-bold tracking-[-0.005em] shadow-sm ${p.fallback.bg} ${p.fallback.fg}`}
+                className="inline-flex h-9 items-center rounded-md border border-border bg-white px-2.5"
+                title={label}
               >
-                {label}
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={p.logo}
+                  alt={label}
+                  height={24}
+                  width={p.logoWidth ?? 76}
+                  className="h-6 w-auto"
+                />
               </span>
             )
           }
           return (
             <span
               key={p.key}
-              className="inline-flex h-7 items-center gap-1.5 rounded-md border border-border bg-muted/40 px-3 text-[12px] font-semibold text-foreground/80"
+              className="inline-flex h-9 items-center gap-1.5 rounded-md border border-border bg-muted/40 px-3 text-[12px] font-semibold text-foreground/80"
             >
               {p.icon && <Icon name={p.icon} size={13} />}
               {label}

@@ -1,17 +1,14 @@
 # Payment provider logos
 
-Drop the official SVG/PNG logos here when you have them, with these exact filenames:
+Official wordmark SVGs used by the footer's "Paiements acceptés" row.
 
-- `mvola.svg` — M-Vola (Telma)
-- `orange-money.svg` — Orange Money
-- `airtel-money.svg` — Airtel Money
+- `Mvola.svg` — M-Vola (Telma)
+- `Orange.svg` — Orange Money
+- `Airtel.svg` — Airtel Money
 
-The footer (`src/components/shared/Footer.tsx`) currently renders brand-colored
-text pills as a fallback. To start using the real logos, update the rendering
-in `PaymentsRow` to use `<img src={p.logo} alt={label} />` when `p.logo` is set,
-keeping the colored pill as a graceful fallback only for missing files.
+Rendered at 24px height inside a white pill (`src/components/shared/Footer.tsx`,
+`PaymentsRow`). To swap a logo, replace the file at the same path; the footer
+picks up the new bytes on the next build / cache bust.
 
-Recommended logo specs:
-- Square or short rectangular shape, transparent background
-- 24–32px display height in the footer
-- SVG preferred (sharp at every density, tiny on the wire)
+Bank transfer and cash use icon-only pills (no third-party trademark)
+so no asset is needed for those.
