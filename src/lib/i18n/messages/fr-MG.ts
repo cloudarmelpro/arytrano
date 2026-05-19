@@ -10,6 +10,90 @@ export const frMG = {
   'common.appName': 'AryTrano',
   'common.home': 'Accueil',
   'common.perMonth': '/mois',
+
+  // ── Legal pages (placeholder v0.5 — to be reviewed by counsel) ──
+  'legal.eyebrow': 'Mentions légales',
+  'legal.lastUpdated': 'Dernière mise à jour : {date}',
+  'legal.draftNotice':
+    'Version provisoire (v0.5). Ce document sera révisé par un conseil juridique avant le lancement officiel. Pour toute question, écris-nous à contact@arytrano.mg.',
+
+  // /legal/terms — CGU
+  'legal.terms.title': 'Conditions générales d’utilisation',
+  'legal.terms.s1.h': '1. Objet',
+  'legal.terms.s1.body':
+    'AryTrano est une plateforme qui met en relation des étudiants et des propriétaires de logements à Fianarantsoa (Madagascar). Nous ne sommes pas agent immobilier, ne signons aucun bail à votre place, et ne percevons aucune commission sur les loyers.',
+  'legal.terms.s2.h': '2. Création de compte',
+  'legal.terms.s2.body':
+    'L’inscription est gratuite. Tu dois être majeur (18 ans), fournir une adresse email valide, et — si tu publies des annonces — une pièce d’identité et un justificatif de propriété. Tu es responsable de la confidentialité de ton mot de passe.',
+  'legal.terms.s3.h': '3. Contenus publiés',
+  'legal.terms.s3.body':
+    'Les annonces, photos, avis et messages que tu publies restent ta propriété. En les publiant sur AryTrano, tu nous accordes une licence limitée pour les afficher sur la plateforme. Tu garantis que ces contenus respectent la loi malagasy et ne portent pas atteinte aux droits de tiers.',
+  'legal.terms.s4.h': '4. Modération',
+  'legal.terms.s4.body':
+    'Nous vérifions manuellement chaque annonce avant publication (identité, titre de propriété, photos). Nous nous réservons le droit de retirer une annonce ou de suspendre un compte en cas de violation des présentes CGU.',
+  'legal.terms.s5.h': '5. Limitation de responsabilité',
+  'legal.terms.s5.body':
+    'AryTrano fournit un outil de mise en relation. Nous ne sommes pas partie au contrat de bail entre étudiant et propriétaire. Tout litige relatif au logement, au loyer ou aux conditions d’occupation doit être réglé directement entre les parties.',
+  'legal.terms.s6.h': '6. Modifications',
+  'legal.terms.s6.body':
+    'Ces CGU peuvent évoluer. Tu seras notifié(e) par email au moins 30 jours avant l’entrée en vigueur de toute modification substantielle. La poursuite de l’usage de la plateforme vaut acceptation.',
+
+  // /legal/privacy
+  'legal.privacy.title': 'Politique de confidentialité',
+  'legal.privacy.s1.h': '1. Données collectées',
+  'legal.privacy.s1.body':
+    'Lors de ton inscription : email, nom, mot de passe (haché). Lors de la publication d’une annonce (propriétaires) : pièce d’identité (chiffrée AES-256-GCM), justificatif de propriété, numéro WhatsApp. Lors de la navigation : adresse IP hachée (rate-limit anti-abus), locale préférée, cookies de session.',
+  'legal.privacy.s2.h': '2. Finalités',
+  'legal.privacy.s2.body':
+    'Authentification, mise en relation, modération, prévention de la fraude, statistiques agrégées anonymisées. Nous ne vendons, ne louons et ne partageons aucune donnée personnelle avec des tiers à des fins commerciales.',
+  'legal.privacy.s3.h': '3. Conservation',
+  'legal.privacy.s3.body':
+    'Compte étudiant : tant que le compte reste actif + 12 mois après la dernière connexion. Compte propriétaire vérifié : tant que des annonces sont actives + 5 ans après la dernière annonce supprimée (obligation comptable malagasy). Pièces d’identité chiffrées : 6 mois après la fin de la vérification.',
+  'legal.privacy.s4.h': '4. Tes droits',
+  'legal.privacy.s4.body':
+    'Conformément à la loi malagasy n°2014-038 relative à la protection des données personnelles, tu peux exercer à tout moment tes droits d’accès, de rectification, d’effacement et de portabilité. Écris à contact@arytrano.mg avec une preuve d’identité.',
+  'legal.privacy.s5.h': '5. Sécurité',
+  'legal.privacy.s5.body':
+    'TLS 1.3 sur toutes les connexions. Mots de passe hachés (Argon2id). Pièces d’identité chiffrées au repos avec rotation des clés. Accès aux données restreint à l’équipe de vérification (4 personnes max). Aucune fuite à signaler à ce jour.',
+  'legal.privacy.s6.h': '6. Sous-traitants',
+  'legal.privacy.s6.body':
+    'Hébergement : Vercel (USA, conformité GDPR via SCC). Base de données : Postgres managé. Stockage images : Cloudinary (chiffré au repos). Email transactionnel : Resend. Tous nos sous-traitants traitent les données selon nos instructions et leurs propres engagements légaux.',
+
+  // /legal/cookies
+  'legal.cookies.title': 'Politique cookies',
+  'legal.cookies.s1.h': '1. Ce que sont les cookies',
+  'legal.cookies.s1.body':
+    'Un cookie est un petit fichier texte stocké par ton navigateur. AryTrano utilise uniquement des cookies strictement nécessaires au fonctionnement du site (session, locale, anti-CSRF). Aucun cookie publicitaire, aucun tracker tiers.',
+  'legal.cookies.s2.h': '2. Liste des cookies utilisés',
+  'legal.cookies.s2.body':
+    'authjs.session-token : session utilisateur (durée 30 jours). arytrano_locale : ta langue préférée FR/MG (durée 1 an). __Host-csrf : protection anti-CSRF (durée de session). Tous ces cookies sont en HttpOnly + Secure + SameSite=Lax.',
+  'legal.cookies.s3.h': '3. Pas de consentement requis',
+  'legal.cookies.s3.body':
+    'Comme nous n’utilisons que des cookies strictement nécessaires, aucun bandeau de consentement n’est obligatoire selon la loi malagasy 2014-038 ni le RGPD européen pour les visiteurs UE.',
+  'legal.cookies.s4.h': '4. Désactivation',
+  'legal.cookies.s4.body':
+    'Tu peux supprimer ou bloquer les cookies via les paramètres de ton navigateur. Attention : sans le cookie de session, tu ne pourras pas rester connecté. Sans le cookie de locale, la langue par défaut sera FR à chaque visite.',
+  'legal.cookies.s5.h': '5. Modifications',
+  'legal.cookies.s5.body':
+    'Si nous introduisons un nouveau cookie (analytics, etc.), cette politique sera mise à jour et un bandeau de consentement explicite apparaîtra avant le dépôt.',
+
+  // /legal/mentions
+  'legal.mentions.title': 'Mentions légales',
+  'legal.mentions.s1.h': 'Éditeur',
+  'legal.mentions.s1.body':
+    'AryTrano SARL (en cours d’immatriculation). Siège social : Fianarantsoa, Madagascar. Représentant légal : à compléter avant lancement officiel.',
+  'legal.mentions.s2.h': 'Contact',
+  'legal.mentions.s2.body':
+    'Email : contact@arytrano.mg. WhatsApp : +261 — à compléter. Pour les questions de protection des données : privacy@arytrano.mg.',
+  'legal.mentions.s3.h': 'Hébergement',
+  'legal.mentions.s3.body':
+    'Le site est hébergé par Vercel Inc. (USA). 340 S Lemon Ave #4133, Walnut, CA 91789, USA. Conformité GDPR via Standard Contractual Clauses.',
+  'legal.mentions.s4.h': 'Propriété intellectuelle',
+  'legal.mentions.s4.body':
+    'Le nom AryTrano, le logo, le design et le code source sont la propriété exclusive d’AryTrano SARL. Toute reproduction sans autorisation préalable écrite est interdite. Les annonces et photos appartiennent à leurs auteurs.',
+  'legal.mentions.s5.h': 'Loi applicable',
+  'legal.mentions.s5.body':
+    'Les présentes mentions et tout litige relatif à l’utilisation d’AryTrano sont régis par le droit malagasy. Compétence exclusive des tribunaux de Fianarantsoa.',
   'common.loading': 'Chargement…',
   'common.back': 'Retour',
   'common.close': 'Fermer',

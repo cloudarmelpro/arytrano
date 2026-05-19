@@ -16,6 +16,90 @@ export const mg: Record<MessageKey, string> = {
   'common.appName': 'AryTrano',
   'common.home': 'Fandraisana',
   'common.perMonth': '/volana',
+
+  // Legal pages (placeholder v0.5)
+  'legal.eyebrow': 'Filazana ara-dalàna',
+  'legal.lastUpdated': 'Fanavaozana farany: {date}',
+  'legal.draftNotice':
+    'Dika voalohany (v0.5). Hojeren’ny mpanolotsaina ara-dalàna ity antontan-taratasy ity alohan’ny fanatontosana. Raha misy fanontaniana, alefaso amin’ny contact@arytrano.mg.',
+
+  // /legal/terms — CGU (Malagasy translations are placeholders, FR is the authoritative text per Madagascar law)
+  'legal.terms.title': 'Fepetra ankapobeny',
+  'legal.terms.s1.h': '1. Tanjona',
+  'legal.terms.s1.body':
+    'AryTrano dia sehatra mampifandray ny mpianatra sy ny tompon-trano ao Fianarantsoa (Madagasikara). Tsy mpiantoka ara-trano izahay, tsy manao sonia ny bail an’ny olona, ary tsy mandray commission amin’ny hofa.',
+  'legal.terms.s2.h': '2. Famoronana kaonty',
+  'legal.terms.s2.body':
+    'Maimaim-poana ny fisoratana anarana. Mila ho efa 18 taona ianao, manana mailaka manan-kery, ary — raha mamoaka filazana — taratasy fanondroana sy taratasy fanamarinana ny fananana. Tompon’andraikitra amin’ny teny miafinao ianao.',
+  'legal.terms.s3.h': '3. Votoaty navoaka',
+  'legal.terms.s3.body':
+    'Ny filazana, sary, hevitra ary hafatra navoakanao dia anao ihany. Amin’ny famoahanao azy ireo amin’ny AryTrano, manome anay alalana voafetra ianao mba haneho azy ireo. Manome antoka ianao fa manaja ny lalàna malagasy izy ireo.',
+  'legal.terms.s4.h': '4. Fanaraha-maso',
+  'legal.terms.s4.body':
+    'Manamarina ny filazana tsirairay an-tanana izahay (mahaolona, taratasy fananana, sary). Manana zo handraisana fanapahan-kevitra hanaisotra filazana na hanafoana kaonty raha misy fandikan-dalàna.',
+  'legal.terms.s5.h': '5. Famerana ny andraikitra',
+  'legal.terms.s5.body':
+    'AryTrano dia fitaovana fampifandraisana. Tsy mpandray anjara amin’ny fifanarahana bail izahay. Ny fifandirana rehetra dia tsy maintsy voafaritra mivantana eo amin’ny andaniny.',
+  'legal.terms.s6.h': '6. Fanovana',
+  'legal.terms.s6.body':
+    'Mety hiova ireo fepetra ireo. Hampandrenesina amin’ny mailaka ianao 30 andro alohan’ny fanovana lehibe. Ny fitohizan’ny fampiasana ny sehatra dia midika ho fanekena.',
+
+  // /legal/privacy
+  'legal.privacy.title': 'Politikan’ny tsiambaratelo',
+  'legal.privacy.s1.h': '1. Vaovao angonina',
+  'legal.privacy.s1.body':
+    'Amin’ny fisoratana anarana: mailaka, anarana, teny miafina (hashed). Amin’ny famoahana filazana (tompon-trano): taratasy fanondroana (chiffré AES-256-GCM), taratasy fananana, laharana WhatsApp. Amin’ny fitsidihana: adiresy IP hashed, fitenenana, cookies session.',
+  'legal.privacy.s2.h': '2. Tanjona',
+  'legal.privacy.s2.body':
+    'Fanamarinana, fampifandraisana, fanaraha-maso, fisorohana ny famitahana, statistika anonyme. Tsy mivarotra, tsy manofa ary tsy mizara vaovao manokana amin’ny olon-kafa izahay.',
+  'legal.privacy.s3.h': '3. Fitehirizana',
+  'legal.privacy.s3.body':
+    'Kaonty mpianatra: raha mbola mavitrika + 12 volana. Kaonty tompon-trano voamarina: raha mbola misy filazana + 5 taona aorian’izay (adidy ara-kaonty malagasy). Taratasy fanondroana chiffré: 6 volana aorian’ny fanamarinana.',
+  'legal.privacy.s4.h': '4. Ny zonao',
+  'legal.privacy.s4.body':
+    'Araka ny lalàna malagasy 2014-038 momba ny fiarovana ny vaovao manokana, afaka mampihatra ny zo hidirana, hanitsy, hamafa ary hanaova portability ianao. Soraty contact@arytrano.mg miaraka amin’ny porofo maha-olona.',
+  'legal.privacy.s5.h': '5. Filaminana',
+  'legal.privacy.s5.body':
+    'TLS 1.3 amin’ny fifandraisana rehetra. Teny miafina hashed (Argon2id). Taratasy fanondroana chiffré + rotation lakile. Ny fidirana voafetra amin’ny ekipa fanamarinana (4 olona farafahabetsany).',
+  'legal.privacy.s6.h': '6. Mpiara-miasa',
+  'legal.privacy.s6.body':
+    'Hosting: Vercel (USA, GDPR via SCC). Base de données: Postgres voatantana. Sary: Cloudinary. Mailaka: Resend. Manaja ny baikonay sy ny adidy ara-dalàna izy ireo.',
+
+  // /legal/cookies
+  'legal.cookies.title': 'Politikan’ny cookies',
+  'legal.cookies.s1.h': '1. Inona ny cookies',
+  'legal.cookies.s1.body':
+    'Ny cookie dia rakitra kely tahirizin’ny browser-nao. AryTrano mampiasa cookies ilaina fotsiny (session, fiteny, anti-CSRF). Tsy misy cookie ho an’ny dokam-barotra, tsy misy tracker.',
+  'legal.cookies.s2.h': '2. Lisitry ny cookies',
+  'legal.cookies.s2.body':
+    'authjs.session-token: session mpampiasa (30 andro). arytrano_locale: fitenenanao FR/MG (1 taona). __Host-csrf: fiarovana anti-CSRF. HttpOnly + Secure + SameSite=Lax izy rehetra.',
+  'legal.cookies.s3.h': '3. Tsy mila fanekena',
+  'legal.cookies.s3.body':
+    'Satria mampiasa cookies ilaina fotsiny izahay, tsy mila bannera fanekena araka ny lalàna malagasy 2014-038 sy ny RGPD eorôpeanina.',
+  'legal.cookies.s4.h': '4. Fanafoanana',
+  'legal.cookies.s4.body':
+    'Azonao foanana na sakanina ny cookies amin’ny browser-nao. Fanairana: tsy hahafahanao mijanona miditra raha tsy misy session cookie. Tsy hitazona ny fiteny raha tsy misy locale cookie.',
+  'legal.cookies.s5.h': '5. Fanovana',
+  'legal.cookies.s5.body':
+    'Raha misy cookie vaovao (analytics sns), havaozinay ity politika ity ary haseho bannera fanekena alohan’ny famoahana.',
+
+  // /legal/mentions
+  'legal.mentions.title': 'Filazana ara-dalàna',
+  'legal.mentions.s1.h': 'Editora',
+  'legal.mentions.s1.body':
+    'AryTrano SARL (eo am-pisoratana). Foibe: Fianarantsoa, Madagasikara. Solontena ara-dalàna: ho fenoina alohan’ny famoahana.',
+  'legal.mentions.s2.h': 'Fifandraisana',
+  'legal.mentions.s2.body':
+    'Mailaka: contact@arytrano.mg. WhatsApp: +261 — ho fenoina. Ho an’ny fanontaniana momba ny vaovao: privacy@arytrano.mg.',
+  'legal.mentions.s3.h': 'Hosting',
+  'legal.mentions.s3.body':
+    'Voapetraka ao amin’ny Vercel Inc. (USA). 340 S Lemon Ave #4133, Walnut, CA 91789, USA. GDPR via Standard Contractual Clauses.',
+  'legal.mentions.s4.h': 'Zon’ny saina',
+  'legal.mentions.s4.body':
+    'Ny anarana AryTrano, ny logo, ny design ary ny kaody loharano dia fananan’ny AryTrano SARL. Ny famerenana raha tsy misy fanomezan-dalana an-tsoratra alohan’izay dia voarara. Ireo filazana sy sary dia an’ny mpamoaka azy ireo.',
+  'legal.mentions.s5.h': 'Lalàna mihatra',
+  'legal.mentions.s5.body':
+    'Ireo filazana ireo sy ny fifandirana rehetra dia fehezin’ny lalàna malagasy. Fahefana manokana an’ny fitsarana ao Fianarantsoa.',
   'common.loading': 'Miandry…',
   'common.back': 'Hiverina',
   'common.close': 'Hidio',

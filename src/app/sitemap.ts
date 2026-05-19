@@ -66,6 +66,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.7,
       alternates: { languages: languages('/proprietaires') },
     },
+    ...['/legal/terms', '/legal/privacy', '/legal/cookies', '/legal/mentions'].map(
+      (path) => ({
+        url: `${baseUrl}${path}`,
+        lastModified: staticLastMod,
+        changeFrequency: 'yearly' as const,
+        priority: 0.3,
+        alternates: { languages: languages(path) },
+      }),
+    ),
   ]
 
   for (const l of listings) {
