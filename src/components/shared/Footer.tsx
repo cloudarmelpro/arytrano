@@ -49,12 +49,46 @@ const COLUMNS: Column[] = [
   },
 ]
 
-const PAYMENTS: MessageKey[] = [
-  'footerV3.pay.mvola',
-  'footerV3.pay.orangeMoney',
-  'footerV3.pay.airtelMoney',
-  'footerV3.pay.bankTransfer',
-  'footerV3.pay.cash',
+type PaymentBrand = {
+  key: MessageKey
+  /**
+   * If a logo exists at this path it's used; otherwise we fall back
+   * to a brand-colored text pill. Drop official SVG/PNG files in
+   * `public/payments/` to replace the colored fallbacks.
+   */
+  logo?: string
+  /** Tailwind classes for the colored pill fallback. */
+  fallback?: {
+    bg: string
+    fg: string
+  }
+  icon?: IconName
+}
+
+const PAYMENTS: PaymentBrand[] = [
+  {
+    key: 'footerV3.pay.mvola',
+    logo: '/payments/mvola.svg',
+    fallback: { bg: 'bg-[#E10A1C]', fg: 'text-white' },
+  },
+  {
+    key: 'footerV3.pay.orangeMoney',
+    logo: '/payments/orange-money.svg',
+    fallback: { bg: 'bg-[#FF7900]', fg: 'text-white' },
+  },
+  {
+    key: 'footerV3.pay.airtelMoney',
+    logo: '/payments/airtel-money.svg',
+    fallback: { bg: 'bg-[#ED1C24]', fg: 'text-white' },
+  },
+  {
+    key: 'footerV3.pay.bankTransfer',
+    icon: 'building',
+  },
+  {
+    key: 'footerV3.pay.cash',
+    icon: 'wallet',
+  },
 ]
 
 const SOCIAL: Array<{ icon: IconName; label: string; href: string }> = [
@@ -194,15 +228,29 @@ function PaymentsRow({ t }: { t: Translator }) {
       <span className="text-[12px] font-semibold uppercase tracking-[0.08em] text-foreground/70">
         {t('footerV3.pay.label')}
       </span>
-      <div className="flex flex-wrap gap-2">
-        {PAYMENTS.map((p) => (
-          <span
-            key={p}
-            className="rounded-md border border-border bg-muted/40 px-3 py-1.5 text-[12px] font-semibold text-foreground/80"
-          >
-            {t(p)}
-          </span>
-        ))}
+      <div className="flex flex-wrap items-center gap-2">
+        {PAYMENTS.map((p) => {
+          const label = t(p.key)
+          if (p.fallback) {
+            return (
+              <span
+                key={p.key}
+                className={`inline-flex h-7 items-center rounded-md px-3 text-[12px] font-bold tracking-[-0.005em] shadow-sm ${p.fallback.bg} ${p.fallback.fg}`}
+              >
+                {label}
+              </span>
+            )
+          }
+          return (
+            <span
+              key={p.key}
+              className="inline-flex h-7 items-center gap-1.5 rounded-md border border-border bg-muted/40 px-3 text-[12px] font-semibold text-foreground/80"
+            >
+              {p.icon && <Icon name={p.icon} size={13} />}
+              {label}
+            </span>
+          )
+        })}
       </div>
     </div>
   )
