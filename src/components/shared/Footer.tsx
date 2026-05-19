@@ -70,7 +70,7 @@ export async function Footer() {
   const year = new Date().getFullYear()
 
   return (
-    <footer className="mt-auto border-t border-border bg-background px-6 lg:px-10">
+    <footer className="mt-auto border-t border-border bg-background">
       <NewsletterBlock t={t} />
       <MainGrid t={t} />
       <PaymentsRow t={t} />
@@ -81,7 +81,7 @@ export async function Footer() {
 
 function NewsletterBlock({ t }: { t: Translator }) {
   return (
-    <div className="mx-auto grid max-w-[1280px] items-center gap-14 border-b border-border py-14 lg:grid-cols-[1.2fr_1fr]">
+    <div className="mx-auto grid max-w-[1280px] items-center gap-14 border-b border-border px-6 py-14 lg:grid-cols-[1.2fr_1fr] lg:px-10">
       <div>
         <div className="text-[11.5px] font-semibold uppercase tracking-[0.1em] text-primary">
           {t('footerV3.newsletter.eyebrow')}
@@ -119,7 +119,7 @@ function NewsletterBlock({ t }: { t: Translator }) {
 
 function MainGrid({ t }: { t: Translator }) {
   return (
-    <div className="mx-auto grid max-w-[1280px] gap-12 py-14 lg:grid-cols-[1.6fr_1fr_1fr_1fr_1fr] max-lg:grid-cols-[1.4fr_1fr_1fr] max-md:grid-cols-2 max-sm:grid-cols-1">
+    <div className="mx-auto grid max-w-[1280px] gap-12 px-6 py-14 lg:grid-cols-[1.6fr_1fr_1fr_1fr_1fr] lg:px-10 max-lg:grid-cols-[1.4fr_1fr_1fr] max-md:grid-cols-2 max-sm:grid-cols-1">
       <div className="lg:col-span-1 max-lg:col-span-full">
         <Link
           href="/"
@@ -185,7 +185,7 @@ function MainGrid({ t }: { t: Translator }) {
 
 function PaymentsRow({ t }: { t: Translator }) {
   return (
-    <div className="mx-auto flex max-w-[1280px] flex-wrap items-center gap-6 border-t border-border py-6">
+    <div className="mx-auto flex max-w-[1280px] flex-wrap items-center gap-6 border-t border-border px-6 py-6 lg:px-10">
       <span className="text-[12px] font-semibold uppercase tracking-[0.08em] text-foreground/70">
         {t('footerV3.pay.label')}
       </span>
@@ -211,7 +211,7 @@ function BottomStrip({ t, year }: { t: Translator; year: number }) {
     { key: 'footerV3.bottom.sitemap', href: '/sitemap.xml' },
   ]
   return (
-    <div className="mx-auto flex max-w-[1280px] flex-wrap items-center justify-between gap-4 border-t border-border py-5 pb-7 text-[12.5px] font-medium">
+    <div className="mx-auto flex max-w-[1280px] flex-wrap items-center justify-between gap-4 border-t border-border px-6 py-5 pb-7 text-[12.5px] font-medium lg:px-10">
       <div className="flex flex-wrap items-center gap-4 text-foreground/70">
         <span>{t('footerV3.bottom.copyright', { year })}</span>
         <span aria-hidden className="h-1 w-1 rounded-full bg-border" />
