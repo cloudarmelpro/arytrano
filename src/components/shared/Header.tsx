@@ -30,6 +30,12 @@ export async function Header() {
             >
               {t('header.nav.listings')}
             </Link>
+            <Link
+              href="/quartiers"
+              className="rounded-md px-3 py-1.5 text-sm font-medium text-muted-foreground transition hover:bg-muted hover:text-foreground"
+            >
+              {t('header.nav.quartiers')}
+            </Link>
           </nav>
         </div>
 

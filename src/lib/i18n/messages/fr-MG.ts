@@ -19,6 +19,7 @@ export const frMG = {
 
   // Header / nav
   'header.nav.listings': 'Annonces',
+  'header.nav.quartiers': 'Quartiers',
   'header.signIn': 'Se connecter',
   'header.signOut': 'Déconnexion',
   'header.dashboard': 'Mon espace',
@@ -454,6 +455,97 @@ export const frMG = {
   'landing.footer.link.privacy': 'Confidentialité',
   'landing.footer.link.cookies': 'Cookies',
   'landing.footer.copyright': '© {year} AryTrano · Fianarantsoa, Madagascar',
+
+  // ── /quartiers page ──
+  'quartiers.meta.title': 'Quartiers de Fianarantsoa',
+  'quartiers.meta.description':
+    'Découvre les 8 quartiers de Fianarantsoa : ambiance, transports, loyer moyen, annonces disponibles.',
+  'quartiers.eyebrow': 'Quartiers',
+  'quartiers.h1': 'Les 8 quartiers de Fianarantsoa.',
+  'quartiers.lead':
+    'Du centre commercial animé d’Antarandolo aux hauteurs résidentielles d’Ankidona — choisis ton quartier selon ton style de vie, pas seulement ton budget.',
+  'quartiers.stats.quartiers.label': 'Quartiers couverts',
+  'quartiers.stats.listings.label': 'Annonces actives',
+  'quartiers.stats.priceRange.label': 'Fourchette Ar/mois',
+  'quartiers.stats.priceRange.value': '95k–420k',
+  'quartiers.map.placeholder':
+    'carte / Fianarantsoa · 8 quartiers · placeholder',
+  'quartiers.block.dataCell.avgPrice': 'Loyer moyen',
+  'quartiers.block.dataCell.distance': 'Distance centre',
+  'quartiers.block.dataCell.listings': 'Annonces',
+  'quartiers.block.dataCell.listings.value.one': '{count} active',
+  'quartiers.block.dataCell.listings.value.other': '{count} actives',
+  'quartiers.block.dataCell.avgPrice.sub': '/mois',
+  'quartiers.block.dataCell.avgPrice.noData': '—',
+  'quartiers.block.poi.walk': 'À pied',
+  'quartiers.block.poi.transport': 'Transports',
+  'quartiers.block.sample.label': 'Aperçu des annonces',
+  'quartiers.block.sample.viewAll.one': 'Voir l’annonce',
+  'quartiers.block.sample.viewAll.other': 'Voir les {count}',
+  'quartiers.block.sample.empty': 'Aucune annonce active pour le moment.',
+  'quartiers.cta.eyebrow': 'Tu hésites ?',
+  'quartiers.cta.title': 'Pas sûr du quartier qui te correspond ?',
+  'quartiers.cta.lead':
+    'Réponds à 4 questions (budget, distance fac, ambiance, transports) — on te recommande les 2 ou 3 quartiers qui te collent. Aucun compte requis.',
+  'quartiers.cta.primary': 'Faire le quiz (2 min)',
+  'quartiers.cta.secondary': 'Voir toutes les annonces',
+
+  // 8 quartiers — ambiance, walk, transport, distance
+  'quartiers.andrainjato.ambiance':
+    'Animé en semaine, calme le weekend. Quartier étudiant historique.',
+  'quartiers.andrainjato.walk':
+    'Fac de Sciences · École polytechnique · Bibliothèque universitaire',
+  'quartiers.andrainjato.transport': 'Taxi-be ligne 1 · Pousse-pousse',
+  'quartiers.andrainjato.distance': '10 min centre-ville',
+
+  'quartiers.antarandolo.ambiance':
+    'Résidentiel, familles. Très calme, propre, bien éclairé le soir.',
+  'quartiers.antarandolo.walk':
+    'Église catholique · École privée Sainte-Marie · Petit marché local',
+  'quartiers.antarandolo.transport': 'Taxi-be ligne 3',
+  'quartiers.antarandolo.distance': '15 min centre-ville',
+
+  'quartiers.tsianolondroa.ambiance':
+    'Cœur historique. Vivant, marchés et commerces à pied.',
+  'quartiers.tsianolondroa.walk':
+    'Marché central · Banques · Restaurants · Cinéma',
+  'quartiers.tsianolondroa.transport':
+    'Toutes lignes taxi-be · Gare routière à 10 min',
+  'quartiers.tsianolondroa.distance': 'Centre-ville',
+
+  'quartiers.mahamanina.ambiance':
+    'Hauteurs et panorama sur la ville. Calme, accès en pente.',
+  'quartiers.mahamanina.walk':
+    'Point de vue panoramique · Petite épicerie de quartier',
+  'quartiers.mahamanina.transport': 'Taxi-be ligne 4 (irrégulier)',
+  'quartiers.mahamanina.distance': '20 min centre-ville',
+
+  'quartiers.anjoma.ambiance':
+    'Carrefour de transports. Pratique pour voyager, parfois bruyant.',
+  'quartiers.anjoma.walk':
+    'Gare routière · Stations-service · Commerces · Pharmacie 24h',
+  'quartiers.anjoma.transport': 'Toutes lignes · Gare routière sur place',
+  'quartiers.anjoma.distance': '8 min centre-ville',
+
+  'quartiers.ankidona.ambiance':
+    'Hauteurs résidentielles. Vue dégagée, air frais.',
+  'quartiers.ankidona.walk': 'Belvédère · Église protestante FJKM',
+  'quartiers.ankidona.transport': 'Taxi-be ligne 5 (rare) · À pied recommandé',
+  'quartiers.ankidona.distance': '18 min centre-ville',
+
+  'quartiers.ambalavato.ambiance':
+    'Quartier scolaire et étudiant. Vie locale dense.',
+  'quartiers.ambalavato.walk':
+    'Lycée Andrianampoinimerina · Terrain de sport · Pharmacie',
+  'quartiers.ambalavato.transport': 'Taxi-be ligne 1',
+  'quartiers.ambalavato.distance': '12 min centre-ville',
+
+  'quartiers.mahasoabe.ambiance':
+    'Périphérie sud paisible. Tranquille, familial, écoles et paroisses.',
+  'quartiers.mahasoabe.walk':
+    'Écoles primaires · Paroisses · Petits commerces',
+  'quartiers.mahasoabe.transport': 'Taxi-be ligne 6',
+  'quartiers.mahasoabe.distance': '25 min centre-ville',
 
   // Legacy `home.*` keys kept for backward-compat / tests until the
   // landing rewrite is fully merged. Drop after T-051.

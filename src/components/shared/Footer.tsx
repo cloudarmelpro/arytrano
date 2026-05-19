@@ -24,7 +24,7 @@ export async function Footer() {
 
         <FooterColumn title={t('landing.footer.section.product')}>
           <FooterLink href="/annonces" label={t('landing.footer.link.listings')} t={t} />
-          <FooterLink href="/#neighborhoods" label={t('landing.footer.link.neighborhoods')} t={t} />
+          <FooterLink href="/quartiers" label={t('landing.footer.link.neighborhoods')} t={t} />
           <FooterLink href="/#how-it-works" label={t('landing.footer.link.howItWorks')} t={t} />
           <FooterLink href="/#faq" label={t('landing.footer.link.faq')} t={t} />
         </FooterColumn>

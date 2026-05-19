@@ -25,6 +25,7 @@ export const mg: Record<MessageKey, string> = {
 
   // Header / nav
   'header.nav.listings': 'Trano hofaina',
+  'header.nav.quartiers': 'Faritra',
   'header.signIn': 'Hiditra',
   'header.signOut': 'Hivoaka',
   'header.dashboard': 'Ny toerako',
@@ -462,6 +463,98 @@ export const mg: Record<MessageKey, string> = {
   'landing.footer.link.privacy': 'Fiarovana',
   'landing.footer.link.cookies': 'Cookies',
   'landing.footer.copyright': '© {year} AryTrano · Fianarantsoa, Madagasikara',
+
+  // ── /quartiers page ──
+  'quartiers.meta.title': 'Faritra ao Fianarantsoa',
+  'quartiers.meta.description':
+    'Fantaro ny faritra 8 ao Fianarantsoa: hatsaran-toetra, fitaterana, salan’ny vidim-panofana, filazana misy.',
+  'quartiers.eyebrow': 'Faritra',
+  'quartiers.h1': 'Ireo faritra 8 ao Fianarantsoa.',
+  'quartiers.lead':
+    'Manomboka amin’i Antarandolo manana hetsika hatrany hatrany ny haavon’i Ankidona — safidio ny faritra mifanaraka amin’ny fomba fiainanao, fa tsy ny tetibola fotsiny.',
+  'quartiers.stats.quartiers.label': 'Faritra voarakitra',
+  'quartiers.stats.listings.label': 'Filazana misy',
+  'quartiers.stats.priceRange.label': 'Eo anelanelan’ny Ar/volana',
+  'quartiers.stats.priceRange.value': '95k–420k',
+  'quartiers.map.placeholder':
+    'sary an-tsaina / Fianarantsoa · faritra 8 · placeholder',
+  'quartiers.block.dataCell.avgPrice': 'Salan’ny hofa',
+  'quartiers.block.dataCell.distance': 'Lavitra ny afovoany',
+  'quartiers.block.dataCell.listings': 'Filazana',
+  'quartiers.block.dataCell.listings.value.one': '{count} mavitrika',
+  'quartiers.block.dataCell.listings.value.other': '{count} mavitrika',
+  'quartiers.block.dataCell.avgPrice.sub': '/volana',
+  'quartiers.block.dataCell.avgPrice.noData': '—',
+  'quartiers.block.poi.walk': 'An-tongotra',
+  'quartiers.block.poi.transport': 'Fitaterana',
+  'quartiers.block.sample.label': 'Topi-maso amin’ny filazana',
+  'quartiers.block.sample.viewAll.one': 'Hijery ny filazana',
+  'quartiers.block.sample.viewAll.other': 'Hijery ireo {count}',
+  'quartiers.block.sample.empty': 'Tsy misy filazana mavitrika amin’izao.',
+  'quartiers.cta.eyebrow': 'Misalasala ve ianao ?',
+  'quartiers.cta.title': 'Tsy fantatrao izay faritra mifanaraka aminao ?',
+  'quartiers.cta.lead':
+    'Mamalia fanontaniana 4 (tetibola, lavitry ny fac, atmosfera, fitaterana) — homenay anao ny faritra 2 na 3 mifanaraka aminao. Tsy mila kaonty.',
+  'quartiers.cta.primary': 'Manaova fanontaniana (2 min)',
+  'quartiers.cta.secondary': 'Hijery ny filazana rehetra',
+
+  // 8 faritra — atmosfera, an-tongotra, fitaterana, halaviran-dalana
+  'quartiers.andrainjato.ambiance':
+    'Mavitrika nandritra ny herinandro, milamina ny faran’ny herinandro. Toerana fonenan’ny mpianatra mananontanona.',
+  'quartiers.andrainjato.walk':
+    'Fac de Sciences · École polytechnique · Tranom-boky an-tampon’oniversite',
+  'quartiers.andrainjato.transport': 'Taxi-be lalana 1 · Pousse-pousse',
+  'quartiers.andrainjato.distance': '10 mn ny afovoany',
+
+  'quartiers.antarandolo.ambiance':
+    'Fonenana, ankohonana. Milamina tokoa, madio, hazavaina tsara amin’ny alina.',
+  'quartiers.antarandolo.walk':
+    'Fiangonana katolika · Sekoly tsy miankina Sainte-Marie · Tsenakely',
+  'quartiers.antarandolo.transport': 'Taxi-be lalana 3',
+  'quartiers.antarandolo.distance': '15 mn ny afovoany',
+
+  'quartiers.tsianolondroa.ambiance':
+    'Foiben’ny tantara. Velombelona, tsena sy fivarotana an-tongotra.',
+  'quartiers.tsianolondroa.walk':
+    'Tsena ivon-toerana · Banky · Toeram-pisakafoanana · Sinema',
+  'quartiers.tsianolondroa.transport':
+    'Ny taxi-be rehetra · Gara fitaterana 10 mn',
+  'quartiers.tsianolondroa.distance': 'Afovoan-tanàna',
+
+  'quartiers.mahamanina.ambiance':
+    'Havoana sy panorama eo ambonin’ny tanàna. Milamina, lalana mideza.',
+  'quartiers.mahamanina.walk':
+    'Toerana fijerena ny tanàna · Epicerie kely an-toerana',
+  'quartiers.mahamanina.transport': 'Taxi-be lalana 4 (tsy tafiditra)',
+  'quartiers.mahamanina.distance': '20 mn ny afovoany',
+
+  'quartiers.anjoma.ambiance':
+    'Sampanan-dalan’ny fitaterana. Mahasoa amin’ny dia, indraindray mitabataba.',
+  'quartiers.anjoma.walk':
+    'Gara fitaterana · Toeram-pivarotam-pamokarana · Fivarotana · Fivarotam-panafody 24h',
+  'quartiers.anjoma.transport': 'Ny lalana rehetra · Gara fitaterana eo an-toerana',
+  'quartiers.anjoma.distance': '8 mn ny afovoany',
+
+  'quartiers.ankidona.ambiance':
+    'Havoana fonenana. Topimaso malalaka, rivotra madio.',
+  'quartiers.ankidona.walk': 'Belvédère · Fiangonana FJKM',
+  'quartiers.ankidona.transport':
+    'Taxi-be lalana 5 (mahalana) · An-tongotra no faniriana',
+  'quartiers.ankidona.distance': '18 mn ny afovoany',
+
+  'quartiers.ambalavato.ambiance':
+    'Toerana ho an’ny sekoly sy ny mpianatra. Fiainana an-tanàna mavitrika.',
+  'quartiers.ambalavato.walk':
+    'Lycée Andrianampoinimerina · Kianja fanatanjahantena · Fivarotam-panafody',
+  'quartiers.ambalavato.transport': 'Taxi-be lalana 1',
+  'quartiers.ambalavato.distance': '12 mn ny afovoany',
+
+  'quartiers.mahasoabe.ambiance':
+    'Faritra atsimo milamina. Tony, fianakaviana, sekoly sy paroasy.',
+  'quartiers.mahasoabe.walk':
+    'Sekoly ambaratonga voalohany · Paroasy · Fivarotana kely',
+  'quartiers.mahasoabe.transport': 'Taxi-be lalana 6',
+  'quartiers.mahasoabe.distance': '25 mn ny afovoany',
 
   // Home page (legacy, dropped after T-051)
   'home.metaTitle': 'Trano ho an\'ny mpianatra ao Madagasikara',
