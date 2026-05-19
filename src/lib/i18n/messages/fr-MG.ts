@@ -433,6 +433,7 @@ export const frMG = {
   'landing.hero.search.quartier.itemSubtitle': 'Fianarantsoa',
   'landing.hero.search.quartier.noResults': 'Aucun quartier ne correspond.',
   'landing.hero.search.type.groupLabel': 'Type de logement',
+  'landing.hero.search.type.noResults': 'Aucun type ne correspond.',
   'landing.hero.microStats': '{count} annonces · {verified} proprios vérif.',
 
   // Trust strip — titre + sous-titre court

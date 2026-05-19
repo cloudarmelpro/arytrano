@@ -5,14 +5,6 @@ import { useRouter } from 'next/navigation'
 import { Combobox } from '@base-ui/react/combobox'
 import { useT } from '@/lib/i18n/client'
 import { Icon, type IconName } from '@/components/shared/Icon'
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-} from '@/components/ui/select'
 
 const LISTING_TYPES = ['ROOM', 'STUDIO', 'APARTMENT', 'HOUSE'] as const
 type ListingType = (typeof LISTING_TYPES)[number]
@@ -45,6 +37,9 @@ export function LandingSearchCard({
   // when typing; reset to the matching label when an item is picked.
   const [quartierText, setQuartierText] = useState('')
   const [type, setType] = useState<ListingType | ''>('')
+  // Same dual-state pattern as Quartier: `type` holds the slug used at
+  // form submit; `typeText` is what the user sees in the input box.
+  const [typeText, setTypeText] = useState('')
   const [priceMax, setPriceMax] = useState('')
 
   const submitKey =
@@ -81,13 +76,6 @@ export function LandingSearchCard({
     })
   }
 
-  const quartierLabel = quartier
-    ? (neighborhoodItems.find((n) => n.value === quartier)?.label ?? '')
-    : ''
-  const typeLabel = type
-    ? (typeItems.find((o) => o.value === type)?.label ?? '')
-    : ''
-
   return (
     <form
       onSubmit={onSubmit}
@@ -122,7 +110,7 @@ export function LandingSearchCard({
         </label>
         <Combobox.Portal>
           <Combobox.Positioner sideOffset={6} align="start" className="z-50">
-            <Combobox.Popup className="min-w-(--anchor-width) max-h-(--available-height) overflow-y-auto rounded-lg bg-white p-1 text-foreground shadow-lg ring-1 ring-foreground/10 data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0">
+            <Combobox.Popup className="w-(--anchor-width) max-h-(--available-height) overflow-y-auto rounded-xl bg-white p-1 text-foreground shadow-lg ring-1 ring-foreground/10 data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0">
             <div className="px-3 pt-3 pb-2 text-[12px] font-semibold uppercase tracking-[0.06em] text-foreground">
               {t('landing.hero.search.quartier.groupLabel')}
             </div>
@@ -153,38 +141,60 @@ export function LandingSearchCard({
         </Combobox.Portal>
       </Combobox.Root>
 
-      <Select
-        value={type}
-        onValueChange={(v) => setType((v ?? '') as ListingType | '')}
-        disabled={pending}
+      <Combobox.Root
         items={typeItems}
+        inputValue={typeText}
+        onInputValueChange={(v) => {
+          setTypeText(v)
+          if (type) setType('')
+        }}
       >
-        <FieldTrigger
-          icon="house"
-          label={t('landing.hero.search.type.label')}
-          placeholder={t('landing.hero.search.type.placeholder')}
-          value={typeLabel}
-        />
-        <SelectContent className="min-w-[260px] bg-white p-1 text-foreground">
-          <SelectGroup className="p-0">
-            <SelectLabel className="px-3 pt-3 pb-2 text-[12px] font-semibold uppercase tracking-[0.06em] text-foreground">
+        <label className="flex min-h-16 items-center gap-3.5 rounded-xl border-[1.5px] border-white/50 px-3.5 py-3 text-left text-white transition focus-within:border-white focus-within:bg-white/[0.06] hover:border-white hover:bg-white/[0.06]">
+          <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-[9px] bg-white/15 text-white">
+            <Icon name="house" size={18} />
+          </span>
+          <span className="flex min-w-0 flex-1 flex-col gap-1">
+            <span className="text-[10.5px] font-semibold uppercase leading-none tracking-[0.1em] text-white/70">
+              {t('landing.hero.search.type.label')}
+            </span>
+            <Combobox.Input
+              placeholder={t('landing.hero.search.type.placeholder')}
+              disabled={pending}
+              className="w-full bg-transparent text-[15.5px] font-bold leading-[1.1] tracking-[-0.01em] text-white outline-none placeholder:font-medium placeholder:text-white/55 disabled:opacity-60"
+            />
+          </span>
+        </label>
+        <Combobox.Portal>
+          <Combobox.Positioner sideOffset={6} align="start" className="z-50">
+            <Combobox.Popup className="w-(--anchor-width) max-h-(--available-height) overflow-y-auto rounded-xl bg-white p-1 text-foreground shadow-lg ring-1 ring-foreground/10 data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0">
+            <div className="px-3 pt-3 pb-2 text-[12px] font-semibold uppercase tracking-[0.06em] text-foreground">
               {t('landing.hero.search.type.groupLabel')}
-            </SelectLabel>
-            {typeItems.map((o) => (
-              <SelectItem
-                key={o.value}
-                value={o.value}
-                className="cursor-pointer rounded-md px-3 py-2.5"
-              >
-                <Row
-                  icon={TYPE_ICON[o.value as ListingType]}
-                  label={o.label}
-                />
-              </SelectItem>
-            ))}
-          </SelectGroup>
-        </SelectContent>
-      </Select>
+            </div>
+            <Combobox.Empty className="px-3 py-4 text-center text-[13px] text-muted-foreground">
+              {t('landing.hero.search.type.noResults' as const)}
+            </Combobox.Empty>
+            <Combobox.List className="flex flex-col">
+              {(o: { value: ListingType; label: string }) => (
+                <Combobox.Item
+                  key={o.value}
+                  value={o}
+                  onClick={() => {
+                    setType(o.value)
+                    setTypeText(o.label)
+                  }}
+                  className="cursor-pointer rounded-md px-3 py-2.5 outline-none data-highlighted:bg-primary/10 data-highlighted:text-foreground"
+                >
+                  <Row
+                    icon={TYPE_ICON[o.value]}
+                    label={o.label}
+                  />
+                </Combobox.Item>
+              )}
+            </Combobox.List>
+            </Combobox.Popup>
+          </Combobox.Positioner>
+        </Combobox.Portal>
+      </Combobox.Root>
 
       <FieldShell icon="wallet" label={t('landing.hero.search.priceMax.label')}>
         <input
@@ -221,10 +231,10 @@ export function LandingSearchCard({
 }
 
 /**
- * The visible "field" inside the hero search bar — icon tile + small
- * uppercase label + value/placeholder. Used both as a static shell
- * (for the Budget input) and as the body of a shadcn Select trigger
- * (for Quartier / Type).
+ * Static field shell used by the Budget input. The Quartier + Type
+ * fields use the same visual but inline (their inner Combobox.Input
+ * lives directly inside the label) so the shell helper is only used
+ * for Budget here.
  */
 function FieldShell({
   icon,
@@ -247,39 +257,6 @@ function FieldShell({
         {children}
       </span>
     </label>
-  )
-}
-
-function FieldTrigger({
-  icon,
-  label,
-  placeholder,
-  value,
-}: {
-  icon: IconName
-  label: string
-  placeholder: string
-  value: string
-}) {
-  return (
-    <SelectTrigger
-      className="!h-auto min-h-16 w-full items-center !gap-3.5 rounded-xl !border-[1.5px] !border-white/50 !bg-transparent !py-3 !pr-3 !pl-3.5 text-left text-white transition hover:!border-white hover:!bg-white/[0.06] focus-visible:!border-white focus-visible:!ring-0"
-    >
-      <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-[9px] bg-white/15 text-white">
-        <Icon name={icon} size={18} />
-      </span>
-      <span className="flex min-w-0 flex-1 flex-col gap-1">
-        <span className="text-[10.5px] font-semibold uppercase leading-none tracking-[0.1em] text-white/70">
-          {label}
-        </span>
-        <span
-          className={`truncate text-[15.5px] font-bold leading-[1.1] tracking-[-0.01em] ${value ? 'text-white' : 'text-white/55 font-medium'
-            }`}
-        >
-          {value || placeholder}
-        </span>
-      </span>
-    </SelectTrigger>
   )
 }
 
