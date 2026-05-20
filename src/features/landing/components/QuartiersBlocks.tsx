@@ -92,19 +92,39 @@ function QuartierBlock({
   reverse: boolean
 }) {
   const name = locale === 'mg' ? quartier.nameMg : quartier.nameFr
+  const heroPhoto = quartier.sampleListings[0]?.photo ?? null
   return (
     <article
       id={quartier.slug}
       className="grid scroll-mt-20 items-start gap-12 lg:grid-cols-[1fr_1.2fr]"
     >
       <div
-        className={`relative overflow-hidden rounded-[20px] ${TONE_BG[tone]} aspect-[4/5] max-lg:aspect-[16/10] ${
-          reverse ? 'lg:order-2' : ''
-        }`}
+        className={`relative overflow-hidden rounded-[20px] aspect-[4/5] max-lg:aspect-[16/10] ${
+          heroPhoto ? 'bg-muted' : TONE_BG[tone]
+        } ${reverse ? 'lg:order-2' : ''}`}
       >
+        {heroPhoto ? (
+          <Image
+            src={heroPhoto.url}
+            alt={heroPhoto.altFr ?? name}
+            fill
+            sizes="(min-width: 1024px) 45vw, 100vw"
+            className="object-cover"
+            placeholder={heroPhoto.blurhash ? 'blur' : 'empty'}
+            blurDataURL={heroPhoto.blurhash ?? undefined}
+          />
+        ) : null}
+        {heroPhoto ? (
+          <div
+            aria-hidden
+            className="absolute inset-0 bg-gradient-to-t from-black/35 via-transparent to-transparent"
+          />
+        ) : null}
         <span className="absolute left-4 top-4">
           <span
-            className={`inline-flex h-6 items-center gap-1.5 rounded-full bg-white/85 px-2.5 text-[11.5px] font-semibold ${TONE_BADGE_FG[tone]}`}
+            className={`inline-flex h-6 items-center gap-1.5 rounded-full bg-white/90 px-2.5 text-[11.5px] font-semibold backdrop-blur-sm ${
+              heroPhoto ? 'text-foreground' : TONE_BADGE_FG[tone]
+            }`}
           >
             {quartier.publishedListings}{' '}
             {t(
@@ -114,9 +134,6 @@ function QuartierBlock({
               { count: quartier.publishedListings },
             ).replace(/^\d+\s*/, '')}
           </span>
-        </span>
-        <span className="absolute bottom-3 right-4 font-mono text-[11px] text-white/70">
-          {quartier.slug}.jpg
         </span>
       </div>
 

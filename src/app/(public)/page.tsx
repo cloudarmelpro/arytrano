@@ -16,6 +16,7 @@ import {
 import {
   getLandingStats,
   listNeighborhoodsWithCounts,
+  getFeaturedOwnerTestimonial,
 } from '@/features/landing/server'
 import { listPublicListings } from '@/features/listings/server'
 import { getFavoritedListingIds } from '@/features/favorites/server'
@@ -42,18 +43,26 @@ export async function generateMetadata(): Promise<Metadata> {
 const FEATURED_LIMIT = 6
 
 export default async function HomePage() {
-  const [session, locale, cities, stats, neighborhoodsRows, featured] =
-    await Promise.all([
-      auth(),
-      getLocale(),
-      listCitiesWithNeighborhoods(),
-      getLandingStats(),
-      listNeighborhoodsWithCounts(),
-      // Tap the existing public-list query — defaults to newest-first +
-      // PUBLISHED-only. We just cap at 6 for the landing's "Featured"
-      // rail; pagination is irrelevant here.
-      listPublicListings({}),
-    ])
+  const [
+    session,
+    locale,
+    cities,
+    stats,
+    neighborhoodsRows,
+    featured,
+    ownerTestimonial,
+  ] = await Promise.all([
+    auth(),
+    getLocale(),
+    listCitiesWithNeighborhoods(),
+    getLandingStats(),
+    listNeighborhoodsWithCounts(),
+    // Tap the existing public-list query — defaults to newest-first +
+    // PUBLISHED-only. We just cap at 6 for the landing's "Featured"
+    // rail; pagination is irrelevant here.
+    listPublicListings({}),
+    getFeaturedOwnerTestimonial(),
+  ])
 
   const featuredItems = featured.items.slice(0, FEATURED_LIMIT)
   const favoritedIds = await getFavoritedListingIds(
@@ -98,6 +107,7 @@ export default async function HomePage() {
           locale={locale}
           role={session?.user?.role ?? null}
           verifiedOwners={stats.verifiedOwners}
+          testimonial={ownerTestimonial}
         />
       </div>
       <div id="faq">

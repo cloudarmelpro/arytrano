@@ -583,3 +583,99 @@ model PaymentEvent {
 
   @@index([paymentId, occurredAt])
 }
+
+// Editorial testimonials shown on marketing surfaces (landing owner
+// block, future student page, etc.). Hand-curated by admin — owners
+// don't write these themselves; we collect quotes after a successful
+// rental and copy them in. Separating audience lets us show owner
+// quotes to owner-facing visitors and student quotes to student-facing
+// visitors without a runtime filter mismatch.
+model Testimonial {
+  id          String              @id @default(cuid())
+  audience    TestimonialAudience
+  body        String              @db.Text
+  authorName  String
+  // Optional secondary line under the name, e.g. "3 logements vérifiés
+  // · Andrainjato" or "Étudiante en L3 · Tsianolondroa". Free-form so
+  // the editor can craft it per quote.
+  authorMeta  String?
+  // Hand-set ordering; lower first. Allows admin to pin a hero quote.
+  sortOrder   Int                 @default(0)
+  // When null, the testimonial is a draft. Only published rows are
+  // served by the public queries — feature toggle for the admin.
+  publishedAt DateTime?
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+
+  @@index([audience, publishedAt, sortOrder])
+}
+
+enum TestimonialAudience {
+  STUDENT
+  OWNER
+}
+
+// Anonymous quiz submission. Captured on /quartiers/quiz when a
+// student completes the 6-question wizard. Email is optional — the
+// quiz shows results unconditionally; the email field exists for the
+// "receive new listings in these quartiers" opt-in at the end.
+//
+// We store the raw answer payload + the slugs of the 3 quartiers we
+// recommended so we can later audit reco quality ("did students who
+// got Andrainjato actually click through?") and segment marketing
+// ("students with budget < 200k who want a calm vibe").
+//
+// Indexed on createdAt so the admin dashboard can paginate recent
+// submissions, and on email so we can dedupe / look up by user.
+model QuizSubmission {
+  id              String   @id @default(cuid())
+  // ISO 639-1 + region of the submission ("fr-MG" or "mg"). Useful
+  // when emailing back so the message language matches.
+  locale          String
+  // Null when the user skipped the optional email step.
+  email           String?
+  // 6 raw answer values as a JSON blob — keys match the quiz schema
+  // (budget, school, housingType, vibe, mobility, priority). We
+  // intentionally store these flat rather than as separate columns so
+  // adding/removing a question is a code-only change, no migration.
+  answers         Json
+  // Slugs of the 3 quartiers we recommended, ranked best → worst.
+  // Stored at submission time so reco audit isn't affected by later
+  // changes to the scoring algorithm.
+  recommendedSlugs String[]
+  // IP hash for rate-limiting + abuse pattern detection. We never
+  // store the raw IP. Null when proxy could not derive one.
+  ipHash          String?
+  createdAt       DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([email])
+}
+
+// Anonymous WhatsApp alert subscription. Captured from the footer
+// newsletter block — visitors leave a phone number to be notified by
+// WhatsApp when new listings publish.
+//
+// v1: just stores the number. Outbound notifications are still manual
+// (admin broadcasts) — we don't want to wire WhatsApp Business API
+// before we know there's enough demand to justify the cost.
+//
+// phoneE164 is UNIQUE so a re-submission of the same number is a
+// no-op upsert (touches updatedAt), not a duplicate row. ipHash lets
+// us spot abuse without storing PII.
+model WhatsAppAlert {
+  id          String   @id @default(cuid())
+  // E.164 format ("+2613XXXXXXX"). Normalized server-side; never trust
+  // the raw input from the form.
+  phoneE164   String   @unique
+  // Submission locale — drives the language of the future broadcast.
+  locale      String
+  // Optional neighborhood filter — students can subscribe to a specific
+  // quartier. Null = "any new listing".
+  quartierSlug String?
+  ipHash      String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([quartierSlug, createdAt])
+}

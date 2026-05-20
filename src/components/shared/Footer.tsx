@@ -4,6 +4,7 @@ import { getT, type Translator } from '@/lib/i18n/translate'
 import type { MessageKey } from '@/lib/i18n/messages'
 import { LocaleSwitcher } from './LocaleSwitcher'
 import { Icon, type IconName } from './Icon'
+import { WhatsAppAlertForm } from '@/features/alerts'
 
 type Column = {
   head: MessageKey
@@ -102,31 +103,7 @@ function NewsletterBlock({ t }: { t: Translator }) {
           {t('footerV3.newsletter.lead')}
         </p>
       </div>
-      <form
-        className="flex items-stretch gap-0 rounded-xl border border-border bg-muted/40 p-1"
-        action="#"
-      >
-        <span className="inline-flex items-center gap-2 border-r border-border px-3 text-[14px] font-semibold text-foreground/80">
-          <Icon name="whatsapp" size={16} /> +261
-        </span>
-        <label htmlFor="footer-newsletter-phone" className="sr-only">
-          {t('footerV3.newsletter.phoneLabel')}
-        </label>
-        <input
-          id="footer-newsletter-phone"
-          type="tel"
-          inputMode="tel"
-          autoComplete="tel-national"
-          placeholder={t('footerV3.newsletter.phonePlaceholder')}
-          className="h-11 min-w-0 flex-1 bg-transparent px-3.5 text-[14.5px] font-medium text-foreground outline-none placeholder:text-muted-foreground"
-        />
-        <button
-          type="submit"
-          className="inline-flex h-11 items-center gap-1.5 rounded-lg bg-primary px-4 text-[13.5px] font-semibold text-primary-foreground transition hover:opacity-95"
-        >
-          {t('footerV3.newsletter.submit')} <Icon name="arrow-right" size={14} />
-        </button>
-      </form>
+      <WhatsAppAlertForm />
     </div>
   )
 }

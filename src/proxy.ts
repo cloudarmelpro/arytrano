@@ -35,7 +35,7 @@ export function proxy(request: NextRequest) {
     default-src 'self';
     script-src 'self' 'nonce-${nonce}' 'strict-dynamic'${isDev ? " 'unsafe-eval'" : ''};
     style-src 'self' 'unsafe-inline';
-    img-src 'self' https://res.cloudinary.com https://*.tile.openstreetmap.org https://lh3.googleusercontent.com https://platform-lookaside.fbsbx.com data: blob:;
+    img-src 'self' https://res.cloudinary.com https://tile.openstreetmap.org https://*.tile.openstreetmap.org https://lh3.googleusercontent.com https://platform-lookaside.fbsbx.com data: blob:;
     font-src 'self' data:;
     connect-src 'self' https://*.upstash.io https://*.cloudinary.com${isDev ? ' ws: wss:' : ''};
     frame-ancestors 'none';

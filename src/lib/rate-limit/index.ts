@@ -91,6 +91,22 @@ const transactionalEmailLimiter = makeLimiter('email-transactional', {
   window: '1 h',
 })
 
+// Quiz submission — anonymous, low-value but writes to DB. 20/h/IP is
+// generous for legitimate retries while bounding bot flooding of the
+// QuizSubmission table.
+const quizSubmitLimiter = makeLimiter('quiz-submit', {
+  requests: 20,
+  window: '1 h',
+})
+
+// WhatsApp alert subscription — anonymous, writes to DB, also surfaces
+// the user's phone number (PII). Tighter than the quiz: 5/h/IP keeps
+// a bot from harvesting a list of valid MG phone formats by spraying.
+const whatsappAlertLimiter = makeLimiter('whatsapp-alert', {
+  requests: 5,
+  window: '1 h',
+})
+
 type RateLimitResult = { success: boolean; remaining?: number; reset?: number }
 
 async function check(
@@ -154,4 +170,12 @@ export const rateLimiters = {
   /** Transactional email — 10/h per (userId, eventType). Fail-soft caller. */
   transactionalEmail: (userId: string, eventType: string) =>
     check(transactionalEmailLimiter, `${userId}:${eventType}`),
+
+  /** Quiz submission — 20/h per IP. Fails CLOSED if IP cannot be derived. */
+  quizSubmit: (ipHash: string | null) =>
+    check(quizSubmitLimiter, ipHash ?? 'noip:quiz-submit'),
+
+  /** WhatsApp alert subscription — 5/h per IP. Fails CLOSED if no IP. */
+  whatsappAlert: (ipHash: string | null) =>
+    check(whatsappAlertLimiter, ipHash ?? 'noip:whatsapp-alert'),
 }

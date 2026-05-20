@@ -21,3 +21,7 @@ export {
   type QuartiersPageData,
   type QuartierSampleListing,
 } from './queries/get-quartiers-data'
+export {
+  getFeaturedOwnerTestimonial,
+  type FeaturedTestimonial,
+} from './queries/get-featured-owner-testimonial'

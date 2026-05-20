@@ -5,7 +5,7 @@ import {
   CommentWhy,
   CommentVerif,
   CommentDont,
-  CommentMoney,
+  CommentFinalCta,
 } from '@/features/static-pages'
 import { getLocale } from '@/lib/i18n/get-locale'
 import { getT } from '@/lib/i18n/translate'
@@ -65,7 +65,7 @@ export default async function CommentCaMarchePage() {
       <CommentWhy locale={locale} />
       <CommentVerif locale={locale} />
       <CommentDont locale={locale} />
-      <CommentMoney locale={locale} />
+      <CommentFinalCta locale={locale} />
     </>
   )
 }

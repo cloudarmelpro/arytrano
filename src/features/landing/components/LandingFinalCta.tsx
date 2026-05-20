@@ -17,9 +17,9 @@ export function LandingFinalCta({ locale }: { locale: Locale }) {
           </p>
           <Link
             href="/annonces"
-            className="inline-flex h-13 items-center gap-2 rounded-xl bg-white px-6 text-[15px] font-semibold text-primary transition hover:bg-[oklch(0.97_0.012_90)]"
+            className="inline-flex h-13 items-center gap-2 rounded-xl bg-white px-6 text-[15px] font-semibold text-[oklch(0.16_0.025_281)] hover:text-[oklch(0.16_0.025_281)]/80 transition"
           >
-            {t('landing.finalCta.cta')} <Icon name="arrow-right" size={16} />
+            {t('landing.finalCta.cta')}
           </Link>
         </div>
       </div>

@@ -11,6 +11,6 @@ export {
   CommentWhy,
   CommentVerif,
   CommentDont,
-  CommentMoney,
+  CommentFinalCta,
 } from './comment/CommentStatic'
 export { ProprietairesPage } from './proprietaires/ProprietairesPage'

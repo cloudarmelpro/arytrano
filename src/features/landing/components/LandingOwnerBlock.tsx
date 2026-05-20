@@ -14,15 +14,24 @@ type OwnerStat = {
   literalN?: boolean
 }
 
+type Testimonial = {
+  body: string
+  authorName: string
+  authorMeta: string | null
+}
+
 export function LandingOwnerBlock({
   locale,
   role,
   verifiedOwners,
+  testimonial,
 }: {
   locale: Locale
   role: UserRole | null
   /** Live count from `getLandingStats()` — replaces the hardcoded "168". */
   verifiedOwners: number
+  /** Curated owner quote from DB, or `null` when nothing is published yet. */
+  testimonial: Testimonial | null
 }) {
   if (role === 'OWNER' || role === 'ADMIN') return null
   const t = getT(locale)
@@ -78,34 +87,37 @@ export function LandingOwnerBlock({
           <div className="flex flex-wrap gap-3">
             <Link
               href="/sign-up?role=OWNER"
-              className="inline-flex h-13 items-center gap-2 rounded-xl bg-primary px-6 text-[15px] font-semibold text-primary-foreground shadow-sm transition hover:opacity-95"
+              className="inline-flex h-12 items-center gap-2 rounded-xl bg-primary px-6 text-[14px] text-primary-foreground transition hover:opacity-95"
             >
               {t('landing.ownerBlock.cta')} <Icon name="arrow-right" size={16} />
             </Link>
             <Link
               href="/quartiers"
-              className="inline-flex h-13 items-center rounded-xl border border-border bg-white px-6 text-[15px] font-semibold text-foreground transition hover:bg-muted"
+              className="inline-flex h-12 items-center rounded-xl border border-border bg-white px-6 text-[14px] text-foreground transition hover:bg-muted"
             >
               {t('landing.ownerBlock.ctaSecondary')}
             </Link>
           </div>
 
-          <div className="mt-8 flex max-w-[500px] gap-3.5 rounded-2xl border border-border bg-white p-5">
-            <span
-              aria-hidden
-              className="h-10 w-10 shrink-0 rounded-full bg-[repeating-linear-gradient(135deg,oklch(0.85_0.06_277)_0_8px,oklch(0.88_0.04_277)_8px_16px)]"
-            />
-            <div>
-              <p className="m-0 text-[14.5px] font-medium leading-[1.5] text-foreground">
-                <span className="mr-1 font-bold text-primary">&ldquo;</span>
-                {t('landing.ownerBlock.quote.body')}
-                <span className="ml-1 font-bold text-primary">&rdquo;</span>
-              </p>
-              <div className="mt-1 text-[12.5px] font-medium text-muted-foreground">
-                {t('landing.ownerBlock.quote.author')}
+          {testimonial ? (
+            <div className="mt-8 flex max-w-[500px] gap-3.5 rounded-2xl border border-border bg-white p-5">
+              <span
+                aria-hidden
+                className="h-10 w-10 shrink-0 rounded-full bg-[repeating-linear-gradient(135deg,oklch(0.85_0.06_277)_0_8px,oklch(0.88_0.04_277)_8px_16px)]"
+              />
+              <div>
+                <p className="m-0 text-[14.5px] font-medium leading-[1.5] text-foreground">
+                  <span className="mr-1 font-bold text-primary">&ldquo;</span>
+                  {testimonial.body}
+                  <span className="ml-1 font-bold text-primary">&rdquo;</span>
+                </p>
+                <div className="mt-1 text-[12.5px] font-medium text-muted-foreground">
+                  {testimonial.authorName}
+                  {testimonial.authorMeta ? ` — ${testimonial.authorMeta}` : null}
+                </div>
               </div>
             </div>
-          </div>
+          ) : null}
         </div>
 
         <DashboardMock t={t} />
@@ -119,7 +131,7 @@ function DashboardMock({ t }: { t: ReturnType<typeof getT> }) {
     // Decorative owner-dashboard preview — no real controls inside.
     // `aria-hidden` + `inert` keep it out of the SR + keyboard tour.
     <div aria-hidden inert className="relative select-none">
-      <div className="absolute -top-3 right-4 z-10 flex items-center gap-2.5 rounded-xl border border-border bg-white px-3 py-2.5 shadow-md">
+      <div className="absolute -top-3 right-4 z-10 flex items-center gap-2.5 rounded-xl border border-border bg-white px-3 py-2.5 shadow-[0_1px_2px_rgba(16,18,40,.04),0_4px_12px_rgba(16,18,40,.04)]">
         <span className="h-2 w-2 shrink-0 rounded-full bg-emerald-500" />
         <div className="min-w-0">
           <div className="text-[12.5px] font-semibold text-foreground">
@@ -132,7 +144,7 @@ function DashboardMock({ t }: { t: ReturnType<typeof getT> }) {
         <Icon name="whatsapp" size={16} className="text-primary" />
       </div>
 
-      <div className="relative rounded-2xl border border-border bg-white p-6 shadow-md">
+      <div className="relative rounded-2xl border border-border bg-white p-6 shadow-[0_1px_2px_rgba(16,18,40,.03),0_8px_24px_-12px_rgba(16,18,40,.08)]">
         <span
           // Explicit "Aperçu" pill so visitors don't read the
           // 47-views / 12-contacts numbers below as their own stats.

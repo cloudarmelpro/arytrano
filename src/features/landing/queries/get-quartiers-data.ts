@@ -22,6 +22,8 @@ export type QuartierRow = {
   nameFr: string
   nameMg: string
   citySlug: string
+  lat: number
+  lng: number
   publishedListings: number
   avgPriceMGA: number | null
   sampleListings: QuartierSampleListing[]
@@ -57,6 +59,8 @@ export async function getQuartiersData(): Promise<QuartiersPageData> {
       slug: true,
       nameFr: true,
       nameMg: true,
+      lat: true,
+      lng: true,
       city: { select: { slug: true } },
     },
   })
@@ -137,6 +141,10 @@ export async function getQuartiersData(): Promise<QuartiersPageData> {
         nameFr: n.nameFr,
         nameMg: n.nameMg,
         citySlug: n.city.slug,
+        // Prisma Decimal → plain number for client serialization
+        // (pigeon-maps expects numeric lat/lng).
+        lat: Number(n.lat),
+        lng: Number(n.lng),
         publishedListings: agg?.count ?? 0,
         avgPriceMGA: agg?.avg !== undefined && agg?.avg !== null ? Math.round(agg.avg) : null,
         sampleListings: samplesByNeighborhood.get(n.id) ?? [],

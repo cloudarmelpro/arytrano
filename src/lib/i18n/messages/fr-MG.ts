@@ -10,6 +10,7 @@ export const frMG = {
   'common.appName': 'AryTrano',
   'common.home': 'Accueil',
   'common.perMonth': '/mois',
+  'common.learnMore': 'En savoir plus',
 
   // ── Legal pages (placeholder v0.5 — to be reviewed by counsel) ──
   'legal.eyebrow': 'Mentions légales',
@@ -123,6 +124,17 @@ export const frMG = {
   'footerV3.newsletter.phonePlaceholder': '34 12 345 67',
   'footerV3.newsletter.phoneLabel': 'Numéro WhatsApp Madagascar',
   'footerV3.newsletter.submit': 'M’alerter',
+  'footerV3.newsletter.submitting': 'Envoi…',
+  'footerV3.newsletter.success':
+    'C’est noté — on t’écrit dès qu’une annonce vérifiée correspond.',
+  'footerV3.newsletter.alreadySubscribed':
+    'Tu es déjà sur la liste. Tes préférences ont été mises à jour.',
+  'footerV3.newsletter.error.invalid':
+    'Numéro invalide. Format attendu : 32, 33, 34, 37, 38 ou 39 suivi de 7 chiffres.',
+  'footerV3.newsletter.error.rateLimit':
+    'Trop d’essais. Réessaie dans une heure.',
+  'footerV3.newsletter.error.unavailable':
+    'Une erreur est survenue. Réessaie dans un moment.',
   'footerV3.tagline':
     'Trouve ton logement à Fianarantsoa, sans intermédiaire. Propriétaires vérifiés, contact direct, gratuit pour les étudiants.',
   'footerV3.status.allOperational': 'Tous les services opérationnels',
@@ -639,10 +651,6 @@ export const frMG = {
   'landing.ownerBlock.stat3.n': '24-48h',
   'landing.ownerBlock.stat3.sub': 'validation',
   'landing.ownerBlock.stat4.sub': 'proprios vérifiés',
-  'landing.ownerBlock.quote.body':
-    'Mon studio loué en 4 jours. Et zéro paperasse côté AryTrano.',
-  'landing.ownerBlock.quote.author':
-    'Mme Rasoa · 3 logements vérifiés · Andrainjato',
   'landing.ownerBlock.dashboard.previewBadge': 'Aperçu',
   'landing.ownerBlock.dashboard.notif.title': 'Nouveau message WhatsApp',
   'landing.ownerBlock.dashboard.notif.sub': 'de Hery · il y a 3 min',
@@ -726,7 +734,7 @@ export const frMG = {
   'comment.studentFlow.s1.time': '2 min',
   'comment.studentFlow.s2.title': 'Tu repères les annonces vérifiées',
   'comment.studentFlow.s2.desc':
-    'Le badge vert « Vérifiée » garantit que notre équipe a contrôlé manuellement la pièce d’identité du propriétaire, le titre de propriété et l’authenticité des photos.',
+    'Le badge « Vérifiée » signifie que notre équipe a contrôlé manuellement la pièce d’identité du propriétaire et relu chaque détail de l’annonce avant publication.',
   'comment.studentFlow.s2.example':
     'Active le filtre « Vérifiées seulement » pour ne voir que les annonces validées.',
   'comment.studentFlow.s2.time': 'instantané',
@@ -734,7 +742,7 @@ export const frMG = {
   'comment.studentFlow.s3.desc':
     'Un clic sur « Contacter » ouvre WhatsApp avec un message pré-rempli incluant la référence. Tu parles direct au propriétaire.',
   'comment.studentFlow.s3.example':
-    'Délai de réponse moyen : 2h 14min. Aucun intermédiaire, aucune file d’attente.',
+    'Aucun intermédiaire, aucune file d’attente — tu écris, le propriétaire répond.',
   'comment.studentFlow.s3.time': '< 1 min',
   'comment.studentFlow.s4.title': 'Tu visites le logement',
   'comment.studentFlow.s4.desc':
@@ -751,27 +759,27 @@ export const frMG = {
 
   'comment.ownerFlow.s1.title': 'Tu crées ton compte propriétaire',
   'comment.ownerFlow.s1.desc':
-    'Email + numéro WhatsApp. Un code OTP confirme ton numéro. Tu choisis un mot de passe. C’est tout pour commencer.',
+    'Email + numéro WhatsApp + mot de passe. C’est tout pour commencer.',
   'comment.ownerFlow.s1.example':
-    'Pas de carte bancaire requise. AryTrano est et restera gratuit.',
+    'Pas de carte bancaire requise. AryTrano est gratuit en v0.5.',
   'comment.ownerFlow.s1.time': '1 min',
-  'comment.ownerFlow.s2.title': 'Tu envoies tes pièces',
+  'comment.ownerFlow.s2.title': 'Tu envoies une pièce d’identité',
   'comment.ownerFlow.s2.desc':
-    'Photo de ta CIN + acte de propriété OU facture JIRAMA récente. Stockés chiffrés sur un serveur séparé. Accessibles uniquement à notre équipe.',
+    'Photo de ta CIN ou de ton passeport, lisible. Stockée via Cloudinary et accessible uniquement à notre équipe pour la validation.',
   'comment.ownerFlow.s2.example':
-    'Si tu es copropriétaire ou héritier, on accepte avec un justificatif supplémentaire.',
-  'comment.ownerFlow.s2.time': '3 min',
+    'Ta pièce d’identité ne sera jamais affichée publiquement ni transmise à un étudiant.',
+  'comment.ownerFlow.s2.time': '2 min',
   'comment.ownerFlow.s3.title': 'Tu décris ton premier logement',
   'comment.ownerFlow.s3.desc':
-    'Type, surface, loyer, quartier, équipements, description libre. 5 photos minimum (façade, pièce principale, lit, salle de bain, cuisine).',
+    'Type, loyer, quartier, équipements, description libre. 1 photo minimum (idéalement 4-5 : façade, pièce principale, salle de bain, cuisine).',
   'comment.ownerFlow.s3.example':
     'Photos de jour, sans personnes, sans filtre. L’authenticité rassure les étudiants.',
   'comment.ownerFlow.s3.time': '5 min',
   'comment.ownerFlow.s4.title': 'Notre équipe vérifie sous 24-48h',
   'comment.ownerFlow.s4.desc':
-    'Contrôle manuel de l’identité, du titre, et reverse-image-search sur tes photos. Si tout est OK, ton annonce passe avec le badge « Vérifiée ».',
+    'Contrôle manuel de ta pièce d’identité et relecture éditoriale de ton annonce (titre, description, photos, prix). Si tout est OK, ton annonce est publiée avec le badge « Vérifiée ».',
   'comment.ownerFlow.s4.example':
-    'Délai moyen : 18h en semaine, 36h le weekend.',
+    'En général sous 48h ouvrées. On t’envoie un email dès que la validation est faite.',
   'comment.ownerFlow.s4.time': '24-48h',
   'comment.ownerFlow.s5.title': 'Tu reçois les demandes',
   'comment.ownerFlow.s5.desc':
@@ -781,51 +789,51 @@ export const frMG = {
   'comment.ownerFlow.s5.time': 'continu',
 
   'comment.why.eyebrow': 'Pourquoi AryTrano',
-  'comment.why.title': 'On a vu trop d’étudiants se faire arnaquer.',
+  'comment.why.title': 'Chercher un logement étudiant, sans louche.',
   'comment.why.p1':
-    'Faux comptes Facebook, photos volées sur Booking et Airbnb, virements vers des « propriétaires » qui disparaissent. À Fianarantsoa, on a compté 1 étudiant sur 5 arnaqué au moins une fois en cherchant un logement.',
+    'À Fianarantsoa, le marché du logement étudiant passe par WhatsApp, Facebook et le bouche-à-oreille. Plein de bonnes annonces — mais aussi des faux comptes, des photos volées sur Booking, des « propriétaires » qui disparaissent après acompte.',
   'comment.why.p2':
-    'AryTrano refuse de publier sans vérification humaine. Toujours.',
-  'comment.why.stat1.n': '1 sur 5',
-  'comment.why.stat1.label': 'étudiants arnaqués à Fianarantsoa avant AryTrano',
-  'comment.why.stat2.n': '800 000 Ar',
-  'comment.why.stat2.label': 'perte moyenne d’une arnaque au logement',
-  'comment.why.stat3.n': '0',
-  'comment.why.stat3.label': 'arnaque rapportée sur AryTrano depuis le lancement',
-  'comment.why.stat4.n': '100 %',
-  'comment.why.stat4.label': 'des propriétaires vérifiés manuellement',
+    'AryTrano part d\'une règle simple : aucune annonce n\'est publiée tant qu\'un humain de l\'équipe n\'a pas validé le propriétaire et l\'annonce.',
+  'comment.why.stat1.n': '8',
+  'comment.why.stat1.label': 'quartiers couverts à Fianarantsoa — on en ajoute progressivement',
+  'comment.why.stat2.n': '0',
+  'comment.why.stat2.label': 'commission, ni pour l’étudiant ni pour le propriétaire — gratuit en v0.5',
+  'comment.why.stat3.n': '24-48h',
+  'comment.why.stat3.label': 'délai de validation d’une nouvelle annonce par notre équipe',
+  'comment.why.stat4.n': '1 par 1',
+  'comment.why.stat4.label': 'chaque propriétaire validé manuellement avant publication',
 
-  'comment.verif.eyebrow': 'Vérification, étape par étape',
-  'comment.verif.title': 'Ce qu’on vérifie. Comment. Pourquoi.',
+  'comment.verif.eyebrow': 'Ce qu’on fait vraiment',
+  'comment.verif.title': 'Les 6 garde-fous qu’on tient aujourd’hui.',
   'comment.verif.v1.title': 'Identité du propriétaire',
   'comment.verif.v1.desc':
-    'CIN ou passeport contrôlé manuellement par notre équipe contre les bases publiques. Aucun bot, aucun algo aveugle.',
-  'comment.verif.v1.why': 'Empêche les arnaqueurs anonymes de publier.',
-  'comment.verif.v2.title': 'Titre de propriété',
+    'Pièce d’identité (CIN ou passeport) demandée à la création du compte propriétaire. Notre équipe contrôle chaque pièce avant d’autoriser la publication.',
+  'comment.verif.v1.why': 'Empêche un compte anonyme de publier une annonce.',
+  'comment.verif.v2.title': 'Annonces validées 1 par 1',
   'comment.verif.v2.desc':
-    'Acte notarié OU facture JIRAMA récente au nom du propriétaire. On accepte copropriétés et héritages (avec justif).',
+    'Aucune annonce n’apparaît automatiquement. Un humain de l’équipe relit le titre, la description, les photos et la cohérence du prix avant publication.',
   'comment.verif.v2.why':
-    'Empêche la sous-location frauduleuse et les « annonces fantômes ».',
-  'comment.verif.v3.title': 'Photos protégées',
+    'Filtre les annonces vides, les photos floues et les prix manifestement incohérents.',
+  'comment.verif.v3.title': 'Photos sans données privées',
   'comment.verif.v3.desc':
-    'EXIF strippé à l’upload + reverse-image-search Google Vision sur chaque photo. Toute correspondance trouvée ailleurs déclenche une review manuelle.',
+    'Les métadonnées des photos (GPS, modèle de téléphone, date) sont automatiquement supprimées au moment de l’upload, avant stockage.',
   'comment.verif.v3.why':
-    'Empêche le vol de photos depuis Airbnb, Booking ou Facebook Marketplace.',
-  'comment.verif.v4.title': 'Adresse confirmée',
+    'Empêche qu’une photo de l’intérieur d’un logement révèle accidentellement son adresse exacte.',
+  'comment.verif.v4.title': 'Contact révélé au clic',
   'comment.verif.v4.desc':
-    'Pour les annonces premium, visite physique ou appel vidéo géolocalisé. L’adresse exacte n’est partagée qu’après le premier contact.',
+    'Le numéro WhatsApp du propriétaire n’apparaît jamais dans le code source de la page. Il est révélé uniquement quand un étudiant clique pour le voir, et chaque clic est limité dans le temps.',
   'comment.verif.v4.why':
-    'Empêche les fausses adresses et protège la vie privée.',
-  'comment.verif.v5.title': 'Numéro WhatsApp actif',
+    'Bloque les scripts qui aspirent les numéros pour les revendre ou spammer.',
+  'comment.verif.v5.title': 'Avis vérifiés après séjour',
   'comment.verif.v5.desc':
-    'Vérification OTP à l’inscription. Le numéro doit être joignable au moins une fois par semaine.',
+    'Seul un étudiant qui a réellement contacté le propriétaire via la plateforme peut laisser un avis. Les notes sont publiques et non modifiables après publication.',
   'comment.verif.v5.why':
-    'Garantit que les étudiants ne contactent pas dans le vide.',
-  'comment.verif.v6.title': 'Avis locataires',
+    'Empêche les faux avis 5★ écrits par des amis ou des bots.',
+  'comment.verif.v6.title': 'Signalement à un clic',
   'comment.verif.v6.desc':
-    'Après séjour, les étudiants laissent un avis vérifié. Un propriétaire avec 3 avis < 3★ est retiré.',
+    'Sur chaque annonce, un bouton « Signaler » envoie le problème à notre équipe. Les signalements multiples déclenchent une review immédiate de l’annonce.',
   'comment.verif.v6.why':
-    'Filtre les propriétaires problématiques sur le long terme.',
+    'Donne aux étudiants un canal direct pour nous alerter d’un comportement suspect.',
 
   'comment.dont.eyebrow': 'Ce qu’on ne fait pas',
   'comment.dont.title': 'Pour qu’il n’y ait aucune ambiguïté.',
@@ -844,24 +852,6 @@ export const frMG = {
   'comment.dont.i6':
     'On ne vend PAS tes données — pas d’ads, pas de profilage, pas de tracking tiers.',
 
-  'comment.money.eyebrow': 'Comment AryTrano gagne de l’argent ?',
-  'comment.money.title': 'Pas avec ta poche.',
-  'comment.money.arrow1.label': 'Loyer mensuel',
-  'comment.money.arrow1.amount': '100% du montant',
-  'comment.money.arrow1.sub': 'virement direct ou mobile money',
-  'comment.money.arrow2.label': 'Commission étudiant',
-  'comment.money.arrow2.amount': '0 Ar',
-  'comment.money.arrow2.sub': 'aucun frais ni commission',
-  'comment.money.arrow3.label': 'Commission propriétaire',
-  'comment.money.arrow3.amount': '0 Ar',
-  'comment.money.arrow3.sub': 'aucun frais ni commission',
-  'comment.money.node.student': 'Étudiant',
-  'comment.money.node.owner': 'Propriétaire',
-  'comment.money.node.aryt': 'AryTrano',
-  'comment.money.tien.title': 'Alors comment on tient ?',
-  'comment.money.tien.body':
-    'Partenariats locaux : assurance habitation (Aro, Mama), services de déménagement, fournitures meublés. On reçoit une commission quand un étudiant choisit volontairement un partenaire — jamais imposé, toujours optionnel.',
-
   'comment.finalCta.student.title': 'Prêt à chercher ?',
   'comment.finalCta.student.lead':
     '64 annonces vérifiées · mises à jour quotidiennement',
@@ -878,15 +868,15 @@ export const frMG = {
   'proprietaires.hero.eyebrow': 'Pour les propriétaires',
   'proprietaires.hero.title': 'Loue plus vite. Sans frais. Sans faux locataires.',
   'proprietaires.hero.sub':
-    'Publie ton annonce en 5 minutes, reçois des demandes d’étudiants vérifiés, gère tes messages WhatsApp depuis un seul dashboard. Aucune commission, jamais.',
+    'Publie ton annonce en quelques minutes, reçois les demandes directement sur WhatsApp, garde le contact direct avec les étudiants. Aucune commission sur les loyers, jamais.',
   'proprietaires.hero.ctaPrimary': 'Publier une annonce',
-  'proprietaires.hero.ctaSecondary': 'Voir les tarifs',
-  'proprietaires.hero.stat1.n': '168',
-  'proprietaires.hero.stat1.label': 'propriétaires vérifiés',
-  'proprietaires.hero.stat2.n': '64',
-  'proprietaires.hero.stat2.label': 'annonces actives',
-  'proprietaires.hero.stat3.n': '< 24h',
-  'proprietaires.hero.stat3.label': 'délai vérif. moyen',
+  'proprietaires.hero.ctaSecondary': 'Voir l’offre',
+  'proprietaires.hero.stat1.n': '0 Ar',
+  'proprietaires.hero.stat1.label': 'commission ni frais d’inscription',
+  'proprietaires.hero.stat2.n': '24-48h',
+  'proprietaires.hero.stat2.label': 'délai de validation d’une annonce',
+  'proprietaires.hero.stat3.n': '1 par 1',
+  'proprietaires.hero.stat3.label': 'chaque propriétaire validé manuellement',
 
   'proprietaires.preview.url': 'arytrano.mg/publier',
   'proprietaires.preview.step': 'Étape 3 sur 4',
@@ -904,78 +894,72 @@ export const frMG = {
   'proprietaires.preview.next': 'Continuer',
 
   'proprietaires.steps.eyebrow': 'Comment publier',
-  'proprietaires.steps.title': '4 étapes. 5 minutes. Gratuit.',
+  'proprietaires.steps.title': '4 étapes. Quelques minutes. Gratuit.',
   'proprietaires.steps.s1.title': 'Crée ton compte',
   'proprietaires.steps.s1.desc':
-    'Email + numéro WhatsApp. C’est tout pour commencer.',
-  'proprietaires.steps.s2.title': 'Envoie tes pièces',
+    'Email + numéro WhatsApp + mot de passe. C’est tout pour commencer.',
+  'proprietaires.steps.s2.title': 'Envoie ta pièce d’identité',
   'proprietaires.steps.s2.desc':
-    'Pièce d’identité + acte ou facture du logement. Stockés chiffrés.',
+    'Photo de ta CIN ou passeport, lisible. Visible uniquement par notre équipe pour validation — jamais publique.',
   'proprietaires.steps.s3.title': 'Décris ton logement',
   'proprietaires.steps.s3.desc':
-    'Titre, prix, quartier, photos. Notre équipe valide sous 24-48h.',
+    'Titre, prix, quartier, équipements, photos. Notre équipe relit chaque détail avant publication.',
   'proprietaires.steps.s4.title': 'Reçois les demandes',
   'proprietaires.steps.s4.desc':
-    'WhatsApp pré-rempli côté étudiant. Tu réponds quand tu veux.',
+    'Quand un étudiant clique « Contacter », WhatsApp s’ouvre côté étudiant avec un message pré-rempli. Tu réponds quand tu veux.',
 
   'proprietaires.verif.eyebrow': 'Vérification',
   'proprietaires.verif.title': 'Pourquoi on vérifie chaque propriétaire ?',
   'proprietaires.verif.body':
-    'Parce que les arnaques au logement étudiant à Madagascar coûtent en moyenne 800 000 Ar aux victimes — souvent toutes leurs économies de rentrée. AryTrano refuse de publier sans vérification humaine. Toujours.',
+    'À Fianarantsoa, le marché du logement étudiant passe par WhatsApp et Facebook — sans filtre, avec son lot de faux comptes et d’annonces volées. AryTrano refuse de publier sans qu’un humain de l’équipe ait validé la personne derrière l’annonce.',
   'proprietaires.verif.i1.title': 'Pièce d’identité',
   'proprietaires.verif.i1.desc':
-    'CIN ou passeport contrôlé manuellement contre la base d’identifiants connus.',
-  'proprietaires.verif.i2.title': 'Justificatif de propriété',
+    'CIN ou passeport contrôlé manuellement par notre équipe à la création du compte.',
+  'proprietaires.verif.i2.title': 'Annonce relue 1 par 1',
   'proprietaires.verif.i2.desc':
-    'Acte de propriété OU facture JIRAMA récente au nom du propriétaire.',
-  'proprietaires.verif.i3.title': 'Photos protégées',
+    'Titre, description, prix, photos — chaque annonce est relue par un humain avant d’apparaître publiquement.',
+  'proprietaires.verif.i3.title': 'Photos sans données privées',
   'proprietaires.verif.i3.desc':
-    'EXIF strippé + reverse-image-search auto. Pas de photos volées d’autres sites.',
-  'proprietaires.verif.i4.title': 'Vérification de l’adresse',
+    'À l’upload, on supprime automatiquement les métadonnées (GPS, modèle de téléphone, date) pour ne jamais exposer l’adresse exacte.',
+  'proprietaires.verif.i4.title': 'Contact révélé au clic',
   'proprietaires.verif.i4.desc':
-    'Visite physique ou appel vidéo géolocalisé pour les annonces premium.',
-  'proprietaires.verif.card.author': 'Mme Rasoa',
-  'proprietaires.verif.card.verifiedAt': 'Vérifiée le 14 mars 2026',
+    'Ton numéro WhatsApp n’est jamais dans le code source de la page. Il est révélé uniquement quand un étudiant clique pour te contacter — anti-scraping intégré.',
+  'proprietaires.verif.card.preview': 'Aperçu',
+  'proprietaires.verif.card.author': 'Profil propriétaire',
+  'proprietaires.verif.card.verifiedAt': 'Validé par AryTrano',
   'proprietaires.verif.card.badge': 'Vérifiée',
-  'proprietaires.verif.card.row.cin': 'CIN',
+  'proprietaires.verif.card.row.cin': 'Pièce d’identité',
   'proprietaires.verif.card.row.cinV': '✓ Contrôle manuel',
-  'proprietaires.verif.card.row.acte': 'Acte de propriété',
-  'proprietaires.verif.card.row.acteV': '✓ Validé',
-  'proprietaires.verif.card.row.phone': 'Téléphone',
-  'proprietaires.verif.card.row.phoneV': '✓ +261 34 ** ** 23',
-  'proprietaires.verif.card.row.active': 'Annonces actives',
-  'proprietaires.verif.card.row.activeV': '3 logements',
-  'proprietaires.verif.card.row.response': 'Réponse moyenne',
-  'proprietaires.verif.card.row.responseV': '2h 14min',
-  'proprietaires.verif.card.row.rating': 'Note locataires',
-  'proprietaires.verif.card.row.ratingV': '★★★★★ (12 avis)',
+  'proprietaires.verif.card.row.acte': 'Annonce',
+  'proprietaires.verif.card.row.acteV': '✓ Relue 1 par 1',
+  'proprietaires.verif.card.row.phone': 'Numéro WhatsApp',
+  'proprietaires.verif.card.row.phoneV': '✓ Révélé au clic',
+  'proprietaires.verif.card.row.active': 'Photos',
+  'proprietaires.verif.card.row.activeV': '✓ Métadonnées effacées',
+  'proprietaires.verif.card.row.response': 'Avis locataires',
+  'proprietaires.verif.card.row.responseV': 'Activable après séjour',
+  'proprietaires.verif.card.row.rating': 'Signalement',
+  'proprietaires.verif.card.row.ratingV': 'À un clic, sur chaque annonce',
 
-  'proprietaires.pricing.eyebrow': 'Tarifs',
-  'proprietaires.pricing.title': 'Gratuit. À vie. Vraiment.',
+  'proprietaires.pricing.eyebrow': 'L’offre v0.5',
+  'proprietaires.pricing.title': 'Gratuit pour démarrer.',
   'proprietaires.pricing.lead':
-    'On se finance avec des partenariats locaux (assurance, déménagement), pas avec ta poche.',
-  'proprietaires.pricing.disclaimer': 'Aucune commission sur les loyers. Jamais.',
-  'proprietaires.pricing.standard.name': 'Standard',
+    'Pendant la beta, publier ton annonce sur AryTrano ne coûte rien. Aucune commission sur le loyer, aucune carte demandée.',
+  'proprietaires.pricing.disclaimer':
+    'Aucune commission sur les loyers — ni maintenant, ni jamais. Ce que l’étudiant t’envoie, c’est ce que tu touches.',
+  'proprietaires.pricing.standard.name': 'Beta v0.5',
   'proprietaires.pricing.standard.price': '0 Ar',
-  'proprietaires.pricing.standard.sub': 'Pour toujours',
-  'proprietaires.pricing.standard.f1': 'Création de compte',
-  'proprietaires.pricing.standard.f2': 'Vérification d’identité',
-  'proprietaires.pricing.standard.f3': 'Jusqu’à 5 annonces actives',
-  'proprietaires.pricing.standard.f4': 'Messages WhatsApp pré-remplis',
-  'proprietaires.pricing.standard.f5': 'Stats de vues basiques',
-  'proprietaires.pricing.standard.cta': 'Commencer (gratuit)',
-  'proprietaires.pricing.premium.name': 'Premium',
-  'proprietaires.pricing.premium.price': '0 Ar',
-  'proprietaires.pricing.premium.sub': 'Sur invitation',
-  'proprietaires.pricing.premium.badge': 'Sur invitation',
-  'proprietaires.pricing.premium.f1': 'Tout du Standard',
-  'proprietaires.pricing.premium.f2': 'Annonces illimitées',
-  'proprietaires.pricing.premium.f3': 'Badge « Vérification renforcée »',
-  'proprietaires.pricing.premium.f4': 'Mise en avant dans les résultats',
-  'proprietaires.pricing.premium.f5': 'Stats avancées + export',
-  'proprietaires.pricing.premium.f6': 'Support prioritaire WhatsApp',
-  'proprietaires.pricing.premium.cta': 'Demander une invitation',
-  'proprietaires.pricing.priceSuffix': '/ mois',
+  'proprietaires.pricing.standard.sub': 'Pendant la beta',
+  'proprietaires.pricing.standard.f1': 'Création de compte + validation manuelle',
+  'proprietaires.pricing.standard.f2': 'Annonces validées 1 par 1 par notre équipe',
+  'proprietaires.pricing.standard.f3': 'Demandes des étudiants directement sur WhatsApp',
+  'proprietaires.pricing.standard.f4': 'Photos sans métadonnées privées (anti-fuite)',
+  'proprietaires.pricing.standard.f5': 'Contact protégé contre le scraping',
+  'proprietaires.pricing.standard.cta': 'Créer mon compte propriétaire',
+  'proprietaires.pricing.roadmap.eyebrow': 'Roadmap',
+  'proprietaires.pricing.roadmap.body':
+    'Plus tard, des options payantes optionnelles arriveront : badge « Vérifié » renforcé et placement boosté de l’annonce. Toujours optionnel, jamais sur le loyer, jamais facturé à l’étudiant.',
+  'proprietaires.pricing.priceSuffix': '',
 
   'proprietaires.faq.eyebrow': 'Questions de propriétaires',
   'proprietaires.faq.title': 'On vous répond direct.',
@@ -984,10 +968,10 @@ export const frMG = {
     'En général 24-48h ouvrées. Si tu envoies tes pièces le lundi matin, ton compte est validé dans la journée du mardi.',
   'proprietaires.faq.q2.q': 'Mes pièces d’identité sont-elles sécurisées ?',
   'proprietaires.faq.q2.a':
-    'Oui. Chiffrées à l’envoi, stockées sur un serveur séparé, accessibles uniquement à notre équipe de vérification. Aucune partie tierce n’y a accès.',
+    'Oui. Tes pièces sont stockées sur Cloudinary (CDN sécurisé en HTTPS), accessibles uniquement à notre équipe de vérification. Elles ne sont jamais affichées sur ton profil public ni transmises aux étudiants.',
   'proprietaires.faq.q3.q': 'Combien d’annonces puis-je publier ?',
   'proprietaires.faq.q3.a':
-    'Jusqu’à 5 sur le plan Standard (gratuit), illimité sur le plan Premium (sur invitation, aussi gratuit).',
+    'Autant que tu veux pendant la beta v0.5 — chaque annonce passe par la validation manuelle avant publication. Si on voit des comportements problématiques (annonces dupliquées, contenus trompeurs), on peut limiter ponctuellement le compte.',
   'proprietaires.faq.q4.q': 'Comment je gère les demandes ?',
   'proprietaires.faq.q4.a':
     'Tu reçois les messages directement sur WhatsApp avec la référence de l’annonce. Tu vois aussi les stats (vues, contacts, favoris) dans ton dashboard.',
@@ -996,7 +980,7 @@ export const frMG = {
     'Tu mets ton annonce en « Loué » depuis ton dashboard. Aucune commission, aucune paperasse côté AryTrano. Tu signes ton bail librement avec l’étudiant.',
   'proprietaires.faq.q6.q': 'Et si un locataire fait défaut ?',
   'proprietaires.faq.q6.a':
-    'AryTrano ne gère pas les relations bail/paiement (c’est entre toi et le locataire). Mais on peut te recommander des partenaires locaux (assurance loyer, médiation) si besoin.',
+    'AryTrano ne gère pas les relations bail/paiement — c’est entre toi et le locataire. Si tu rencontres un problème, écris-nous : on peut t’écouter, signaler le locataire pour les futurs propriétaires, et te donner des conseils pratiques. Pas de service juridique en v0.5.',
 
   'proprietaires.finalCta.title': 'Prêt à publier ?',
   'proprietaires.finalCta.lead': '5 minutes. Aucun frais. Validation sous 24-48h.',
@@ -1014,8 +998,6 @@ export const frMG = {
   'quartiers.stats.listings.label': 'Annonces actives',
   'quartiers.stats.priceRange.label': 'Fourchette Ar/mois',
   'quartiers.stats.priceRange.value': '95k–420k',
-  'quartiers.map.placeholder':
-    'carte / Fianarantsoa · 8 quartiers · placeholder',
   'quartiers.block.dataCell.avgPrice': 'Loyer moyen',
   'quartiers.block.dataCell.distance': 'Distance centre',
   'quartiers.block.dataCell.listings': 'Annonces',
@@ -1032,9 +1014,102 @@ export const frMG = {
   'quartiers.cta.eyebrow': 'Tu hésites ?',
   'quartiers.cta.title': 'Pas sûr du quartier qui te correspond ?',
   'quartiers.cta.lead':
-    'Réponds à 4 questions (budget, distance fac, ambiance, transports) — on te recommande les 2 ou 3 quartiers qui te collent. Aucun compte requis.',
+    'Réponds à 6 questions (budget, école, type de logement, ambiance, transports, priorité) — on te recommande les 3 quartiers qui te collent. Aucun compte requis.',
   'quartiers.cta.primary': 'Faire le quiz (2 min)',
   'quartiers.cta.secondary': 'Voir toutes les annonces',
+
+  // Quiz wizard — meta + chrome
+  'quiz.meta.title': 'Quel quartier de Fianarantsoa te correspond ? · AryTrano',
+  'quiz.meta.description':
+    '6 questions, 2 minutes — on te recommande les quartiers de Fianarantsoa qui matchent ton budget, ton école et ton mode de vie.',
+  'quiz.h1': 'Quel quartier te correspond ?',
+  'quiz.lead':
+    '6 questions pour trouver les quartiers de Fianarantsoa qui matchent ta vie étudiante.',
+  'quiz.progress': 'Question {step} sur {total}',
+  'quiz.next': 'Continuer',
+  'quiz.back': 'Retour',
+  'quiz.submit': 'Voir mes quartiers',
+  'quiz.restart': 'Refaire le quiz',
+
+  // Q1 — Budget
+  'quiz.q.budget.title': 'Quel est ton budget mensuel max ?',
+  'quiz.q.budget.help': 'Loyer charges comprises.',
+  'quiz.q.budget.opt.lt150k': 'Moins de 150 000 Ar',
+  'quiz.q.budget.opt.150_250k': '150 000 – 250 000 Ar',
+  'quiz.q.budget.opt.250_400k': '250 000 – 400 000 Ar',
+  'quiz.q.budget.opt.gte400k': 'Plus de 400 000 Ar',
+
+  // Q2 — School
+  'quiz.q.school.title': 'Tu étudies où ?',
+  'quiz.q.school.help': 'On priorise les quartiers proches de ton école.',
+  'quiz.q.school.opt.university': 'Université de Fianarantsoa',
+  'quiz.q.school.opt.lycee': 'Lycée / centre-ville',
+  'quiz.q.school.opt.unsure': 'Autre · je ne sais pas encore',
+
+  // Q3 — Housing type
+  'quiz.q.housingType.title': 'Quel type de logement tu cherches ?',
+  'quiz.q.housingType.help': 'Tu pourras toujours filtrer après.',
+  'quiz.q.housingType.opt.ROOM': 'Chambre seule',
+  'quiz.q.housingType.opt.STUDIO': 'Studio',
+  'quiz.q.housingType.opt.APARTMENT': 'Appartement',
+  'quiz.q.housingType.opt.any': 'Pas de préférence',
+
+  // Q4 — Vibe
+  'quiz.q.vibe.title': 'Quelle ambiance tu préfères ?',
+  'quiz.q.vibe.help': "On match l'ambiance du quartier à la tienne.",
+  'quiz.q.vibe.opt.calm': 'Calme, je veux dormir',
+  'quiz.q.vibe.opt.lively': 'Animé, vie locale, marchés',
+  'quiz.q.vibe.opt.mixed': 'Mix : calme la nuit, vie le jour',
+
+  // Q5 — Mobility
+  'quiz.q.mobility.title': 'Comment tu te déplaces ?',
+  'quiz.q.mobility.help': 'Au quotidien — école, courses, sorties.',
+  'quiz.q.mobility.opt.walk': 'À pied uniquement',
+  'quiz.q.mobility.opt.taxibe': 'Taxi-be · pousse-pousse',
+  'quiz.q.mobility.opt.car': "J'ai un véhicule",
+
+  // Q6 — Priority
+  'quiz.q.priority.title': 'Ta priorité numéro 1 ?',
+  'quiz.q.priority.help': 'Le critère qui pèse le plus dans ton choix.',
+  'quiz.q.priority.opt.price': 'Prix le plus bas',
+  'quiz.q.priority.opt.school': 'Proximité école',
+  'quiz.q.priority.opt.calm': 'Tranquillité',
+  'quiz.q.priority.opt.social': 'Vie sociale · commerces',
+
+  // Results page
+  'quiz.results.eyebrow': 'Tes quartiers',
+  'quiz.results.title': 'Voici les 3 quartiers qui te collent',
+  'quiz.results.subtitle':
+    "On a comparé tes réponses aux profils de chaque quartier. Top match en premier.",
+  'quiz.results.topMatchLabel': 'Top match',
+  'quiz.results.whyMatches': 'Pourquoi ça matche',
+  'quiz.results.alsoConsider': "À considérer aussi",
+  'quiz.results.viewListings.one': "Voir l'annonce",
+  'quiz.results.viewListings.other': 'Voir les {count} annonces',
+  'quiz.results.viewListings.zero': "Pas encore d'annonces — sois alerté",
+  'quiz.results.emailEyebrow': 'Reste informé',
+  'quiz.results.emailTitle': 'Reçois les nouvelles annonces dans ces quartiers',
+  'quiz.results.emailLead':
+    'Un email par nouvelle annonce, jamais de spam. Tu peux te désabonner à tout moment.',
+  'quiz.results.emailPlaceholder': 'ton@email.com',
+  'quiz.results.emailSubmit': "M'inscrire",
+  'quiz.results.emailSuccess': 'C\'est noté — on t\'écrit dès qu\'une annonce sort.',
+  'quiz.results.emailError': "Une erreur est survenue. Réessaie dans un moment.",
+  'quiz.results.shareLabel': 'Partager mes résultats',
+
+  // Reason chips on result cards (machine codes → human text)
+  'quiz.reason.budget.match': 'Dans ton budget',
+  'quiz.reason.school.university.close': 'Proche de la fac',
+  'quiz.reason.school.lycee.close': 'Proche des lycées',
+  'quiz.reason.housingType.available': 'Type de logement dispo',
+  'quiz.reason.vibe.match': 'Ambiance qui te correspond',
+  'quiz.reason.mobility.walk.good': 'Tout à pied',
+  'quiz.reason.mobility.taxibe.good': 'Bien desservi en taxi-be',
+  'quiz.reason.mobility.car.good': 'Pratique en voiture',
+  'quiz.reason.priority.price.matches': 'Prix attractifs',
+  'quiz.reason.priority.school.matches': 'Quartier étudiant',
+  'quiz.reason.priority.calm.matches': 'Cadre tranquille',
+  'quiz.reason.priority.social.matches': 'Vie locale animée',
 
   // 8 quartiers — ambiance, walk, transport, distance
   'quartiers.andrainjato.ambiance':
