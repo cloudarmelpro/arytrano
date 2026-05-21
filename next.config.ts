@@ -1,4 +1,5 @@
 import type { NextConfig } from 'next'
+import { withSentryConfig } from '@sentry/nextjs'
 
 /**
  * Static security headers. The Content-Security-Policy itself is set
@@ -54,4 +55,32 @@ const nextConfig: NextConfig = {
   },
 }
 
-export default nextConfig
+// Sentry build-time integration (T-056).
+//
+// `withSentryConfig` wires up source-map upload during `next build`
+// so production stack traces show real source code instead of
+// minified gibberish. The upload requires SENTRY_AUTH_TOKEN +
+// SENTRY_ORG + SENTRY_PROJECT — if any is missing, the upload step
+// is silently skipped (dev + first deploys still build cleanly).
+//
+// The runtime SDK init happens in `src/instrumentation.ts` +
+// `sentry.client.config.ts`, not here.
+export default withSentryConfig(nextConfig, {
+  org: process.env.SENTRY_ORG,
+  project: process.env.SENTRY_PROJECT,
+  authToken: process.env.SENTRY_AUTH_TOKEN,
+
+  // Keep build logs quiet unless the upload actually fails.
+  silent: true,
+
+  // Disable Sentry's auto-wrapping of the Vercel cron API since we use
+  // our own protected /api/cron/* routes with explicit Sentry capture
+  // where needed.
+  automaticVercelMonitors: false,
+
+  // Hide source map URLs from the client bundle — keeps them
+  // server-side for Sentry but not exposed to visitors.
+  sourcemaps: {
+    deleteSourcemapsAfterUpload: true,
+  },
+})

@@ -71,6 +71,40 @@ const EnvSchema = z.object({
   // When missing, requests pass (fail-open) — a warning is logged at boot.
   UPSTASH_REDIS_REST_URL: z.string().url().optional(),
   UPSTASH_REDIS_REST_TOKEN: z.string().optional(),
+
+  // --- Health check (T-055) --------------------------------
+  // Path to the file `backup-db.sh` writes its last-success timestamp to.
+  // Read by /api/health to report backup freshness. When the file is
+  // missing (dev, first deploy), health reports `lastBackupAgeHours: null`
+  // — not an error, just unknown.
+  BACKUP_FRESHNESS_FILE: z
+    .string()
+    .default('/var/lib/arytrano/last-backup.txt'),
+
+  // --- Sentry monitoring (T-056) ---------------------------
+  // All Sentry vars are optional. When DSN is missing the SDK initializes
+  // as a no-op — no network calls, no overhead. Set in prod via
+  // /etc/arytrano/app.env to enable error tracking + tracing.
+  //
+  // NEXT_PUBLIC_SENTRY_DSN is exposed to the browser bundle (intentional —
+  // Sentry DSNs are NOT secrets, they only identify the project). Server
+  // and edge runtimes also use this same DSN.
+  NEXT_PUBLIC_SENTRY_DSN: z.string().url().optional(),
+  // SENTRY_AUTH_TOKEN is server-only — used at build time to upload
+  // source maps to Sentry for unminified stack traces. Never exposed to
+  // the client.
+  SENTRY_AUTH_TOKEN: z.string().optional(),
+  SENTRY_ORG: z.string().optional(),
+  SENTRY_PROJECT: z.string().optional(),
+  // Environment tag for grouping errors in Sentry UI (production /
+  // staging / preview). Defaults to NODE_ENV.
+  SENTRY_ENVIRONMENT: z.string().optional(),
+  // Sample rate for performance traces (0-1). Defaults to 0.1 (10%) in
+  // prod to bound monthly quota; 1.0 in dev for visibility.
+  SENTRY_TRACES_SAMPLE_RATE: z
+    .string()
+    .regex(/^(0(\.\d+)?|1(\.0+)?)$/, 'Must be a number between 0 and 1')
+    .optional(),
 })
 
 export type Env = z.infer<typeof EnvSchema>
