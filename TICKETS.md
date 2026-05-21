@@ -1170,7 +1170,7 @@ enum ListingStatus {
 
 **Effort estimé** : ~1 jour (queries + page + empty state + remove-all + i18n)
 
-**Priorité** : P1 · **Statut** : 📋 todo
+**Priorité** : P1 · **Statut** : ✅ done (2026-05-22) — l'essentiel existait déjà (`/dashboard/favoris` + query `list-user-favorites` + toggle heart). Ajout du flow « Retirer tous » : service `remove-all-favorites.ts` + Server Action avec auth guard + `RemoveAllFavoritesButton` Client Component (Dialog Base UI + toast feedback) + i18n FR/MG. Le query exclut DELETED/SUSPENDED (cleaner que le badge « Plus disponible » prévu).
 
 ---
 

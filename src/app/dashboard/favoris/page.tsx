@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { auth } from '@/features/auth'
 import { listUserFavorites } from '@/features/favorites/server'
+import { RemoveAllFavoritesButton } from '@/features/favorites/components/RemoveAllFavoritesButton'
 import { PublicListingCard } from '@/features/listings'
 import { getLocale } from '@/lib/i18n/get-locale'
 import { getT } from '@/lib/i18n/translate'
@@ -34,13 +35,16 @@ export default async function FavoritesPage({
 
   return (
     <div className="flex flex-col gap-8">
-      <header className="flex flex-col gap-1">
-        <h1 className="text-3xl font-semibold text-primary">
-          {t('favorites.page.title')}
-        </h1>
-        <p className="text-sm text-muted-foreground">
-          {t('favorites.page.lead')}
-        </p>
+      <header className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between sm:gap-6">
+        <div className="flex flex-col gap-1">
+          <h1 className="text-3xl font-semibold text-primary">
+            {t('favorites.page.title')}
+          </h1>
+          <p className="text-sm text-muted-foreground">
+            {t('favorites.page.lead')}
+          </p>
+        </div>
+        <RemoveAllFavoritesButton count={items.length} />
       </header>
 
       {items.length === 0 ? (
