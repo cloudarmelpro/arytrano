@@ -47,9 +47,15 @@ export function WhatsAppAlertForm() {
 
   // Success card replaces the form. Encourages closure — user knows
   // their submission landed without having to scan for a toast.
+  // role="status" + aria-live="polite" announces the success to screen
+  // readers since the visual form-→-success swap is invisible to them.
   if (status.type === 'success') {
     return (
-      <div className="flex items-center gap-3 rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-[14px] font-medium text-emerald-900">
+      <div
+        role="status"
+        aria-live="polite"
+        className="flex items-center gap-3 rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-[14px] font-medium text-emerald-900"
+      >
         <span
           aria-hidden
           className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-emerald-500 text-white"

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useTransition } from 'react'
-import { motion, AnimatePresence } from 'motion/react'
+import { motion, AnimatePresence, MotionConfig } from 'motion/react'
 import { Radio } from '@base-ui/react/radio'
 import { RadioGroup } from '@base-ui/react/radio-group'
 import { Button } from '@/components/ui/button'
@@ -174,6 +174,13 @@ export function QuizWizard({
   }
 
   return (
+    // Respect prefers-reduced-motion at the JS layer too — the global
+    // CSS `@media (prefers-reduced-motion: reduce)` only short-circuits
+    // CSS transitions, not Motion's RAF-driven animations. With
+    // reducedMotion="user", Motion strips translate/scale/rotate
+    // entirely when the user opts out; opacity fades stay because
+    // they're not a vestibular-motion trigger.
+    <MotionConfig reducedMotion="user">
     <div className="mx-auto w-full max-w-[640px]">
       <header className="mb-10 text-center">
         <h1 className="font-serif text-[clamp(30px,3.6vw,46px)] font-normal leading-[1.05] tracking-[-0.02em] text-foreground">
@@ -242,6 +249,7 @@ export function QuizWizard({
         </Button>
       </div>
     </div>
+    </MotionConfig>
   )
 }
 
@@ -255,14 +263,26 @@ function ProgressBar({
   label: ReturnType<typeof getT>
 }) {
   const pct = (step / total) * 100
+  const labelText = label('quiz.progress', { step, total })
   return (
     <div>
       <div className="mb-2 flex items-baseline justify-between">
-        <span className="text-[12px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
-          {label('quiz.progress', { step, total })}
+        <span
+          id="quiz-progress-label"
+          className="text-[12px] font-semibold uppercase tracking-[0.12em] text-muted-foreground"
+        >
+          {labelText}
         </span>
       </div>
-      <div className="relative h-1.5 overflow-hidden rounded-full bg-muted">
+      <div
+        role="progressbar"
+        aria-labelledby="quiz-progress-label"
+        aria-valuenow={step}
+        aria-valuemin={1}
+        aria-valuemax={total}
+        aria-valuetext={labelText}
+        className="relative h-1.5 overflow-hidden rounded-full bg-muted"
+      >
         <motion.div
           initial={false}
           animate={{ width: `${pct}%` }}

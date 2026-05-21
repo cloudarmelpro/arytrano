@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { motion, AnimatePresence } from 'motion/react'
+import { motion, AnimatePresence, MotionConfig } from 'motion/react'
 import { Icon } from '@/components/shared/Icon'
 
 type FaqItem = {
@@ -23,6 +23,7 @@ export function ProprietairesFaqAccordion({ items }: { items: FaqItem[] }) {
   const [openIndex, setOpenIndex] = useState<number | null>(null)
 
   return (
+    <MotionConfig reducedMotion="user">
     <ul className="flex flex-col gap-2">
       {items.map((it, i) => {
         const isOpen = openIndex === i
@@ -101,5 +102,6 @@ export function ProprietairesFaqAccordion({ items }: { items: FaqItem[] }) {
         )
       })}
     </ul>
+    </MotionConfig>
   )
 }

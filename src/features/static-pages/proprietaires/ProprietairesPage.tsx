@@ -4,6 +4,7 @@ import { getT, type Translator } from '@/lib/i18n/translate'
 import type { MessageKey } from '@/lib/i18n/messages'
 import { Icon } from '@/components/shared/Icon'
 import { ProprietairesFaqAccordion } from './ProprietairesFaqAccordion'
+import { PROPRIETAIRES_FAQ_ITEMS } from './faq-items'
 
 const STEPS: Array<{ n: string; title: MessageKey; desc: MessageKey }> = [
   { n: '01', title: 'proprietaires.steps.s1.title', desc: 'proprietaires.steps.s1.desc' },
@@ -27,14 +28,6 @@ const STANDARD_F: MessageKey[] = [
   'proprietaires.pricing.standard.f5',
 ]
 
-const FAQ: Array<{ q: MessageKey; a: MessageKey }> = [
-  { q: 'proprietaires.faq.q1.q', a: 'proprietaires.faq.q1.a' },
-  { q: 'proprietaires.faq.q2.q', a: 'proprietaires.faq.q2.a' },
-  { q: 'proprietaires.faq.q3.q', a: 'proprietaires.faq.q3.a' },
-  { q: 'proprietaires.faq.q4.q', a: 'proprietaires.faq.q4.a' },
-  { q: 'proprietaires.faq.q5.q', a: 'proprietaires.faq.q5.a' },
-  { q: 'proprietaires.faq.q6.q', a: 'proprietaires.faq.q6.a' },
-]
 
 export function ProprietairesPage({ locale }: { locale: Locale }) {
   const t = getT(locale)
@@ -383,7 +376,10 @@ function Faq({ t }: { t: Translator }) {
           </h2>
         </header>
         <ProprietairesFaqAccordion
-          items={FAQ.map((it) => ({ question: t(it.q), answer: t(it.a) }))}
+          items={PROPRIETAIRES_FAQ_ITEMS.map((it) => ({
+            question: t(it.q),
+            answer: t(it.a),
+          }))}
         />
       </div>
     </section>

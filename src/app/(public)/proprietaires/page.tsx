@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { ProprietairesPage } from '@/features/static-pages'
+import { PROPRIETAIRES_FAQ_ITEMS } from '@/features/static-pages/proprietaires/faq-items'
 import { getLocale } from '@/lib/i18n/get-locale'
 import { getT } from '@/lib/i18n/translate'
 import { localeAlternates } from '@/lib/seo/alternates'
@@ -22,22 +23,13 @@ export async function generateMetadata(): Promise<Metadata> {
   }
 }
 
-const FAQ_KEYS = [
-  { q: 'proprietaires.faq.q1.q', a: 'proprietaires.faq.q1.a' },
-  { q: 'proprietaires.faq.q2.q', a: 'proprietaires.faq.q2.a' },
-  { q: 'proprietaires.faq.q3.q', a: 'proprietaires.faq.q3.a' },
-  { q: 'proprietaires.faq.q4.q', a: 'proprietaires.faq.q4.a' },
-  { q: 'proprietaires.faq.q5.q', a: 'proprietaires.faq.q5.a' },
-  { q: 'proprietaires.faq.q6.q', a: 'proprietaires.faq.q6.a' },
-] as const
-
 export default async function ProprietairesRoute() {
   const locale = await getLocale()
   const t = getT(locale)
   const faqJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'FAQPage',
-    mainEntity: FAQ_KEYS.map((it) => ({
+    mainEntity: PROPRIETAIRES_FAQ_ITEMS.map((it) => ({
       '@type': 'Question',
       name: t(it.q),
       acceptedAnswer: { '@type': 'Answer', text: t(it.a) },

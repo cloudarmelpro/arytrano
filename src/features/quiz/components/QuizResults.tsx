@@ -3,7 +3,7 @@
 import { useState, useTransition } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { motion } from 'motion/react'
+import { motion, MotionConfig } from 'motion/react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Field, FieldLabel, FieldDescription, FieldError } from '@/components/ui/field'
@@ -43,6 +43,7 @@ export function QuizResults({
   const [top, ...rest] = ranked
 
   return (
+    <MotionConfig reducedMotion="user">
     <motion.div
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
@@ -91,6 +92,7 @@ export function QuizResults({
         <EmailCaptureCard submissionId={submissionId} t={t} />
       ) : null}
     </motion.div>
+    </MotionConfig>
   )
 }
 
