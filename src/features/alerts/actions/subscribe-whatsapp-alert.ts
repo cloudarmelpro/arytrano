@@ -23,6 +23,15 @@ type ActionResult =
  * v1: storage only. Outbound WhatsApp broadcasts are still manual via
  * the admin tooling; we don't want to pay for WhatsApp Business API
  * before validating demand.
+ *
+ * SUBSCRIPTION POLICY (v1): one row per phone number. Re-submitting
+ * with a different `quartierSlug` REPLACES the previous filter
+ * destructively — a user who first opts into "any quartier" and then
+ * subscribes to "andrainjato" loses the "any" subscription. This
+ * matches the schema's `phoneE164 @unique` constraint. If we ever
+ * want multi-quartier subscriptions per phone, change the constraint
+ * to `@@unique([phoneE164, quartierSlug], nulls: "not distinct")`
+ * and run a migration to split existing rows.
  */
 export async function subscribeWhatsAppAlertAction(input: {
   phone: unknown

@@ -1036,7 +1036,7 @@ export const mg: Record<MessageKey, string> = {
 
   // Quiz wizard — meta + chrome
   'quiz.meta.title':
-    'Inona no faritra mifanaraka aminao any Fianarantsoa ? · AryTrano',
+    'Inona no faritra mifanaraka aminao any Fianarantsoa ?',
   'quiz.meta.description':
     'Fanontaniana 6, 2 minitra — homenay anao ny faritra ao Fianarantsoa mifanaraka amin’ny tetibolanao, ny sekolinao ary ny fomba fiainanao.',
   'quiz.h1': 'Inona no faritra mifanaraka aminao ?',

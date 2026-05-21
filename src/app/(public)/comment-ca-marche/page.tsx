@@ -7,6 +7,7 @@ import {
   CommentDont,
   CommentFinalCta,
 } from '@/features/static-pages'
+import { env } from '@/lib/env'
 import { getLocale } from '@/lib/i18n/get-locale'
 import { getT } from '@/lib/i18n/translate'
 import { localeAlternates } from '@/lib/seo/alternates'
@@ -32,6 +33,13 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function CommentCaMarchePage() {
   const locale = await getLocale()
   const t = getT(locale)
+  // HowTo JSON-LD — Google requires each HowToStep to carry a `url`
+  // to render the rich result. Pointing every step at the page itself
+  // (no per-step anchor) is enough to satisfy the spec since the
+  // student flow lives inside a Client Component tab and has no
+  // stable fragment IDs yet.
+  const baseUrl = env.AUTH_URL.replace(/\/$/, '')
+  const stepUrl = `${baseUrl}/comment-ca-marche`
   const howToJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'HowTo',
@@ -48,6 +56,7 @@ export default async function CommentCaMarchePage() {
       position: i + 1,
       name: s.title,
       text: s.desc,
+      url: stepUrl,
     })),
   }
   return (

@@ -631,6 +631,8 @@ model QuizSubmission {
   id              String   @id @default(cuid())
   // ISO 639-1 + region of the submission ("fr-MG" or "mg"). Useful
   // when emailing back so the message language matches.
+  // TODO(audit P2): migrate to `Locale` enum (FR_MG / MG) before the
+  // table fills up — see prisma audit followup in TICKETS.
   locale          String
   // Null when the user skipped the optional email step.
   email           String?
@@ -669,6 +671,8 @@ model WhatsAppAlert {
   // the raw input from the form.
   phoneE164   String   @unique
   // Submission locale — drives the language of the future broadcast.
+  // TODO(audit P2): migrate to `Locale` enum (FR_MG / MG) before the
+  // table fills up — see prisma audit followup in TICKETS.
   locale      String
   // Optional neighborhood filter — students can subscribe to a specific
   // quartier. Null = "any new listing".

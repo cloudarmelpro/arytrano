@@ -8,7 +8,7 @@ export const revalidate = 3600 // regenerate hourly
 // would update the value on every regeneration even though the content
 // is identical, which pollutes Google's freshness signals. Bump this
 // constant manually when the static content actually changes.
-const STATIC_PAGES_LAST_MODIFIED = '2026-05-19'
+const STATIC_PAGES_LAST_MODIFIED = '2026-05-20'
 
 /**
  * Sitemap dual-language: every public URL is listed twice — once at the
@@ -51,6 +51,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'weekly',
       priority: 0.8,
       alternates: { languages: languages('/quartiers') },
+    },
+    {
+      url: `${baseUrl}/quartiers/quiz`,
+      lastModified: staticLastMod,
+      changeFrequency: 'monthly',
+      priority: 0.6,
+      alternates: { languages: languages('/quartiers/quiz') },
     },
     {
       url: `${baseUrl}/comment-ca-marche`,

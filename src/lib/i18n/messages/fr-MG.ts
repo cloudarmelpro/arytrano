@@ -1019,7 +1019,7 @@ export const frMG = {
   'quartiers.cta.secondary': 'Voir toutes les annonces',
 
   // Quiz wizard — meta + chrome
-  'quiz.meta.title': 'Quel quartier de Fianarantsoa te correspond ? · AryTrano',
+  'quiz.meta.title': 'Quel quartier de Fianarantsoa te correspond ?',
   'quiz.meta.description':
     '6 questions, 2 minutes — on te recommande les quartiers de Fianarantsoa qui matchent ton budget, ton école et ton mode de vie.',
   'quiz.h1': 'Quel quartier te correspond ?',

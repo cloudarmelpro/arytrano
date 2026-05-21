@@ -369,6 +369,21 @@ Objectif : revenus durables.
 
 ---
 
+## 🔁 Audit followups (post 2026-05-20 batch)
+
+- **AUD-001** — Migrer `QuizSubmission.locale` + `WhatsAppAlert.locale` de `String` à enum `Locale` (FR_MG / MG). À faire **avant que les tables aient du volume**. Voir `TODO(audit P2)` dans `prisma/schema.prisma`. Nécessite : (1) migration SQL qui ALTER COLUMN avec USING-cast, (2) MAJ des 2 actions pour écrire `'FR_MG'` / `'MG'` au lieu de `'fr-MG'` / `'mg'`.
+- **AUD-002** — Retirer `QuizSubmission @@index([email])` jamais utilisé par le code actuel. Le ré-ajouter quand "retrieve my submissions by email" sera implémenté.
+- **AUD-003** — Réorganiser `Testimonial @@index([audience, publishedAt, sortOrder])` → `@@index([audience, sortOrder, publishedAt(sort: Desc)])` pour matcher la query `ORDER BY sortOrder ASC, publishedAt DESC`.
+- **AUD-004** — Dédupliquer la liste FAQ `/proprietaires` : `FAQ_KEYS` dans `page.tsx` + `FAQ` dans `ProprietairesPage.tsx` sont 2 sources qui peuvent diverger. Extraire dans `features/static-pages/proprietaires/faq-items.ts`.
+- **AUD-005** — A11y : `QuizWizard` progress bar manque `role="progressbar"` + `aria-valuenow` / `aria-valuemax`.
+- **AUD-006** — A11y : ajouter `useReducedMotion()` (ou `<MotionConfig reducedMotion="user">`) dans les composants Motion (QuizWizard, QuizResults, ProprietairesFaqAccordion) — le CSS global ne kill que les CSS transitions, pas les anims JS Motion.
+- **AUD-007** — A11y : ajouter `aria-live="polite"` sur les wrappers de `WhatsAppAlertForm` (success state) + `ProprietairesFaqAccordion` (open state).
+- **AUD-008** — Pré-launch : remplacer le provider de tuiles OSM public (`tile.openstreetmap.org`) par Maptiler / Stadia / self-hosted — usage commercial sur tile.openstreetmap.org rate-limité ou bloqué.
+- **AUD-009** — Anticiper `WhatsAppAlert.confirmedAt` + `unsubscribedAt` avant de wirer le broadcast WhatsApp Business API.
+- **AUD-010** — Architecture : `QuartierRow` type est consommé par `features/quiz/components/*` (Client Components) via `import type` depuis `@/features/landing/server` (server-only barrel). Extraire le type dans `features/landing/types.ts` (client-safe) pour décourager un futur retrait du `type` keyword.
+
+---
+
 ## ❄️ Frozen / À discuter
 
 - Messagerie interne (vs WhatsApp direct) — pas sûr que ça apporte de la valeur en v0

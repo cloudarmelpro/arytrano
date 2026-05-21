@@ -2,7 +2,6 @@
 
 import { useState } from 'react'
 import { useT } from '@/lib/i18n/client'
-import { Icon } from '@/components/shared/Icon'
 import type { MessageKey } from '@/lib/i18n/messages'
 
 type Audience = 'student' | 'owner'
