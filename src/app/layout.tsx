@@ -79,7 +79,7 @@ export default async function RootLayout({
       <body className="bg-background text-foreground min-h-full flex flex-col">
         <SkipToContent />
         <LocaleProvider locale={locale}>{children}</LocaleProvider>
-        <Toaster position="bottom-right" richColors closeButton />
+        <Toaster position="bottom-right" closeButton />
         {/*
           JSON-LD scripts are DATA, not executable code. CSP `script-src`
           does not apply to `type="application/ld+json"` so no nonce is
