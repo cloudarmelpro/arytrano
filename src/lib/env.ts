@@ -105,6 +105,20 @@ const EnvSchema = z.object({
     .string()
     .regex(/^(0(\.\d+)?|1(\.0+)?)$/, 'Must be a number between 0 and 1')
     .optional(),
+
+  // --- Map tiles provider (AUD-008) ------------------------
+  // Stadia Maps API key for production tile delivery. Public — exposed
+  // to the browser via `NEXT_PUBLIC_*`. Stadia recommends restricting
+  // the key to your domains in the Stadia dashboard so it can't be
+  // copy-pasted into a third-party app.
+  //
+  // When unset, the map falls back to the public `tile.openstreetmap.org`
+  // (fine for dev; rate-limited / blocked at commercial scale).
+  NEXT_PUBLIC_STADIA_API_KEY: z.string().optional(),
+  // Stadia style id. `alidade_smooth` is a clean grey/blue palette
+  // close to the AryTrano brand. Other options: `alidade_smooth_dark`,
+  // `outdoors`, `osm_bright`, `stamen_terrain`.
+  NEXT_PUBLIC_STADIA_STYLE: z.string().default('alidade_smooth'),
 })
 
 export type Env = z.infer<typeof EnvSchema>

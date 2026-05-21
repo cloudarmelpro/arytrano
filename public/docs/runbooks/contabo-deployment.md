@@ -50,6 +50,7 @@ External dependencies (managed services) :
 - **Upstash Redis** — rate limits
 - **Sentry** — error tracking (T-056)
 - **Cloudflare R2** — backup storage (this doc)
+- **Stadia Maps** — map tiles for /quartiers (AUD-008)
 - **Gmail SMTP** ou **Resend** — emails transactionnels
 
 ---
@@ -129,7 +130,8 @@ Required env vars in `/etc/arytrano/app.env` :
 - `AUTH_SECRET=` (`openssl rand -base64 32`)
 - `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`
 - `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN`
-- `SENTRY_DSN` (T-056)
+- `NEXT_PUBLIC_SENTRY_DSN`, `SENTRY_AUTH_TOKEN`, `SENTRY_ORG`, `SENTRY_PROJECT` (T-056)
+- `NEXT_PUBLIC_STADIA_API_KEY` (AUD-008 — see § 9)
 - `GMAIL_USER`, `GMAIL_APP_PASSWORD` (or Resend API key)
 - OAuth secrets (Google, Facebook)
 
@@ -361,13 +363,76 @@ You should see one `arytrano-YYYYMMDD-HHMMSS.sql.gz` file.
 
 ---
 
-## 9. Monitoring (T-056 — separate runbook)
+## 9. Map tiles — Stadia Maps (AUD-008)
+
+The `/quartiers` page and the future `/villes/<slug>/quartiers/<slug>`
+pages (E-T11) need a real tile provider. Public `tile.openstreetmap.org`
+will rate-limit / block our commercial traffic — we use Stadia Maps
+instead (200k tile views/mo free, ~$20/mo above).
+
+### 9.1 Create the Stadia account
+
+1. https://client.stadiamaps.com/signup → free plan
+2. Create a property `arytrano-web`
+3. **Authentication > Authorized Domains** :
+   - `arytrano.mg`
+   - `www.arytrano.mg`
+   - `localhost:3000` (dev — optional, restrict to a separate key in prod)
+4. **Authentication > API Keys** → create one for production
+5. Copy the key (~30 char alnum)
+
+### 9.2 Configure the app
+
+Add to `/etc/arytrano/app.env` :
+```
+NEXT_PUBLIC_STADIA_API_KEY=<your-key>
+NEXT_PUBLIC_STADIA_STYLE=alidade_smooth
+```
+
+Other style options (cf. https://stadiamaps.com/products/map-tiles/) :
+- `alidade_smooth` — clean grey/blue, default (recommended for AryTrano)
+- `alidade_smooth_dark` — dark mode
+- `outdoors` — terrain + hiking trails
+- `osm_bright` — vibrant colors, more "Google Maps" look
+- `stamen_terrain` — artistic shaded relief
+
+Rebuild + restart :
+```bash
+docker compose -f docker-compose.prod.yml up -d
+```
+
+Verify : open `/quartiers` in the browser, the map tiles should load
+from `tiles.stadiamaps.com` (check DevTools Network).
+
+### 9.3 Monitoring usage
+
+- Dashboard : https://client.stadiamaps.com/dashboard
+- Free tier limit : 200k tile views/month
+- Estimate v0.5 beta : ~5k views/mo (50 listings × 100 visitors/mo × ~1 map view each)
+- Alert : Stadia sends email warnings at 80% / 90% / 100% of quota
+- Upgrade path : $20/mo unlocks 500k views
+
+### 9.4 Fallback
+
+If `NEXT_PUBLIC_STADIA_API_KEY` is unset, the app silently falls back
+to `tile.openstreetmap.org` apex (current dev behavior). This is fine
+for dev but **NOT for production** — OSM apex will block our traffic.
+
+If Stadia is down (rare), the map will show grey tiles. Caddy can
+serve a static fallback image but that's overkill — Stadia uptime is
+historically > 99.9%.
+
+---
+
+## 10. Monitoring (T-056 — separate runbook)
 
 See `monitoring.md` runbook for Sentry + uptime ping + alerts setup.
 
 ---
 
-## 10. Deploy a new version
+---
+
+## 11. Deploy a new version
 
 ```bash
 ssh deploy@arytrano.mg
@@ -381,7 +446,7 @@ docker compose -f docker-compose.prod.yml logs -f app
 
 ---
 
-## 11. Rollback
+## 12. Rollback
 
 ```bash
 # Identify the previous good image tag
@@ -395,7 +460,7 @@ If a migration broke things : restore from backup (see `restore-db.md`).
 
 ---
 
-## 12. Known caveats
+## 13. Known caveats
 
 - **Single-box** : if the VPS crashes, both app and DB are down. Migrate to multi-box (DB on separate VPS) once revenue justifies.
 - **No load balancing** : downtime during deploys (~5s while containers swap). Acceptable for v0.5 beta. Use a blue/green or Caddy `health_uri` for zero-downtime later.
@@ -404,7 +469,7 @@ If a migration broke things : restore from backup (see `restore-db.md`).
 
 ---
 
-## 13. Cost estimate (v0.5 beta)
+## 14. Cost estimate (v0.5 beta)
 
 | Service | Monthly cost |
 |---------|--------------|
@@ -414,6 +479,7 @@ If a migration broke things : restore from backup (see `restore-db.md`).
 | Cloudinary (free tier 25GB) | $0 |
 | Upstash Redis (free tier 10k commands/day) | $0 |
 | Sentry (free tier 5k errors/mo) | $0 |
+| Stadia Maps (free tier 200k tile views/mo) | $0 |
 | **Total** | **~€6.80/mo** |
 
 Scaling triggers :

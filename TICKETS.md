@@ -3130,7 +3130,7 @@ Objectif : un livre de contrôle exhaustif à dérouler avant d'ouvrir publiquem
 - **AUD-005** — A11y : `QuizWizard` progress bar manque `role="progressbar"` + `aria-valuenow` / `aria-valuemax`.
 - **AUD-006** — A11y : ajouter `useReducedMotion()` (ou `<MotionConfig reducedMotion="user">`) dans les composants Motion (QuizWizard, QuizResults, ProprietairesFaqAccordion) — le CSS global ne kill que les CSS transitions, pas les anims JS Motion.
 - **AUD-007** — A11y : ajouter `aria-live="polite"` sur les wrappers de `WhatsAppAlertForm` (success state) + `ProprietairesFaqAccordion` (open state).
-- **AUD-008** — Pré-launch : remplacer le provider de tuiles OSM public (`tile.openstreetmap.org`) par Maptiler / Stadia / self-hosted — usage commercial sur tile.openstreetmap.org rate-limité ou bloqué.
+- ✅ **AUD-008** — ~~Pré-launch : remplacer le provider de tuiles OSM public (`tile.openstreetmap.org`) par Maptiler / Stadia / self-hosted~~ — **Done 2026-05-22** : Stadia Maps wired in `QuartiersMapClient.tsx` (env `NEXT_PUBLIC_STADIA_API_KEY` + `STADIA_STYLE`), fallback OSM apex en dev, CSP étendu, attribution Stadia + OpenMapTiles + OSM, doc dans `runbooks/contabo-deployment.md §9`.
 - **AUD-009** — Anticiper `WhatsAppAlert.confirmedAt` + `unsubscribedAt` avant de wirer le broadcast WhatsApp Business API.
 - **AUD-010** — Architecture : `QuartierRow` type est consommé par `features/quiz/components/*` (Client Components) via `import type` depuis `@/features/landing/server` (server-only barrel). Extraire le type dans `features/landing/types.ts` (client-safe) pour décourager un futur retrait du `type` keyword.
 

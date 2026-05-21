@@ -11,6 +11,23 @@ import type { QuartierRow } from '../queries/get-quartiers-data'
 const FIANARANTSOA_CENTER: [number, number] = [-21.4554, 47.0857]
 const DEFAULT_ZOOM = 13
 
+// Tile provider (AUD-008). When the Stadia API key is set, we use
+// Stadia's commercial tile endpoint (200k views/mo free, paid above).
+// Without a key, pigeon-maps falls back to `tile.openstreetmap.org`
+// — fine for dev, rate-limited at commercial scale.
+const STADIA_API_KEY = process.env.NEXT_PUBLIC_STADIA_API_KEY
+const STADIA_STYLE = process.env.NEXT_PUBLIC_STADIA_STYLE ?? 'alidade_smooth'
+
+function stadiaTileProvider(
+  x: number,
+  y: number,
+  z: number,
+  dpr?: number,
+): string {
+  const retina = dpr && dpr >= 2 ? '@2x' : ''
+  return `https://tiles.stadiamaps.com/tiles/${STADIA_STYLE}/${z}/${x}/${y}${retina}.png?api_key=${STADIA_API_KEY}`
+}
+
 export function QuartiersMapClient({
   locale,
   quartiers,
@@ -28,19 +45,55 @@ export function QuartiersMapClient({
         minZoom={11}
         maxZoom={16}
         attributionPrefix={false}
-        // OSM ToS requires keeping the © OpenStreetMap credit visible;
-        // the "Pigeon" brand prefix is removed via attributionPrefix.
+        provider={STADIA_API_KEY ? stadiaTileProvider : undefined}
+        // Attribution ToS: Stadia requires "© Stadia Maps © OpenMapTiles
+        // © OpenStreetMap contributors" when their tiles are used. OSM
+        // alone needs just "© OpenStreetMap contributors".
         attribution={
           <span className="font-sans text-[10.5px]">
-            ©{' '}
-            <a
-              href="https://www.openstreetmap.org/copyright"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="underline"
-            >
-              OpenStreetMap
-            </a>
+            {STADIA_API_KEY ? (
+              <>
+                ©{' '}
+                <a
+                  href="https://stadiamaps.com/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline"
+                >
+                  Stadia Maps
+                </a>
+                {' '}©{' '}
+                <a
+                  href="https://openmaptiles.org/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline"
+                >
+                  OpenMapTiles
+                </a>
+                {' '}©{' '}
+                <a
+                  href="https://www.openstreetmap.org/copyright"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline"
+                >
+                  OpenStreetMap
+                </a>
+              </>
+            ) : (
+              <>
+                ©{' '}
+                <a
+                  href="https://www.openstreetmap.org/copyright"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline"
+                >
+                  OpenStreetMap
+                </a>
+              </>
+            )}
           </span>
         }
       >
