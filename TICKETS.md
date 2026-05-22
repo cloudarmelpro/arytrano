@@ -3064,20 +3064,29 @@ CREATE INDEX cohort_signup_week_idx ON cohort_signup_week (cohort_week, role);
 
 Objectif : un livre de contrôle exhaustif à dérouler avant d'ouvrir publiquement aux 50 premiers propriétaires + ~200 étudiants beta.
 
-### Tech & infra
+### Tech & infra (code-side)
 
-- [ ] **T-055** Backup DB automatique + restauration testée ✅ pré-launch P0
-- [ ] **T-056** Monitoring + alerting (Sentry / 5xx + p95 latency + cron failures) ✅ pré-launch P0
-- [ ] **AUD-008** Tuiles OSM commerciales (Maptiler / Stadia / self-host) pré-launch P0
-- [ ] Domain achat + DNS configuré (arytrano.mg)
-- [ ] Cert SSL Let's Encrypt auto-renewal
-- [ ] CDN frontal (Cloudflare ou similaire pour 3G MG)
-- [ ] Cloudinary quota check (free tier = 25 GB storage, ~50k transformations / mois)
-- [ ] Upstash Redis quota check (free tier = 10k commands/jour — pour rate limits)
-- [ ] Email Gmail SMTP relay → migrer vers Postmark / Resend / SES si > 500 emails/jour
-- [ ] Cron jobs configurés (Vercel Cron ou external) : expiration listings (T-049), digest searches (E-T09), reconciliation paiements (E-T20)
-- [ ] Performance audit Lighthouse mobile (target LCP < 2.5s on 3G fast)
-- [ ] CSP + security headers (HSTS, X-Frame-Options DENY, Referrer-Policy strict-origin-when-cross-origin)
+- [x] **T-055** Backup DB automatique + restauration testée ✅ done 2026-05-22 — scripts `scripts/backup-db.sh` + `restore-db.sh` + `check-backup-freshness.sh` + `/api/health` endpoint + runbook
+- [x] **T-056** Monitoring + alerting (Sentry / scrubber PII / error boundaries) ✅ done 2026-05-22 — `instrumentation.ts` + 3 sentry.*.config.ts + scrub-pii.ts + error.tsx + global-error.tsx + runbook
+- [x] **AUD-008** Tuiles OSM commerciales (Stadia Maps) ✅ done 2026-05-22 — env `NEXT_PUBLIC_STADIA_API_KEY` + fallback OSM apex dev + CSP étendu + runbook §9
+- [x] **CSP + security headers** ✅ déjà en place (`proxy.ts` + `next.config.ts`)
+- [x] **Runbook incident response** ✅ done — `public/docs/runbooks/incidents.md`
+
+### Tech & infra (action hors-code, à faire manuellement)
+
+- [ ] **Louer Contabo VPS S** (~€5.89/mo) + suivre `contabo-deployment.md` §1-6
+- [ ] **Domain arytrano.mg achat** + DNS A records → IP Contabo
+- [ ] **Cert SSL Let's Encrypt auto-renewal** (Caddy le fait auto si DNS pointe vers le VPS)
+- [ ] **Créer compte Cloudflare R2** (backup storage) + configurer rclone — voir `contabo-deployment.md` §8
+- [ ] **Créer compte Stadia Maps** (200k tiles/mo free) + authorized domains — voir `contabo-deployment.md` §9
+- [ ] **Créer projet Sentry** (5k errors/mo free) + DSN + auth token — voir `monitoring.md`
+- [ ] **CDN frontal Cloudflare** (free tier proxy devant le VPS — recommandé pour 3G MG)
+- [ ] **Cloudinary quota check** (free tier = 25 GB storage, ~50k transformations / mois)
+- [ ] **Upstash Redis quota check** (free tier = 10k commands/jour — pour rate limits)
+- [ ] **Email Gmail SMTP relay** → migrer vers Postmark / Resend / SES si > 500 emails/jour
+- [ ] **UptimeRobot** monitor sur `/api/health` (free tier 50 monitors)
+- [ ] **Systemd timers** : backup-db (02:00 UTC), check-backup-freshness (every 6h), prompt-review (09:00 UTC) — configs dans `contabo-deployment.md` §8.4 + §10b
+- [ ] **Performance audit Lighthouse mobile** (target LCP < 2.5s on 3G fast)
 
 ### Légal & conformité
 
