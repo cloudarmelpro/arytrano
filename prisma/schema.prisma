@@ -386,12 +386,18 @@ model ContactEvent {
   ipHash    String         // SHA-256(ip + secret), no raw IP
   uaHash    String?        // SHA-256(user agent + secret)
   createdAt DateTime       @default(now())
+  // Set when the prompt-review cron has emailed the viewer to ask
+  // for a review. Prevents the cron from re-emailing the same
+  // viewer for the same listing every day. Null = never prompted.
+  reviewPromptSentAt DateTime?
 
   listing Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
   viewer  User?   @relation(fields: [viewerId], references: [id], onDelete: SetNull)
 
   @@index([listingId, createdAt])
   @@index([listingId, viewerId])
+  // Used by the daily prompt-review cron to find candidates fast.
+  @@index([reviewPromptSentAt, createdAt])
 }
 
 enum ContactChannel {

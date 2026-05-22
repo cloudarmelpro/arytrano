@@ -430,6 +430,70 @@ See `monitoring.md` runbook for Sentry + uptime ping + alerts setup.
 
 ---
 
+## 10b. Cron jobs (T-050 review-prompt + future T-049, E-T20)
+
+Cron routes are server endpoints protected by a shared Bearer secret
+(`env.CRON_SECRET`). They must be invoked by an external scheduler.
+
+### 10b.1 Set the secret
+
+Add to `/etc/arytrano/app.env` :
+```
+CRON_SECRET=<generate: node -e "console.log(require('crypto').randomBytes(32).toString('base64url'))">
+```
+
+Restart the app : `docker compose -f docker-compose.prod.yml restart app`.
+
+### 10b.2 Systemd timer for review-prompt
+
+`/etc/systemd/system/arytrano-cron-prompt-review.service` :
+```ini
+[Unit]
+Description=AryTrano — review prompt cron
+After=network-online.target
+
+[Service]
+Type=oneshot
+EnvironmentFile=/etc/arytrano/app.env
+ExecStart=/usr/bin/curl -fsS -H "Authorization: Bearer ${CRON_SECRET}" https://arytrano.mg/api/cron/prompt-review
+User=root
+```
+
+`/etc/systemd/system/arytrano-cron-prompt-review.timer` :
+```ini
+[Unit]
+Description=Run review-prompt cron daily at 09:00 UTC (12:00 MG)
+
+[Timer]
+OnCalendar=09:00 UTC
+Persistent=true
+RandomizedDelaySec=300
+
+[Install]
+WantedBy=timers.target
+```
+
+Enable :
+```bash
+sudo systemctl daemon-reload
+sudo systemctl enable --now arytrano-cron-prompt-review.timer
+sudo systemctl list-timers | grep arytrano-cron
+```
+
+### 10b.3 Test manually
+
+```bash
+curl -H "Authorization: Bearer $CRON_SECRET" https://arytrano.mg/api/cron/prompt-review
+# { "ok": true, "candidates": N, "emailed": N, "failed": 0 }
+```
+
+### 10b.4 Adding new crons
+
+Same pattern : `/api/cron/<name>/route.ts` checks the Bearer secret +
+runs an orchestrator, with a matching systemd `.service` + `.timer`
+pair on the VPS. Future crons : T-049 listing expiration, E-T20
+GoalPay reconciliation, E-T17 subscription renewal.
+
 ---
 
 ## 11. Deploy a new version

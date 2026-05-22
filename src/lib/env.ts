@@ -119,6 +119,13 @@ const EnvSchema = z.object({
   // close to the AryTrano brand. Other options: `alidade_smooth_dark`,
   // `outdoors`, `osm_bright`, `stamen_terrain`.
   NEXT_PUBLIC_STADIA_STYLE: z.string().default('alidade_smooth'),
+
+  // --- Cron secret (T-050 + T-049 + E-T20) -----------------
+  // Shared secret expected as `Authorization: Bearer <secret>` on
+  // /api/cron/* endpoints. Without it, prod crons would be publicly
+  // triggerable. In dev (no scheduler), the routes still respond if
+  // the secret is set locally — set a random value in .env to test.
+  CRON_SECRET: requiredInProd('CRON_SECRET is required in production'),
 })
 
 export type Env = z.infer<typeof EnvSchema>

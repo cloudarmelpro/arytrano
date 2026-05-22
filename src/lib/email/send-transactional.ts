@@ -5,6 +5,7 @@ import { sendEmail } from './index'
 export type TransactionalEventType =
   | 'listing-published'
   | 'review-received'
+  | 'review-prompt'
   | 'listing-verified'
   | 'report-received'
   | 'review-replied'

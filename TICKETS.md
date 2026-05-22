@@ -275,7 +275,7 @@ C/D/E sont planifiées mais non détaillées ici.
 - i18n FR : `reviews.verifiedStay.label`, `.tooltip` ; idem MG
 - Tests : unit sur la logique de détermination (avec/sans ContactEvent antérieur, edge cases timing)
 - Backfill : skip (4 listings actuels, accept stale `false`)
-**Priorité** : P1 · **Statut** : 📋 todo
+**Priorité** : P1 · **Statut** : ✅ done (confirmé 2026-05-22) — schema `Review.verifiedStay`, calcul au submit dans `create-review.ts` via `hasPriorContactEvent`, badge UI sur `ReviewRow` avec tooltip i18n. Le flow étudiant submit existe (form inline sur la page détail listing).
 
 #### T-032 · EXIF strip explicite Cloudinary (audit M1)
 **En tant qu'**équipe sécurité
@@ -1104,7 +1104,7 @@ enum ListingStatus {
 
 **Effort estimé** : ~2.5 jours (form + star rating accessible + service + cron + email)
 
-**Priorité** : P1 · **Statut** : 📋 todo
+**Priorité** : P1 · **Statut** : ✅ done (confirmé 2026-05-22) — la boucle review était déjà en place (schema, service `create-review.ts` avec verifiedStay computation via `hasPriorContactEvent`, ReviewForm inline sur la page détail, StarRating accessible, badge sur ReviewRow). Ajout 2026-05-22 du **cron de rappel email 14j post-contact** : nouveau champ `ContactEvent.reviewPromptSentAt`, services `find-review-prompt-candidates.ts` + `send-review-prompts.ts`, email template FR+MG `review-prompt.ts`, route `/api/cron/prompt-review` Bearer-protégée, env `CRON_SECRET`, nouveau `TransactionalEventType: 'review-prompt'`.
 
 ---
 
