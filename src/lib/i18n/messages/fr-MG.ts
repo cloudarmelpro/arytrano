@@ -1599,6 +1599,18 @@ export const frMG = {
   'dashboard.reason.adminRevoked':
     'Ton accès admin a été révoqué. Contacte un autre admin si nécessaire.',
 
+  // 404 — global + scoped listing variant
+  'notFound.title': 'Cette page n\'existe pas (ou plus).',
+  'notFound.lead':
+    'Le lien est peut-être obsolète, ou la ressource a été déplacée. Reviens à l\'accueil ou parcours les annonces disponibles.',
+  'notFound.cta.home': 'Accueil',
+  'notFound.cta.listings': 'Voir les annonces',
+  'listing.notFound.title': 'Cette annonce n\'est plus en ligne.',
+  'listing.notFound.lead':
+    'Le proprio l\'a peut-être retirée ou louée. Plein d\'autres annonces t\'attendent — par quartier ou par filtres.',
+  'listing.notFound.cta.search': 'Toutes les annonces',
+  'listing.notFound.cta.quartiers': 'Explorer les quartiers',
+
   // Auth — error page details
   'authError.description.default': 'On n\'a pas pu finaliser ta connexion. Réessaie dans un instant.',
   'authError.description.configuration':

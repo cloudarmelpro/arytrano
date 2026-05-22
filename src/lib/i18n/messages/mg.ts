@@ -1620,6 +1620,18 @@ export const mg: Record<MessageKey, string> = {
   'dashboard.reason.adminRevoked':
     'Voaesotra ny zo admin-nao. Mifandraisa amin\'ny admin hafa raha ilaina.',
 
+  // 404 — global + scoped listing variant
+  'notFound.title': 'Tsy misy ity pejy ity (na tsy misy intsony).',
+  'notFound.lead':
+    'Mety efa tsy mandeha ny rohy, na nafindra ny loharanon-kevitra. Miverena amin\'ny fandraisana na jereo ny filazana misy.',
+  'notFound.cta.home': 'Fandraisana',
+  'notFound.cta.listings': 'Hijery ny filazana',
+  'listing.notFound.title': 'Tsy misy intsony ity filazana ity.',
+  'listing.notFound.lead':
+    'Mety efa nesorin\'ny tompony na nahofa. Be no filazana hafa miandry anao — araka ny faritra na ny sivana.',
+  'listing.notFound.cta.search': 'Filazana rehetra',
+  'listing.notFound.cta.quartiers': 'Hizaha ny faritra',
+
   // Auth — error page descriptions
   'authError.description.default': 'Tsy afaka namarana ny fidirana izahay. Andramo indray.',
   'authError.description.configuration':
