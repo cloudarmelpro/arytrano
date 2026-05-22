@@ -1,6 +1,7 @@
 import type { MetadataRoute } from 'next'
 import { env } from '@/lib/env'
 import { listSitemapListings } from '@/features/listings/server'
+import { listCitiesWithCounts } from '@/features/landing/server'
 
 export const revalidate = 3600 // regenerate hourly
 
@@ -21,7 +22,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = env.AUTH_URL.replace(/\/$/, '')
   const staticLastMod = new Date(STATIC_PAGES_LAST_MODIFIED)
 
-  const listings = await listSitemapListings()
+  const [listings, cities] = await Promise.all([
+    listSitemapListings(),
+    listCitiesWithCounts(),
+  ])
 
   function languages(path: string) {
     return {
@@ -45,13 +49,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.9,
       alternates: { languages: languages('/annonces') },
     },
-    {
-      url: `${baseUrl}/quartiers`,
-      lastModified: staticLastMod,
-      changeFrequency: 'weekly',
-      priority: 0.8,
-      alternates: { languages: languages('/quartiers') },
-    },
+    // /quartiers itself now 308-redirects to the default city
+    // (E-T07). Indexable URLs live at /quartiers/<citySlug> — those
+    // are added dynamically below.
     {
       url: `${baseUrl}/quartiers/quiz`,
       lastModified: staticLastMod,
@@ -83,6 +83,21 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       }),
     ),
   ]
+
+  // E-T07 multi-ville : each city gets its own /quartiers/<citySlug>
+  // page. Priority slightly lower than the (deprecated) /quartiers
+  // index since visitors typically reach these via the CitySelect
+  // on the landing or a direct search result.
+  for (const city of cities) {
+    const path = `/quartiers/${city.slug}`
+    entries.push({
+      url: `${baseUrl}${path}`,
+      lastModified: staticLastMod,
+      changeFrequency: 'weekly',
+      priority: 0.8,
+      alternates: { languages: languages(path) },
+    })
+  }
 
   for (const l of listings) {
     const path = `/${l.citySlug}/${l.neighborhoodSlug}/${l.slug}`

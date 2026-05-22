@@ -1019,6 +1019,21 @@ export const mg: Record<MessageKey, string> = {
   'quartiers.meta.title': 'Faritra ao Fianarantsoa',
   'quartiers.meta.description':
     'Fantaro ny faritra 8 ao Fianarantsoa: hatsaran-toetra, fitaterana, salan’ny vidim-panofana, filazana misy.',
+  // E-T07 multi-ville : meta variantes paramétrées par ville
+  'quartiers.cityMeta.title': 'Faritra ao {city}',
+  'quartiers.cityMeta.description':
+    'Fantaro ny faritra ho an\'ny mpianatra ao {city}: hatsaran-toetra, fitaterana, salan\'ny vidim-panofana, filazana misy.',
+  // City labels — E-T07
+  'cities.fianarantsoa.name': 'Fianarantsoa',
+  'cities.fianarantsoa.tagline': 'Renivohitra mpianatra atsimo',
+  'cities.antananarivo.name': 'Antananarivo',
+  'cities.antananarivo.tagline': 'Renivohitra + isan-jato mpianatra lehibe indrindra',
+  'cities.toamasina.name': 'Toamasina',
+  'cities.toamasina.tagline': 'Morontsiraka atsinanana, seranan-tsambo + oniversite',
+  'cities.mahajanga.name': 'Mahajanga',
+  'cities.mahajanga.tagline': 'Morontsiraka andrefana, toetrandro malefaka',
+  'cities.toliara.name': 'Toliara',
+  'cities.toliara.tagline': 'Atsimo-andrefana, oniversite + siansa an-dranomasina',
   'quartiers.eyebrow': 'Faritra',
   'quartiers.h1': 'Ireo faritra 8 ao Fianarantsoa.',
   'quartiers.lead':

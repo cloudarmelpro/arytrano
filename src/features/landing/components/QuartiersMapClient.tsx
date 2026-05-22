@@ -5,11 +5,32 @@ import { Map, Overlay } from 'pigeon-maps'
 import type { Locale } from '@/lib/i18n/config'
 import type { QuartierRow } from '../queries/get-quartiers-data'
 
-// Fianarantsoa center — v0.5 is single-city, so hardcoding the center
-// is correct. When multi-city ships, derive from props (e.g. centroid
-// of the passed quartiers) so the same component handles any city.
-const FIANARANTSOA_CENTER: [number, number] = [-21.4554, 47.0857]
+// Pre-multi-city fallback. The component now derives center from
+// the centroid of the passed quartiers so /quartiers/<anyCity>
+// works without a city-specific constant. This stays only as the
+// "no quartiers seeded yet" safety value.
+const FALLBACK_CENTER: [number, number] = [-21.4554, 47.0857] // Fianarantsoa
 const DEFAULT_ZOOM = 13
+
+/**
+ * Average lat/lng across the passed quartiers. Falls back to
+ * Fianarantsoa when the list is empty (loading state / brand-new
+ * city with no seeded quartiers yet). Math.average works for the
+ * Madagascar coordinate range — antimeridian crossing isn't a
+ * concern, the country sits within a single hemisphere.
+ */
+function centerOfQuartiers(
+  quartiers: ReadonlyArray<{ lat: number; lng: number }>,
+): [number, number] {
+  if (quartiers.length === 0) return FALLBACK_CENTER
+  let sumLat = 0
+  let sumLng = 0
+  for (const q of quartiers) {
+    sumLat += q.lat
+    sumLng += q.lng
+  }
+  return [sumLat / quartiers.length, sumLng / quartiers.length]
+}
 
 // Tile provider (AUD-008). When the Stadia API key is set, we use
 // Stadia's commercial tile endpoint (200k views/mo free, paid above).
@@ -36,11 +57,18 @@ export function QuartiersMapClient({
   quartiers: QuartierRow[]
 }) {
   const [hoveredSlug, setHoveredSlug] = useState<string | null>(null)
+  const center = centerOfQuartiers(quartiers)
 
   return (
     <div className="relative aspect-[16/7] w-full overflow-hidden rounded-[20px] border border-border bg-muted max-[720px]:aspect-[4/3]">
       <Map
-        defaultCenter={FIANARANTSOA_CENTER}
+        // `key` forces a re-mount when the center moves to a new city
+        // (lat changes by > 0.1) — pigeon-maps caches `defaultCenter`
+        // on mount and ignores re-renders, so without the key the
+        // first navigation to a different city would still center on
+        // the old one. Coarse-grained key avoids flicker on hover.
+        key={`${Math.round(center[0] * 10)}:${Math.round(center[1] * 10)}`}
+        defaultCenter={center}
         defaultZoom={DEFAULT_ZOOM}
         minZoom={11}
         maxZoom={16}

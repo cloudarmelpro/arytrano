@@ -1003,6 +1003,22 @@ export const frMG = {
   'quartiers.meta.title': 'Quartiers de Fianarantsoa',
   'quartiers.meta.description':
     'Découvre les 8 quartiers de Fianarantsoa : ambiance, transports, loyer moyen, annonces disponibles.',
+  // E-T07 multi-ville : meta variantes paramétrées par ville pour
+  // /quartiers/<citySlug>
+  'quartiers.cityMeta.title': 'Quartiers de {city}',
+  'quartiers.cityMeta.description':
+    'Découvre les quartiers étudiants de {city} : ambiance, transports, loyer moyen, annonces disponibles.',
+  // City labels — E-T07
+  'cities.fianarantsoa.name': 'Fianarantsoa',
+  'cities.fianarantsoa.tagline': 'La capitale étudiante du Sud',
+  'cities.antananarivo.name': 'Antananarivo',
+  'cities.antananarivo.tagline': 'Capitale + plus grand bassin étudiant',
+  'cities.toamasina.name': 'Toamasina',
+  'cities.toamasina.tagline': 'Côte Est, port + université',
+  'cities.mahajanga.name': 'Mahajanga',
+  'cities.mahajanga.tagline': 'Côte Ouest, climat doux',
+  'cities.toliara.name': 'Toliara',
+  'cities.toliara.tagline': 'Sud-Ouest, université + sciences marines',
   'quartiers.eyebrow': 'Quartiers',
   'quartiers.h1': 'Les 8 quartiers de Fianarantsoa.',
   'quartiers.lead':

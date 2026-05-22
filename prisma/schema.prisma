@@ -50,6 +50,13 @@ model User {
   // one place.
   contactNotificationsEnabled Boolean @default(true)
 
+  // E-T07 — multi-city v1. Captured at sign-up or first listing
+  // creation. Soft FK : SetNull on city delete so account survives
+  // even if a city is later removed (admin tooling can't drop a
+  // city with active listings; the cascade is here for migrations).
+  preferredCityId String?
+  preferredCity   City?   @relation(fields: [preferredCityId], references: [id], onDelete: SetNull)
+
   createdAt     DateTime   @default(now())
   updatedAt     DateTime   @updatedAt
 
@@ -218,8 +225,9 @@ model City {
   lng       Decimal  @db.Decimal(9, 6)
   createdAt DateTime @default(now())
 
-  neighborhoods Neighborhood[]
-  listings      Listing[]
+  neighborhoods   Neighborhood[]
+  listings        Listing[]
+  preferringUsers User[] // E-T07 inverse for User.preferredCity
 }
 
 model Neighborhood {

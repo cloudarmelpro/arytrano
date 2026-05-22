@@ -1,51 +1,15 @@
-import type { Metadata } from 'next'
-import {
-  QuartiersHero,
-  QuartiersMap,
-  QuartiersJump,
-  QuartiersBlocks,
-  QuartiersQuizCta,
-} from '@/features/landing'
-import { getQuartiersData } from '@/features/landing/server'
-import { getLocale } from '@/lib/i18n/get-locale'
-import { getT } from '@/lib/i18n/translate'
-import { localeAlternates } from '@/lib/seo/alternates'
-import { BreadcrumbJsonLd } from '@/lib/seo/breadcrumb'
+import { permanentRedirect } from 'next/navigation'
 
-export async function generateMetadata(): Promise<Metadata> {
-  const locale = await getLocale()
-  const t = getT(locale)
-  return {
-    title: t('quartiers.meta.title'),
-    description: t('quartiers.meta.description'),
-    alternates: await localeAlternates('/quartiers'),
-    openGraph: {
-      title: t('quartiers.meta.title'),
-      description: t('quartiers.meta.description'),
-      url: '/quartiers',
-      type: 'website',
-    },
-  }
-}
-
-export default async function QuartiersPage() {
-  const [locale, data] = await Promise.all([getLocale(), getQuartiersData()])
-  const t = getT(locale)
-  return (
-    <>
-      <BreadcrumbJsonLd
-        homeLabel={t('common.home')}
-        trail={[{ name: t('quartiers.meta.title'), href: '/quartiers' }]}
-      />
-      <QuartiersHero
-        locale={locale}
-        quartiersCount={data.quartiers.length}
-        totalListings={data.totalListings}
-      />
-      <QuartiersMap locale={locale} quartiers={data.quartiers} />
-      <QuartiersJump locale={locale} quartiers={data.quartiers} />
-      <QuartiersBlocks locale={locale} quartiers={data.quartiers} />
-      <QuartiersQuizCta locale={locale} />
-    </>
-  )
+/**
+ * E-T07 multi-ville : `/quartiers` is no longer a real page — every
+ * quartiers index lives under `/quartiers/<citySlug>`. We 308 to the
+ * default city (Fianarantsoa, the v0.5 launch base) so existing
+ * bookmarks + inbound links keep working.
+ *
+ * Once multi-city ships in production we can swap the default city
+ * for whichever has the most inventory, or detect the visitor's
+ * geo + redirect to the nearest seeded city.
+ */
+export default function QuartiersIndexRedirect() {
+  permanentRedirect('/quartiers/fianarantsoa')
 }

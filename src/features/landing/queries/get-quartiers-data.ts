@@ -52,8 +52,11 @@ const SAMPLES_PER_QUARTIER = 2
  *
  * Net: O(quartiers × SAMPLES_PER_QUARTIER) ≪ O(full corpus).
  */
-export async function getQuartiersData(): Promise<QuartiersPageData> {
+export async function getQuartiersData(
+  citySlug?: string,
+): Promise<QuartiersPageData> {
   const neighborhoods = await prisma.neighborhood.findMany({
+    where: citySlug ? { city: { slug: citySlug } } : undefined,
     select: {
       id: true,
       slug: true,

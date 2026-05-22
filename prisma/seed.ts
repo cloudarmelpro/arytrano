@@ -1,6 +1,7 @@
 import 'dotenv/config'
 import { PrismaClient } from '@prisma/client'
 import { PrismaPg } from '@prisma/adapter-pg'
+import { CITY_SEEDS } from './seed-helpers/cities'
 
 const connectionString = process.env.DATABASE_URL
 if (!connectionString) {
@@ -11,57 +12,57 @@ const prisma = new PrismaClient({
   adapter: new PrismaPg({ connectionString }),
 })
 
-// Fianarantsoa — coordonnées centre-ville approximatives.
-// Les quartiers (fokontany) ci-dessous sont les zones les plus pertinentes
-// pour les étudiants (proximité Université / écoles / centre).
-// NB : coordonnées à valider à terme avec source officielle.
-const FIANARANTSOA = {
-  slug: 'fianarantsoa',
-  nameFr: 'Fianarantsoa',
-  nameMg: 'Fianarantsoa',
-  lat: '-21.4554',
-  lng: '47.0857',
-}
-
-const NEIGHBORHOODS = [
-  { slug: 'andrainjato',   nameFr: 'Andrainjato',   nameMg: 'Andrainjato',   lat: '-21.4628', lng: '47.0764' },
-  { slug: 'antarandolo',   nameFr: 'Antarandolo',   nameMg: 'Antarandolo',   lat: '-21.4717', lng: '47.0728' },
-  { slug: 'tsianolondroa', nameFr: 'Tsianolondroa', nameMg: 'Tsianolondroa', lat: '-21.4504', lng: '47.0856' },
-  { slug: 'mahamanina',    nameFr: 'Mahamanina',    nameMg: 'Mahamanina',    lat: '-21.4581', lng: '47.0892' },
-  { slug: 'anjoma',        nameFr: 'Anjoma',        nameMg: 'Anjoma',        lat: '-21.4488', lng: '47.0903' },
-  { slug: 'ankidona',      nameFr: 'Ankidona',      nameMg: 'Ankidona',      lat: '-21.4395', lng: '47.0828' },
-  { slug: 'ambalavato',    nameFr: 'Ambalavato',    nameMg: 'Ambalavato',    lat: '-21.4612', lng: '47.0830' },
-  { slug: 'mahasoabe',     nameFr: 'Mahasoabe',     nameMg: 'Mahasoabe',     lat: '-21.4790', lng: '47.0801' },
-]
-
+/**
+ * Seeds the City + Neighborhood tables for the 5 launch cities :
+ *   - Fianarantsoa (v0.5 launch baseline)
+ *   - Antananarivo, Toamasina, Mahajanga, Toliara (E-T07 v1)
+ *
+ * Idempotent : upsert by `slug` on cities, by `(cityId, slug)` on
+ * neighborhoods. Re-running the seed updates lat/lng + names without
+ * touching listings, photos, or any other downstream rows.
+ *
+ * Quartier data was selected for student-relevance (proximity to
+ * universities + lycées + centre-ville rentable). Coordinates are
+ * centre-of-fokontany approximations — fine for the v1 map overlay
+ * and pin clustering, refine with a GIS source post-launch.
+ */
 async function main() {
-  console.log('Seeding Fianarantsoa…')
-
-  const city = await prisma.city.upsert({
-    where: { slug: FIANARANTSOA.slug },
-    create: FIANARANTSOA,
-    update: {
-      nameFr: FIANARANTSOA.nameFr,
-      nameMg: FIANARANTSOA.nameMg,
-      lat: FIANARANTSOA.lat,
-      lng: FIANARANTSOA.lng,
-    },
-  })
-
-  for (const n of NEIGHBORHOODS) {
-    await prisma.neighborhood.upsert({
-      where: { cityId_slug: { cityId: city.id, slug: n.slug } },
-      create: { ...n, cityId: city.id },
+  let totalNeighborhoods = 0
+  for (const seed of CITY_SEEDS) {
+    const city = await prisma.city.upsert({
+      where: { slug: seed.slug },
+      create: {
+        slug: seed.slug,
+        nameFr: seed.nameFr,
+        nameMg: seed.nameMg,
+        lat: seed.lat,
+        lng: seed.lng,
+      },
       update: {
-        nameFr: n.nameFr,
-        nameMg: n.nameMg,
-        lat: n.lat,
-        lng: n.lng,
+        nameFr: seed.nameFr,
+        nameMg: seed.nameMg,
+        lat: seed.lat,
+        lng: seed.lng,
       },
     })
+    for (const n of seed.neighborhoods) {
+      await prisma.neighborhood.upsert({
+        where: { cityId_slug: { cityId: city.id, slug: n.slug } },
+        create: { ...n, cityId: city.id },
+        update: {
+          nameFr: n.nameFr,
+          nameMg: n.nameMg,
+          lat: n.lat,
+          lng: n.lng,
+        },
+      })
+    }
+    totalNeighborhoods += seed.neighborhoods.length
+    console.log(`✅ ${seed.nameFr} + ${seed.neighborhoods.length} quartiers`)
   }
-
-  console.log(`✅ ${FIANARANTSOA.nameFr} + ${NEIGHBORHOODS.length} neighborhoods seeded`)
+  console.log(
+    `\n${CITY_SEEDS.length} cities · ${totalNeighborhoods} neighborhoods seeded`,
+  )
 }
 
 main()
