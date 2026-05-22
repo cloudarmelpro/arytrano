@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react'
 import { useFormStatus } from 'react-dom'
+import { useSearchParams } from 'next/navigation'
 import { useT } from '@/lib/i18n/client'
 import { signInWithProvider } from '../actions/oauth-sign-in'
 import type { OAuthProvider } from '../schemas'
@@ -74,8 +75,11 @@ export function OAuthButton({
   /** Reports own pending state up so the parent can lock siblings. */
   onPendingChange?: (pending: boolean) => void
 }) {
+  const searchParams = useSearchParams()
+  const returnTo = searchParams.get('returnTo') ?? undefined
+
   async function action() {
-    await signInWithProvider(provider, intendedRole)
+    await signInWithProvider(provider, intendedRole, returnTo)
   }
   return (
     <form action={action} className="w-full">

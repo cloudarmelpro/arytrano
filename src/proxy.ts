@@ -3,14 +3,23 @@ import { NextRequest, NextResponse } from 'next/server'
 /**
  * Next.js 16 — Proxy (formerly middleware.ts).
  *
- * Two responsibilities:
+ * Three responsibilities:
  *
- *   1. **CSP nonce**: generate a per-request nonce, inject it into the
+ *   1. **Route protection (fast path)**: before the route handler even
+ *      runs, check the JWT cookie presence and redirect unauthenticated
+ *      requests on protected paths to /sign-in (with `?returnTo=`),
+ *      and signed-in requests on auth-only pages to /dashboard. This
+ *      kills the "URL flashes through /dashboard before redirect" UX
+ *      bug — at the middleware layer the redirect is a HTTP 307 issued
+ *      before any HTML hits the browser. The layout guards stay as
+ *      defense-in-depth (cookie present but expired or user banned).
+ *
+ *   2. **CSP nonce**: generate a per-request nonce, inject it into the
  *      `Content-Security-Policy` header (so we can drop `'unsafe-inline'`
  *      from `script-src`) and into a request header so Server Components
  *      can stamp it on their own inline scripts.
  *
- *   2. **`/mg/` locale prefix**: when the URL begins with `/mg`, set
+ *   3. **`/mg/` locale prefix**: when the URL begins with `/mg`, set
  *      `x-locale=mg`, refresh the locale cookie, and REWRITE the request
  *      to the path-without-prefix. Pages remain unaware of the prefix —
  *      `getLocale()` reads the header and the cookie keeps subsequent
@@ -19,9 +28,79 @@ import { NextRequest, NextResponse } from 'next/server'
  * Nonces FORCE dynamic rendering on matched routes. AryTrano's pages are
  * already dynamic (DB reads on every render), so we lose nothing here.
  */
+
+/** Paths that require an active session — middleware bounces anon visitors. */
+const PROTECTED_PREFIXES = ['/dashboard', '/admin']
+
+/**
+ * Paths only useful to anonymous visitors — middleware bounces signed-in
+ * users back to /dashboard. /reset-password, /verify-email, /auth-error
+ * are deliberately omitted because token-gated / recovery flows must
+ * stay reachable even when signed in (e.g. accepting a verification
+ * link from a different account, or surfacing OAuth errors).
+ */
+const AUTH_ONLY_PATHS = ['/sign-in', '/sign-up', '/forgot-password']
+
+/**
+ * Detect Auth.js session cookie presence without parsing the JWT. Fast
+ * (no crypto, no DB) — the layout's `auth()` does the real validation.
+ *
+ * Auth.js v5 cookie name is `authjs.session-token` over HTTP and
+ * `__Secure-authjs.session-token` over HTTPS. Large JWTs are also split
+ * into `.0`, `.1` chunks, so we match by `startsWith`.
+ */
+function hasSessionCookie(request: NextRequest): boolean {
+  for (const cookie of request.cookies.getAll()) {
+    if (
+      cookie.name === 'authjs.session-token' ||
+      cookie.name === '__Secure-authjs.session-token' ||
+      cookie.name.startsWith('authjs.session-token.') ||
+      cookie.name.startsWith('__Secure-authjs.session-token.')
+    ) {
+      // Empty value = stale cookie, not a real session.
+      if (cookie.value && cookie.value.length > 0) return true
+    }
+  }
+  return false
+}
+
+function isProtectedPath(pathname: string): boolean {
+  return PROTECTED_PREFIXES.some(
+    (p) => pathname === p || pathname.startsWith(`${p}/`),
+  )
+}
+
+function isAuthOnlyPath(pathname: string): boolean {
+  return AUTH_ONLY_PATHS.some(
+    (p) => pathname === p || pathname.startsWith(`${p}/`),
+  )
+}
+
 export function proxy(request: NextRequest) {
-  // ─── 1. Locale prefix detection ────────────────────────────────────
   const { pathname } = request.nextUrl
+
+  // ─── 0. Route protection — fast cookie-presence check ─────────────
+  // The /mg/* locale prefix is stripped for the auth check so that
+  // /mg/dashboard maps to the same policy as /dashboard. We keep the
+  // original URL in the redirect so the user lands back on the right
+  // locale variant after signing in.
+  const unprefixedPath = pathname.startsWith('/mg/')
+    ? pathname.slice('/mg'.length)
+    : pathname === '/mg'
+      ? '/'
+      : pathname
+  const hasSession = hasSessionCookie(request)
+
+  if (isProtectedPath(unprefixedPath) && !hasSession) {
+    const signInUrl = new URL('/sign-in', request.url)
+    signInUrl.searchParams.set('returnTo', pathname + request.nextUrl.search)
+    return NextResponse.redirect(signInUrl)
+  }
+  if (isAuthOnlyPath(unprefixedPath) && hasSession) {
+    return NextResponse.redirect(new URL('/dashboard', request.url))
+  }
+
+  // ─── 1. Locale prefix detection ────────────────────────────────────
   const isMgPath = pathname === '/mg' || pathname.startsWith('/mg/')
   const locale = isMgPath ? 'mg' : 'fr-MG'
 

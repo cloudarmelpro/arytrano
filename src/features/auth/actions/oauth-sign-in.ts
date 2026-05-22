@@ -5,6 +5,7 @@ import { z } from 'zod'
 import { env } from '@/lib/env'
 import { signIn } from '../auth'
 import { SIGNUP_ROLE_COOKIE_NAME } from '../constants'
+import { sanitizeReturnTo } from '../lib/safe-return-to'
 import { oauthProviderSchema, type OAuthProvider } from '../schemas'
 
 /**
@@ -46,10 +47,12 @@ async function assertSameOrigin() {
 export async function signInWithProvider(
   provider: OAuthProvider,
   intendedRole?: 'STUDENT' | 'OWNER',
+  returnTo?: string,
 ) {
   await assertSameOrigin()
   const parsedProvider = oauthProviderSchema.parse(provider)
   const parsedRole = intendedRoleSchema.parse(intendedRole)
+  const safeReturnTo = sanitizeReturnTo(returnTo) ?? '/dashboard'
 
   if (parsedRole) {
     const c = await cookies()
@@ -64,5 +67,5 @@ export async function signInWithProvider(
     })
   }
 
-  await signIn(parsedProvider, { redirectTo: '/' })
+  await signIn(parsedProvider, { redirectTo: safeReturnTo })
 }

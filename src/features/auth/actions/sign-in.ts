@@ -7,6 +7,7 @@ import { prisma } from '@/lib/db'
 import { verifyPassword } from '@/lib/auth/password'
 import { signIn } from '../auth'
 import { loginSchema } from '../schemas'
+import { sanitizeReturnTo } from '../lib/safe-return-to'
 
 type SignInActionState = {
   ok: boolean
@@ -88,12 +89,18 @@ export async function signInAction(
     return { ok: false, needTotp: true }
   }
 
+  // Honor `returnTo` from the URL when middleware bounced an
+  // unauthenticated user here. sanitizeReturnTo blocks open-redirect
+  // shenanigans (foreign hosts, protocol-relative URLs, etc.). Default
+  // is /dashboard so most sign-ins still land on something useful.
+  const returnTo = sanitizeReturnTo(formData.get('returnTo')?.toString()) ?? '/dashboard'
+
   try {
     await signIn('credentials', {
       email: input.email,
       password: input.password,
       totpCode: input.totpCode ?? '',
-      redirectTo: '/',
+      redirectTo: returnTo,
     })
   } catch (err) {
     if (err instanceof AuthError) {

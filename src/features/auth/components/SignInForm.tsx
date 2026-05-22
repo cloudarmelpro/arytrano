@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useTransition } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { Controller, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { toast } from 'sonner'
@@ -27,6 +27,11 @@ export function SignInForm({
 } = {}) {
   const t = useT()
   const router = useRouter()
+  const searchParams = useSearchParams()
+  // Carried through from middleware-issued redirects (eg. clicked
+  // /dashboard while signed out). Server Action sanitizes against
+  // open-redirect attacks before honoring it.
+  const returnTo = searchParams.get('returnTo') ?? ''
   const [pending, startTransition] = useTransition()
   const [showPassword, setShowPassword] = useState(false)
   const [twofaPrompt, setTwofaPrompt] = useState(false)
@@ -48,6 +53,7 @@ export function SignInForm({
       formData.append('email', values.email)
       formData.append('password', values.password)
       if (code) formData.append('totpCode', code)
+      if (returnTo) formData.append('returnTo', returnTo)
       const result = await signInAction({ ok: false }, formData)
       if (result.ok) return // redirect handled by Server Action
 
