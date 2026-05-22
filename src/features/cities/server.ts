@@ -6,3 +6,7 @@ export {
   getCityLandingData,
   type CityLandingData,
 } from './queries/get-city-landing-data'
+export {
+  getNeighborhoodLandingData,
+  type NeighborhoodLandingData,
+} from './queries/get-neighborhood-landing-data'

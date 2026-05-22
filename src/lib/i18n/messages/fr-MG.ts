@@ -1058,6 +1058,37 @@ export const frMG = {
     '{count} quartiers couverts à {city} — chacun avec son ambiance et son budget moyen.',
   'cityLanding.quartiers.card.count': '{count} annonces',
   'cityLanding.quartiers.card.empty': 'Bientôt',
+
+  // E-T11 B2 — neighborhood landing page
+  'neighborhoodLanding.meta.title': '{quartier}, {city} — Logement étudiant',
+  'neighborhoodLanding.meta.description':
+    '{count} annonces étudiantes à {quartier}, {city}. Loyers, ambiance, contact direct propriétaire — pas de commission.',
+  'neighborhoodLanding.title': '{quartier}, {city}.',
+  'neighborhoodLanding.description':
+    '{count} annonces actives à {quartier}. Compare les prix, repère l\'ambiance du quartier, contacte les proprios directement.',
+  'neighborhoodLanding.description.empty':
+    'Aucune annonce active à {quartier} pour l\'instant. Tu es propriétaire dans le coin ? Publie ton bien et touche les premiers étudiants intéressés.',
+  'neighborhoodLanding.stats.listings': 'Annonces',
+  'neighborhoodLanding.stats.avgPrice': 'Loyer moyen / mois',
+  'neighborhoodLanding.stats.reviews': '{count} avis publiés',
+  'neighborhoodLanding.map.eyebrow': 'Sur la carte',
+  'neighborhoodLanding.map.title': 'Localisation',
+  'neighborhoodLanding.listings.eyebrow': 'Disponible',
+  'neighborhoodLanding.listings.title':
+    '{count} annonces à {quartier}',
+  'neighborhoodLanding.listings.viewAll': 'Voir les {total}',
+  'neighborhoodLanding.listings.empty.title':
+    'Pas encore d\'annonce à {quartier}.',
+  'neighborhoodLanding.listings.empty.lead':
+    'On vient de seeder ce quartier — la mise en ligne se fait au rythme des proprios qui rejoignent AryTrano. Tu peux ouvrir la marche.',
+  'neighborhoodLanding.listings.empty.cta': 'Publier mon annonce',
+  'neighborhoodLanding.reviews.eyebrow': 'Retours d\'étudiants',
+  'neighborhoodLanding.reviews.title': 'Avis sur {quartier}',
+  'neighborhoodLanding.reviews.lead':
+    'Note agrégée des étudiants qui ont vécu dans une des annonces de {quartier}. Les avis détaillés se trouvent sur chaque page d\'annonce.',
+  'neighborhoodLanding.reviews.basedOn': 'Sur {count} avis',
+  'neighborhoodLanding.siblings.title': 'Autres quartiers de {city}',
+
   'quartiers.eyebrow': 'Quartiers',
   // E-T07 : H1 + lead dynamiques paramétrés par ville
   'quartiers.h1': '{count} quartiers de {city}.',

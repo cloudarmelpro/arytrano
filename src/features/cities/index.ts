@@ -7,3 +7,7 @@ export {
   CityQuartiersGrid,
   type CityQuartiersGridItem,
 } from './components/CityQuartiersGrid'
+export { NeighborhoodHero } from './components/NeighborhoodHero'
+export { NeighborhoodMap } from './components/NeighborhoodMap'
+export { NeighborhoodListings } from './components/NeighborhoodListings'
+export { NeighborhoodReviews } from './components/NeighborhoodReviews'

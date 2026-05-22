@@ -1073,6 +1073,35 @@ export const mg: Record<MessageKey, string> = {
   'cityLanding.quartiers.card.count': 'Filazana {count}',
   'cityLanding.quartiers.card.empty': 'Tsy ho ela',
 
+  // E-T11 B2 — pejy faritra
+  'neighborhoodLanding.meta.title': '{quartier}, {city} — Trano hofaina ho an\'ny mpianatra',
+  'neighborhoodLanding.meta.description':
+    'Filazana {count} ho an\'ny mpianatra ao {quartier}, {city}. Vidiny, toetra, resaka mivantana amin\'ny tompony — tsy misy commission.',
+  'neighborhoodLanding.title': '{quartier}, {city}.',
+  'neighborhoodLanding.description':
+    'Filazana {count} mavitrika ao {quartier}. Ampitahao ny vidiny, fantaro ny toetra, mifandraisa mivantana.',
+  'neighborhoodLanding.description.empty':
+    'Mbola tsy misy filazana mavitrika ao {quartier}. Tompon-trano ianao ? Apetraho ny tranonao ary tratray ireo mpianatra voalohany.',
+  'neighborhoodLanding.stats.listings': 'Filazana',
+  'neighborhoodLanding.stats.avgPrice': 'Salan\'ny hofa / volana',
+  'neighborhoodLanding.stats.reviews': 'Hevitra {count} navoaka',
+  'neighborhoodLanding.map.eyebrow': 'Eo amin\'ny sary',
+  'neighborhoodLanding.map.title': 'Toerana',
+  'neighborhoodLanding.listings.eyebrow': 'Misy',
+  'neighborhoodLanding.listings.title': 'Filazana {count} ao {quartier}',
+  'neighborhoodLanding.listings.viewAll': 'Jereo ny {total}',
+  'neighborhoodLanding.listings.empty.title':
+    'Mbola tsy misy filazana ao {quartier}.',
+  'neighborhoodLanding.listings.empty.lead':
+    'Vao avao no nampidirinay ity faritra ity. Afaka ianao no mamoaka voalohany.',
+  'neighborhoodLanding.listings.empty.cta': 'Apetraho ny filazanao',
+  'neighborhoodLanding.reviews.eyebrow': 'Hevitra avy amin\'ny mpianatra',
+  'neighborhoodLanding.reviews.title': 'Hevitra momba ny {quartier}',
+  'neighborhoodLanding.reviews.lead':
+    'Salan\'isa ny hevitry ny mpianatra niaina tao amin\'ny filazana iray ao {quartier}. Ireo hevitra feno dia eo amin\'ny pejy ny filazana tsirairay.',
+  'neighborhoodLanding.reviews.basedOn': 'Avy amin\'ny hevitra {count}',
+  'neighborhoodLanding.siblings.title': 'Faritra hafa ao {city}',
+
   'quartiers.eyebrow': 'Faritra',
   // E-T07 : H1 + lead miankina amin'ny tanàna
   'quartiers.h1': 'Faritra {count} ao {city}.',

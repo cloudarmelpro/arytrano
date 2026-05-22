@@ -2,6 +2,7 @@ import type { MetadataRoute } from 'next'
 import { env } from '@/lib/env'
 import { listSitemapListings } from '@/features/listings/server'
 import { listCitiesWithCounts } from '@/features/landing/server'
+import { prisma } from '@/lib/db'
 
 export const revalidate = 3600 // regenerate hourly
 
@@ -22,9 +23,19 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = env.AUTH_URL.replace(/\/$/, '')
   const staticLastMod = new Date(STATIC_PAGES_LAST_MODIFIED)
 
-  const [listings, cities] = await Promise.all([
+  const [listings, cities, neighborhoods] = await Promise.all([
     listSitemapListings(),
     listCitiesWithCounts(),
+    // For the per-quartier landing pages (E-T11 B2) we need the
+    // (cityslug, neighborhoodslug) pairs. Light read — 37 rows at
+    // launch — so no caching needed beyond the page-level
+    // `revalidate = 3600`.
+    prisma.neighborhood.findMany({
+      select: {
+        slug: true,
+        city: { select: { slug: true } },
+      },
+    }),
   ])
 
   function languages(path: string) {
@@ -109,6 +120,21 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: staticLastMod,
       changeFrequency: 'weekly',
       priority: 0.85,
+      alternates: { languages: languages(path) },
+    })
+  }
+
+  // E-T11 B2 neighborhood landing : /villes/<city>/quartiers/<n>.
+  // Long-tail SEO ("location quartier Anosy" etc). Priority 0.75 —
+  // lower than the city hub since each individual quartier page has
+  // a narrower audience.
+  for (const n of neighborhoods) {
+    const path = `/villes/${n.city.slug}/quartiers/${n.slug}`
+    entries.push({
+      url: `${baseUrl}${path}`,
+      lastModified: staticLastMod,
+      changeFrequency: 'weekly',
+      priority: 0.75,
       alternates: { languages: languages(path) },
     })
   }
