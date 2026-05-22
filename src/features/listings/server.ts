@@ -39,3 +39,8 @@ export {
   listSitemapListings,
   type SitemapListing,
 } from './queries/list-sitemap-listings'
+export {
+  getListingStats,
+  type ListingStats,
+  type ListingStatsRecentContact,
+} from './queries/get-listing-stats'

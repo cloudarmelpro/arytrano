@@ -161,13 +161,22 @@ export default async function MyListingsPage() {
                 </div>
 
                 <div className="mt-2 flex items-center justify-between gap-2">
-                  <Link
-                    href={`/dashboard/listings/${l.id}/edit`}
-                    className="inline-flex items-center gap-1.5 text-xs font-medium text-primary transition hover:text-primary/80"
-                  >
-                    <IconEdit />
-                    {t('dashboard.listings.edit')}
-                  </Link>
+                  <div className="flex items-center gap-3">
+                    <Link
+                      href={`/dashboard/listings/${l.id}/edit`}
+                      className="inline-flex items-center gap-1.5 text-xs font-medium text-primary transition hover:text-primary/80"
+                    >
+                      <IconEdit />
+                      {t('dashboard.listings.edit')}
+                    </Link>
+                    <Link
+                      href={`/dashboard/listings/${l.id}/stats`}
+                      className="inline-flex items-center gap-1.5 text-xs font-medium text-foreground/70 transition hover:text-foreground"
+                    >
+                      <IconChart />
+                      {t('dashboard.listings.statsCta')}
+                    </Link>
+                  </div>
                   <ListingActionsMenu listingId={l.id} status={l.status} />
                 </div>
               </div>
@@ -213,6 +222,16 @@ function IconEdit() {
     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <path d="M12 20h9" />
       <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z" />
+    </svg>
+  )
+}
+
+function IconChart() {
+  return (
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <line x1="18" y1="20" x2="18" y2="10" />
+      <line x1="12" y1="20" x2="12" y2="4" />
+      <line x1="6" y1="20" x2="6" y2="14" />
     </svg>
   )
 }

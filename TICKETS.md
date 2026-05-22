@@ -791,7 +791,7 @@ model ListingView {
 
 **Effort estimé** : ~2.5 jours (ListingView + queries SQL + beacon + 4 components + tests)
 
-**Priorité** : P1 · **Statut** : 📋 todo
+**Priorité** : P1 · **Statut** : ✅ done (2026-05-22, scope v0.5) — query `getListingStats(listingId, ownerId)` agrégée (total contacts + 30d split par canal WhatsApp/PHONE + reviews count + avg rating + conversion + 5 derniers contacts sans PII) avec auth check au niveau DB (WHERE ownerId), route `/dashboard/listings/[id]/stats` Server Component (4 StatCards + RecentContactRow list + privacy note), bouton « Stats » avec IconChart sur chaque card de `/dashboard/listings`, 17 nouvelles clés i18n FR+MG. Cohérent avec l'email T-047 (statsUrl pointe ici). Note : scope v0.5 = stats agrégées (pas de vue par jour / sparkline) — la table `ListingView` distincte des `ContactEvent` reste un upgrade v1 si on veut tracker les vues anonymes.
 
 ---
 
@@ -1305,7 +1305,7 @@ enum ListingStatus {
 
 **Effort estimé** : ~0.5 jour (composant existant pigeon-maps déjà intégré ailleurs)
 
-**Priorité** : P1 · **Statut** : 📋 todo
+**Priorité** : P1 · **Statut** : ✅ done (confirmé 2026-05-22) — `ListingMap` (Leaflet vanilla, 40KB gzipped, 200m radius circle au lieu d'un pin exact pour la privacy) intégré sur la page détail via `ListingMapClient` dynamic import. Centré sur `neighborhood.lat/lng`. Note 2026-05-22 : migré le tile provider de l'OSM apex public vers Stadia Maps (env `NEXT_PUBLIC_STADIA_API_KEY` + retina @2x + attribution Stadia+OMT+OSM) pour cohérence avec AUD-008 ; fallback OSM apex si pas de key (dev).
 
 ---
 

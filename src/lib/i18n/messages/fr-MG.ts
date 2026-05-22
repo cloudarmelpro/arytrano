@@ -1253,6 +1253,37 @@ export const frMG = {
   'sidebar.security': 'Sécurité',
   'sidebar.signOut': 'Déconnexion',
 
+  // Dashboard — listing stats (T-046)
+  'dashboard.listingStats.title': 'Statistiques de l\'annonce',
+  'dashboard.listingStats.back': 'Retour à mes annonces',
+  'dashboard.listingStats.viewPublic': 'Voir l\'annonce publiée',
+  'dashboard.listingStats.kpi.contactsTotal': 'Contacts au total',
+  'dashboard.listingStats.kpi.contactsTotal.help':
+    'Nombre cumulé de clics « Contacter » depuis la création.',
+  'dashboard.listingStats.kpi.contacts30d': 'Contacts 30 derniers jours',
+  'dashboard.listingStats.kpi.contacts30d.help':
+    '{wa} WhatsApp · {ph} téléphone',
+  'dashboard.listingStats.kpi.reviews': 'Avis publiés',
+  'dashboard.listingStats.kpi.reviews.helpRated':
+    'Note moyenne {avg}/5',
+  'dashboard.listingStats.kpi.reviews.helpEmpty':
+    'Aucun avis encore. Tes premiers locataires seront sollicités 14 jours après contact.',
+  'dashboard.listingStats.kpi.conversion': 'Taux de retour',
+  'dashboard.listingStats.kpi.conversion.help':
+    'Avis publiés ÷ contacts totaux. Cet indicateur monte au fil des séjours.',
+  'dashboard.listingStats.recentContacts.title': 'Derniers contacts',
+  'dashboard.listingStats.recentContacts.empty':
+    'Aucun contact reçu pour le moment. Vérifie que tes photos et ton prix sont en place.',
+  'dashboard.listingStats.recentContacts.signedIn':
+    'Visiteur identifié (compte AryTrano)',
+  'dashboard.listingStats.recentContacts.anonymous':
+    'Visiteur anonyme',
+  'dashboard.listingStats.recentContacts.privacy':
+    'Pour respecter la vie privée des étudiants, leur identité n\'est dévoilée qu\'à travers leur message WhatsApp.',
+  'dashboard.listingStats.channel.whatsapp': 'Contact WhatsApp',
+  'dashboard.listingStats.channel.phone': 'Appel téléphonique',
+  'dashboard.listings.statsCta': 'Stats',
+
   // Dashboard pages — listings index (owner)
   'dashboard.listings.title': 'Mes annonces',
   'dashboard.listings.count.one': '{count} annonce',

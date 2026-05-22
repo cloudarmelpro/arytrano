@@ -1275,6 +1275,37 @@ export const mg: Record<MessageKey, string> = {
   'sidebar.security': 'Filaminana',
   'sidebar.signOut': 'Hivoaka',
 
+  // Dashboard — listing stats (T-046)
+  'dashboard.listingStats.title': 'Antontan-tarehimarika filazana',
+  'dashboard.listingStats.back': 'Hiverina amin\'ny tranoko',
+  'dashboard.listingStats.viewPublic': 'Hijery ny filazana navoaka',
+  'dashboard.listingStats.kpi.contactsTotal': 'Fifandraisana totaly',
+  'dashboard.listingStats.kpi.contactsTotal.help':
+    'Isan\'ny tsindrim-paneva « Mifandray » nanomboka tamin\'ny voalohany.',
+  'dashboard.listingStats.kpi.contacts30d': 'Fifandraisana 30 andro',
+  'dashboard.listingStats.kpi.contacts30d.help':
+    '{wa} WhatsApp · {ph} telefaonina',
+  'dashboard.listingStats.kpi.reviews': 'Hevitra navoaka',
+  'dashboard.listingStats.kpi.reviews.helpRated':
+    'Salan\'isa {avg}/5',
+  'dashboard.listingStats.kpi.reviews.helpEmpty':
+    'Mbola tsy misy hevitra. Hangatahina hanome hevitra ny mpianatra 14 andro aorian\'ny fifandraisana.',
+  'dashboard.listingStats.kpi.conversion': 'Tahan\'ny hevitra',
+  'dashboard.listingStats.kpi.conversion.help':
+    'Hevitra navoaka ÷ fifandraisana totaly. Mitombo arakaraka ny fizarana.',
+  'dashboard.listingStats.recentContacts.title': 'Fifandraisana farany',
+  'dashboard.listingStats.recentContacts.empty':
+    'Mbola tsy misy fifandraisana. Jereo raha mety ny sary sy ny vidiny.',
+  'dashboard.listingStats.recentContacts.signedIn':
+    'Mpitsidika voafantatra (kaonty AryTrano)',
+  'dashboard.listingStats.recentContacts.anonymous':
+    'Mpitsidika tsy fantatra',
+  'dashboard.listingStats.recentContacts.privacy':
+    'Mba hanajana ny vie privée ny mpianatra, hita ihany ny mombamomba azy rehefa nandefa hafatra WhatsApp izy ireo.',
+  'dashboard.listingStats.channel.whatsapp': 'Fifandraisana WhatsApp',
+  'dashboard.listingStats.channel.phone': 'Antso telefaonina',
+  'dashboard.listings.statsCta': 'Antontan-tarehimarika',
+
   // Dashboard — listings index
   'dashboard.listings.title': 'Ny tranoko',
   'dashboard.listings.count.one': 'Trano {count}',

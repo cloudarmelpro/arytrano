@@ -3,6 +3,13 @@
 import { useEffect, useRef } from 'react'
 import 'leaflet/dist/leaflet.css'
 
+// Tile provider (AUD-008). When the Stadia API key is set, point
+// Leaflet at Stadia's commercial endpoint (200k tile views/mo free).
+// Without a key, we fall back to the raw OSM apex — fine for dev,
+// rate-limited at commercial scale.
+const STADIA_API_KEY = process.env.NEXT_PUBLIC_STADIA_API_KEY
+const STADIA_STYLE = process.env.NEXT_PUBLIC_STADIA_STYLE ?? 'alidade_smooth'
+
 /**
  * Map showing a listing's approximate location.
  *
@@ -49,9 +56,17 @@ export function ListingMap({
         attributionControl: true,
       })
 
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      const retina = window.devicePixelRatio >= 2 ? '@2x' : ''
+      const tileUrl = STADIA_API_KEY
+        ? `https://tiles.stadiamaps.com/tiles/${STADIA_STYLE}/{z}/{x}/{y}${retina}.png?api_key=${STADIA_API_KEY}`
+        : `https://tile.openstreetmap.org/{z}/{x}/{y}.png`
+      const attribution = STADIA_API_KEY
+        ? '© <a href="https://stadiamaps.com/">Stadia Maps</a> © <a href="https://openmaptiles.org/">OpenMapTiles</a> © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+        : '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+
+      L.tileLayer(tileUrl, {
         maxZoom: 19,
-        attribution: '© OpenStreetMap',
+        attribution,
       }).addTo(map)
 
       L.circle([lat, lng], {
