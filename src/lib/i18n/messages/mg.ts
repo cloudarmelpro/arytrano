@@ -158,6 +158,7 @@ export const mg: Record<MessageKey, string> = {
     'Tadiavo ny tranonao ao Fianarantsoa, tsy misy mpanelanelana. Tompon-trano voamarina, fifandraisana mivantana, maimaim-poana ho an’ny mpianatra.',
   'footerV3.status.allOperational': 'Mandeha tsara ireo serivisy rehetra',
   'footerV3.col.product': 'Vokatra',
+  'footerV3.col.cities': 'Tanàna',
   'footerV3.col.owners': 'Tompon-trano',
   'footerV3.col.about': 'Orinasa',
   'footerV3.col.legal': 'Lalàna',
@@ -1045,6 +1046,18 @@ export const mg: Record<MessageKey, string> = {
   'cities.mahajanga.tagline': 'Morontsiraka andrefana, toetrandro malefaka',
   'cities.toliara.name': 'Toliara',
   'cities.toliara.tagline': 'Atsimo-andrefana, oniversite + siansa an-dranomasina',
+
+  // E-T11 B4 Hub /villes
+  'villesHub.meta.title': 'Tanàna rehetra — AryTrano',
+  'villesHub.meta.description':
+    'Trano hofaina ho an\'ny mpianatra ao Madagasikara : Fianarantsoa, Antananarivo, Toamasina, Mahajanga, Toliara. Filazana voamarina, fifandraisana mivantana amin\'ny tompony.',
+  'villesHub.eyebrow': 'Faritra arakitrana AryTrano',
+  'villesHub.title': 'Tanàna rehetra',
+  'villesHub.lead':
+    'Tanàna {count} voarakitra. Safidio ny tanànanao mba hijery ny faritra sy ny filazana misy.',
+  'villesHub.card.count': 'Filazana {count}',
+  'villesHub.card.empty': 'Tsy ho ela',
+  'villesHub.card.cta': 'Hijery ny tanàna',
 
   // E-T11 City landing /villes/[citySlug]
   'cityLanding.meta.title': 'Trano hofaina ho an\'ny mpianatra ao {city} — AryTrano',

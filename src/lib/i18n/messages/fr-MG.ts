@@ -152,6 +152,7 @@ export const frMG = {
     'Trouve ton logement à Fianarantsoa, sans intermédiaire. Propriétaires vérifiés, contact direct, gratuit pour les étudiants.',
   'footerV3.status.allOperational': 'Tous les services opérationnels',
   'footerV3.col.product': 'Produit',
+  'footerV3.col.cities': 'Villes',
   'footerV3.col.owners': 'Propriétaires',
   'footerV3.col.about': 'Entreprise',
   'footerV3.col.legal': 'Légal',
@@ -1031,6 +1032,18 @@ export const frMG = {
   'cities.mahajanga.tagline': 'Côte Ouest, climat doux',
   'cities.toliara.name': 'Toliara',
   'cities.toliara.tagline': 'Sud-Ouest, université + sciences marines',
+
+  // E-T11 B4 Hub /villes
+  'villesHub.meta.title': 'Toutes les villes — AryTrano',
+  'villesHub.meta.description':
+    'Logement étudiant à Madagascar : Fianarantsoa, Antananarivo, Toamasina, Mahajanga, Toliara. Annonces vérifiées, contact direct propriétaire.',
+  'villesHub.eyebrow': 'Couverture AryTrano',
+  'villesHub.title': 'Toutes les villes',
+  'villesHub.lead':
+    '{count} villes couvertes. Choisis ta destination pour parcourir les quartiers et les annonces disponibles.',
+  'villesHub.card.count': '{count} annonces',
+  'villesHub.card.empty': 'Bientôt',
+  'villesHub.card.cta': 'Voir la ville',
 
   // E-T11 City landing /villes/[citySlug]
   'cityLanding.meta.title': 'Logement étudiant à {city} — AryTrano',

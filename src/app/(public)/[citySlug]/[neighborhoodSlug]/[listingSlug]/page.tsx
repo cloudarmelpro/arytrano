@@ -167,15 +167,27 @@ export default async function PublicListingDetailPage({
       />
 
       <div className="mx-auto max-w-6xl px-4 py-6 sm:py-8">
-        {/* Breadcrumb */}
+        {/* Breadcrumb — every step except the current page is a link
+            so visitors can climb back up to the city or quartier
+            landing pages (E-T11 internal linking). */}
         <nav className="mb-4 text-xs text-muted-foreground" aria-label={t('detail.breadcrumb.aria')}>
           <Link href="/annonces" className="transition hover:text-foreground">
             {t('detail.breadcrumb.listings')}
           </Link>
           <span className="mx-1.5">›</span>
-          <span>{listing.city.nameFr}</span>
+          <Link
+            href={`/villes/${listing.city.slug}`}
+            className="transition hover:text-foreground"
+          >
+            {listing.city.nameFr}
+          </Link>
           <span className="mx-1.5">›</span>
-          <span className="text-foreground">{listing.neighborhood.nameFr}</span>
+          <Link
+            href={`/villes/${listing.city.slug}/quartiers/${listing.neighborhood.slug}`}
+            className="text-foreground transition hover:opacity-80"
+          >
+            {listing.neighborhood.nameFr}
+          </Link>
         </nav>
 
         {/* Title block — above the gallery (Airbnb-style) */}

@@ -110,9 +110,17 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     })
   }
 
-  // E-T11 city landing : /villes/<citySlug>. SEO-prio pages targeting
-  // "logement étudiant à {city}" keywords — slightly higher priority
-  // (0.85) than /quartiers because they're the entry funnel.
+  // E-T11 city landing : /villes (hub) + /villes/<citySlug>. SEO-prio
+  // pages targeting "logement étudiant à {city}" keywords — slightly
+  // higher priority (0.85) than /quartiers because they're the entry
+  // funnel.
+  entries.push({
+    url: `${baseUrl}/villes`,
+    lastModified: staticLastMod,
+    changeFrequency: 'weekly',
+    priority: 0.85,
+    alternates: { languages: languages('/villes') },
+  })
   for (const city of cities) {
     const path = `/villes/${city.slug}`
     entries.push({

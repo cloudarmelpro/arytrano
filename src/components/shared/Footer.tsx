@@ -22,12 +22,21 @@ const COLUMNS: Column[] = [
     ],
   },
   {
+    head: 'footerV3.col.cities',
+    items: [
+      { label: 'cities.fianarantsoa.name', href: '/villes/fianarantsoa' },
+      { label: 'cities.antananarivo.name', href: '/villes/antananarivo' },
+      { label: 'cities.toamasina.name', href: '/villes/toamasina' },
+      { label: 'cities.mahajanga.name', href: '/villes/mahajanga' },
+      { label: 'cities.toliara.name', href: '/villes/toliara' },
+    ],
+  },
+  {
     head: 'footerV3.col.owners',
     items: [
       { label: 'footerV3.link.publishListing', href: '/proprietaires' },
       { label: 'footerV3.link.verification', href: '/proprietaires#verif' },
       { label: 'footerV3.link.pricing', href: '/proprietaires#tarifs' },
-      { label: 'footerV3.link.resources', href: '#' },
     ],
   },
   {
@@ -36,7 +45,6 @@ const COLUMNS: Column[] = [
       { label: 'footerV3.link.about', href: '/about' },
       { label: 'footerV3.link.contact', href: '/contact' },
       { label: 'footerV3.link.blog', href: '/blog' },
-      { label: 'footerV3.link.careers', href: '/careers' },
     ],
   },
   {

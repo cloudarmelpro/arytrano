@@ -34,6 +34,10 @@ export function buildBreadcrumbListLd(
   baseUrl: string,
 ) {
   const detailUrl = `${baseUrl}/${listing.city.slug}/${listing.neighborhood.slug}/${listing.slug}`
+  // E-T11 B4 : breadcrumb structure matches the visible nav on the
+  // page (Annonces > City > Quartier > Listing). Each step except
+  // the current points at a real SEO landing — Google reads the
+  // hierarchy + uses it to surface rich breadcrumbs in SERP.
   return {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
@@ -47,12 +51,18 @@ export function buildBreadcrumbListLd(
       {
         '@type': 'ListItem',
         position: 2,
-        name: listing.neighborhood.nameFr,
-        item: `${baseUrl}/annonces?neighborhood=${listing.neighborhood.slug}`,
+        name: listing.city.nameFr,
+        item: `${baseUrl}/villes/${listing.city.slug}`,
       },
       {
         '@type': 'ListItem',
         position: 3,
+        name: listing.neighborhood.nameFr,
+        item: `${baseUrl}/villes/${listing.city.slug}/quartiers/${listing.neighborhood.slug}`,
+      },
+      {
+        '@type': 'ListItem',
+        position: 4,
         name: listing.title,
         item: detailUrl,
       },
