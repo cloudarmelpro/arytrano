@@ -247,6 +247,8 @@ export const frMG = {
   'filters.reset': 'Réinitialiser',
   'filters.sidebar.title': 'Filtres',
   'toolbar.search.label': 'Recherche :',
+  'toolbar.query.label': 'Recherche par mots-clés',
+  'toolbar.query.placeholder': 'Mot-clé (ex. meublé, balcon, calme…)',
   'filters.amenities.label': 'Ce que propose ce logement',
 
   // Sort

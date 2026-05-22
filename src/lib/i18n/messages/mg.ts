@@ -252,6 +252,8 @@ export const mg: Record<MessageKey, string> = {
   'filters.reset': 'Avadika',
   'filters.sidebar.title': 'Sivana',
   'toolbar.search.label': 'Fitadiavana :',
+  'toolbar.query.label': 'Fitadiavana amin\'ny teny fototra',
+  'toolbar.query.placeholder': 'Teny (oh. fanaka, balkôny, mangina…)',
   'filters.amenities.label': 'Izay omen\'ity trano ity',
 
   // Sort

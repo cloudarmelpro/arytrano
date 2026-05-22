@@ -71,6 +71,14 @@ export const listPublicListingsQuerySchema = z
     priceMax: priceSchema,
     sort: z.enum(LISTING_SORT_VALUES).optional(),
     amenities: amenitiesFromUrl,
+    // E-T14 full-text search. Bounded to 120 chars to keep the
+    // ILIKE scan cheap until we promote to a tsvector GIN index.
+    q: z
+      .string()
+      .trim()
+      .min(2, 'Au moins 2 caractères')
+      .max(120, 'Recherche trop longue')
+      .optional(),
   })
   .refine(
     (v) => v.priceMin === undefined || v.priceMax === undefined || v.priceMin <= v.priceMax,
@@ -136,6 +144,18 @@ export async function listPublicListings(
   // on the listing. `hasEvery` does the array-contains-all check.
   if (input.amenities && input.amenities.length > 0) {
     where.amenities = { hasEvery: input.amenities }
+  }
+  // E-T14 full-text search. Pragmatic v1 impl : Prisma's
+  // `contains` mode insensitive on title + description. At Madagascar
+  // launch scale (~50-200 listings) this is instantaneous. Upgrade
+  // to a `tsvector` generated column + GIN index when volume crosses
+  // a few thousand listings — same `q` URL shape, just a different
+  // WHERE branch.
+  if (input.q) {
+    where.OR = [
+      { title: { contains: input.q, mode: 'insensitive' } },
+      { description: { contains: input.q, mode: 'insensitive' } },
+    ]
   }
 
   // Sort selection — `id` is always the tie-breaker so cursor pagination

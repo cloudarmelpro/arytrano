@@ -30,6 +30,7 @@ type SearchParams = Promise<{
   priceMax?: string
   sort?: string
   amenities?: string
+  q?: string
 }>
 
 function hasAnyFilter(sp: Awaited<SearchParams>) {
@@ -43,7 +44,8 @@ function hasAnyFilter(sp: Awaited<SearchParams>) {
       sp.priceMin ||
       sp.priceMax ||
       sp.sort ||
-      sp.amenities,
+      sp.amenities ||
+      sp.q,
   )
 }
 
@@ -108,6 +110,7 @@ export default async function PublicListingsPage({
     priceMax: sp.priceMax || undefined,
     sort: sp.sort || undefined,
     amenities: sp.amenities || undefined,
+    q: sp.q || undefined,
   })
   const query = parsed.success ? parsed.data : {}
 
@@ -171,6 +174,7 @@ export default async function PublicListingsPage({
   if (sp.priceMax) cityTabsParams.set('priceMax', sp.priceMax)
   if (sp.sort) cityTabsParams.set('sort', sp.sort)
   if (sp.amenities) cityTabsParams.set('amenities', sp.amenities)
+  if (sp.q) cityTabsParams.set('q', sp.q)
 
   // Single SET lookup per card avoids N+1 favorite queries.
   const favoritedIds = await getFavoritedListingIds(
@@ -187,6 +191,7 @@ export default async function PublicListingsPage({
     if (sp.priceMax) next.set('priceMax', sp.priceMax)
     if (sp.sort) next.set('sort', sp.sort)
     if (sp.amenities) next.set('amenities', sp.amenities)
+    if (sp.q) next.set('q', sp.q)
     next.set('cursor', cursor)
     return `/annonces?${next.toString()}`
   }
