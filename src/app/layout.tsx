@@ -10,6 +10,7 @@ import { SkipToContent } from '@/components/shared/SkipToContent'
 // re-exports server-only `auth`/`signIn`/`signOut`. Going straight to
 // the Client Component file keeps the layout's import graph tight.
 import { AuthBroadcastListener } from '@/features/auth/components/AuthBroadcastListener'
+import { ServiceWorkerRegister } from '@/components/shared/ServiceWorkerRegister'
 import './globals.css'
 
 const dmSans = DM_Sans({
@@ -88,6 +89,7 @@ export default async function RootLayout({
             the header / sidebar / route guards pick up the new state
             without the user having to F5 each tab manually. */}
         <AuthBroadcastListener />
+        <ServiceWorkerRegister />
         {/*
           JSON-LD scripts are DATA, not executable code. CSP `script-src`
           does not apply to `type="application/ld+json"` so no nonce is
