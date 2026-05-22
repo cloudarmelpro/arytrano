@@ -10,6 +10,7 @@ import {
   ListingSearchToolbar,
   CityTabs,
 } from '@/features/listings'
+import { SaveSearchButton } from '@/features/search'
 import { listCitiesWithNeighborhoods } from '@/features/geo'
 import { listCitiesWithCounts } from '@/features/landing/server'
 import { prisma } from '@/lib/db'
@@ -229,8 +230,12 @@ export default async function PublicListingsPage({
         currentParams={cityTabsParams}
       />
 
-      {/* Top toolbar — neighborhood autocomplete on the left, sort on the right */}
-      <ListingSearchToolbar neighborhoods={neighborhoods} />
+      {/* Top toolbar — neighborhood autocomplete on the left, sort on
+          the right + Save search dialog on the far right (E-T09). */}
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <ListingSearchToolbar neighborhoods={neighborhoods} />
+        <SaveSearchButton signedIn={Boolean(session?.user)} />
+      </div>
 
       {/* Two-column layout: filters sidebar + results main */}
       <div className="grid gap-8 lg:grid-cols-[18rem_1fr]">

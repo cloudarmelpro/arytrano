@@ -1348,6 +1348,43 @@ export const mg: Record<MessageKey, string> = {
   'sidebar.section.discover': 'Fitadiavana',
   'sidebar.section.account': 'Kaonty',
   'sidebar.favorites': 'Tiana',
+  'sidebar.savedSearches': 'Fitadiavana voatahiry',
+
+  // E-T09 — saved searches
+  'savedSearch.page.title': 'Fitadiavana voatahiry',
+  'savedSearch.page.lead':
+    'Ireo fitadiavana notahirizinao. Alefaso amin\'ny click iray, na esory raha tsy mila intsony.',
+  'savedSearch.page.empty.title': 'Tsy misy fitadiavana voatahiry.',
+  'savedSearch.page.empty.lead':
+    'Rehefa mametraka sivana ianao amin\'ny /annonces, tsindrio « Tahirizo ny fitadiavana » mba hahitana azy eto.',
+  'savedSearch.page.empty.cta': 'Mijery ny filazana',
+  'savedSearch.save.cta': 'Tahirizo ny fitadiavana',
+  'savedSearch.save.success': 'Voatahiry ny fitadiavana.',
+  'savedSearch.save.error': 'Tsy nahomby. Andramo indray.',
+  'savedSearch.save.needsAuth': 'Midira mba hitahiry.',
+  'savedSearch.save.noFilters':
+    'Mametraha sivana iray farafahakeliny alohan\'ny hitahiry.',
+  'savedSearch.dialog.title': 'Omeo anarana ny fitadiavanao',
+  'savedSearch.dialog.body':
+    'Ho ampahafantarinay amin\'ny mailaka rehefa misy filazana vaovao mifanaraka. Azonao atao ny manakana ny fanairana aoriana.',
+  'savedSearch.dialog.signInBody':
+    'Mamoroña kaonty na midira mba hitahiry ity fitadiavana ity sy handray fanairana.',
+  'savedSearch.dialog.nameLabel': 'Anarana',
+  'savedSearch.dialog.namePlaceholder': 'Studio Andrainjato latsaky ny 250k',
+  'savedSearch.dialog.cancel': 'Hialana',
+  'savedSearch.dialog.save': 'Tahirizo',
+  'savedSearch.dialog.pending': 'Mitahiry…',
+  'savedSearch.dialog.signInCta': 'Hiditra',
+  'savedSearch.row.allListings': 'Ny filazana rehetra',
+  'savedSearch.row.run': 'Alefa',
+  'savedSearch.row.alertsOnCta': 'Mavitrika ny fanairana',
+  'savedSearch.row.alertsOffCta': 'Voasakana ny fanairana',
+  'savedSearch.row.alertsOn': 'Voavokatra ny fanairana.',
+  'savedSearch.row.alertsOff': 'Voasakana ny fanairana.',
+  'savedSearch.row.delete': 'Esorina',
+  'savedSearch.row.confirmDelete':
+    'Esorina ity fitadiavana voatahiry ity ?',
+  'savedSearch.row.deleted': 'Voafafa ny fitadiavana.',
 
   // Favorites
   'favorites.add': 'Ampio amin\'ny tiana',

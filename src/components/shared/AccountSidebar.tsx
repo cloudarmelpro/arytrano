@@ -106,6 +106,24 @@ function IconHeart() {
   )
 }
 
+function IconBookmark() {
+  return (
+    <svg
+      width="18"
+      height="18"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
+    </svg>
+  )
+}
+
 function IconLogOut() {
   return (
     <svg
@@ -178,6 +196,11 @@ const SECTIONS: Section[] = [
     roles: null,
     items: [
       { href: '/dashboard/favoris', labelKey: 'sidebar.favorites', icon: <IconHeart /> },
+      {
+        href: '/dashboard/saved-searches',
+        labelKey: 'sidebar.savedSearches',
+        icon: <IconBookmark />,
+      },
     ],
   },
   {

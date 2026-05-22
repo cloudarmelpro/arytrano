@@ -1329,6 +1329,43 @@ export const frMG = {
   'sidebar.section.discover': 'Découverte',
   'sidebar.section.account': 'Compte',
   'sidebar.favorites': 'Favoris',
+  'sidebar.savedSearches': 'Recherches sauvegardées',
+
+  // E-T09 — saved searches
+  'savedSearch.page.title': 'Recherches sauvegardées',
+  'savedSearch.page.lead':
+    'Tes recherches enregistrées. Lance-les en un clic ou désactive les alertes si tu n\'es plus intéressé.',
+  'savedSearch.page.empty.title': 'Aucune recherche sauvegardée.',
+  'savedSearch.page.empty.lead':
+    'Quand tu poses des filtres sur /annonces, clique sur « Sauver la recherche » pour la retrouver ici.',
+  'savedSearch.page.empty.cta': 'Parcourir les annonces',
+  'savedSearch.save.cta': 'Sauver la recherche',
+  'savedSearch.save.success': 'Recherche sauvegardée.',
+  'savedSearch.save.error': 'Impossible. Réessaie.',
+  'savedSearch.save.needsAuth': 'Connecte-toi pour sauver.',
+  'savedSearch.save.noFilters':
+    'Pose au moins un filtre avant de sauver la recherche.',
+  'savedSearch.dialog.title': 'Donne un nom à ta recherche',
+  'savedSearch.dialog.body':
+    'On t\'avertira par email quand de nouvelles annonces matcheront. Tu peux désactiver les alertes plus tard.',
+  'savedSearch.dialog.signInBody':
+    'Crée un compte ou connecte-toi pour sauvegarder cette recherche et recevoir des alertes.',
+  'savedSearch.dialog.nameLabel': 'Nom',
+  'savedSearch.dialog.namePlaceholder': 'Studio Andrainjato sous 250k',
+  'savedSearch.dialog.cancel': 'Annuler',
+  'savedSearch.dialog.save': 'Sauver',
+  'savedSearch.dialog.pending': 'Sauvegarde…',
+  'savedSearch.dialog.signInCta': 'Se connecter',
+  'savedSearch.row.allListings': 'Toutes les annonces',
+  'savedSearch.row.run': 'Lancer',
+  'savedSearch.row.alertsOnCta': 'Alertes activées',
+  'savedSearch.row.alertsOffCta': 'Alertes désactivées',
+  'savedSearch.row.alertsOn': 'Alertes activées.',
+  'savedSearch.row.alertsOff': 'Alertes désactivées.',
+  'savedSearch.row.delete': 'Supprimer',
+  'savedSearch.row.confirmDelete':
+    'Supprimer cette recherche sauvegardée ?',
+  'savedSearch.row.deleted': 'Recherche supprimée.',
 
   // Favorites
   'favorites.add': 'Ajouter aux favoris',
