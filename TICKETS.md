@@ -302,7 +302,7 @@ C/D/E sont planifiées mais non détaillées ici.
 - Email owner sur **première** vérification → consomme T-034 (Phase B). Si T-034 pas encore mergé : log + TODO, pas de blocking
 - Audit trail : la transition non-vérifié → vérifié écrit `verifiedAt` + `verifiedBy` ; retirer la vérif passe `verifiedAt = null` mais on garde `verifiedBy` en historique facultatif (à décider à l'impl)
 - i18n FR/MG : `listing.badge.verified.label`, `admin.listings.verify.cta`, `admin.listings.unverify.cta`, `admin.listings.verify.confirm`
-**Priorité** : P1 · **Statut** : 📋 todo
+**Priorité** : P1 · **Statut** : ✅ done (confirmé 2026-05-22) — schema Listing.verifiedAt + verifiedBy, services `verifyListing` + `unverifyListing` avec preserve-original-timestamp sur re-verify, Server Action `toggleListingVerifiedAction` avec requireAdmin guard, bouton `VerifyListingButton` sur `/admin/listings`, badge `VerifiedListingBadge` sur PublicListingCard + page détail, email transactionnel `listing-verified` template + envoi à la première vérification uniquement (fail-soft).
 
 ### Phase C — Marketing surface + discovery (shipped 2026-05-20)
 
