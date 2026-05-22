@@ -6,6 +6,10 @@ import { LocaleProvider } from '@/lib/i18n/client'
 import { getLocale } from '@/lib/i18n/get-locale'
 import { safeJsonLd } from '@/lib/seo/safe-json-ld'
 import { SkipToContent } from '@/components/shared/SkipToContent'
+// Direct file import (not via the auth barrel) — the barrel also
+// re-exports server-only `auth`/`signIn`/`signOut`. Going straight to
+// the Client Component file keeps the layout's import graph tight.
+import { AuthBroadcastListener } from '@/features/auth/components/AuthBroadcastListener'
 import './globals.css'
 
 const dmSans = DM_Sans({
@@ -80,6 +84,10 @@ export default async function RootLayout({
         <SkipToContent />
         <LocaleProvider locale={locale}>{children}</LocaleProvider>
         <Toaster position="bottom-right" closeButton />
+        {/* Cross-tab sign-in/out sync — refreshes RSC in other tabs so
+            the header / sidebar / route guards pick up the new state
+            without the user having to F5 each tab manually. */}
+        <AuthBroadcastListener />
         {/*
           JSON-LD scripts are DATA, not executable code. CSP `script-src`
           does not apply to `type="application/ld+json"` so no nonce is

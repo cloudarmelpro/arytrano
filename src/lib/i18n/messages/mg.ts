@@ -1613,6 +1613,12 @@ export const mg: Record<MessageKey, string> = {
     'Mbola tsy voamarina ny email — tsindrio ny rohy ao amin\'ny boatinao.',
   'signIn.verifiedToast':
     'Voamarina ny email. Afaka miditra ianao.',
+  'signIn.reason.sessionExpired':
+    'Lany andro ny session. Midira indray hanohizana ny tao aminao.',
+  'signIn.reason.accountSuspended':
+    'Voasakana ny kaontinao. Mifandraisa aminay raha hadisoana.',
+  'dashboard.reason.adminRevoked':
+    'Voaesotra ny zo admin-nao. Mifandraisa amin\'ny admin hafa raha ilaina.',
 
   // Auth — error page descriptions
   'authError.description.default': 'Tsy afaka namarana ny fidirana izahay. Andramo indray.',

@@ -1592,6 +1592,12 @@ export const frMG = {
     'Email pas encore vérifié — clique sur le lien dans ta boîte mail.',
   'signIn.verifiedToast':
     'Email vérifié. Tu peux te connecter.',
+  'signIn.reason.sessionExpired':
+    'Session expirée. Reconnecte-toi pour reprendre où tu en étais.',
+  'signIn.reason.accountSuspended':
+    'Ton compte est suspendu. Contacte-nous si tu penses que c\'est une erreur.',
+  'dashboard.reason.adminRevoked':
+    'Ton accès admin a été révoqué. Contacte un autre admin si nécessaire.',
 
   // Auth — error page details
   'authError.description.default': 'On n\'a pas pu finaliser ta connexion. Réessaie dans un instant.',

@@ -23,13 +23,15 @@ export const metadata: Metadata = {
  */
 export default async function AdminLayout({ children }: { children: ReactNode }) {
   const session = await auth()
-  if (!session?.user) redirect('/sign-in')
+  if (!session?.user) redirect('/sign-in?reason=session-expired')
 
   // Live DB read on every admin request — closes JWT staleness and feeds
   // the sidebar badge in one round-trip. See getAdminContext for details.
   const { user: dbUser, openReports } = await getAdminContext(session.user.id)
   if (!dbUser || dbUser.status !== 'ACTIVE' || dbUser.role !== 'ADMIN') {
-    redirect('/dashboard')
+    // Reaching here = JWT said ADMIN but DB no longer agrees (demoted
+    // or suspended). Send them to the regular dashboard with a hint.
+    redirect('/dashboard?reason=admin-revoked')
   }
 
   return (

@@ -1,6 +1,6 @@
 import 'server-only'
 import { cookies, headers } from 'next/headers'
-import NextAuth, { type NextAuthConfig } from 'next-auth'
+import NextAuth, { type NextAuthConfig, type Session } from 'next-auth'
 import Credentials from 'next-auth/providers/credentials'
 import Google from 'next-auth/providers/google'
 import Facebook from 'next-auth/providers/facebook'
@@ -36,6 +36,15 @@ declare module '@auth/core/jwt' {
   interface JWT {
     sub?: string
     role?: UserRole
+    /**
+     * Snapshot of `User.tokenVersion` at sign-in. Re-checked against the
+     * DB on every request — a mismatch (password changed, OAuth unlink,
+     * account banned) invalidates the session immediately so a long-
+     * lived JWT can't outlive the trust event.
+     */
+    ver?: number
+    /** Marks the token as known-stale so the session callback bails. */
+    invalid?: boolean
   }
 }
 
@@ -201,31 +210,70 @@ export const authConfig = {
   },
   callbacks: {
     async jwt({ token, user, trigger }) {
+      // 1) Initial sign-in path — stamp the token from the User object
+      //    that the provider returned. Capture tokenVersion at this
+      //    point so future requests can compare against the live row.
       if (user) {
         token.sub = user.id
         if (user.role) token.role = user.role
+        const userRecord = await prisma.user.findUnique({
+          where: { id: user.id },
+          select: { tokenVersion: true, status: true },
+        })
+        token.ver = userRecord?.tokenVersion ?? 0
+        token.invalid = userRecord?.status !== 'ACTIVE'
       }
-      // On OAuth sign-up the `user.role` we just baked into the token is the
-      // schema default (STUDENT) — it was captured BEFORE events.createUser
-      // ran and applied the role chosen on the sign-up page. Re-read from DB
-      // so the JWT reflects the post-event state.
+
+      // 2) OAuth sign-up path — events.createUser may have flipped role
+      //    or tokenVersion after the JWT was first issued. Re-read so
+      //    the token reflects the post-event state.
       if (trigger === 'signUp' && token.sub) {
         const dbUser = await prisma.user.findUnique({
           where: { id: token.sub },
-          select: { role: true },
+          select: { role: true, tokenVersion: true, status: true },
         })
-        if (dbUser) token.role = dbUser.role
+        if (dbUser) {
+          token.role = dbUser.role
+          token.ver = dbUser.tokenVersion
+          token.invalid = dbUser.status !== 'ACTIVE'
+        }
       }
-      if (token.sub && !token.role) {
-        const dbUser = await prisma.user.findUnique({
+
+      // 3) Per-request validation — catches stale sessions :
+      //      - User row deleted / status flipped to BANNED/PENDING
+      //      - Password changed elsewhere (tokenVersion bump)
+      //      - Role changed (admin demoted while logged in)
+      //    One Prisma read per protected request. Acceptable at v0.5
+      //    scale; revisit with a short-TTL cache if it shows up in
+      //    p95 latency post-launch.
+      if (token.sub && !token.invalid) {
+        const live = await prisma.user.findUnique({
           where: { id: token.sub },
-          select: { role: true },
+          select: { role: true, status: true, tokenVersion: true },
         })
-        if (dbUser) token.role = dbUser.role
+        if (!live || live.status !== 'ACTIVE') {
+          token.invalid = true
+        } else if (token.ver !== undefined && live.tokenVersion !== token.ver) {
+          // tokenVersion bump = revoke (password reset, OAuth unlink…).
+          token.invalid = true
+        } else {
+          // Pick up live role so a demoted admin loses /admin access
+          // immediately instead of on next sign-in.
+          token.role = live.role
+        }
       }
+
       return token
     },
     async session({ session, token }) {
+      // Bail the session entirely when the JWT is known-stale. Auth.js
+      // treats an empty session as signed-out, so middleware bounces
+      // the user back to /sign-in on the next request. We don't add a
+      // ?reason= here — that's wired in proxy.ts where we have access
+      // to the request URL.
+      if (token.invalid) {
+        return { ...session, user: undefined as unknown as Session['user'] }
+      }
       if (token.sub) session.user.id = token.sub
       if (token.role) session.user.role = token.role
       return session

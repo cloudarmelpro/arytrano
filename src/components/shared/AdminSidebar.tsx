@@ -10,6 +10,7 @@ import type { MessageKey } from '@/lib/i18n/messages'
 // index also re-exports `auth` / `signIn` which depend on `next/headers`
 // and would poison this Client Component bundle.
 import { signOutAction } from '@/features/auth/actions/sign-out'
+import { broadcastAuthChange } from '@/features/auth/lib/broadcast'
 
 export type AdminSidebarUser = {
   name: string | null
@@ -228,7 +229,11 @@ export function AdminSidebar({
         ))}
 
         {/* Sign-out — bottom of the sidebar, separated by a divider. */}
-        <form action={signOutAction} className="mt-2 border-t border-border pt-4">
+        <form
+          action={signOutAction}
+          onSubmit={() => broadcastAuthChange('signout')}
+          className="mt-2 border-t border-border pt-4"
+        >
           <button
             type="submit"
             className="group flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm text-muted-foreground transition hover:bg-destructive/10 hover:text-destructive"

@@ -1,7 +1,12 @@
 import type { Metadata } from 'next'
 import { Suspense } from 'react'
 import { redirect } from 'next/navigation'
-import { auth, SignInClient, VerifiedSuccessToast } from '@/features/auth'
+import {
+  auth,
+  SignInClient,
+  SignInReasonToast,
+  VerifiedSuccessToast,
+} from '@/features/auth'
 import { AuthPageShell, AuthAltLink } from '@/components/shared/AuthPageShell'
 import { env } from '@/lib/env'
 import { getLocale } from '@/lib/i18n/get-locale'
@@ -39,10 +44,14 @@ export default async function SignInPage() {
       }
     >
       <SignInClient googleEnabled={googleEnabled} facebookEnabled={facebookEnabled} />
-      {/* Reads `?verified=1` and fires a one-time success toast — wrapped
-          in Suspense because useSearchParams() suspends during SSR. */}
+      {/* Both toasts read URL search params via useSearchParams() which
+          requires a Suspense boundary in Next 16. The same Suspense
+          shell is reused — only one of the two toasts fires per page
+          load (verified=1 from email verification, reason=... from a
+          stale-session bounce). */}
       <Suspense fallback={null}>
         <VerifiedSuccessToast />
+        <SignInReasonToast />
       </Suspense>
     </AuthPageShell>
   )

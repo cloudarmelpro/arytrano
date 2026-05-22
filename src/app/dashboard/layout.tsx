@@ -1,10 +1,10 @@
 import type { Metadata } from 'next'
-import type { ReactNode } from 'react'
+import { Suspense, type ReactNode } from 'react'
 import { redirect } from 'next/navigation'
 import { Header } from '@/components/shared/Header'
 import { Footer } from '@/components/shared/Footer'
 import { AccountSidebar } from '@/components/shared/AccountSidebar'
-import { auth } from '@/features/auth'
+import { auth, DashboardReasonToast } from '@/features/auth'
 import { getProfile } from '@/features/auth/server'
 
 export const metadata: Metadata = {
@@ -13,7 +13,12 @@ export const metadata: Metadata = {
 
 export default async function DashboardLayout({ children }: { children: ReactNode }) {
   const session = await auth()
-  if (!session?.user) redirect('/sign-in')
+  // Middleware (proxy.ts) already bounces visitors WITHOUT a session
+  // cookie before we get here. Reaching this guard means the cookie
+  // was present but the JWT callback invalidated it (tokenVersion
+  // mismatch, account banned, deleted). Carry a friendly reason so
+  // /sign-in can explain what happened.
+  if (!session?.user) redirect('/sign-in?reason=session-expired')
 
   // Sidebar needs avatar + name + email — fetch once at the layout level so
   // every dashboard page below gets the same widget without re-querying.
@@ -32,6 +37,11 @@ export default async function DashboardLayout({ children }: { children: ReactNod
         </div>
       </main>
       <Footer />
+      {/* Surfaces `?reason=admin-revoked` etc. as toasts. Wrapped in
+          Suspense because useSearchParams() suspends during SSR. */}
+      <Suspense fallback={null}>
+        <DashboardReasonToast />
+      </Suspense>
     </>
   )
 }

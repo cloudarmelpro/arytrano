@@ -10,6 +10,7 @@ import type { MessageKey } from '@/lib/i18n/messages'
 // index also re-exports `auth` / `signIn` which depend on `next/headers`
 // and would poison this Client Component bundle.
 import { signOutAction } from '@/features/auth/actions/sign-out'
+import { broadcastAuthChange } from '@/features/auth/lib/broadcast'
 
 type Item = {
   href: string
@@ -274,7 +275,11 @@ export function AccountSidebar({
         {/* Sign-out — separated from the nav by a divider, sits at the
            bottom of the sidebar. Server Action triggered via a form so
            it works without client JS and naturally posts CSRF-protected. */}
-        <form action={signOutAction} className="mt-2 border-t border-border pt-4">
+        <form
+          action={signOutAction}
+          onSubmit={() => broadcastAuthChange('signout')}
+          className="mt-2 border-t border-border pt-4"
+        >
           <button
             type="submit"
             className="group flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm text-muted-foreground transition hover:bg-destructive/10 hover:text-destructive"

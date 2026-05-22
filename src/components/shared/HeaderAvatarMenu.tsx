@@ -9,6 +9,7 @@ import type { MessageKey } from '@/lib/i18n/messages'
 // Direct file import — `@/features/auth` index pulls in `next/headers`
 // and would poison this Client Component bundle.
 import { signOutAction } from '@/features/auth/actions/sign-out'
+import { broadcastAuthChange } from '@/features/auth/lib/broadcast'
 
 /**
  * Right-side user menu in the Header — avatar trigger opens a Base UI
@@ -121,7 +122,10 @@ export function HeaderAvatarMenu({
                consistency with the rest of the items). */}
             <Menu.Item
               render={
-                <form action={signOutAction}>
+                <form
+                  action={signOutAction}
+                  onSubmit={() => broadcastAuthChange('signout')}
+                >
                   <button
                     type="submit"
                     className="group/item flex w-full cursor-pointer items-center gap-3 px-4 py-2 text-sm text-destructive outline-none transition data-highlighted:text-destructive/70"
