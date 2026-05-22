@@ -91,12 +91,24 @@ export function proxy(request: NextRequest) {
       : pathname
   const hasSession = hasSessionCookie(request)
 
+  // Stale-session loop guard. Reaching an auth-only path WITH `?reason`
+  // is a signal from a layout (dashboard / admin) that `auth()` refused
+  // the JWT — token-version bump, banned user, deleted row, etc. The
+  // cookie is still present byte-wise so a naive bounce-to-dashboard
+  // here would send the request straight back to the layout that just
+  // rejected it → infinite redirect loop. We flag this case and clear
+  // the stale cookies once we've built the response below.
+  const isStaleSessionHint =
+    isAuthOnlyPath(unprefixedPath) &&
+    hasSession &&
+    request.nextUrl.searchParams.has('reason')
+
   if (isProtectedPath(unprefixedPath) && !hasSession) {
     const signInUrl = new URL('/sign-in', request.url)
     signInUrl.searchParams.set('returnTo', pathname + request.nextUrl.search)
     return NextResponse.redirect(signInUrl)
   }
-  if (isAuthOnlyPath(unprefixedPath) && hasSession) {
+  if (isAuthOnlyPath(unprefixedPath) && hasSession && !isStaleSessionHint) {
     return NextResponse.redirect(new URL('/dashboard', request.url))
   }
 
@@ -157,6 +169,29 @@ export function proxy(request: NextRequest) {
       secure: process.env.NODE_ENV === 'production',
     })
   }
+
+  // ─── 6. Stale-session cookie cleanup ───────────────────────────────
+  // Triggered when an auth-only path was reached WITH `?reason=` (set
+  // above). Deleting a missing cookie is a no-op so we can be exhaustive
+  // about Auth.js's many variants (HTTP, __Secure-HTTPS, chunked .0/.1).
+  if (isStaleSessionHint) {
+    const cookieNamesToClear = [
+      'authjs.session-token',
+      '__Secure-authjs.session-token',
+      'authjs.callback-url',
+      '__Secure-authjs.callback-url',
+      'authjs.csrf-token',
+      '__Host-authjs.csrf-token',
+    ]
+    for (const name of cookieNamesToClear) {
+      response.cookies.delete(name)
+    }
+    for (let i = 0; i < 5; i++) {
+      response.cookies.delete(`authjs.session-token.${i}`)
+      response.cookies.delete(`__Secure-authjs.session-token.${i}`)
+    }
+  }
+
   response.headers.set('Content-Security-Policy', cspHeader)
   return response
 }
