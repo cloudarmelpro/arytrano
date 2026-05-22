@@ -9,6 +9,7 @@ export type TransactionalEventType =
   | 'listing-verified'
   | 'report-received'
   | 'review-replied'
+  | 'contact-received'
   | 'cin-approved'
   | 'cin-rejected'
 

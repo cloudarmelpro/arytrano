@@ -698,7 +698,7 @@ unsubscribeToken String?    @unique  // long-lived, généré au signup
 **Je veux** me désabonner sans contacter le support
 **Afin de** respecter ma vie privée et la loi
 **Acceptance** : ajouter colonnes `unsubscribedAt DateTime?` + `unsubscribeToken String? @unique` sur WhatsAppAlert · au subscribe, générer + persister un token long-lived (cuid v2 ou crypto random base64) · email/WhatsApp message inclut un lien `https://arytrano.mg/u/<token>` qui marque `unsubscribedAt = now()` côté DB sans login · page de confirmation simple « Tu es désabonné, ciao » · queries broadcast doivent ignorer `unsubscribedAt IS NOT NULL` · i18n FR/MG · cf AUD-009
-**Priorité** : P1 · **Statut** : 📋 todo
+**Priorité** : P1 · **Statut** : ✅ done (2026-05-22) — schema migration `20260522060000_add_whatsapp_unsubscribe` (unsubscribedAt + unsubscribeToken unique + index), services `generate-unsubscribe-token.ts` (crypto.randomBytes 24→base64url 192-bit) + `unsubscribe-by-token.ts` (idempotent), subscribe action génère le token et re-active sur re-subscribe en gardant le token stable, route publique `/u/[token]` 200 partout (don't leak token existence) avec 3 états success/already/invalid, 5 clés i18n FR+MG. Future broadcast cron filtrera `WHERE unsubscribedAt IS NULL`.
 
 ---
 
@@ -859,7 +859,7 @@ Migration `<ts>_add_user_contact_notif_pref`
 
 **Effort estimé** : ~1.5 jour (depend de l'état T-034)
 
-**Priorité** : P1 · **Statut** : 📋 todo
+**Priorité** : P1 · **Statut** : ✅ done (2026-05-22) — schema migration `20260522060500_add_user_contact_notif_pref` (User.contactNotificationsEnabled bool default true), email template `lib/email/templates/contact-received.ts` FR+MG (channel-aware WhatsApp/PHONE, anonymous — no student info), new TransactionalEventType `contact-received`, service `notify-owner-contact.ts` fire-soft skip conditions (opted-out / no email), hook fire-and-forget `void notifyOwnerContact(...)` dans `record-contact-click.ts` après l'insert ContactEvent (le reveal phone côté étudiant ne se bloque jamais sur SMTP), NotificationsSection Client Component (toggle optimistic + toast feedback) + Server Action `toggleContactNotificationsAction` avec auth guard + revalidatePath, intégré dans /dashboard/settings derrière condition role === OWNER|ADMIN, 9 nouvelles clés i18n FR+MG. Tests 115/115.
 
 ---
 

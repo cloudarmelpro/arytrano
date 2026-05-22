@@ -6,8 +6,10 @@ import {
   OAuthConnectionsSection,
   DeleteAccountSection,
   LoginEventsSection,
+  NotificationsSection,
   TwoFactorSection,
 } from '@/features/auth'
+import { prisma } from '@/lib/db'
 import {
   listConnections,
   countAuthMethods,
@@ -29,7 +31,7 @@ export default async function SettingsPage() {
   if (!session?.user) redirect('/sign-in')
 
   const userId = session.user.id
-  const [connections, methods, loginEvents, locale, twofaEnabled, recoveryCount] =
+  const [connections, methods, loginEvents, locale, twofaEnabled, recoveryCount, userPrefs] =
     await Promise.all([
       listConnections(userId),
       countAuthMethods(userId),
@@ -37,8 +39,14 @@ export default async function SettingsPage() {
       getLocale(),
       isTotpEnabled(userId),
       countActiveRecoveryCodes(userId),
+      prisma.user.findUnique({
+        where: { id: userId },
+        select: { contactNotificationsEnabled: true, role: true },
+      }),
     ])
   const t = getT(locale)
+  const showNotificationsSection =
+    userPrefs?.role === 'OWNER' || userPrefs?.role === 'ADMIN'
 
   const googleEnabled = Boolean(env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET)
   const facebookEnabled = Boolean(env.FACEBOOK_CLIENT_ID && env.FACEBOOK_CLIENT_SECRET)
@@ -85,6 +93,17 @@ export default async function SettingsPage() {
           <p className="text-sm text-muted-foreground">{t('settings.oauthNotConfigured')}</p>
         )}
       </Section>
+
+      {showNotificationsSection ? (
+        <Section
+          title={t('settings.section.notifications.title')}
+          description={t('settings.section.notifications.lead')}
+        >
+          <NotificationsSection
+            initialEnabled={userPrefs?.contactNotificationsEnabled ?? true}
+          />
+        </Section>
+      ) : null}
 
       <Section
         title={t('settings.section.logins.title')}

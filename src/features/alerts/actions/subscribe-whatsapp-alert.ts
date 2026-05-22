@@ -5,6 +5,7 @@ import { prisma } from '@/lib/db'
 import { extractRequestInfo } from '@/lib/auth/request-info'
 import { rateLimiters } from '@/lib/rate-limit'
 import { whatsappAlertSchema } from '../schemas/whatsapp-alert'
+import { generateUnsubscribeToken } from '../services/generate-unsubscribe-token'
 
 type ActionResult =
   | { ok: true; alreadySubscribed: boolean }
@@ -53,15 +54,23 @@ export async function subscribeWhatsAppAlertAction(input: {
     // do both but couldn't differentiate the two outcomes.
     const existing = await prisma.whatsAppAlert.findUnique({
       where: { phoneE164: parsed.data.phone },
-      select: { id: true },
+      select: { id: true, unsubscribedAt: true, unsubscribeToken: true },
     })
 
     if (existing) {
+      // Re-subscribing? Clear the unsubscribedAt flag and refresh
+      // settings. The token stays stable so the user keeps a working
+      // unsubscribe link in any old broadcast. Only generate a new
+      // token if the row predates the T-045 migration (token null).
       await prisma.whatsAppAlert.update({
         where: { id: existing.id },
         data: {
           locale,
           quartierSlug: parsed.data.quartierSlug ?? null,
+          unsubscribedAt: null,
+          ...(existing.unsubscribeToken
+            ? {}
+            : { unsubscribeToken: generateUnsubscribeToken() }),
         },
       })
       return { ok: true, alreadySubscribed: true }
@@ -73,6 +82,7 @@ export async function subscribeWhatsAppAlertAction(input: {
         locale,
         quartierSlug: parsed.data.quartierSlug ?? null,
         ipHash,
+        unsubscribeToken: generateUnsubscribeToken(),
       },
     })
     return { ok: true, alreadySubscribed: false }

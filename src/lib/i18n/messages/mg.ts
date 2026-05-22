@@ -141,6 +141,19 @@ export const mg: Record<MessageKey, string> = {
     'Be loatra ny andrana. Andramo indray afaka adiny iray.',
   'footerV3.newsletter.error.unavailable':
     'Nisy olana. Andramo indray afaka kely.',
+
+  // Public unsubscribe page (T-045)
+  'unsubscribe.success.title': 'Voarainay — voaesotra ianao.',
+  'unsubscribe.success.body':
+    'Tsy hisy hafatra WhatsApp na mailaka momba ny filazana vaovao intsony. Azonao atao ny misoratra anarana indray amin\'ny alalan\'ny rohy ao ambany pejy.',
+  'unsubscribe.alreadyDone.title': 'Efa voaesotra ianao.',
+  'unsubscribe.alreadyDone.body':
+    'Tsy misy olana — tsy hisy hafatra alefa amin\'io laharana io. Raha tianao ny mandray filazana indray, mamerena amin\'ny formulaire ao ambany pejy.',
+  'unsubscribe.invalid.title': 'Tsy mety na lany andro ny rohy.',
+  'unsubscribe.invalid.body':
+    'Tsy fantatra ny rohy nokitihinao. Raha mbola mahazo hafatra ianao, fifandraisana amin\'ny contact@arytrano.mg.',
+  'unsubscribe.backHome': 'Hiverina amin\'ny AryTrano',
+
   'footerV3.tagline':
     'Tadiavo ny tranonao ao Fianarantsoa, tsy misy mpanelanelana. Tompon-trano voamarina, fifandraisana mivantana, maimaim-poana ho an’ny mpianatra.',
   'footerV3.status.allOperational': 'Mandeha tsara ireo serivisy rehetra',
@@ -1421,6 +1434,17 @@ export const mg: Record<MessageKey, string> = {
   'settings.section.oauth.lead': 'Ampifandraiso na esory ny kaonty Google / Facebook.',
   'settings.section.logins.title': 'Fidirana farany',
   'settings.section.logins.lead': 'Hamarino fa tsy misy fivoriana mahasahirana.',
+  'settings.section.notifications.title': 'Fanairana',
+  'settings.section.notifications.lead':
+    'Fehezo ireo mailaka azonao mandeha ho azy.',
+  'settings.notifications.contactReceived.label':
+    'Mailaka isaky ny fifandraisana vaovao',
+  'settings.notifications.contactReceived.help':
+    'Mandefa mailaka aminao izahay raha vao mitsindry « Mifandray » ny mpianatra amin\'ny iray amin\'ny filazanao. Esory raha aleo manjery ny dashboard fotsiny.',
+  'settings.notifications.toast.on': 'Voahetsika ny fanairana.',
+  'settings.notifications.toast.off': 'Nofoanana ny fanairana.',
+  'settings.notifications.error':
+    'Tsy nahomby ny fanavaozana ny safidy.',
   'settings.section.danger.title': 'Faritra mampidi-doza',
   'settings.section.danger.lead': 'Mamafa ny kaontinao dia tsy azo verenina.',
 

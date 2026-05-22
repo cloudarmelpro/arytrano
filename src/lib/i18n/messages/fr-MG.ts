@@ -135,6 +135,19 @@ export const frMG = {
     'Trop d’essais. Réessaie dans une heure.',
   'footerV3.newsletter.error.unavailable':
     'Une erreur est survenue. Réessaie dans un moment.',
+
+  // Public unsubscribe page (T-045)
+  'unsubscribe.success.title': 'C\'est noté — tu es désabonné.',
+  'unsubscribe.success.body':
+    'On ne t\'enverra plus de messages WhatsApp ni d\'emails sur les nouvelles annonces. Tu peux te réinscrire à tout moment depuis le footer du site.',
+  'unsubscribe.alreadyDone.title': 'Tu étais déjà désabonné.',
+  'unsubscribe.alreadyDone.body':
+    'Pas de soucis — aucun message ne partira vers ce numéro. Si tu veux à nouveau recevoir les annonces, repasse par le formulaire en bas du site.',
+  'unsubscribe.invalid.title': 'Lien invalide ou expiré.',
+  'unsubscribe.invalid.body':
+    'Le lien de désabonnement que tu as cliqué n\'est pas reconnu. Si tu reçois encore des messages, contacte-nous à contact@arytrano.mg.',
+  'unsubscribe.backHome': 'Retour à AryTrano',
+
   'footerV3.tagline':
     'Trouve ton logement à Fianarantsoa, sans intermédiaire. Propriétaires vérifiés, contact direct, gratuit pour les étudiants.',
   'footerV3.status.allOperational': 'Tous les services opérationnels',
@@ -1399,6 +1412,17 @@ export const frMG = {
   'settings.section.oauth.lead': 'Lie ou délie tes comptes Google / Facebook.',
   'settings.section.logins.title': 'Dernières connexions',
   'settings.section.logins.lead': 'Vérifie qu\'aucune session suspecte n\'apparaît.',
+  'settings.section.notifications.title': 'Notifications',
+  'settings.section.notifications.lead':
+    'Contrôle les emails automatiques que tu reçois.',
+  'settings.notifications.contactReceived.label':
+    'Email à chaque nouveau contact',
+  'settings.notifications.contactReceived.help':
+    'On t\'envoie un email dès qu\'un étudiant clique « Contacter » sur une de tes annonces. Désactive si tu préfères seulement consulter le dashboard.',
+  'settings.notifications.toast.on': 'Notifications activées.',
+  'settings.notifications.toast.off': 'Notifications désactivées.',
+  'settings.notifications.error':
+    'Impossible de mettre à jour la préférence.',
   'settings.section.danger.title': 'Zone dangereuse',
   'settings.section.danger.lead': 'Supprimer ton compte est irréversible.',
 

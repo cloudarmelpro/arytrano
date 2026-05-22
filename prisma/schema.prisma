@@ -43,6 +43,13 @@ model User {
   totpSecret      String?
   totpEnabledAt   DateTime?
 
+  // T-047 — owners get an email on every contact click by default.
+  // Toggle off via /dashboard/settings if they prefer to check the
+  // dashboard only. Students never trigger this (they don't own
+  // listings) — the field exists on User to keep the toggle UI in
+  // one place.
+  contactNotificationsEnabled Boolean @default(true)
+
   createdAt     DateTime   @default(now())
   updatedAt     DateTime   @updatedAt
 
@@ -686,6 +693,17 @@ model WhatsAppAlert {
   ipHash      String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+  // T-045 — public unsubscribe via one-click link.
+  // `unsubscribeToken` is a long-lived crypto-random string included
+  // in every outbound broadcast. When the user clicks the link,
+  // `unsubscribedAt` flips to now() and broadcast queries filter the
+  // row out. Token stays unique — once set, never reused — so a
+  // re-subscribe of the same phone gets a fresh token.
+  unsubscribedAt   DateTime?
+  unsubscribeToken String?   @unique
 
   @@index([quartierSlug, createdAt])
+  // Broadcast queries hit `WHERE unsubscribedAt IS NULL`; a partial
+  // index on the live subset keeps the cron fast as the table grows.
+  @@index([unsubscribedAt])
 }

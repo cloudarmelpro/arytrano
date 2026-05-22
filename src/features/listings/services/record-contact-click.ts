@@ -4,6 +4,7 @@ import { errors } from '@/lib/api/errors'
 import { hashUa } from '@/lib/auth/request-info'
 import { rateLimiters } from '@/lib/rate-limit'
 import type { ContactChannel } from '../schemas/contact'
+import { notifyOwnerContact } from './notify-owner-contact'
 
 export type RecordContactClickResult = {
   channel: ContactChannel
@@ -47,7 +48,17 @@ export async function recordContactClick(input: {
     where: { id: input.listingId, status: 'PUBLISHED' },
     select: {
       id: true,
-      owner: { select: { phone: true, name: true } },
+      title: true,
+      owner: {
+        select: {
+          id: true,
+          email: true,
+          phone: true,
+          name: true,
+          locale: true,
+          contactNotificationsEnabled: true,
+        },
+      },
     },
   })
 
@@ -74,6 +85,21 @@ export async function recordContactClick(input: {
       uaHash,
       viewerId: input.viewerId,
     },
+  })
+
+  // T-047 — notify the owner. Fire-and-forget : the student's reveal
+  // MUST succeed even if SMTP is down, so we don't await the result.
+  // notifyOwnerContact swallows its own errors; this `void` discards
+  // the returned promise without leaking unhandledRejection.
+  void notifyOwnerContact({
+    ownerId: listing.owner.id,
+    ownerEmail: listing.owner.email,
+    ownerName: listing.owner.name,
+    ownerLocale: listing.owner.locale,
+    contactNotificationsEnabled: listing.owner.contactNotificationsEnabled,
+    listingId: listing.id,
+    listingTitle: listing.title,
+    channel: input.channel,
   })
 
   // Owner display name: first token only (privacy mirror of get-public-listing).
