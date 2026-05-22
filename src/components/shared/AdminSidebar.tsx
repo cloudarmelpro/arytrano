@@ -84,6 +84,17 @@ function IconIdCard() {
   )
 }
 
+function IconQuote() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M3 21c0-4 0-6 3-9" />
+      <path d="M3 14V8a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H3z" />
+      <path d="M13 21c0-4 0-6 3-9" />
+      <path d="M13 14V8a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2h-6z" />
+    </svg>
+  )
+}
+
 /**
  * Top-level section roots (e.g. `/admin`, `/dashboard`) match only on
  * exact pathname — otherwise their prefix swallows every sub-route and
@@ -116,6 +127,16 @@ const buildSections = (openReports: number): Section[] => [
         href: '/admin/owner-verifications',
         labelKey: 'admin.nav.cinQueue',
         icon: <IconIdCard />,
+      },
+    ],
+  },
+  {
+    labelKey: 'admin.section.marketing',
+    items: [
+      {
+        href: '/admin/testimonials',
+        labelKey: 'admin.nav.testimonials',
+        icon: <IconQuote />,
       },
     ],
   },

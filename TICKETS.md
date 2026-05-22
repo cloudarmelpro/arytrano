@@ -452,7 +452,7 @@ C/D/E sont planifiées mais non détaillées ici.
 
 **Effort estimé** : ~1 jour (services + actions + 3 routes + form + i18n)
 
-**Priorité** : P1 · **Statut** : 📋 todo
+**Priorité** : P1 · **Statut** : ✅ done (2026-05-22) — feature `features/admin-testimonials/` complète : services CRUD + 4 Server Actions (create/update/publish/delete avec requireAdmin), query paginée cursor 20/page + filtres audience+status, 3 routes `/admin/testimonials/{,/new,/[id]/edit}`, TestimonialForm Client avec useActionState + field errors + char counter, TestimonialActions inline (edit/publish/unpublish/delete Dialog), AdminSidebar section MARKETING > Témoignages, ~50 nouvelles clés i18n FR+MG. `revalidateTag('landing-testimonials', 'max')` après chaque mutation (Next 16 signature avec profile).
 
 #### T-043 · Admin view Quiz submissions + analytics
 **En tant qu'**admin

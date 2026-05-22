@@ -1567,10 +1567,71 @@ export const mg: Record<MessageKey, string> = {
   'admin.console': 'Console admin',
   'admin.section.dashboard': 'Solaitra fanaraha-maso',
   'admin.section.moderation': 'Fanaraha-maso',
+  'admin.section.marketing': 'Marketing',
   'admin.nav.overview': 'Topi-maso ankapobeny',
   'admin.nav.listings': 'Trano hofaina',
   'admin.nav.reports': 'Fitarainana',
+  'admin.nav.testimonials': 'Fijoroana ho vavolombelona',
   'admin.headerLink': 'Admin',
+
+  // Admin testimonials CRUD (T-042)
+  'admin.testimonials.list.title': 'Fijoroana ho vavolombelona',
+  'admin.testimonials.list.lead':
+    'Teny navoaka ao amin\'ny pejy fandraisan\'ny AryTrano. Manampia, manova, mamoaha na manesotra araka ny ilaina.',
+  'admin.testimonials.list.create': 'Hanampy vaovao',
+  'admin.testimonials.list.empty':
+    'Mbola tsy misy — tsindrio « Hanampy vaovao » mba hanomboka.',
+  'admin.testimonials.list.next': 'Pejy manaraka',
+  'admin.testimonials.list.backLink': 'Hiverina amin\'ny lisitra',
+  'admin.testimonials.filter.audience.all': 'Mpanaraka rehetra',
+  'admin.testimonials.filter.audience.owner': 'Tompon-trano',
+  'admin.testimonials.filter.audience.student': 'Mpianatra',
+  'admin.testimonials.filter.status.all': 'Sata rehetra',
+  'admin.testimonials.filter.status.published': 'Navoaka',
+  'admin.testimonials.filter.status.draft': 'Drafy',
+  'admin.testimonials.new.title': 'Fijoroana vaovao',
+  'admin.testimonials.new.lead':
+    'Mamorona teny avy amin\'ny tena valin-teny azo tamin\'ny WhatsApp na mailaka tamin\'ny tompon-trano na mpianatra.',
+  'admin.testimonials.edit.title': 'Manova ny fijoroana',
+  'admin.testimonials.edit.lead':
+    'Hita amin\'ny besinimaro aorian\'ny fanavaozana (mety 5 mn cache).',
+  'admin.testimonials.form.audience.label': 'Mpanaraka',
+  'admin.testimonials.form.audience.owner': 'Tompon-trano',
+  'admin.testimonials.form.audience.student': 'Mpianatra',
+  'admin.testimonials.form.authorName.label': 'Anarana hiseho',
+  'admin.testimonials.form.authorName.placeholder': 'Andry R. na Maison Rasoa',
+  'admin.testimonials.form.authorMeta.label': 'Andalana faharoa (tsy voatery)',
+  'admin.testimonials.form.authorMeta.placeholder':
+    'Trano 3 voamarina · Andrainjato',
+  'admin.testimonials.form.authorMeta.help':
+    'Miseho kely eo ambanin\'ny anarana. Ilaina ho amin\'ny tontolo (anarana asa, faritra, taonan\'ny fiaraha-miasa).',
+  'admin.testimonials.form.body.label': 'Teny',
+  'admin.testimonials.form.body.placeholder':
+    'Voa-hofa tao anatin\'ny 4 andro ny studio-ko. Tsy nisy taratasy amin\'ny AryTrano.',
+  'admin.testimonials.form.body.charCount': '{count}/{max} litera',
+  'admin.testimonials.form.sortOrder.label': 'Filaharana',
+  'admin.testimonials.form.sortOrder.help':
+    'Kely = ambony amin\'ny landing. 0 ho default. Mahasoa raha mametra teny hero.',
+  'admin.testimonials.form.publishImmediately.label':
+    'Mamoaka avy hatrany',
+  'admin.testimonials.form.publishImmediately.help':
+    'Esory raha tianao ho draft — afaka mamoaka aty aoriana avy amin\'ny lisitra.',
+  'admin.testimonials.form.submit.create': 'Mamorona',
+  'admin.testimonials.form.submit.update': 'Manavao',
+  'admin.testimonials.form.submit.pending': 'Mitahiry…',
+  'admin.testimonials.row.edit': 'Manova',
+  'admin.testimonials.row.publish': 'Mamoaka',
+  'admin.testimonials.row.unpublish': 'Esory amin\'ny besinimaro',
+  'admin.testimonials.row.delete': 'Esory',
+  'admin.testimonials.delete.dialog.title': 'Esorina io fijoroana io ?',
+  'admin.testimonials.delete.dialog.body':
+    'Tsy azo averina io. Esorina avy hatrany amin\'ny landing ny teny.',
+  'admin.testimonials.delete.dialog.cancel': 'Hialana',
+  'admin.testimonials.delete.dialog.confirm': 'Esory',
+  'admin.testimonials.toast.published': 'Navoaka ny fijoroana.',
+  'admin.testimonials.toast.unpublished': 'Voaesotra tamin\'ny besinimaro.',
+  'admin.testimonials.toast.deleted': 'Voaesotra ny fijoroana.',
+  'admin.testimonials.toast.error': 'Tsy nahomby. Andramo indray.',
 
   // Admin overview
   'admin.overview.title': 'Topi-maso ankapobeny',

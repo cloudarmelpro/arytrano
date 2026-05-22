@@ -1545,10 +1545,71 @@ export const frMG = {
   'admin.console': 'Console admin',
   'admin.section.dashboard': 'Tableau de bord',
   'admin.section.moderation': 'Modération',
+  'admin.section.marketing': 'Marketing',
   'admin.nav.overview': 'Vue d\'ensemble',
   'admin.nav.listings': 'Annonces',
   'admin.nav.reports': 'Signalements',
+  'admin.nav.testimonials': 'Témoignages',
   'admin.headerLink': 'Admin',
+
+  // Admin testimonials CRUD (T-042)
+  'admin.testimonials.list.title': 'Témoignages',
+  'admin.testimonials.list.lead':
+    'Citations publiées sur la landing AryTrano. Ajoute, édite, publie ou retire selon les besoins marketing.',
+  'admin.testimonials.list.create': 'Nouveau témoignage',
+  'admin.testimonials.list.empty':
+    'Aucun témoignage encore — clique « Nouveau témoignage » pour commencer.',
+  'admin.testimonials.list.next': 'Page suivante',
+  'admin.testimonials.list.backLink': 'Retour à la liste',
+  'admin.testimonials.filter.audience.all': 'Toutes audiences',
+  'admin.testimonials.filter.audience.owner': 'Propriétaires',
+  'admin.testimonials.filter.audience.student': 'Étudiants',
+  'admin.testimonials.filter.status.all': 'Tous statuts',
+  'admin.testimonials.filter.status.published': 'Publiés',
+  'admin.testimonials.filter.status.draft': 'Brouillons',
+  'admin.testimonials.new.title': 'Nouveau témoignage',
+  'admin.testimonials.new.lead':
+    'Crée une citation à partir d\'un retour réel collecté par WhatsApp ou email avec un propriétaire / étudiant.',
+  'admin.testimonials.edit.title': 'Éditer le témoignage',
+  'admin.testimonials.edit.lead':
+    'Les modifications sont visibles publiquement après revalidation (jusqu\'à 5 min de cache).',
+  'admin.testimonials.form.audience.label': 'Audience',
+  'admin.testimonials.form.audience.owner': 'Propriétaire',
+  'admin.testimonials.form.audience.student': 'Étudiant',
+  'admin.testimonials.form.authorName.label': 'Nom affiché',
+  'admin.testimonials.form.authorName.placeholder': 'Andry R. ou Maison Rasoa',
+  'admin.testimonials.form.authorMeta.label': 'Sous-ligne (optionnel)',
+  'admin.testimonials.form.authorMeta.placeholder':
+    '3 logements vérifiés · Andrainjato',
+  'admin.testimonials.form.authorMeta.help':
+    'Apparaît en petit sous le nom. Idéal pour le contexte (rôle, quartier, ancienneté).',
+  'admin.testimonials.form.body.label': 'Citation',
+  'admin.testimonials.form.body.placeholder':
+    'Mon studio loué en 4 jours. Et zéro paperasse côté AryTrano.',
+  'admin.testimonials.form.body.charCount': '{count}/{max} caractères',
+  'admin.testimonials.form.sortOrder.label': 'Ordre',
+  'admin.testimonials.form.sortOrder.help':
+    'Plus petit = plus haut sur la landing. 0 par défaut. Utile pour épingler une citation hero.',
+  'admin.testimonials.form.publishImmediately.label':
+    'Publier immédiatement',
+  'admin.testimonials.form.publishImmediately.help':
+    'Décoche pour créer en brouillon — tu pourras publier plus tard depuis la liste.',
+  'admin.testimonials.form.submit.create': 'Créer',
+  'admin.testimonials.form.submit.update': 'Mettre à jour',
+  'admin.testimonials.form.submit.pending': 'Enregistrement…',
+  'admin.testimonials.row.edit': 'Éditer',
+  'admin.testimonials.row.publish': 'Publier',
+  'admin.testimonials.row.unpublish': 'Dépublier',
+  'admin.testimonials.row.delete': 'Supprimer',
+  'admin.testimonials.delete.dialog.title': 'Supprimer ce témoignage ?',
+  'admin.testimonials.delete.dialog.body':
+    'L\'action est définitive. La citation disparaît de la landing immédiatement.',
+  'admin.testimonials.delete.dialog.cancel': 'Annuler',
+  'admin.testimonials.delete.dialog.confirm': 'Supprimer',
+  'admin.testimonials.toast.published': 'Témoignage publié.',
+  'admin.testimonials.toast.unpublished': 'Témoignage dépublié.',
+  'admin.testimonials.toast.deleted': 'Témoignage supprimé.',
+  'admin.testimonials.toast.error': 'Action impossible. Réessaie.',
 
   // Admin overview page
   'admin.overview.title': 'Vue d\'ensemble',
