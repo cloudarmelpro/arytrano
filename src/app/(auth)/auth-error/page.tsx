@@ -2,10 +2,15 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { getLocale } from '@/lib/i18n/get-locale'
 import { getT, type Translator } from '@/lib/i18n/translate'
+import { localeAlternates } from '@/lib/seo/alternates'
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = getT(await getLocale())
-  return { title: t('authError.title.default') }
+  return {
+    title: t('authError.title.default'),
+    alternates: await localeAlternates('/auth-error'),
+    robots: { index: false, follow: false },
+  }
 }
 
 /**

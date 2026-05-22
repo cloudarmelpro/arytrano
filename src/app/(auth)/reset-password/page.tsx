@@ -1,7 +1,16 @@
+import type { Metadata } from 'next'
 import Link from 'next/link'
 import { ResetPasswordForm } from '@/features/auth'
+import { localeAlternates } from '@/lib/seo/alternates'
 
-export const metadata = { title: 'Nouveau mot de passe' }
+export async function generateMetadata(): Promise<Metadata> {
+  return {
+    title: 'Nouveau mot de passe',
+    alternates: await localeAlternates('/reset-password'),
+    // The page is token-gated and never indexable.
+    robots: { index: false, follow: false },
+  }
+}
 
 export default async function ResetPasswordPage({
   searchParams,

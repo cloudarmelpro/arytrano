@@ -4,10 +4,14 @@ import { AuthPageShell, AuthAltLink } from '@/components/shared/AuthPageShell'
 import { env } from '@/lib/env'
 import { getLocale } from '@/lib/i18n/get-locale'
 import { getT } from '@/lib/i18n/translate'
+import { localeAlternates } from '@/lib/seo/alternates'
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = getT(await getLocale())
-  return { title: t('signUp.title') }
+  return {
+    title: t('signUp.title'),
+    alternates: await localeAlternates('/sign-up'),
+  }
 }
 
 type SearchParams = Promise<{ role?: string }>

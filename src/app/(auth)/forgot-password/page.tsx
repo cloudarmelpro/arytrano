@@ -3,10 +3,14 @@ import { ForgotPasswordForm } from '@/features/auth'
 import { AuthPageShell, AuthAltLink } from '@/components/shared/AuthPageShell'
 import { getLocale } from '@/lib/i18n/get-locale'
 import { getT } from '@/lib/i18n/translate'
+import { localeAlternates } from '@/lib/seo/alternates'
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = getT(await getLocale())
-  return { title: t('forgot.title') }
+  return {
+    title: t('forgot.title'),
+    alternates: await localeAlternates('/forgot-password'),
+  }
 }
 
 export default async function ForgotPasswordPage() {

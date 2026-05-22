@@ -2,10 +2,15 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { getLocale } from '@/lib/i18n/get-locale'
 import { getT } from '@/lib/i18n/translate'
+import { localeAlternates } from '@/lib/seo/alternates'
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = getT(await getLocale())
-  return { title: t('verifyEmail.title') }
+  return {
+    title: t('verifyEmail.title'),
+    alternates: await localeAlternates('/verify-email'),
+    robots: { index: false, follow: false },
+  }
 }
 
 export default async function VerifyEmailPage({

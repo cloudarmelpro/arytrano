@@ -942,7 +942,7 @@ model OwnerResponse {
 
 **Effort estimé** : ~1 jour (si schema + composant existent partiellement, sinon 2j)
 
-**Priorité** : P2 · **Statut** : 📋 todo (partiel : schéma + composant existent, action submit à vérifier)
+**Priorité** : P2 · **Statut** : ✅ done (confirmé 2026-05-22) — schema `Review.ownerResponse` + `ownerResponseAt`, services `respond-to-review.ts` + `delete-owner-response.ts`, Server Actions correspondantes, composants `OwnerResponseForm` (Client, edit/create/delete) + `OwnerResponseBubble` (Server display sur ReviewRow), email template `review-replied.ts` envoyé à l'auteur de l'avis, rate-limit + auth guard (owner du listing uniquement).
 
 ---
 
@@ -1363,7 +1363,7 @@ enum ListingStatus {
 
 **Effort estimé** : ~1 jour (audit + compléter clés manquantes + tester)
 
-**Priorité** : P2 · **Statut** : 📋 todo (auth-gated donc impact faible — mais signal de cohérence)
+**Priorité** : P2 · **Statut** : ✅ done (2026-05-22) — `alternates: await localeAlternates(...)` ajouté à `/sign-in`, `/sign-up`, `/forgot-password`, `/reset-password`, `/verify-email`, `/auth-error` (6 pages). Les 3 pages token-gated (reset, verify, error) gardent aussi `robots: { index: false, follow: false }`. Cohérence FR↔MG complète, plus de hreflang manquant côté auth.
 
 ---
 
