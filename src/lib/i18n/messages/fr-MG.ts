@@ -249,6 +249,11 @@ export const frMG = {
   'toolbar.search.label': 'Recherche :',
   'toolbar.query.label': 'Recherche par mots-clés',
   'toolbar.query.placeholder': 'Mot-clé (ex. meublé, balcon, calme…)',
+  'toolbar.view.label': 'Vue',
+  'toolbar.view.grid': 'Grille',
+  'toolbar.view.map': 'Carte',
+  'annonces.map.empty.title': 'Aucune annonce à afficher sur la carte',
+  'annonces.map.empty.lead': 'Modifiez vos filtres ou repassez en vue Grille.',
   'filters.amenities.label': 'Ce que propose ce logement',
 
   // Sort

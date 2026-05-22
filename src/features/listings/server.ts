@@ -17,6 +17,10 @@ export {
   type PublicListingsPage,
   type PublicListingCard as PublicListingCardData,
 } from './queries/list-public-listings'
+export {
+  listPublicListingsForMap,
+  type PublicMapListing,
+} from './queries/list-public-listings-for-map'
 export { listRelatedListings } from './queries/list-related-listings'
 export {
   getPublicListing,

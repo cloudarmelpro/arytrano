@@ -254,6 +254,11 @@ export const mg: Record<MessageKey, string> = {
   'toolbar.search.label': 'Fitadiavana :',
   'toolbar.query.label': 'Fitadiavana amin\'ny teny fototra',
   'toolbar.query.placeholder': 'Teny (oh. fanaka, balkôny, mangina…)',
+  'toolbar.view.label': 'Sehotra',
+  'toolbar.view.grid': 'Tabilao',
+  'toolbar.view.map': 'Sarintany',
+  'annonces.map.empty.title': 'Tsy misy filazana hita amin\'ny sarintany',
+  'annonces.map.empty.lead': 'Ovay ny sivana na miverena amin\'ny tabilao.',
   'filters.amenities.label': 'Izay omen\'ity trano ity',
 
   // Sort

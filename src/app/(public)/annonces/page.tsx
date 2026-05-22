@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import {
   listPublicListings,
+  listPublicListingsForMap,
   listPublicListingsQuerySchema,
 } from '@/features/listings/server'
 import { PublicListingCard } from '@/features/listings'
@@ -9,6 +10,8 @@ import {
   ListingFiltersSidebar,
   ListingSearchToolbar,
   CityTabs,
+  ListingsMapClient,
+  ListingsViewToggle,
 } from '@/features/listings'
 import { SaveSearchButton } from '@/features/search'
 import { listCitiesWithNeighborhoods } from '@/features/geo'
@@ -31,6 +34,7 @@ type SearchParams = Promise<{
   sort?: string
   amenities?: string
   q?: string
+  view?: string
 }>
 
 function hasAnyFilter(sp: Awaited<SearchParams>) {
@@ -45,7 +49,8 @@ function hasAnyFilter(sp: Awaited<SearchParams>) {
       sp.priceMax ||
       sp.sort ||
       sp.amenities ||
-      sp.q,
+      sp.q ||
+      sp.view,
   )
 }
 
@@ -113,17 +118,28 @@ export default async function PublicListingsPage({
     q: sp.q || undefined,
   })
   const query = parsed.success ? parsed.data : {}
+  const viewMode: 'grid' | 'map' = sp.view === 'map' ? 'map' : 'grid'
 
   // Fetch the listings + neighborhood list + session in parallel —
   // neighborhoods power the filter dropdown, listings are the page payload,
   // and the session lets us mark already-favorited cards.
+  // For map view, fetch ALL matching listings (capped at 500) so every
+  // quartier shows its true count — pagination is meaningless on a map.
   const [
     { items, nextCursor, hasMore },
+    mapItems,
     cities,
     cityCounts,
     session,
   ] = await Promise.all([
-    listPublicListings(query),
+    viewMode === 'grid'
+      ? listPublicListings(query)
+      : Promise.resolve({ items: [], nextCursor: null, hasMore: false } as Awaited<
+          ReturnType<typeof listPublicListings>
+        >),
+    viewMode === 'map'
+      ? listPublicListingsForMap(query)
+      : Promise.resolve([] as Awaited<ReturnType<typeof listPublicListingsForMap>>),
     listCitiesWithNeighborhoods(),
     // CityTabs counts. Separate query (cached 5min) — `listCitiesWith
     // Neighborhoods` doesn't aggregate, and we don't want to fold the
@@ -175,6 +191,7 @@ export default async function PublicListingsPage({
   if (sp.sort) cityTabsParams.set('sort', sp.sort)
   if (sp.amenities) cityTabsParams.set('amenities', sp.amenities)
   if (sp.q) cityTabsParams.set('q', sp.q)
+  if (sp.view) cityTabsParams.set('view', sp.view)
 
   // Single SET lookup per card avoids N+1 favorite queries.
   const favoritedIds = await getFavoritedListingIds(
@@ -236,10 +253,16 @@ export default async function PublicListingsPage({
       />
 
       {/* Top toolbar — neighborhood autocomplete on the left, sort on
-          the right + Save search dialog on the far right (E-T09). */}
+          the right + Save search dialog on the far right (E-T09).
+          The Grid/Map toggle (E-T10) sits between the toolbar and the
+          Save-search button so the visitor's eye flows naturally :
+          filter → switch view → save. */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <ListingSearchToolbar neighborhoods={neighborhoods} />
-        <SaveSearchButton signedIn={Boolean(session?.user)} />
+        <div className="flex items-center gap-2">
+          <ListingsViewToggle view={viewMode} />
+          <SaveSearchButton signedIn={Boolean(session?.user)} />
+        </div>
       </div>
 
       {/* Two-column layout: filters sidebar + results main */}
@@ -247,7 +270,20 @@ export default async function PublicListingsPage({
         <ListingFiltersSidebar />
 
         <main className="flex min-w-0 flex-col gap-4">
-          {items.length === 0 ? (
+          {viewMode === 'map' ? (
+            mapItems.length === 0 ? (
+              <div className="rounded-md border border-dashed border-border bg-muted/30 p-12 text-center">
+                <p className="text-base font-medium">
+                  {t('annonces.map.empty.title')}
+                </p>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  {t('annonces.map.empty.lead')}
+                </p>
+              </div>
+            ) : (
+              <ListingsMapClient locale={locale} listings={mapItems} />
+            )
+          ) : items.length === 0 ? (
             <div className="rounded-md border border-dashed border-border bg-muted/30 p-12 text-center">
               <p className="text-base font-medium">
                 {filterActive

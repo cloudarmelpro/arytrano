@@ -19,6 +19,11 @@ export { PhotoManager } from './components/PhotoManager'
 export { ContactButtons } from './components/ContactButtons'
 export { ShareButton } from './components/ShareButton'
 export { ListingMapClient } from './components/ListingMapClient'
+export {
+  ListingsMapClient,
+  type MapListing,
+} from './components/ListingsMapClient'
+export { ListingsViewToggle } from './components/ListingsViewToggle'
 export { VerifiedListingBadge } from './components/VerifiedListingBadge'
 export { ListingStatusBadge } from './components/ListingStatusBadge'
 export { ListingForm } from './components/ListingForm'
