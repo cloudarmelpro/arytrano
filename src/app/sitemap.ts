@@ -23,7 +23,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = env.AUTH_URL.replace(/\/$/, '')
   const staticLastMod = new Date(STATIC_PAGES_LAST_MODIFIED)
 
-  const [listings, cities, neighborhoods] = await Promise.all([
+  const [listings, cities, neighborhoods, freshnessRaw] = await Promise.all([
     listSitemapListings(),
     listCitiesWithCounts(),
     // For the per-quartier landing pages (E-T11 B2) we need the
@@ -36,10 +36,47 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         city: { select: { slug: true } },
       },
     }),
+    // E-T12 : real `lastmod` signal — MAX(publishedAt) over PUBLISHED
+    // listings, grouped by (citySlug, neighborhoodSlug). One Prisma
+    // query covers both city + quartier scopes via aggregation in
+    // the loop below. Google uses this to schedule re-crawl after
+    // an owner publishes a new annonce.
+    prisma.listing.findMany({
+      where: { status: 'PUBLISHED' },
+      select: {
+        publishedAt: true,
+        city: { select: { slug: true } },
+        neighborhood: { select: { slug: true } },
+      },
+    }),
   ])
+
+  // Reduce listings → freshness map keyed by both city and city+quartier.
+  // We end up with two lookups : `maxPublishByCity[citySlug]` and
+  // `maxPublishByQuartier[citySlug:slug]`.
+  const maxPublishByCity = new Map<string, Date>()
+  const maxPublishByQuartier = new Map<string, Date>()
+  for (const row of freshnessRaw) {
+    if (!row.publishedAt) continue
+    const citySlug = row.city.slug
+    const qKey = `${citySlug}:${row.neighborhood.slug}`
+    const prevCity = maxPublishByCity.get(citySlug)
+    if (!prevCity || row.publishedAt > prevCity) {
+      maxPublishByCity.set(citySlug, row.publishedAt)
+    }
+    const prevQ = maxPublishByQuartier.get(qKey)
+    if (!prevQ || row.publishedAt > prevQ) {
+      maxPublishByQuartier.set(qKey, row.publishedAt)
+    }
+  }
 
   function languages(path: string) {
     return {
+      // `x-default` tells Google what to serve when no language matches
+      // — same value as fr-MG (broader audience than MG). Mirrors the
+      // metadata-level `localeAlternates` helper so sitemap + page
+      // <head> stay consistent.
+      'x-default': `${baseUrl}${path}`,
       'fr-MG': `${baseUrl}${path}`,
       mg: `${baseUrl}/mg${path}`,
     }
@@ -98,12 +135,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // E-T07 multi-ville : each city gets its own /quartiers/<citySlug>
   // page. Priority slightly lower than the (deprecated) /quartiers
   // index since visitors typically reach these via the CitySelect
-  // on the landing or a direct search result.
+  // on the landing or a direct search result. lastmod reflects the
+  // most recent publish in that city.
   for (const city of cities) {
     const path = `/quartiers/${city.slug}`
     entries.push({
       url: `${baseUrl}${path}`,
-      lastModified: staticLastMod,
+      lastModified: maxPublishByCity.get(city.slug) ?? staticLastMod,
       changeFrequency: 'weekly',
       priority: 0.8,
       alternates: { languages: languages(path) },
@@ -113,7 +151,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // E-T11 city landing : /villes (hub) + /villes/<citySlug>. SEO-prio
   // pages targeting "logement étudiant à {city}" keywords — slightly
   // higher priority (0.85) than /quartiers because they're the entry
-  // funnel.
+  // funnel. lastmod = MAX publishedAt across the city so freshness
+  // signals correctly when an owner publishes there.
   entries.push({
     url: `${baseUrl}/villes`,
     lastModified: staticLastMod,
@@ -125,7 +164,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const path = `/villes/${city.slug}`
     entries.push({
       url: `${baseUrl}${path}`,
-      lastModified: staticLastMod,
+      lastModified: maxPublishByCity.get(city.slug) ?? staticLastMod,
       changeFrequency: 'weekly',
       priority: 0.85,
       alternates: { languages: languages(path) },
@@ -135,12 +174,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // E-T11 B2 neighborhood landing : /villes/<city>/quartiers/<n>.
   // Long-tail SEO ("location quartier Anosy" etc). Priority 0.75 —
   // lower than the city hub since each individual quartier page has
-  // a narrower audience.
+  // a narrower audience. lastmod = MAX publishedAt in the quartier.
   for (const n of neighborhoods) {
     const path = `/villes/${n.city.slug}/quartiers/${n.slug}`
     entries.push({
       url: `${baseUrl}${path}`,
-      lastModified: staticLastMod,
+      lastModified:
+        maxPublishByQuartier.get(`${n.city.slug}:${n.slug}`) ?? staticLastMod,
       changeFrequency: 'weekly',
       priority: 0.75,
       alternates: { languages: languages(path) },

@@ -1738,7 +1738,7 @@ Migration `<ts>_add_user_preferred_city`
 
 **Effort estimé** : ~3 jours (après E-T11)
 
-**Priorité** : P1 · **Statut** : 📋 todo
+**Priorité** : P1 · **Statut** : ✅ done (2026-05-23, scope v1) — `src/app/sitemap.ts` étendu avec : hub `/villes`, 5 city landings `/villes/<slug>`, 37 quartier landings `/villes/<city>/quartiers/<n>`, 5 quartiers pages `/quartiers/<slug>`, tous les listings PUBLISHED `/<city>/<n>/<slug>`. `lastModified` calculé dynamiquement via `groupBy MAX(publishedAt)` par city ET par (city, neighborhood) — Google voit la fraîcheur en temps réel quand un proprio publie. Hreflang `x-default` + `fr-MG` + `mg` sur chaque entry. robots.ts hardened avec `/u/` (T-045 tokens) + `/api/cron/` disallow. `revalidate = 3600` (régénération horaire). Scope v1 : sitemap simple suffisant (< 200 URLs total, loin du 50k Google limit). Split en sitemap-index reporté à v2 si volume explose.
 
 ### Découverte & engagement
 
