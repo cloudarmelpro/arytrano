@@ -2,17 +2,19 @@ import type { Locale } from '@/lib/i18n/config'
 import { getT } from '@/lib/i18n/translate'
 import {
   LandingSearchCard,
-  type NeighborhoodOption,
+  type CityOption,
 } from './LandingSearchCard'
 
 export function LandingHero({
   locale,
-  neighborhoods,
+  cities,
+  defaultCitySlug,
   publishedListings,
   verifiedOwners,
 }: {
   locale: Locale
-  neighborhoods: NeighborhoodOption[]
+  cities: CityOption[]
+  defaultCitySlug?: string
   publishedListings: number
   verifiedOwners: number
 }) {
@@ -37,7 +39,8 @@ export function LandingHero({
         </p>
 
         <LandingSearchCard
-          neighborhoods={neighborhoods}
+          cities={cities}
+          defaultCitySlug={defaultCitySlug}
           publishedListings={publishedListings}
         />
 

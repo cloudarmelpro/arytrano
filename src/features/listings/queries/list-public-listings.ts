@@ -60,6 +60,12 @@ export const listPublicListingsQuerySchema = z
       .regex(/^[a-z0-9]{20,40}$/, 'Curseur invalide')
       .optional(),
     type: z.enum(['ROOM', 'STUDIO', 'APARTMENT', 'HOUSE']).optional(),
+    // E-T07 multi-ville : neighborhood slugs are unique PER city
+    // (composite @@unique [cityId, slug]) — the same slug "anjoma"
+    // exists in Fianarantsoa AND Toamasina. Always scope by city
+    // when filtering by neighborhood, otherwise we'd return results
+    // from the wrong city.
+    city: slugSchema,
     neighborhood: slugSchema, // neighborhood slug
     priceMin: priceSchema,
     priceMax: priceSchema,
@@ -110,7 +116,16 @@ export async function listPublicListings(
 
   const where: Prisma.ListingWhereInput = { status: 'PUBLISHED' }
   if (input.type) where.type = input.type
-  if (input.neighborhood) where.neighborhood = { slug: input.neighborhood }
+  if (input.city) where.city = { slug: input.city }
+  if (input.neighborhood) {
+    // Scope the neighborhood lookup to the city when both are passed
+    // so two homonymous neighborhood slugs from different cities don't
+    // collide. Without a city, we still allow the bare slug match for
+    // backward-compatibility with v0.5 single-city links.
+    where.neighborhood = input.city
+      ? { slug: input.neighborhood, city: { slug: input.city } }
+      : { slug: input.neighborhood }
+  }
   if (input.priceMin !== undefined || input.priceMax !== undefined) {
     where.priceMonthlyMGA = {
       ...(input.priceMin !== undefined && { gte: input.priceMin }),

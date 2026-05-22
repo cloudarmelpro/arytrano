@@ -449,6 +449,9 @@ export const mg: Record<MessageKey, string> = {
     'Doka {count} ao Fianarantsoa, voajery avy amin\'ny ekipanay. Fifandraisana mivantana amin\'ny tompony amin\'ny WhatsApp.',
   'landing.hero.lead.other':
     'Doka {count} ao Fianarantsoa, voajery tsirairay avy amin\'ny ekipanay. Fifandraisana mivantana amin\'ny tompony amin\'ny WhatsApp.',
+  'landing.hero.search.city.label': 'Tanàna',
+  'landing.hero.search.city.placeholder': 'Safidio ny tanànanao',
+  'landing.hero.search.city.noResults': 'Tsy misy tanàna mifanaraka.',
   'landing.hero.search.quartier.label': 'Faritra',
   'landing.hero.search.quartier.placeholder': 'Faritra rehetra',
   'landing.hero.search.type.label': 'Karazana trano',

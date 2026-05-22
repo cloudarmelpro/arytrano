@@ -445,6 +445,9 @@ export const frMG = {
     '{count} annonce à Fianarantsoa, contrôlée par notre équipe. Contact propriétaire direct via WhatsApp.',
   'landing.hero.lead.other':
     '{count} annonces à Fianarantsoa, contrôlées une par une par notre équipe. Contact propriétaire direct via WhatsApp.',
+  'landing.hero.search.city.label': 'Ville',
+  'landing.hero.search.city.placeholder': 'Choisis ta ville',
+  'landing.hero.search.city.noResults': 'Aucune ville ne correspond.',
   'landing.hero.search.quartier.label': 'Quartier',
   'landing.hero.search.quartier.placeholder': 'Tous les quartiers',
   'landing.hero.search.type.label': 'Type de logement',

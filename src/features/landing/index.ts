@@ -22,4 +22,7 @@ export { QuartiersMap } from './components/QuartiersMap'
 export { QuartiersJump } from './components/QuartiersJump'
 export { QuartiersBlocks } from './components/QuartiersBlocks'
 export { QuartiersQuizCta } from './components/QuartiersQuizCta'
-export type { NeighborhoodOption } from './components/LandingSearchCard'
+export type {
+  NeighborhoodOption,
+  CityOption,
+} from './components/LandingSearchCard'

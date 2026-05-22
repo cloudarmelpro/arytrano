@@ -11,7 +11,7 @@ import {
   LandingOwnerBlock,
   LandingFaq,
   LandingFinalCta,
-  type NeighborhoodOption,
+  type CityOption,
 } from '@/features/landing'
 import {
   getLandingStats,
@@ -70,21 +70,30 @@ export default async function HomePage() {
     featuredItems.map((l) => l.id),
   )
 
-  // v0.5 — only Fianarantsoa is seeded. Flatten its neighborhoods for the
-  // hero search card. When multi-city ships, swap this for a city tab UI
-  // or a city select in the search card itself.
-  const neighborhoods: NeighborhoodOption[] = (cities[0]?.neighborhoods ?? []).map(
-    (n) => ({
+  // E-T07 multi-ville : pass ALL cities + their nested neighborhoods
+  // to the hero so the search card can cascade City → Quartier. The
+  // CitySelect hides itself when there's only one city seeded, so
+  // single-city deployments behave like before.
+  const cityOptions: CityOption[] = cities.map((c) => ({
+    slug: c.slug,
+    label: locale === 'mg' ? c.nameMg : c.nameFr,
+    neighborhoods: c.neighborhoods.map((n) => ({
       slug: n.slug,
       label: locale === 'mg' ? n.nameMg : n.nameFr,
-    }),
-  )
+    })),
+  }))
+  // Default to Fianarantsoa (v0.5 launch baseline + most inventory)
+  // until the analytics signal a different default per region.
+  const defaultCitySlug =
+    cityOptions.find((c) => c.slug === 'fianarantsoa')?.slug ??
+    cityOptions[0]?.slug
 
   return (
     <>
       <LandingHero
         locale={locale}
-        neighborhoods={neighborhoods}
+        cities={cityOptions}
+        defaultCitySlug={defaultCitySlug}
         publishedListings={stats.publishedListings}
         verifiedOwners={stats.verifiedOwners}
       />
