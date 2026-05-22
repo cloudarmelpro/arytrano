@@ -96,6 +96,15 @@ function IconQuote() {
   )
 }
 
+function IconMegaphone() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M3 11l18-7v16L3 13z" />
+      <path d="M11 17h2a2 2 0 0 0 2-2v-1" />
+    </svg>
+  )
+}
+
 /**
  * Top-level section roots (e.g. `/admin`, `/dashboard`) match only on
  * exact pathname — otherwise their prefix swallows every sub-route and
@@ -138,6 +147,11 @@ const buildSections = (openReports: number): Section[] => [
         href: '/admin/testimonials',
         labelKey: 'admin.nav.testimonials',
         icon: <IconQuote />,
+      },
+      {
+        href: '/admin/whatsapp-alerts',
+        labelKey: 'admin.nav.whatsappAlerts',
+        icon: <IconMegaphone />,
       },
     ],
   },

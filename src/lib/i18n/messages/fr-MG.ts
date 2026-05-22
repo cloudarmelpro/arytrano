@@ -1639,7 +1639,38 @@ export const frMG = {
   'admin.nav.listings': 'Annonces',
   'admin.nav.reports': 'Signalements',
   'admin.nav.testimonials': 'Témoignages',
+  'admin.nav.whatsappAlerts': 'Alertes WhatsApp',
   'admin.headerLink': 'Admin',
+
+  // Admin WhatsApp Alerts (T-044)
+  'admin.alerts.page.title': 'Alertes WhatsApp',
+  'admin.alerts.page.lead':
+    'Liste des abonnés actifs. Filtre par quartier ou langue, sélectionne, exporte en CSV puis broadcast manuel via WhatsApp Business.',
+  'admin.alerts.kpi.total': 'Abonnés actifs',
+  'admin.alerts.kpi.newThisWeek': '7 derniers jours',
+  'admin.alerts.kpi.locale': 'Par langue',
+  'admin.alerts.kpi.unsubscribed': 'Désabonnés',
+  'admin.alerts.filter.quartier': 'Quartier',
+  'admin.alerts.filter.locale': 'Langue',
+  'admin.alerts.filter.allQuartiers': 'Tous quartiers',
+  'admin.alerts.filter.allLocales': 'Toutes langues',
+  'admin.alerts.col.phone': 'Téléphone',
+  'admin.alerts.col.locale': 'Langue',
+  'admin.alerts.col.quartier': 'Quartier filtré',
+  'admin.alerts.col.signedUp': 'Inscrit le',
+  'admin.alerts.col.anyQuartier': 'tous quartiers',
+  'admin.alerts.selectedCount': '{count} sélectionné(s)',
+  'admin.alerts.selection.clear': 'Désélectionner',
+  'admin.alerts.selection.toggleAll': 'Tout sélectionner',
+  'admin.alerts.selection.toggleOne': 'Sélectionner cette ligne',
+  'admin.alerts.export.all': 'Exporter {count} en CSV',
+  'admin.alerts.export.selected': 'Exporter la sélection',
+  'admin.alerts.export.success': 'CSV téléchargé — {count} contacts.',
+  'admin.alerts.empty':
+    'Aucun abonné ne matche le filtre. Élargis ou efface les filtres.',
+  'admin.alerts.next': 'Page suivante',
+  'admin.alerts.privacy':
+    'Les abonnés désabonnés (T-045) sont automatiquement exclus de toutes les exportations, même si tu les inclus dans une sélection — anti pile-on.',
 
   // Admin testimonials CRUD (T-042)
   'admin.testimonials.list.title': 'Témoignages',

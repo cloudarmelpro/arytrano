@@ -1660,7 +1660,38 @@ export const mg: Record<MessageKey, string> = {
   'admin.nav.listings': 'Trano hofaina',
   'admin.nav.reports': 'Fitarainana',
   'admin.nav.testimonials': 'Fijoroana ho vavolombelona',
+  'admin.nav.whatsappAlerts': 'Fanairana WhatsApp',
   'admin.headerLink': 'Admin',
+
+  // Admin WhatsApp Alerts (T-044)
+  'admin.alerts.page.title': 'Fanairana WhatsApp',
+  'admin.alerts.page.lead':
+    'Lisitry ny mpisoratra anarana. Sivanao araka ny faritra na ny fiteny, safidio, esory amin\'ny CSV, dia mandefa broadcast amin\'ny WhatsApp Business.',
+  'admin.alerts.kpi.total': 'Mpisoratra mavitrika',
+  'admin.alerts.kpi.newThisWeek': '7 andro lasa',
+  'admin.alerts.kpi.locale': 'Araka ny fiteny',
+  'admin.alerts.kpi.unsubscribed': 'Voaesotra',
+  'admin.alerts.filter.quartier': 'Faritra',
+  'admin.alerts.filter.locale': 'Fiteny',
+  'admin.alerts.filter.allQuartiers': 'Faritra rehetra',
+  'admin.alerts.filter.allLocales': 'Fiteny rehetra',
+  'admin.alerts.col.phone': 'Telefaonina',
+  'admin.alerts.col.locale': 'Fiteny',
+  'admin.alerts.col.quartier': 'Faritra sivanina',
+  'admin.alerts.col.signedUp': 'Nisoratra ny',
+  'admin.alerts.col.anyQuartier': 'faritra rehetra',
+  'admin.alerts.selectedCount': '{count} voafidy',
+  'admin.alerts.selection.clear': 'Esory ny safidy',
+  'admin.alerts.selection.toggleAll': 'Safidio ny rehetra',
+  'admin.alerts.selection.toggleOne': 'Safidio ity laharana ity',
+  'admin.alerts.export.all': 'Esorina amin\'ny CSV ({count})',
+  'admin.alerts.export.selected': 'Esory ny voafidy',
+  'admin.alerts.export.success': 'CSV voatahiry — fifandraisana {count}.',
+  'admin.alerts.empty':
+    'Tsy misy mpisoratra mifanaraka. Vahao na esory ny sivana.',
+  'admin.alerts.next': 'Pejy manaraka',
+  'admin.alerts.privacy':
+    'Ireo voaesotra (T-045) dia esorina amin\'ny export rehetra, na dia amin\'ny safidy aza — anti pile-on.',
 
   // Admin testimonials CRUD (T-042)
   'admin.testimonials.list.title': 'Fijoroana ho vavolombelona',
