@@ -220,6 +220,7 @@ export const frMG = {
   // City tabs above the filter row
   'annonces.cityTabs.all': 'Toutes',
   'annonces.cityTabs.aria': 'Filtrer par ville',
+  'annonces.cityTabs.eyebrow': 'Ville',
   'annonces.empty.lead': 'On en publie chaque semaine — reviens bientôt.',
   'annonces.empty.filtered.title': 'Aucune annonce ne correspond à ces filtres.',
   'annonces.empty.filtered.lead':

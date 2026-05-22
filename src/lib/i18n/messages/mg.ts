@@ -225,6 +225,7 @@ export const mg: Record<MessageKey, string> = {
   // E-T07 city tabs
   'annonces.cityTabs.all': 'Rehetra',
   'annonces.cityTabs.aria': 'Sivanao araka ny tanàna',
+  'annonces.cityTabs.eyebrow': 'Tanàna',
   'annonces.empty.lead': 'Manampy isan-kerinandro izahay — miverena tsy ho ela.',
   'annonces.empty.filtered.title': 'Tsy misy trano mifanaraka amin\'ireo sivana.',
   'annonces.empty.filtered.lead':

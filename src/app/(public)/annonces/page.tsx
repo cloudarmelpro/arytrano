@@ -11,6 +11,7 @@ import {
   CityTabs,
 } from '@/features/listings'
 import { listCitiesWithNeighborhoods } from '@/features/geo'
+import { listCitiesWithCounts } from '@/features/landing/server'
 import { prisma } from '@/lib/db'
 import { getFavoritedListingIds } from '@/features/favorites/server'
 import { auth } from '@/features/auth'
@@ -112,11 +113,32 @@ export default async function PublicListingsPage({
   // Fetch the listings + neighborhood list + session in parallel —
   // neighborhoods power the filter dropdown, listings are the page payload,
   // and the session lets us mark already-favorited cards.
-  const [{ items, nextCursor, hasMore }, cities, session] = await Promise.all([
+  const [
+    { items, nextCursor, hasMore },
+    cities,
+    cityCounts,
+    session,
+  ] = await Promise.all([
     listPublicListings(query),
     listCitiesWithNeighborhoods(),
+    // CityTabs counts. Separate query (cached 5min) — `listCitiesWith
+    // Neighborhoods` doesn't aggregate, and we don't want to fold the
+    // count into it because that one is hit by the listing-form too
+    // (no aggregate needed there).
+    listCitiesWithCounts(),
     auth(),
   ])
+
+  // Merge counts into the cities list — order follows `listCitiesWith
+  // Neighborhoods` (alphabetical) for stable tab order across renders.
+  const countBySlug = new Map(cityCounts.map((c) => [c.slug, c.listingCount]))
+  const cityTabs = cities.map((c) => ({
+    slug: c.slug,
+    nameFr: c.nameFr,
+    nameMg: c.nameMg,
+    count: countBySlug.get(c.slug) ?? 0,
+  }))
+  const totalListingCount = cityTabs.reduce((sum, c) => sum + c.count, 0)
   // E-T07 multi-ville : show neighborhoods of the city in `?city=` if
   // passed, otherwise flatten ALL cities' neighborhoods so the filter
   // dropdown remains useful when the visitor hasn't picked a city.
@@ -201,8 +223,9 @@ export default async function PublicListingsPage({
           results). */}
       <CityTabs
         locale={locale}
-        cities={cities}
+        cities={cityTabs}
         activeCitySlug={activeCity?.slug ?? null}
+        totalCount={totalListingCount}
         currentParams={cityTabsParams}
       />
 

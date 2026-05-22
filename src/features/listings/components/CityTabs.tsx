@@ -6,6 +6,8 @@ export type CityTab = {
   slug: string
   nameFr: string
   nameMg: string
+  /** PUBLISHED listing count — drives the badge + the "no inventory" greyed state. */
+  count: number
 }
 
 /**
@@ -14,23 +16,29 @@ export type CityTab = {
  *
  * The "All" tab clears `?city=`; each city pill carries `?city=<slug>`
  * while preserving every OTHER query param (type, price, sort,
- * amenities, neighborhood). Switching city naturally invalidates the
- * neighborhood filter — a neighborhood slug is unique only per city,
- * so we DROP it when changing city to avoid a no-result trap.
+ * amenities). Switching city DROPS the stale neighborhood slug + the
+ * pagination cursor (slugs are unique per city; cursor belongs to the
+ * previous filtered set).
  *
  * Server Component — pure rendering. The active pill is highlighted
- * via `aria-current="page"` + a visual variant.
+ * via `aria-current="page"` + a visual variant. Pills with 0 listings
+ * stay clickable but render in a muted state to telegraph "no
+ * inventory yet" without hiding the city (owners need to know they
+ * CAN list there).
  */
 export function CityTabs({
   locale,
   cities,
   activeCitySlug,
+  totalCount,
   currentParams,
 }: {
   locale: Locale
   cities: CityTab[]
   /** The currently selected `?city=` value, or null when filter is off. */
   activeCitySlug: string | null
+  /** Sum of counts across all cities — shown on the "All" pill. */
+  totalCount: number
   /** Current URL search params (minus city + neighborhood). Preserved across pills. */
   currentParams: URLSearchParams
 }) {
@@ -38,8 +46,6 @@ export function CityTabs({
 
   function hrefFor(nextCity: string | null): string {
     const next = new URLSearchParams(currentParams)
-    // Wipe pagination cursor when changing city — old cursor IDs
-    // belong to listings of the previous city's filtered set.
     next.delete('cursor')
     if (nextCity) next.set('city', nextCity)
     else next.delete('city')
@@ -48,47 +54,72 @@ export function CityTabs({
   }
 
   return (
-    <nav
+    <section
       aria-label={t('annonces.cityTabs.aria')}
-      className="flex flex-wrap gap-2"
+      className="flex flex-col gap-3 rounded-2xl bg-muted/40 p-4 sm:flex-row sm:items-center sm:gap-5"
     >
-      <Pill
-        href={hrefFor(null)}
-        label={t('annonces.cityTabs.all')}
-        active={activeCitySlug === null}
-      />
-      {cities.map((city) => (
+      <span className="shrink-0 text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+        {t('annonces.cityTabs.eyebrow')}
+      </span>
+      <nav className="flex flex-wrap gap-2">
         <Pill
-          key={city.slug}
-          href={hrefFor(city.slug)}
-          label={locale === 'mg' ? city.nameMg : city.nameFr}
-          active={activeCitySlug === city.slug}
+          href={hrefFor(null)}
+          label={t('annonces.cityTabs.all')}
+          count={totalCount}
+          active={activeCitySlug === null}
+          empty={false}
         />
-      ))}
-    </nav>
+        {cities.map((city) => (
+          <Pill
+            key={city.slug}
+            href={hrefFor(city.slug)}
+            label={locale === 'mg' ? city.nameMg : city.nameFr}
+            count={city.count}
+            active={activeCitySlug === city.slug}
+            empty={city.count === 0}
+          />
+        ))}
+      </nav>
+    </section>
   )
 }
 
 function Pill({
   href,
   label,
+  count,
   active,
+  empty,
 }: {
   href: string
   label: string
+  count: number
   active: boolean
+  empty: boolean
 }) {
+  // Active state always wins on contrast — the primary fill makes the
+  // current city obvious even when its count is 0.
+  const baseClasses =
+    'inline-flex h-9 items-center gap-1.5 rounded-full px-3.5 text-[13px] font-semibold transition'
+  const variant = active
+    ? 'bg-primary text-primary-foreground'
+    : empty
+      ? 'border border-border bg-transparent text-muted-foreground hover:bg-muted/60 hover:text-foreground'
+      : 'border border-border bg-background text-foreground hover:bg-muted'
   return (
     <Link
       href={href}
       aria-current={active ? 'page' : undefined}
-      className={`inline-flex h-9 items-center rounded-full px-4 text-[13px] font-semibold transition ${
-        active
-          ? 'bg-primary text-primary-foreground'
-          : 'bg-muted/60 text-foreground hover:bg-muted'
-      }`}
+      className={`${baseClasses} ${variant}`}
     >
-      {label}
+      <span>{label}</span>
+      <span
+        className={`font-mono text-[11px] ${
+          active ? 'text-primary-foreground/80' : 'text-muted-foreground'
+        }`}
+      >
+        {count}
+      </span>
     </Link>
   )
 }
