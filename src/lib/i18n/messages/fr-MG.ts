@@ -1031,6 +1031,33 @@ export const frMG = {
   'cities.mahajanga.tagline': 'Côte Ouest, climat doux',
   'cities.toliara.name': 'Toliara',
   'cities.toliara.tagline': 'Sud-Ouest, université + sciences marines',
+
+  // E-T11 City landing /villes/[citySlug]
+  'cityLanding.meta.title': 'Logement étudiant à {city} — AryTrano',
+  'cityLanding.meta.description':
+    '{count} annonces actives à {city} — chambres, studios et appartements pour étudiants. Contact direct propriétaire, sans intermédiaire.',
+  'cityLanding.eyebrow': 'Ville',
+  'cityLanding.title': 'Logement étudiant à {city}.',
+  'cityLanding.description':
+    'Trouve ta chambre, ton studio ou ton appartement à {city} en contactant les propriétaires directement. Pas d\'agence, pas de commission.',
+  'cityLanding.description.empty':
+    'On démarre la couverture de {city}. Tu es propriétaire ? Sois le premier à publier ton annonce.',
+  'cityLanding.stats.activeListings': 'Annonces actives',
+  'cityLanding.stats.verifiedOwners': 'Propriétaires vérifiés',
+  'cityLanding.stats.neighborhoodsCount': 'Quartiers couverts',
+  'cityLanding.cta.searchListings': 'Voir les annonces à {city}',
+  'cityLanding.cta.exploreQuartiers': 'Explorer les quartiers',
+  'cityLanding.listings.eyebrow': 'Disponible maintenant',
+  'cityLanding.listings.title': 'Dernières annonces à {city}',
+  'cityLanding.listings.lead':
+    '{total} annonces publiées actuellement. Les plus récentes en premier.',
+  'cityLanding.listings.viewAll': 'Voir les {total}',
+  'cityLanding.quartiers.eyebrow': 'Quartiers',
+  'cityLanding.quartiers.title': 'Quartiers étudiants de {city}',
+  'cityLanding.quartiers.lead':
+    '{count} quartiers couverts à {city} — chacun avec son ambiance et son budget moyen.',
+  'cityLanding.quartiers.card.count': '{count} annonces',
+  'cityLanding.quartiers.card.empty': 'Bientôt',
   'quartiers.eyebrow': 'Quartiers',
   // E-T07 : H1 + lead dynamiques paramétrés par ville
   'quartiers.h1': '{count} quartiers de {city}.',

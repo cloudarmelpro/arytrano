@@ -1045,6 +1045,34 @@ export const mg: Record<MessageKey, string> = {
   'cities.mahajanga.tagline': 'Morontsiraka andrefana, toetrandro malefaka',
   'cities.toliara.name': 'Toliara',
   'cities.toliara.tagline': 'Atsimo-andrefana, oniversite + siansa an-dranomasina',
+
+  // E-T11 City landing /villes/[citySlug]
+  'cityLanding.meta.title': 'Trano hofaina ho an\'ny mpianatra ao {city} — AryTrano',
+  'cityLanding.meta.description':
+    'Filazana {count} mavitrika ao {city} — efitra, studio, apartemà ho an\'ny mpianatra. Resaka mivantana amin\'ny tompon-trano, tsy misy mpanelanelana.',
+  'cityLanding.eyebrow': 'Tanàna',
+  'cityLanding.title': 'Trano hofaina ho an\'ny mpianatra ao {city}.',
+  'cityLanding.description':
+    'Tadiavo ny efitranao, ny studio na ny apartemà ao {city} amin\'ny fifandraisana mivantana amin\'ny tompony. Tsy misy mpanelanelana, tsy misy commission.',
+  'cityLanding.description.empty':
+    'Manomboka manarona an\'i {city} izahay. Tompon-trano ianao ? Aoka ho ianao no voalohany hametraka filazana.',
+  'cityLanding.stats.activeListings': 'Filazana mavitrika',
+  'cityLanding.stats.verifiedOwners': 'Tompon-trano voamarina',
+  'cityLanding.stats.neighborhoodsCount': 'Faritra voarakitra',
+  'cityLanding.cta.searchListings': 'Hijery filazana ao {city}',
+  'cityLanding.cta.exploreQuartiers': 'Hizaha ny faritra',
+  'cityLanding.listings.eyebrow': 'Misy amin\'izao',
+  'cityLanding.listings.title': 'Filazana farany ao {city}',
+  'cityLanding.listings.lead':
+    'Filazana {total} navoaka. Vao haingana voalohany.',
+  'cityLanding.listings.viewAll': 'Jereo ny {total}',
+  'cityLanding.quartiers.eyebrow': 'Faritra',
+  'cityLanding.quartiers.title': 'Faritra ho an\'ny mpianatra ao {city}',
+  'cityLanding.quartiers.lead':
+    'Faritra {count} voarakitra ao {city} — samy manana ny endriny sy ny salan\'ny vidiny.',
+  'cityLanding.quartiers.card.count': 'Filazana {count}',
+  'cityLanding.quartiers.card.empty': 'Tsy ho ela',
+
   'quartiers.eyebrow': 'Faritra',
   // E-T07 : H1 + lead miankina amin'ny tanàna
   'quartiers.h1': 'Faritra {count} ao {city}.',
