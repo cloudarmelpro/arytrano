@@ -8,6 +8,15 @@ import { sendTransactionalEmail } from '@/lib/email/send-transactional'
 import { buildListingPublishedEmail } from '@/lib/email/templates/listing-published'
 
 /**
+ * Listing TTL — 60 days from publication (T-049). Past this date the
+ * daily cron flips the listing to UNAVAILABLE and emails the owner.
+ * The owner can extend with one click from the dashboard, which sets
+ * a fresh `expiresAt` 60 days out and clears `expirationAlertSentAt`.
+ */
+export const LISTING_TTL_DAYS = 60
+export const LISTING_TTL_MS = LISTING_TTL_DAYS * 24 * 60 * 60 * 1000
+
+/**
  * DRAFT → PUBLISHED. Validates the listing has the minimum required content:
  *   - title, description (already enforced by schema at create/update time)
  *   - priceMonthlyMGA > 0
@@ -59,9 +68,20 @@ export async function publishListing(ownerId: string, listingId: string): Promis
     throw errors.validation('Ajoute au moins 1 photo avant de publier')
   }
 
+  const now = new Date()
   const updated = await prisma.listing.update({
     where: { id: listing.id },
-    data: { status: 'PUBLISHED', publishedAt: new Date() },
+    data: {
+      status: 'PUBLISHED',
+      publishedAt: now,
+      // T-049 — start the 60-day TTL on first publish. Re-publishing
+      // (after auto-expire or owner-toggle UNAVAILABLE→PUBLISHED) also
+      // resets the clock here, which is what the user expects.
+      expiresAt: new Date(now.getTime() + LISTING_TTL_MS),
+      // Fresh publish = fresh warning window. Cron will alert the
+      // owner 7 days before this new expiresAt.
+      expirationAlertSentAt: null,
+    },
   })
 
   // T-034: fire-and-forget owner email. `sendTransactionalEmail` is

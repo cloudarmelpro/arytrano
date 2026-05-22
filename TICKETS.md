@@ -1025,7 +1025,7 @@ enum ListingStatus {
 
 **Effort estimé** : ~2 jours (cron + service + email + UI)
 
-**Priorité** : P2 · **Statut** : 📋 todo
+**Priorité** : P2 · **Statut** : ✅ done (2026-05-22) — schema migration `20260522134700_add_listing_expiration` (Listing.expiresAt + expirationAlertSentAt + composite index status+expiresAt), constante `LISTING_TTL_DAYS=60` exportée depuis `publish-listing.ts`, publishListing set expiresAt = now+60d + reset expirationAlertSentAt à chaque publish, service `processListingExpirations` orchestrator 2-passes (warning 7d via `listing-expiring` email + auto-expire PUBLISHED→UNAVAILABLE via `listing-expired` email), route `/api/cron/listing-expiration` Bearer-protégée + Sentry capture, service `extendListingExpiration` + Server Action `extendListingExpirationAction` avec auth guard (refuse SUSPENDED, supporte UNAVAILABLE→PUBLISHED republish flow), query `listOwnerListings` ajoute `expiryClass` (safe/warning/urgent/expired/null) calculé en query layer (pas dans le render — React Compiler), composant `ExtendExpirationButton` Client avec toast feedback (Prolonger vs Republier selon status), `ExpiryHint` inline avec tone color (red/amber/grey) sur `/dashboard/listings`, 2 nouveaux `TransactionalEventType` listing-expiring + listing-expired, 10 clés i18n FR+MG, runbook contabo-deployment.md §10b.4 systemd timer 09:30 UTC.
 
 ---
 

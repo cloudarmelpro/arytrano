@@ -289,6 +289,17 @@ model Listing {
   verifiedAt      DateTime?
   verifiedBy      String?
 
+  // T-049 — auto-expiration lifecycle. Set on first publish to
+  // (publishedAt + 60d) so abandoned listings don't pollute the
+  // catalog forever. The daily cron flips PUBLISHED → UNAVAILABLE
+  // when this date passes and emails the owner so they can extend
+  // with a single click. NULL while the listing is still DRAFT.
+  expiresAt              DateTime?
+  // Set when the 7-day-warning email has been delivered so the cron
+  // doesn't re-spam an owner who already got the notice. Cleared when
+  // the owner extends — they get a fresh warning at the next cycle.
+  expirationAlertSentAt  DateTime?
+
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt
 
@@ -318,6 +329,10 @@ model Listing {
   // `Listing.amenities` `hasEvery` filter on the public list page does
   // an array containment scan — GIN turns it from O(rows) into O(log n).
   @@index([amenities], type: Gin)
+  // T-049 daily cron : find PUBLISHED listings approaching or past
+  // their expiration date. Composite covers both the 7d-warning and
+  // the auto-expire queries.
+  @@index([status, expiresAt])
 }
 
 enum ListingType {

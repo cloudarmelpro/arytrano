@@ -1283,6 +1283,19 @@ export const frMG = {
   'dashboard.listingStats.channel.whatsapp': 'Contact WhatsApp',
   'dashboard.listingStats.channel.phone': 'Appel téléphonique',
   'dashboard.listings.statsCta': 'Stats',
+  'dashboard.listings.expiresOn': 'Expire le {date}',
+  'dashboard.listings.expired': 'Expirée',
+  'dashboard.listings.expiration.extend': 'Prolonger',
+  'dashboard.listings.expiration.republish': 'Republier',
+  'dashboard.listings.expiration.pending': '…',
+  'dashboard.listings.expiration.extended':
+    'Annonce prolongée — 60 jours de plus.',
+  'dashboard.listings.expiration.republished':
+    'Annonce republiée — visible publiquement à nouveau.',
+  'dashboard.listings.expiration.needsAuth':
+    'Connecte-toi pour prolonger l\'annonce.',
+  'dashboard.listings.expiration.error':
+    'Impossible de prolonger l\'annonce. Réessaie.',
 
   // Dashboard pages — listings index (owner)
   'dashboard.listings.title': 'Mes annonces',

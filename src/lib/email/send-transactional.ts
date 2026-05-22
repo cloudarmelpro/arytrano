@@ -7,6 +7,8 @@ export type TransactionalEventType =
   | 'review-received'
   | 'review-prompt'
   | 'listing-verified'
+  | 'listing-expiring'
+  | 'listing-expired'
   | 'report-received'
   | 'review-replied'
   | 'contact-received'

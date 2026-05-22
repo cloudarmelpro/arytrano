@@ -7,6 +7,7 @@ import {
   ListingStatusBadge,
   ListingActionsMenu,
 } from '@/features/listings'
+import { ExtendExpirationButton } from '@/features/listings/components/ExtendExpirationButton'
 import { listOwnerListings } from '@/features/listings/server'
 import { formatAriary } from '@/lib/format/currency'
 import { getLocale } from '@/lib/i18n/get-locale'
@@ -158,6 +159,14 @@ export default async function MyListingsPage() {
                           date: dateFormatter.format(l.createdAt),
                         })}
                   </span>
+                  {l.expiryClass ? (
+                    <ExpiryHint
+                      expiresAt={l.expiresAt}
+                      expiryClass={l.expiryClass}
+                      t={t}
+                      formatter={dateFormatter}
+                    />
+                  ) : null}
                 </div>
 
                 <div className="mt-2 flex items-center justify-between gap-2">
@@ -176,6 +185,14 @@ export default async function MyListingsPage() {
                       <IconChart />
                       {t('dashboard.listings.statsCta')}
                     </Link>
+                    {l.expiryClass === 'expired' ||
+                    l.expiryClass === 'urgent' ||
+                    l.expiryClass === 'warning' ? (
+                      <ExtendExpirationButton
+                        listingId={l.id}
+                        isUnavailable={l.expiryClass === 'expired'}
+                      />
+                    ) : null}
                   </div>
                   <ListingActionsMenu listingId={l.id} status={l.status} />
                 </div>
@@ -185,6 +202,45 @@ export default async function MyListingsPage() {
         </ul>
       )}
     </div>
+  )
+}
+
+/**
+ * Inline tag : "Expire le X" (or "Expirée") with a tone matching the
+ * urgency class already computed in the query layer.
+ */
+function ExpiryHint({
+  expiresAt,
+  expiryClass,
+  t,
+  formatter,
+}: {
+  expiresAt: Date | null
+  expiryClass: 'safe' | 'warning' | 'urgent' | 'expired'
+  t: Translator
+  formatter: Intl.DateTimeFormat
+}) {
+  if (expiryClass === 'expired') {
+    return (
+      <span className="inline-flex items-center gap-1 text-amber-700">
+        {t('dashboard.listings.expired')}
+      </span>
+    )
+  }
+  if (!expiresAt) return null
+  const tone =
+    expiryClass === 'urgent'
+      ? 'text-red-600'
+      : expiryClass === 'warning'
+        ? 'text-amber-700'
+        : 'text-muted-foreground'
+
+  return (
+    <span className={`inline-flex items-center gap-1 ${tone}`}>
+      {t('dashboard.listings.expiresOn', {
+        date: formatter.format(expiresAt),
+      })}
+    </span>
   )
 }
 

@@ -487,12 +487,50 @@ curl -H "Authorization: Bearer $CRON_SECRET" https://arytrano.mg/api/cron/prompt
 # { "ok": true, "candidates": N, "emailed": N, "failed": 0 }
 ```
 
-### 10b.4 Adding new crons
+### 10b.4 Listing expiration cron (T-049)
+
+`/etc/systemd/system/arytrano-cron-listing-expiration.service` :
+```ini
+[Unit]
+Description=AryTrano — listing expiration cron
+After=network-online.target
+
+[Service]
+Type=oneshot
+EnvironmentFile=/etc/arytrano/app.env
+ExecStart=/usr/bin/curl -fsS -H "Authorization: Bearer ${CRON_SECRET}" https://arytrano.mg/api/cron/listing-expiration
+User=root
+```
+
+`/etc/systemd/system/arytrano-cron-listing-expiration.timer` :
+```ini
+[Unit]
+Description=Run listing-expiration cron daily at 09:30 UTC
+
+[Timer]
+# Run 30 min after the review-prompt cron to spread daily volume.
+OnCalendar=09:30 UTC
+Persistent=true
+RandomizedDelaySec=300
+
+[Install]
+WantedBy=timers.target
+```
+
+Enable + verify :
+```bash
+sudo systemctl daemon-reload
+sudo systemctl enable --now arytrano-cron-listing-expiration.timer
+curl -H "Authorization: Bearer $CRON_SECRET" https://arytrano.mg/api/cron/listing-expiration
+# { "ok": true, "warned": N, "expired": N, "failed": 0 }
+```
+
+### 10b.5 Adding new crons
 
 Same pattern : `/api/cron/<name>/route.ts` checks the Bearer secret +
 runs an orchestrator, with a matching systemd `.service` + `.timer`
-pair on the VPS. Future crons : T-049 listing expiration, E-T20
-GoalPay reconciliation, E-T17 subscription renewal.
+pair on the VPS. Future crons : E-T20 GoalPay reconciliation,
+E-T17 subscription renewal.
 
 ---
 

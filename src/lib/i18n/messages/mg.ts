@@ -1305,6 +1305,19 @@ export const mg: Record<MessageKey, string> = {
   'dashboard.listingStats.channel.whatsapp': 'Fifandraisana WhatsApp',
   'dashboard.listingStats.channel.phone': 'Antso telefaonina',
   'dashboard.listings.statsCta': 'Antontan-tarehimarika',
+  'dashboard.listings.expiresOn': 'Hifarana ny {date}',
+  'dashboard.listings.expired': 'Tapitra',
+  'dashboard.listings.expiration.extend': 'Halavaina',
+  'dashboard.listings.expiration.republish': 'Avoaka indray',
+  'dashboard.listings.expiration.pending': '…',
+  'dashboard.listings.expiration.extended':
+    'Voalavaina ny filazana — 60 andro fanampiny.',
+  'dashboard.listings.expiration.republished':
+    'Navoaka indray ny filazana — hita amin\'ny daholobe.',
+  'dashboard.listings.expiration.needsAuth':
+    'Midira mba hanalavanao ny filazana.',
+  'dashboard.listings.expiration.error':
+    'Tsy nahomby ny fanalavana. Andramo indray.',
 
   // Dashboard — listings index
   'dashboard.listings.title': 'Ny tranoko',
