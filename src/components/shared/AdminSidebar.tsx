@@ -105,6 +105,16 @@ function IconMegaphone() {
   )
 }
 
+function IconBarChart() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <line x1="6" y1="20" x2="6" y2="13" />
+      <line x1="12" y1="20" x2="12" y2="6" />
+      <line x1="18" y1="20" x2="18" y2="10" />
+    </svg>
+  )
+}
+
 /**
  * Top-level section roots (e.g. `/admin`, `/dashboard`) match only on
  * exact pathname — otherwise their prefix swallows every sub-route and
@@ -152,6 +162,11 @@ const buildSections = (openReports: number): Section[] => [
         href: '/admin/whatsapp-alerts',
         labelKey: 'admin.nav.whatsappAlerts',
         icon: <IconMegaphone />,
+      },
+      {
+        href: '/admin/quiz-analytics',
+        labelKey: 'admin.nav.quizAnalytics',
+        icon: <IconBarChart />,
       },
     ],
   },

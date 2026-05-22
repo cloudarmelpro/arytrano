@@ -1667,7 +1667,59 @@ export const frMG = {
   'admin.nav.reports': 'Signalements',
   'admin.nav.testimonials': 'Témoignages',
   'admin.nav.whatsappAlerts': 'Alertes WhatsApp',
+  'admin.nav.quizAnalytics': 'Quiz analytics',
   'admin.headerLink': 'Admin',
+
+  // Admin Quiz analytics (T-043)
+  'admin.quiz.page.title': 'Analytics du quiz quartier',
+  'admin.quiz.page.lead':
+    'Distribution des réponses + top quartiers recommandés. Sert à orienter les contenus marketing et à ajuster les profils de quartier.',
+  'admin.quiz.kpi.total': 'Soumissions totales',
+  'admin.quiz.kpi.last7Days': '7 derniers jours',
+  'admin.quiz.kpi.last30Days': '30 derniers jours',
+  'admin.quiz.kpi.emailRate': 'Taux email opt-in',
+  'admin.quiz.kpi.emailRate.help':
+    '{with} avec email · {without} sans',
+  'admin.quiz.section.locale': 'Répartition par langue',
+  'admin.quiz.section.topQuartiers': 'Top quartiers recommandés',
+  'admin.quiz.section.topQuartiers.help':
+    'Compte le nombre de fois qu\'un quartier apparaît dans le top-3 recommandé (toutes positions confondues).',
+  'admin.quiz.section.answers': 'Distribution des réponses',
+  'admin.quiz.empty': 'Aucune soumission encore — partage le lien /quartiers/quiz.',
+  // Question labels
+  'admin.quiz.question.budget': 'Budget mensuel',
+  'admin.quiz.question.school': 'École fréquentée',
+  'admin.quiz.question.housingType': 'Type de logement',
+  'admin.quiz.question.vibe': 'Ambiance recherchée',
+  'admin.quiz.question.mobility': 'Mobilité préférée',
+  'admin.quiz.question.priority': 'Priorité',
+  // Budget values
+  'admin.quiz.answer.budget.lt150k': '< 150k Ar',
+  'admin.quiz.answer.budget.150_250k': '150k - 250k Ar',
+  'admin.quiz.answer.budget.250_400k': '250k - 400k Ar',
+  'admin.quiz.answer.budget.gte400k': '> 400k Ar',
+  // School
+  'admin.quiz.answer.school.university': 'Université',
+  'admin.quiz.answer.school.lycee': 'Lycée',
+  'admin.quiz.answer.school.unsure': 'Pas sûr·e',
+  // Housing type
+  'admin.quiz.answer.housingType.ROOM': 'Chambre',
+  'admin.quiz.answer.housingType.STUDIO': 'Studio',
+  'admin.quiz.answer.housingType.APARTMENT': 'Appartement',
+  'admin.quiz.answer.housingType.any': 'Indifférent',
+  // Vibe
+  'admin.quiz.answer.vibe.calm': 'Calme',
+  'admin.quiz.answer.vibe.lively': 'Animé',
+  'admin.quiz.answer.vibe.mixed': 'Mixte',
+  // Mobility
+  'admin.quiz.answer.mobility.walk': 'À pied',
+  'admin.quiz.answer.mobility.taxibe': 'Taxi-be',
+  'admin.quiz.answer.mobility.car': 'Voiture',
+  // Priority
+  'admin.quiz.answer.priority.price': 'Prix',
+  'admin.quiz.answer.priority.school': 'École',
+  'admin.quiz.answer.priority.calm': 'Calme',
+  'admin.quiz.answer.priority.social': 'Vie sociale',
 
   // Admin WhatsApp Alerts (T-044)
   'admin.alerts.page.title': 'Alertes WhatsApp',

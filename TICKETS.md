@@ -536,7 +536,7 @@ model AuditLog {
 
 **Effort estimé** : ~3 jours (queries SQL groupBy + charts SVG inline + audit log infra réutilisable)
 
-**Priorité** : P2 · **Statut** : 📋 todo
+**Priorité** : P2 · **Statut** : ✅ done (2026-05-22, scope v0.5) — feature `features/admin-quiz/` : query `getQuizAnalytics` agrège (total + 7d + 30d + email opt-in rate + byLocale + answer distribution par question via in-process loop sur JSON + top 10 quartiers recommandés via String[] unnesting). 6 questions × valeurs énumérées via constante `QUIZ_ANSWER_VALUES` partagée. Route `/admin/quiz-analytics` Server Component avec 4 KPI cards + section locale + section topQuartiers + 6 blocs questions, bar charts CSS-only (zéro chart library — `width: pct%` direct, bundle léger). AdminSidebar lien "Quiz analytics" section MARKETING avec IconBarChart. ~40 nouvelles clés i18n FR+MG (incluant tous les labels questions + valeurs : budget tranches, school, housingType, vibe, mobility, priority). Scope v0.5 : pas d'export CSV, pas de filtres temporels — KPI snapshot only. V1 add filters quartier + period si volume justifie.
 
 ---
 
