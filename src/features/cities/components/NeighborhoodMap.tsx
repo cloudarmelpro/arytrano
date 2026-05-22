@@ -1,18 +1,14 @@
-import dynamic from 'next/dynamic'
 import type { Locale } from '@/lib/i18n/config'
 import { getT } from '@/lib/i18n/translate'
+import { NeighborhoodMapClient } from './NeighborhoodMapClient'
 
-// pigeon-maps reads `window` at module-eval time → must stay
-// client-side. Dynamic import with `ssr: false` mirrors the
-// QuartiersMap pattern.
-const NeighborhoodMapClient = dynamic(
-  () =>
-    import('./NeighborhoodMapClient').then((m) => ({
-      default: m.NeighborhoodMapClient,
-    })),
-  { ssr: false },
-)
-
+/**
+ * Server-side wrapper around the pigeon-maps Client island. Mirrors
+ * the `QuartiersMap` pattern : direct import of the `'use client'`
+ * module — no `next/dynamic`, no `ssr: false` (Next 16 forbids the
+ * latter from Server Components anyway). The client directive itself
+ * creates the SSR boundary.
+ */
 export function NeighborhoodMap({
   locale,
   lat,
