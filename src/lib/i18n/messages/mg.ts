@@ -1595,9 +1595,24 @@ export const mg: Record<MessageKey, string> = {
   // Auth — verify email
   'verifyEmail.title': 'Hamarino ny boatim-pailakanao',
   'verifyEmail.lead':
-    'Vao avy nalefa rohy majika amin\'ny adiresinao. Tsindrio anatin\'ny ora iray hampiasanao ny kaontinao.',
+    'Vao avy nalefa rohy fanamarinana amin\'ny adiresinao. Tsindrio anatin\'ny 24 ora hampiasanao ny kaontinao.',
   'verifyEmail.signInLink': 'Mankanesa amin\'ny fidirana',
   'verifyEmail.changeEmail': 'Hanova adiresy mailaka',
+  'verifyEmail.helpInbox':
+    'Tsy noraisinao ? Jereo ny spam, na tsindrio « Avereno alefa » etsy ambony. Raha tsy mandeha, soraty indray amin\'ny adiresy hafa.',
+  'verifyEmail.resend.cta': 'Avereno alefa ny rohy',
+  'verifyEmail.resend.pending': 'Mandefa…',
+  'verifyEmail.resend.cooldown': 'Avereno alefa ({seconds}s)',
+  'verifyEmail.resend.success': 'Voaverina alefa. Jereo ny boatinao.',
+  'verifyEmail.resend.rateLimit':
+    'Maro be ny fanandramana. Andramo indray afaka adiny iray.',
+  'verifyEmail.resend.invalid': 'Adiresy email tsy mety.',
+  'verifyEmail.resend.unavailable':
+    'Tsy afaka mandefa amin\'izao. Andramo afaka kely.',
+  'signIn.emailNotVerified':
+    'Mbola tsy voamarina ny email — tsindrio ny rohy ao amin\'ny boatinao.',
+  'signIn.verifiedToast':
+    'Voamarina ny email. Afaka miditra ianao.',
 
   // Auth — error page descriptions
   'authError.description.default': 'Tsy afaka namarana ny fidirana izahay. Andramo indray.',

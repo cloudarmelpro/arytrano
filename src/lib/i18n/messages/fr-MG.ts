@@ -1570,12 +1570,28 @@ export const frMG = {
   'reset.submit': 'Mettre à jour le mot de passe',
   'reset.submitting': 'Mise à jour…',
 
-  // Auth — verify email (post-magic-link send)
-  'verifyEmail.title': 'Vérifiez votre boîte mail',
+  // Auth — verify email (post-sign-up + resend flow)
+  'verifyEmail.title': 'Vérifie ta boîte mail',
   'verifyEmail.lead':
-    'On vient d\'envoyer un lien magique à votre adresse. Cliquez-le dans l\'heure pour activer votre compte.',
+    'On vient d\'envoyer un lien de confirmation à ton adresse. Clique dessus dans les 24 heures pour activer ton compte.',
   'verifyEmail.signInLink': 'Aller à la connexion',
   'verifyEmail.changeEmail': 'Changer d\'adresse email',
+  'verifyEmail.helpInbox':
+    'Pas reçu ? Vérifie tes spams, ou clique sur « Renvoyer » ci-dessus. Si rien ne marche, recommence l\'inscription avec une autre adresse.',
+  'verifyEmail.resend.cta': 'Renvoyer le lien',
+  'verifyEmail.resend.pending': 'Envoi…',
+  'verifyEmail.resend.cooldown': 'Renvoyer ({seconds}s)',
+  'verifyEmail.resend.success': 'Email renvoyé. Vérifie ta boîte.',
+  'verifyEmail.resend.rateLimit':
+    'Trop d\'essais. Réessaie dans une heure.',
+  'verifyEmail.resend.invalid': 'Adresse email invalide.',
+  'verifyEmail.resend.unavailable':
+    'Impossible pour le moment. Réessaie dans un instant.',
+  // Sign-in : strict-mode messages
+  'signIn.emailNotVerified':
+    'Email pas encore vérifié — clique sur le lien dans ta boîte mail.',
+  'signIn.verifiedToast':
+    'Email vérifié. Tu peux te connecter.',
 
   // Auth — error page details
   'authError.description.default': 'On n\'a pas pu finaliser ta connexion. Réessaie dans un instant.',

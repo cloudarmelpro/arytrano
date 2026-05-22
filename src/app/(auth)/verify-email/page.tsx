@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { ResendVerificationButton } from '@/features/auth'
 import { getLocale } from '@/lib/i18n/get-locale'
 import { getT } from '@/lib/i18n/translate'
 import { localeAlternates } from '@/lib/seo/alternates'
@@ -42,12 +43,11 @@ export default async function VerifyEmailPage({
         </span>
       )}
 
-      <Link
-        href="/sign-in"
-        className="w-full max-w-xs rounded-md bg-primary px-4 py-3 font-medium text-primary-foreground transition hover:opacity-90"
-      >
-        {t('verifyEmail.signInLink')}
-      </Link>
+      {email ? <ResendVerificationButton email={email} /> : null}
+
+      <p className="max-w-md text-[12.5px] text-muted-foreground">
+        {t('verifyEmail.helpInbox')}
+      </p>
 
       <Link href="/sign-up" className="text-sm text-muted-foreground underline">
         {t('verifyEmail.changeEmail')}

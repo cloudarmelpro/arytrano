@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
-import { ForgotPasswordForm } from '@/features/auth'
+import { redirect } from 'next/navigation'
+import { auth, ForgotPasswordForm } from '@/features/auth'
 import { AuthPageShell, AuthAltLink } from '@/components/shared/AuthPageShell'
 import { getLocale } from '@/lib/i18n/get-locale'
 import { getT } from '@/lib/i18n/translate'
@@ -14,6 +15,9 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function ForgotPasswordPage() {
+  const session = await auth()
+  if (session?.user) redirect('/dashboard')
+
   const t = getT(await getLocale())
   return (
     <AuthPageShell

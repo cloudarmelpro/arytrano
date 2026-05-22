@@ -82,6 +82,12 @@ const contactByIpListing = makeLimiter('contact-ip-listing', { requests: 30, win
 const signInEmailByEmail = makeLimiter('signin-email-email', { requests: 3, window: '1 h' })
 const signInEmailByIp = makeLimiter('signin-email-ip', { requests: 10, window: '1 h' })
 
+// Email verification resend — same shape as forgot-password (3/email/h
+// + 10/IP/h). Keeps a separate bucket so a user who maxed out their
+// password resets still has room to receive a verification email.
+const resendVerificationByEmail = makeLimiter('verify-resend-email', { requests: 3, window: '1 h' })
+const resendVerificationByIp = makeLimiter('verify-resend-ip', { requests: 10, window: '1 h' })
+
 // Transactional emails (T-034) — cap per-user per-event-type to prevent
 // storms if a service retry loop or webhook double-fires. 10/h is enough
 // for healthy activity (multiple publishes/reviews per hour shouldn't
@@ -165,6 +171,13 @@ export const rateLimiters = {
     const byEmail = await check(signInEmailByEmail, email.toLowerCase())
     if (!byEmail.success) return byEmail
     return check(signInEmailByIp, ipHash)
+  },
+
+  /** Resend verification email — 3/email/h + 10/IP/h. Same shape as forgot-password. */
+  resendVerification: async (email: string, ipHash: string): Promise<RateLimitResult> => {
+    const byEmail = await check(resendVerificationByEmail, email.toLowerCase())
+    if (!byEmail.success) return byEmail
+    return check(resendVerificationByIp, ipHash)
   },
 
   /** Transactional email — 10/h per (userId, eventType). Fail-soft caller. */

@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
-import { SignUpClient } from '@/features/auth'
+import { redirect } from 'next/navigation'
+import { auth, SignUpClient } from '@/features/auth'
 import { AuthPageShell, AuthAltLink } from '@/components/shared/AuthPageShell'
 import { env } from '@/lib/env'
 import { getLocale } from '@/lib/i18n/get-locale'
@@ -21,6 +22,9 @@ export default async function SignUpPage({
 }: {
   searchParams: SearchParams
 }) {
+  const session = await auth()
+  if (session?.user) redirect('/dashboard')
+
   const [locale, sp] = await Promise.all([getLocale(), searchParams])
   const t = getT(locale)
   const googleEnabled = Boolean(env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET)

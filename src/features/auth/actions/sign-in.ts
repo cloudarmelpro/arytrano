@@ -18,6 +18,14 @@ type SignInActionState = {
    * prompt and re-submits with `totpCode` populated.
    */
   needTotp?: boolean
+  /**
+   * True when password was accepted but the user has never confirmed
+   * their email. The form switches to a "check your inbox" CTA with a
+   * "resend" button. `unverifiedEmail` lets the resend action target
+   * the right address without re-entering the password.
+   */
+  emailNotVerified?: boolean
+  unverifiedEmail?: string
 }
 
 export async function signInAction(
@@ -54,6 +62,7 @@ export async function signInAction(
       passwordHash: true,
       status: true,
       totpEnabledAt: true,
+      emailVerified: true,
     },
   })
   if (
@@ -62,6 +71,17 @@ export async function signInAction(
     !(await verifyPassword(input.password, preflight.passwordHash))
   ) {
     return { ok: false, message: 'Email ou mot de passe incorrect' }
+  }
+
+  // Strict email verification : credentials sign-in is blocked until
+  // emailVerified is set. OAuth users skip this check because their
+  // provider has already verified the email upstream.
+  if (preflight.emailVerified === null) {
+    return {
+      ok: false,
+      emailNotVerified: true,
+      unverifiedEmail: input.email,
+    }
   }
 
   if (preflight.totpEnabledAt && !input.totpCode) {

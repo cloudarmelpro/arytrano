@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useTransition } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { Controller, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { toast } from 'sonner'
@@ -25,6 +26,7 @@ export function SignInForm({
   onPendingChange?: (pending: boolean) => void
 } = {}) {
   const t = useT()
+  const router = useRouter()
   const [pending, startTransition] = useTransition()
   const [showPassword, setShowPassword] = useState(false)
   const [twofaPrompt, setTwofaPrompt] = useState(false)
@@ -53,6 +55,16 @@ export function SignInForm({
         setTwofaPrompt(true)
         setTotpError(result.message ?? null)
         if (result.message) toast.error(result.message)
+        return
+      }
+
+      if (result.emailNotVerified && result.unverifiedEmail) {
+        // Send the user to /verify-email so they can request a new
+        // verification link. Toast hints why we're redirecting.
+        toast.error(t('signIn.emailNotVerified'))
+        router.push(
+          `/verify-email?email=${encodeURIComponent(result.unverifiedEmail)}`,
+        )
         return
       }
 

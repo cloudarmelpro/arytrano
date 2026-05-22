@@ -74,12 +74,19 @@ const providers: NextAuthConfig['providers'] = [
           passwordHash: true,
           status: true,
           totpEnabledAt: true,
+          emailVerified: true,
         },
       })
       if (!user || !user.passwordHash || user.status !== 'ACTIVE') return null
 
       const ok = await verifyPassword(parsed.data.password, user.passwordHash)
       if (!ok) return null
+
+      // Defense-in-depth : block credentials sign-in for unverified
+      // emails even if the signInAction preflight was bypassed (e.g.
+      // someone hitting /api/auth/callback/credentials directly).
+      // OAuth providers are exempt — they set emailVerified upstream.
+      if (user.emailVerified === null) return null
 
       // 2FA enforcement: if user has TOTP enabled, the credentials payload
       // MUST include a valid totpCode (6-digit TOTP or XXXX-XXXX recovery).
