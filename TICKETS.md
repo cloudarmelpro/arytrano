@@ -286,7 +286,7 @@ C/D/E sont planifiées mais non détaillées ici.
 - `lib/cloudinary/index.ts` mis à jour, pas de changement d'API publique
 - Test manuel documenté : upload photo avec GPS → `exiftool` sur l'URL Cloudinary doit ne rien retourner
 - Memory : créer `feedback_exif_strip_explicit.md`
-**Priorité** : P1 · **Statut** : 📋 todo
+**Priorité** : P1 · **Statut** : ✅ done (déjà appliqué) — `image_metadata: false` + `exif: false` dans tous les `upload_stream` (avatar + listing photos). Memory existante.
 
 #### T-033 · Badge "Annonce vérifiée" (admin marker)
 **En tant qu'**admin
@@ -374,7 +374,7 @@ C/D/E sont planifiées mais non détaillées ici.
 - Rate-limit dédié par-event-par-userId (e.g. 10/h pour éviter spam si retry-loop)
 - Liens cliquables pointent vers la page concernée (`/dashboard/listings/${id}/edit` ou page détail publique selon contexte)
 - Tests : 1 unit test par template (escape HTML + variable interpolation)
-**Priorité** : P1 · **Statut** : 📋 todo
+**Priorité** : P1 · **Statut** : ✅ done (déjà livré) — 9 templates dans `src/lib/email/templates/` (listing-published, review-received, review-prompt, listing-verified, listing-expiring, listing-expired, report-received, review-replied, contact-received, cin-result, verify-email) + tests unitaires par template. Wrapper `sendTransactionalEmail` avec rate-limit 10/h/userId/eventType.
 
 ### Phase D — Admin curation des surfaces marketing (todo)
 
@@ -614,7 +614,7 @@ lastBroadcastAt DateTime?  // tracks when this number last received a broadcast
 
 **Effort estimé** : ~3 jours (table multi-select + composer + batchs WhatsApp Web)
 
-**Priorité** : P2 · **Statut** : 📋 todo
+**Priorité** : P2 · **Statut** : ✅ done (2026-05-22, duplicate ticket — cf T-044 plus bas pour le détail).
 
 ---
 
@@ -684,7 +684,7 @@ unsubscribeToken String?    @unique  // long-lived, généré au signup
 
 **Effort estimé** : ~1.5 jour (schema + service + page + backfill script + tests)
 
-**Priorité** : P1 · **Statut** : 📋 todo
+**Priorité** : P1 · **Statut** : ✅ done (2026-05-22, ticket dupliqué dans TICKETS.md — voir première occurrence T-045 plus haut pour le détail complet).
 
 #### T-044 · Admin WhatsApp Alerts list + broadcast manuel
 **En tant qu'**admin
@@ -1419,7 +1419,7 @@ enum ListingStatus {
 
 **Effort estimé** : ~1 jour (config provider + test restore + runbook)
 
-**Priorité** : P0 (pre-launch) · **Statut** : 📋 todo
+**Priorité** : P0 (pre-launch) · **Statut** : ✅ done (2026-05-22) — scripts `scripts/backup-db.sh` (pg_dump → gzip → rclone Cloudflare R2, retention 30j + archive mensuelle + Slack webhook on failure + freshness flag pour `/api/health`), `scripts/restore-db.sh` avec safeguard `--allow-prod` + double confirmation typed `RESTORE PRODUCTION`, `scripts/check-backup-freshness.sh` runs every 6h alerte si > 26h, runbook `public/docs/runbooks/restore-db.md` + `contabo-deployment.md §8`, env `BACKUP_FRESHNESS_FILE`, route `/api/health` DB ping + lastBackupAgeHours (503 si DB down mais 200 si backup stale — anti dead-cron lockout).
 
 ---
 
@@ -1484,7 +1484,7 @@ enum ListingStatus {
 
 **Effort estimé** : ~1.5 jour (SDK + scrubbers + alertes + status page + runbook)
 
-**Priorité** : P0 (pre-launch) · **Statut** : 📋 todo
+**Priorité** : P0 (pre-launch) · **Statut** : ✅ done (2026-05-22) — `@sentry/nextjs@10.53` + 3 sentry.{client,server,edge}.config.ts (no-op si DSN missing), `src/instrumentation.ts` Next 16 register + onRequestError, `lib/observability/scrub-pii.ts` strips Auth/Cookie/body + masque email/+261/CIN (10 tests), boundaries `app/error.tsx` + `global-error.tsx` avec captureException, `next.config.ts` wrappé `withSentryConfig` (sourcemaps upload + deleteSourcemapsAfterUpload), 6 env vars Sentry, runbook `monitoring.md` + `incidents.md` (severity matrix + 5 playbooks).
 
 ---
 
