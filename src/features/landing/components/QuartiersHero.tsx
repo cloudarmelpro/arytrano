@@ -1,16 +1,31 @@
 import type { Locale } from '@/lib/i18n/config'
 import { getT } from '@/lib/i18n/translate'
 
+/**
+ * Quartiers index hero — adapts to the city in the route :
+ *   - non-empty city : "{N} quartiers de {City}" + lead générique
+ *   - empty city (seeded but no quartiers yet, edge case) : "Bientôt
+ *     à {City}" + lead inviting to come back later
+ *
+ * The static `priceRange` stat from v0.5 was dropped — it hardcoded
+ * "95k-420k" Fianar-specific values and would mislead visitors on
+ * other cities. The 2 remaining stats (quartiers count + active
+ * listings) are real-time accurate for every city.
+ */
 export function QuartiersHero({
   locale,
+  cityName,
   quartiersCount,
   totalListings,
 }: {
   locale: Locale
+  /** Localized city name shown in the H1 interpolation. */
+  cityName: string
   quartiersCount: number
   totalListings: number
 }) {
   const t = getT(locale)
+  const isEmpty = quartiersCount === 0
   return (
     <section className="bg-background pt-16 pb-10 lg:pt-20 lg:pb-12">
       <div className="mx-auto grid max-w-[1280px] items-end gap-12 px-6 lg:grid-cols-[1.5fr_1fr] lg:px-10">
@@ -19,20 +34,28 @@ export function QuartiersHero({
             {t('quartiers.eyebrow')}
           </span>
           <h1 className="mt-3.5 font-serif text-[clamp(36px,4.2vw,56px)] font-normal leading-[1.05] tracking-[-0.02em] text-foreground">
-            {t('quartiers.h1')}
+            {isEmpty
+              ? t('quartiers.h1.empty', { city: cityName })
+              : t('quartiers.h1', { count: quartiersCount, city: cityName })}
           </h1>
           <p className="mt-4 max-w-[540px] text-[17px] leading-[1.55] text-foreground/70">
-            {t('quartiers.lead')}
+            {isEmpty
+              ? t('quartiers.lead.empty', { city: cityName })
+              : t('quartiers.lead')}
           </p>
         </div>
-        <div className="flex flex-wrap gap-10">
-          <Stat n={String(quartiersCount)} label={t('quartiers.stats.quartiers.label')} />
-          <Stat n={String(totalListings)} label={t('quartiers.stats.listings.label')} />
-          <Stat
-            n={t('quartiers.stats.priceRange.value')}
-            label={t('quartiers.stats.priceRange.label')}
-          />
-        </div>
+        {!isEmpty && (
+          <div className="flex flex-wrap gap-10">
+            <Stat
+              n={String(quartiersCount)}
+              label={t('quartiers.stats.quartiers.label')}
+            />
+            <Stat
+              n={String(totalListings)}
+              label={t('quartiers.stats.listings.label')}
+            />
+          </div>
+        )}
       </div>
     </section>
   )

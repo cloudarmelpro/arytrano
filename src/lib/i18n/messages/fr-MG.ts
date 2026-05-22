@@ -1032,13 +1032,16 @@ export const frMG = {
   'cities.toliara.name': 'Toliara',
   'cities.toliara.tagline': 'Sud-Ouest, université + sciences marines',
   'quartiers.eyebrow': 'Quartiers',
-  'quartiers.h1': 'Les 8 quartiers de Fianarantsoa.',
+  // E-T07 : H1 + lead dynamiques paramétrés par ville
+  'quartiers.h1': '{count} quartiers de {city}.',
+  'quartiers.h1.empty': 'Bientôt à {city}.',
   'quartiers.lead':
-    'Du centre commercial animé d’Antarandolo aux hauteurs résidentielles d’Ankidona — choisis ton quartier selon ton style de vie, pas seulement ton budget.',
+    'Chaque quartier a sa propre ambiance, son budget moyen et ses commodités. Choisis selon ton style de vie, pas seulement ton budget.',
+  'quartiers.lead.empty':
+    'On est en train de cartographier les quartiers étudiants de {city}. Reviens dans quelques semaines, ou explore les autres villes ci-dessus.',
+  'quartiers.cityNav.aria': 'Changer de ville',
   'quartiers.stats.quartiers.label': 'Quartiers couverts',
   'quartiers.stats.listings.label': 'Annonces actives',
-  'quartiers.stats.priceRange.label': 'Fourchette Ar/mois',
-  'quartiers.stats.priceRange.value': '95k–420k',
   'quartiers.block.dataCell.avgPrice': 'Loyer moyen',
   'quartiers.block.dataCell.distance': 'Distance centre',
   'quartiers.block.dataCell.listings': 'Annonces',

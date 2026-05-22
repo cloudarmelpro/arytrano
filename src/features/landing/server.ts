@@ -29,3 +29,7 @@ export {
   listCitiesWithCounts,
   type CityWithCount,
 } from './queries/list-cities-with-counts'
+export {
+  listCitiesWithQuartierCounts,
+  type CityQuartierCount,
+} from './queries/list-cities-with-quartier-counts'

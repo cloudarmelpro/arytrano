@@ -1046,13 +1046,16 @@ export const mg: Record<MessageKey, string> = {
   'cities.toliara.name': 'Toliara',
   'cities.toliara.tagline': 'Atsimo-andrefana, oniversite + siansa an-dranomasina',
   'quartiers.eyebrow': 'Faritra',
-  'quartiers.h1': 'Ireo faritra 8 ao Fianarantsoa.',
+  // E-T07 : H1 + lead miankina amin'ny tanàna
+  'quartiers.h1': 'Faritra {count} ao {city}.',
+  'quartiers.h1.empty': 'Tsy ho ela ao {city}.',
   'quartiers.lead':
-    'Manomboka amin’i Antarandolo manana hetsika hatrany hatrany ny haavon’i Ankidona — safidio ny faritra mifanaraka amin’ny fomba fiainanao, fa tsy ny tetibola fotsiny.',
+    'Manana ny endriny manokana ny faritra tsirairay : tontolo, salan\'ny vidiny sy fanamora-piainana. Safidio araka ny fomba fiainanao, fa tsy ny tetibola fotsiny.',
+  'quartiers.lead.empty':
+    'Mbola eo am-piomanana ny faritra ho an\'ny mpianatra ao {city}. Miverena indray manaraka, na zaha ny tanàna hafa etsy ambony.',
+  'quartiers.cityNav.aria': 'Hanova tanàna',
   'quartiers.stats.quartiers.label': 'Faritra voarakitra',
   'quartiers.stats.listings.label': 'Filazana misy',
-  'quartiers.stats.priceRange.label': 'Eo anelanelan’ny Ar/volana',
-  'quartiers.stats.priceRange.value': '95k–420k',
   'quartiers.block.dataCell.avgPrice': 'Salan’ny hofa',
   'quartiers.block.dataCell.distance': 'Lavitra ny afovoany',
   'quartiers.block.dataCell.listings': 'Filazana',

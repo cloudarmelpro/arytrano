@@ -18,6 +18,10 @@ export { LandingStudents } from './components/LandingStudents'
 export { LandingFinalCta } from './components/LandingFinalCta'
 export { LandingFaq } from './components/LandingFaq'
 export { QuartiersHero } from './components/QuartiersHero'
+export {
+  QuartiersCityNav,
+  type QuartiersCityNavItem,
+} from './components/QuartiersCityNav'
 export { QuartiersMap } from './components/QuartiersMap'
 export { QuartiersJump } from './components/QuartiersJump'
 export { QuartiersBlocks } from './components/QuartiersBlocks'

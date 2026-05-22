@@ -3,12 +3,16 @@ import { notFound } from 'next/navigation'
 import { prisma } from '@/lib/db'
 import {
   QuartiersHero,
+  QuartiersCityNav,
   QuartiersMap,
   QuartiersJump,
   QuartiersBlocks,
   QuartiersQuizCta,
 } from '@/features/landing'
-import { getQuartiersData } from '@/features/landing/server'
+import {
+  getQuartiersData,
+  listCitiesWithQuartierCounts,
+} from '@/features/landing/server'
 import { getLocale } from '@/lib/i18n/get-locale'
 import { getT } from '@/lib/i18n/translate'
 import { localeAlternates } from '@/lib/seo/alternates'
@@ -59,11 +63,14 @@ export default async function QuartiersByCityPage({
 }) {
   const { citySlug } = await params
   const city = await getCityOrNotFound(citySlug)
-  const [locale, data] = await Promise.all([
+  const [locale, data, cityNavItems] = await Promise.all([
     getLocale(),
     getQuartiersData(city.slug),
+    listCitiesWithQuartierCounts(),
   ])
   const t = getT(locale)
+  const cityName = locale === 'mg' ? city.nameMg : city.nameFr
+  const isEmpty = data.quartiers.length === 0
 
   return (
     <>
@@ -71,18 +78,28 @@ export default async function QuartiersByCityPage({
         homeLabel={t('common.home')}
         trail={[
           { name: t('quartiers.meta.title'), href: '/quartiers' },
-          { name: city.nameFr, href: `/quartiers/${city.slug}` },
+          { name: cityName, href: `/quartiers/${city.slug}` },
         ]}
+      />
+      <QuartiersCityNav
+        locale={locale}
+        cities={cityNavItems}
+        activeCitySlug={city.slug}
       />
       <QuartiersHero
         locale={locale}
+        cityName={cityName}
         quartiersCount={data.quartiers.length}
         totalListings={data.totalListings}
       />
-      <QuartiersMap locale={locale} quartiers={data.quartiers} />
-      <QuartiersJump locale={locale} quartiers={data.quartiers} />
-      <QuartiersBlocks locale={locale} quartiers={data.quartiers} />
-      <QuartiersQuizCta locale={locale} />
+      {!isEmpty && (
+        <>
+          <QuartiersMap locale={locale} quartiers={data.quartiers} />
+          <QuartiersJump locale={locale} quartiers={data.quartiers} />
+          <QuartiersBlocks locale={locale} quartiers={data.quartiers} />
+          <QuartiersQuizCta locale={locale} />
+        </>
+      )}
     </>
   )
 }
