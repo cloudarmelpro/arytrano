@@ -8,8 +8,10 @@ import { PublicListingCard } from '@/features/listings'
 import {
   ListingFiltersSidebar,
   ListingSearchToolbar,
+  CityTabs,
 } from '@/features/listings'
 import { listCitiesWithNeighborhoods } from '@/features/geo'
+import { prisma } from '@/lib/db'
 import { getFavoritedListingIds } from '@/features/favorites/server'
 import { auth } from '@/features/auth'
 import { getLocale } from '@/lib/i18n/get-locale'
@@ -43,6 +45,24 @@ function hasAnyFilter(sp: Awaited<SearchParams>) {
   )
 }
 
+/**
+ * Lookup a city's localized name by slug, for metadata + H1 interpolation.
+ * Returns null when the slug doesn't match a seeded city — caller falls
+ * back to the city-less generic title.
+ */
+async function getCityLabel(
+  citySlug: string | undefined,
+  locale: string,
+): Promise<string | null> {
+  if (!citySlug) return null
+  const city = await prisma.city.findUnique({
+    where: { slug: citySlug },
+    select: { nameFr: true, nameMg: true },
+  })
+  if (!city) return null
+  return locale === 'mg' ? city.nameMg : city.nameFr
+}
+
 export async function generateMetadata({
   searchParams,
 }: {
@@ -52,9 +72,14 @@ export async function generateMetadata({
   const t = getT(locale)
   const isPaginated = Boolean(sp.cursor)
   const isFiltered = hasAnyFilter(sp)
+  const cityLabel = await getCityLabel(sp.city, locale)
   return {
-    title: t('annonces.title'),
-    description: t('annonces.metaDescription'),
+    title: cityLabel
+      ? t('annonces.title.city', { city: cityLabel })
+      : t('annonces.title'),
+    description: cityLabel
+      ? t('annonces.metaDescription.city', { city: cityLabel })
+      : t('annonces.metaDescription'),
     // Consolidate paginated/filtered variants on the canonical landing URL.
     // `localeAlternates` adds the `/mg/annonces` hreflang.
     alternates: await localeAlternates('/annonces'),
@@ -104,6 +129,26 @@ export default async function PublicListingsPage({
     ? activeCity.neighborhoods
     : cities.flatMap((c) => c.neighborhoods)
 
+  // Page H1 + breadcrumb adapt to the city filter so visitors who land
+  // here via `?city=antananarivo` don't see a misleading "Annonces à
+  // Fianarantsoa" hardcoded headline.
+  const pageTitle = activeCity
+    ? t('annonces.title.city', {
+        city: locale === 'mg' ? activeCity.nameMg : activeCity.nameFr,
+      })
+    : t('annonces.title')
+
+  // CityTabs preserves the user's other filters (type, price, sort,
+  // amenities) but drops `city`, `neighborhood`, and `cursor` — the
+  // pill itself sets the city and pagination/neighborhood scoping
+  // belongs to the new city, not the previous one.
+  const cityTabsParams = new URLSearchParams()
+  if (sp.type) cityTabsParams.set('type', sp.type)
+  if (sp.priceMin) cityTabsParams.set('priceMin', sp.priceMin)
+  if (sp.priceMax) cityTabsParams.set('priceMax', sp.priceMax)
+  if (sp.sort) cityTabsParams.set('sort', sp.sort)
+  if (sp.amenities) cityTabsParams.set('amenities', sp.amenities)
+
   // Single SET lookup per card avoids N+1 favorite queries.
   const favoritedIds = await getFavoritedListingIds(
     session?.user?.id ?? null,
@@ -134,10 +179,10 @@ export default async function PublicListingsPage({
             {t('common.appName')}
           </Link>
           <Icon name="arrow-right" size={11} />
-          <span className="text-foreground">{t('annonces.title')}</span>
+          <span className="text-foreground">{pageTitle}</span>
         </nav>
         <h1 className="font-serif text-[clamp(32px,3.8vw,52px)] font-normal leading-[1.05] tracking-[-0.025em] text-foreground">
-          {t('annonces.title')}
+          {pageTitle}
         </h1>
         <p className="max-w-2xl text-[14.5px] text-foreground/70">
           <strong className="text-foreground">{items.length}</strong>{' '}
@@ -147,6 +192,19 @@ export default async function PublicListingsPage({
           {filterActive ? null : t('annonces.lead')}
         </p>
       </header>
+
+      {/* City pills row (E-T07). Lets a visitor switch city filter in
+          one click without touching URL params. The "Tous" pill clears
+          ?city= ; clicking another city replaces it AND drops the
+          stale neighborhood slug (neighborhood slugs are unique per
+          city — keeping one across city change would produce zero
+          results). */}
+      <CityTabs
+        locale={locale}
+        cities={cities}
+        activeCitySlug={activeCity?.slug ?? null}
+        currentParams={cityTabsParams}
+      />
 
       {/* Top toolbar — neighborhood autocomplete on the left, sort on the right */}
       <ListingSearchToolbar neighborhoods={neighborhoods} />
@@ -161,7 +219,14 @@ export default async function PublicListingsPage({
               <p className="text-base font-medium">
                 {filterActive
                   ? t('annonces.empty.filtered.title')
-                  : t('annonces.empty.title')}
+                  : activeCity
+                    ? t('annonces.empty.title.city', {
+                        city:
+                          locale === 'mg'
+                            ? activeCity.nameMg
+                            : activeCity.nameFr,
+                      })
+                    : t('annonces.empty.title')}
               </p>
               <p className="mt-2 text-sm text-muted-foreground">
                 {filterActive

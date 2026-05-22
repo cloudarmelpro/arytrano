@@ -203,15 +203,23 @@ export const frMG = {
   'listing.type.HOUSE': 'Maison',
 
   // /annonces — public list
-  'annonces.title': 'Annonces à Fianarantsoa',
+  'annonces.title': 'Annonces étudiantes',
+  // E-T07 : title variantes paramétrées par ville quand ?city= est dans l'URL.
+  'annonces.title.city': 'Annonces à {city}',
   'annonces.lead':
     'Chambres, studios et appartements pour étudiants. Annonces postées par les propriétaires — contact direct, pas de commission.',
   'annonces.metaDescription':
-    "Trouvez votre logement étudiant à Fianarantsoa : chambres, studios, appartements meublés. Contact direct avec le propriétaire, pas d'intermédiaire.",
+    "Trouvez votre logement étudiant à Madagascar : chambres, studios, appartements meublés. Contact direct avec le propriétaire, pas d'intermédiaire.",
+  'annonces.metaDescription.city':
+    'Trouvez votre logement étudiant à {city} : chambres, studios, appartements meublés. Contact direct avec le propriétaire, pas d\'intermédiaire.',
   'annonces.count.one': '{count} annonce',
   'annonces.count.other': '{count} annonces',
   'annonces.count.hasMore': '(plus disponibles)',
-  'annonces.empty.title': "Aucune annonce pour l'instant à Fianarantsoa.",
+  'annonces.empty.title': "Aucune annonce pour l'instant.",
+  'annonces.empty.title.city': "Aucune annonce pour l'instant à {city}.",
+  // City tabs above the filter row
+  'annonces.cityTabs.all': 'Toutes',
+  'annonces.cityTabs.aria': 'Filtrer par ville',
   'annonces.empty.lead': 'On en publie chaque semaine — reviens bientôt.',
   'annonces.empty.filtered.title': 'Aucune annonce ne correspond à ces filtres.',
   'annonces.empty.filtered.lead':

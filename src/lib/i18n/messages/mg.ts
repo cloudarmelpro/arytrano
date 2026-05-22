@@ -209,15 +209,22 @@ export const mg: Record<MessageKey, string> = {
   'listing.type.HOUSE': 'Trano',
 
   // /annonces
-  'annonces.title': 'Trano hofaina ao Fianarantsoa',
+  'annonces.title': 'Trano hofaina ho an\'ny mpianatra',
+  'annonces.title.city': 'Trano hofaina ao {city}',
   'annonces.lead':
     'Efitra, studio sy apartemà ho an\'ny mpianatra. Apetraky ny tompon-trano mivantana — tsy misy mpanelanelana.',
   'annonces.metaDescription':
-    'Mitady toeram-ponenana ho an\'ny mpianatra ao Fianarantsoa : efitra, studio, apartemà voafefy. Resaka mivantana amin\'ny tompon-trano.',
+    'Mitady toeram-ponenana ho an\'ny mpianatra ao Madagasikara : efitra, studio, apartemà voafefy. Resaka mivantana amin\'ny tompon-trano.',
+  'annonces.metaDescription.city':
+    'Mitady toeram-ponenana ho an\'ny mpianatra ao {city} : efitra, studio, apartemà voafefy. Resaka mivantana amin\'ny tompon-trano.',
   'annonces.count.one': 'Trano {count}',
   'annonces.count.other': 'Trano {count}',
   'annonces.count.hasMore': '(maro hafa)',
-  'annonces.empty.title': 'Mbola tsy misy trano ao Fianarantsoa.',
+  'annonces.empty.title': 'Mbola tsy misy trano.',
+  'annonces.empty.title.city': 'Mbola tsy misy trano ao {city}.',
+  // E-T07 city tabs
+  'annonces.cityTabs.all': 'Rehetra',
+  'annonces.cityTabs.aria': 'Sivanao araka ny tanàna',
   'annonces.empty.lead': 'Manampy isan-kerinandro izahay — miverena tsy ho ela.',
   'annonces.empty.filtered.title': 'Tsy misy trano mifanaraka amin\'ireo sivana.',
   'annonces.empty.filtered.lead':
