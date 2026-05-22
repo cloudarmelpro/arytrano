@@ -1670,7 +1670,7 @@ Migration `<ts>_add_user_preferred_city`
 
 **Effort estimé** : ~1 semaine (après E-T07)
 
-**Priorité** : P0 · **Statut** : 📋 todo
+**Priorité** : P0 · **Statut** : ✅ done (2026-05-23) — 4 batches livrés : B1 `/villes/[citySlug]` (Hero SEO + Listings top 8 + QuartiersGrid + query cached 5min + sitemap dyn priority 0.85). B2 `/villes/[city]/quartiers/[n]` (Hero + Map zoomée + Listings 12 + Reviews aggregated + Place JSON-LD + ItemList JSON-LD + siblings chip row + sitemap dyn priority 0.75). B4 internal linking (listing detail breadcrumb clickable vers /villes/<city> + /villes/<city>/quartiers/<n>, footer "Villes" colonne, hub `/villes` listant les 5 villes). B3 OG images dynamiques next/og pour /villes/[citySlug] + /villes/[city]/quartiers/[n] (1200×630 PNG, branded primary bg, count d'annonces). ~75 nouvelles clés i18n FR+MG.
 
 ---
 
