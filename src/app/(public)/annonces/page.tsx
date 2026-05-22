@@ -20,6 +20,7 @@ import { Icon } from '@/components/shared/Icon'
 type SearchParams = Promise<{
   cursor?: string
   type?: string
+  city?: string
   neighborhood?: string
   priceMin?: string
   priceMax?: string
@@ -33,6 +34,7 @@ function hasAnyFilter(sp: Awaited<SearchParams>) {
   // and ?sort=price-desc would be independently indexable.
   return Boolean(
     sp.type ||
+      sp.city ||
       sp.neighborhood ||
       sp.priceMin ||
       sp.priceMax ||
@@ -73,6 +75,7 @@ export default async function PublicListingsPage({
   const parsed = listPublicListingsQuerySchema.safeParse({
     cursor: sp.cursor,
     type: sp.type || undefined,
+    city: sp.city || undefined,
     neighborhood: sp.neighborhood || undefined,
     priceMin: sp.priceMin || undefined,
     priceMax: sp.priceMax || undefined,
@@ -89,8 +92,17 @@ export default async function PublicListingsPage({
     listCitiesWithNeighborhoods(),
     auth(),
   ])
-  // v0 = Fianarantsoa only — flatten its neighborhoods.
-  const neighborhoods = cities[0]?.neighborhoods ?? []
+  // E-T07 multi-ville : show neighborhoods of the city in `?city=` if
+  // passed, otherwise flatten ALL cities' neighborhoods so the filter
+  // dropdown remains useful when the visitor hasn't picked a city.
+  // When city IS in the URL but unknown, fall through to first city
+  // as a defensive default.
+  const activeCity = sp.city
+    ? (cities.find((c) => c.slug === sp.city) ?? cities[0])
+    : null
+  const neighborhoods = activeCity
+    ? activeCity.neighborhoods
+    : cities.flatMap((c) => c.neighborhoods)
 
   // Single SET lookup per card avoids N+1 favorite queries.
   const favoritedIds = await getFavoritedListingIds(
@@ -101,6 +113,7 @@ export default async function PublicListingsPage({
   const buildPageHref = (cursor: string) => {
     const next = new URLSearchParams()
     if (sp.type) next.set('type', sp.type)
+    if (sp.city) next.set('city', sp.city)
     if (sp.neighborhood) next.set('neighborhood', sp.neighborhood)
     if (sp.priceMin) next.set('priceMin', sp.priceMin)
     if (sp.priceMax) next.set('priceMax', sp.priceMax)

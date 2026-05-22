@@ -45,6 +45,18 @@ export async function createListing(
       },
     })
 
+    // E-T07 B4 : capture the owner's city of activity. We only set
+    // `preferredCityId` when it's still null — never overwrite. An
+    // owner who lists in city A first and city B second keeps A as
+    // their preferred city (used to pre-fill the CitySelect on the
+    // landing search next time they sign in). `updateMany` accepts
+    // non-unique WHERE filters and returns 0-or-1 silently — perfect
+    // for "set if null".
+    await tx.user.updateMany({
+      where: { id: ownerId, preferredCityId: null },
+      data: { preferredCityId: input.cityId },
+    })
+
     return tx.listing.update({
       where: { id: draft.id },
       data: { slug: buildSlug(input.title, draft.id) },

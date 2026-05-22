@@ -1,25 +1,32 @@
 import type { QuartierProfile } from '../types'
 
 /**
- * Hand-curated profile per Fianarantsoa quartier.
+ * Hand-curated quartier scoring profiles, keyed by `citySlug → quartierSlug`.
  *
- * Source of truth: the existing editorial descriptors in
+ * Source of truth: editorial descriptors in
  * `src/features/landing/quartier-descriptors.ts` (ambiance, walk,
  * transport, distance text) translated into numeric scores. Reviewed
- * against Fianarantsoa local context (university campus at
- * Andrainjato, lycée concentration in centre-ville).
+ * against on-the-ground knowledge of each city.
  *
- * Keys match the canonical neighborhood slugs in `prisma/seed.ts`.
- * Adding a new quartier requires:
- *   1. Seed it in `prisma/seed.ts`
- *   2. Add an editorial descriptor entry
- *   3. Add a scoring profile here
+ * Adding coverage for a new city :
+ *   1. Seed its quartiers in `prisma/seed-helpers/cities.ts`
+ *   2. Add editorial descriptors (FR + MG)
+ *   3. Add a city entry here with a profile per quartier
+ *   4. The quiz Q0 will automatically pick up the new city
  *
  * The numbers are deliberate, not heuristic — bumping a single score
  * shifts which quartier wins for borderline answer sets, so reviews
  * should treat this file like config.
+ *
+ * v1 coverage : Fianarantsoa. Other cities seeded in batch 1 are
+ * usable for browsing but the quiz doesn't recommend them yet — Q0
+ * lists only cities present in this map.
  */
-export const QUARTIER_PROFILES: Record<string, QuartierProfile> = {
+export const QUARTIER_PROFILES_BY_CITY: Record<
+  string,
+  Record<string, QuartierProfile>
+> = {
+  fianarantsoa: {
   // Quartier étudiant historique, campus universitaire à proximité.
   // Animé semaine, calme weekend.
   andrainjato: {
@@ -93,4 +100,16 @@ export const QUARTIER_PROFILES: Record<string, QuartierProfile> = {
     mobilityScores: { walk: 0, taxibe: 1, car: 3 },
     strengths: ['price', 'calm'],
   },
+  },
+  // Coverage for the other 4 seeded cities (Antananarivo, Toamasina,
+  // Mahajanga, Toliara) is intentionally left empty — adding entries
+  // below will surface them in the quiz Q0 automatically.
 }
+
+/**
+ * Backward-compatible single-city alias. Kept so existing imports
+ * don't break while v1 has only Fianarantsoa profile data. Deprecated
+ * once additional cities ship — callers should switch to
+ * `QUARTIER_PROFILES_BY_CITY[citySlug]`.
+ */
+export const QUARTIER_PROFILES = QUARTIER_PROFILES_BY_CITY.fianarantsoa

@@ -1079,6 +1079,11 @@ export const mg: Record<MessageKey, string> = {
   'quiz.submit': 'Hijery ny faritra',
   'quiz.restart': 'Atao indray',
 
+  // Q0 — Tanàna (E-T07)
+  'quiz.q.city.title': 'Ao amin\'ny tanàna inona ianao no mitady ?',
+  'quiz.q.city.help':
+    'Ho voasivana ho amin\'ity tanàna ity ny tolo-kevitra. Tanàna hafa mbola ho avy.',
+
   // Q1 — Tetibola
   'quiz.q.budget.title': 'Ohatrinona ny tetibolanao isam-bolana ?',
   'quiz.q.budget.help': 'Hofan-trano sy fandaniana iraisana.',

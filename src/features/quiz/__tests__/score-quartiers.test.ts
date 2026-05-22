@@ -6,6 +6,7 @@ import type { QuizAnswers } from '../types'
 describe('scoreQuartiers', () => {
   it('returns exactly 3 quartiers by default', () => {
     const answers: QuizAnswers = {
+      citySlug: 'fianarantsoa',
       budget: '150_250k',
       school: 'university',
       housingType: 'STUDIO',
@@ -19,6 +20,7 @@ describe('scoreQuartiers', () => {
 
   it('respects the limit parameter', () => {
     const answers: QuizAnswers = {
+      citySlug: 'fianarantsoa',
       budget: '150_250k',
       school: 'university',
       housingType: 'STUDIO',
@@ -32,6 +34,7 @@ describe('scoreQuartiers', () => {
 
   it('sorts by score descending', () => {
     const answers: QuizAnswers = {
+      citySlug: 'fianarantsoa',
       budget: '150_250k',
       school: 'university',
       housingType: 'STUDIO',
@@ -49,6 +52,7 @@ describe('scoreQuartiers', () => {
     // Student with mid budget, university, mixed vibe, prioritizing school
     // → Andrainjato should win (uni:3, vibe:mixed, school strength).
     const answers: QuizAnswers = {
+      citySlug: 'fianarantsoa',
       budget: '150_250k',
       school: 'university',
       housingType: 'STUDIO',
@@ -64,6 +68,7 @@ describe('scoreQuartiers', () => {
     // Tight budget, calm preference, priority on price → Mahasoabe
     // or Anjoma. Mahasoabe has calm vibe + price strength.
     const answers: QuizAnswers = {
+      citySlug: 'fianarantsoa',
       budget: 'lt150k',
       school: 'unsure',
       housingType: 'ROOM',
@@ -78,6 +83,7 @@ describe('scoreQuartiers', () => {
   it('ranks a lively/lycee-focused quartier for that profile', () => {
     // Centre-ville student priorities → Tsianolondroa or Mahamanina or Anjoma.
     const answers: QuizAnswers = {
+      citySlug: 'fianarantsoa',
       budget: '150_250k',
       school: 'lycee',
       housingType: 'STUDIO',
@@ -94,6 +100,7 @@ describe('scoreQuartiers', () => {
     // quartier loses the same amount of theoretical max, so ranking
     // is determined by the other dimensions.
     const unsure: QuizAnswers = {
+      citySlug: 'fianarantsoa',
       budget: '150_250k',
       school: 'unsure',
       housingType: 'STUDIO',
@@ -110,6 +117,7 @@ describe('scoreQuartiers', () => {
     // Same answers except for the priority. Different priority should
     // produce different winners since strengths arrays differ.
     const base: Omit<QuizAnswers, 'priority'> = {
+      citySlug: 'fianarantsoa',
       budget: '150_250k',
       school: 'lycee',
       housingType: 'STUDIO',
@@ -134,6 +142,7 @@ describe('scoreQuartiers', () => {
   it('produces deterministic order on tied scores (alphabetical)', () => {
     // Two consecutive calls must return the same order.
     const answers: QuizAnswers = {
+      citySlug: 'fianarantsoa',
       budget: '150_250k',
       school: 'unsure',
       housingType: 'any',
@@ -148,6 +157,7 @@ describe('scoreQuartiers', () => {
 
   it('returns reason codes that are non-empty strings', () => {
     const answers: QuizAnswers = {
+      citySlug: 'fianarantsoa',
       budget: '150_250k',
       school: 'university',
       housingType: 'STUDIO',
@@ -163,6 +173,7 @@ describe('scoreQuartiers', () => {
 
   it('handles "any" housing type without crashing', () => {
     const answers: QuizAnswers = {
+      citySlug: 'fianarantsoa',
       budget: '150_250k',
       school: 'university',
       housingType: 'any',

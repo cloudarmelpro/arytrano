@@ -11,7 +11,7 @@ import { getT } from '@/lib/i18n/translate'
 import type { MessageKey } from '@/lib/i18n/messages'
 import type { QuartierRow } from '@/features/landing/server'
 import { scoreQuartiers } from '../services/score-quartiers'
-import { QUARTIER_PROFILES } from '../data/quartier-profiles'
+import { QUARTIER_PROFILES_BY_CITY } from '../data/quartier-profiles'
 import type { QuizAnswers, ScoredQuartier } from '../types'
 import { QuizResults } from './QuizResults'
 import { submitQuizAction } from '../actions/submit-quiz'
@@ -25,7 +25,22 @@ type StepDef = {
   options: Array<{ value: string; label: MessageKey }>
 }
 
-const STEPS: StepDef[] = [
+/** Cities the quiz can actually score against (i.e. those with profile
+ * coverage in `QUARTIER_PROFILES_BY_CITY`). v1 = just Fianarantsoa.
+ * Q0 (city) appears only when this list has > 1 entry. */
+const QUIZ_CITIES = Object.keys(QUARTIER_PROFILES_BY_CITY)
+
+const CITY_STEP: StepDef = {
+  key: 'citySlug',
+  title: 'quiz.q.city.title',
+  help: 'quiz.q.city.help',
+  options: QUIZ_CITIES.map((slug) => ({
+    value: slug,
+    label: `cities.${slug}.name` as MessageKey,
+  })),
+}
+
+const BASE_STEPS: StepDef[] = [
   {
     key: 'budget',
     title: 'quiz.q.budget.title',
@@ -91,6 +106,13 @@ const STEPS: StepDef[] = [
   },
 ]
 
+/** Show Q0 only when there are multiple scorable cities — otherwise
+ * pre-fill the citySlug silently and keep the wizard at 6 questions. */
+const SHOW_CITY_STEP = QUIZ_CITIES.length > 1
+const STEPS: StepDef[] = SHOW_CITY_STEP
+  ? [CITY_STEP, ...BASE_STEPS]
+  : BASE_STEPS
+
 export function QuizWizard({
   locale,
   quartiers,
@@ -101,17 +123,28 @@ export function QuizWizard({
   const t = getT(locale)
   const [step, setStep] = useState(0)
   const [direction, setDirection] = useState<1 | -1>(1)
-  const [answers, setAnswers] = useState<Partial<QuizAnswers>>({})
+  // Pre-fill citySlug when Q0 is hidden (single scorable city). The
+  // wizard otherwise starts empty and the user picks via Q0.
+  const [answers, setAnswers] = useState<Partial<QuizAnswers>>(
+    SHOW_CITY_STEP ? {} : { citySlug: QUIZ_CITIES[0] },
+  )
   const [phase, setPhase] = useState<'quiz' | 'results'>('quiz')
   const [results, setResults] = useState<ScoredQuartier[]>([])
   const [submissionId, setSubmissionId] = useState<string | null>(null)
   const [, startTransition] = useTransition()
 
   if (phase === 'results') {
+    // Scope the quartiers list to the chosen city so the "À considérer
+    // aussi" cards never bleed in quartiers of a different city than
+    // the one the user picked at Q0.
+    const chosenCity = answers.citySlug as string | undefined
+    const scopedQuartiers = chosenCity
+      ? quartiers.filter((q) => q.citySlug === chosenCity)
+      : quartiers
     return (
       <QuizResults
         locale={locale}
-        quartiers={quartiers}
+        quartiers={scopedQuartiers}
         scored={results}
         submissionId={submissionId}
         onRestart={() => {
@@ -145,7 +178,8 @@ export function QuizWizard({
     // Final step → score + submit + show results.
     // 4 quartiers: 1 top match in the hero card + 3 in "À considérer aussi".
     const finalAnswers = answers as QuizAnswers
-    const scored = scoreQuartiers(finalAnswers, QUARTIER_PROFILES, 4)
+    const cityProfiles = QUARTIER_PROFILES_BY_CITY[finalAnswers.citySlug] ?? {}
+    const scored = scoreQuartiers(finalAnswers, cityProfiles, 4)
     setResults(scored)
     setPhase('results')
     // Fire-and-forget submission (no email yet — that comes from the

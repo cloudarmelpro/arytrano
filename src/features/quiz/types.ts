@@ -16,6 +16,13 @@ export type Mobility = 'walk' | 'taxibe' | 'car'
 export type Priority = 'price' | 'school' | 'calm' | 'social'
 
 export type QuizAnswers = {
+  /**
+   * E-T07 multi-ville. The scoring engine looks up profiles by
+   * city, so we need to know which city the user wants quartiers
+   * scored against. Hidden Q0 step pre-fills this when only one
+   * city has profile coverage (v1 = fianarantsoa).
+   */
+  citySlug: string
   budget: BudgetTier
   school: SchoolFocus
   housingType: HousingType

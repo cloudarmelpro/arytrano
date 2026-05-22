@@ -1063,6 +1063,11 @@ export const frMG = {
   'quiz.submit': 'Voir mes quartiers',
   'quiz.restart': 'Refaire le quiz',
 
+  // Q0 — Ville (E-T07, affichée si ≥ 2 villes ont des profils quiz)
+  'quiz.q.city.title': 'Tu cherches dans quelle ville ?',
+  'quiz.q.city.help':
+    'On scope les recommandations à la ville choisie. D\'autres villes arrivent au fil des semaines.',
+
   // Q1 — Budget
   'quiz.q.budget.title': 'Quel est ton budget mensuel max ?',
   'quiz.q.budget.help': 'Loyer charges comprises.',
