@@ -1241,7 +1241,7 @@ enum ListingStatus {
 
 **Effort estimé** : ~1.5 jour (page + queries + export service + Dialog confirm)
 
-**Priorité** : P2 · **Statut** : 📋 todo
+**Priorité** : P2 · **Statut** : ✅ done (2026-05-22, scope v0.5) — `/dashboard/profile` ProfileForm + `/dashboard/settings` DeleteAccountSection existaient déjà. Ajout 2026-05-22 : service `export-user-data.ts` collecte profil + listings authored + reviews + favorites + savedSearches + quizSubmissions (matched par email) + whatsAppAlert (matched par phone) + 50 dernières connexions, exclut secrets (passwordHash, totpSecret, recoveryCodes), Server Action `exportMyDataAction` auth-guarded + rate-limit 1/h/userId via `rateLimiters.exportUserData`, `DataExportSection` Client Component avec Blob download `arytrano-mes-donnees-{YYYY-MM-DD}.json`, intégré dans /dashboard/settings au-dessus de la danger zone, 9 nouvelles clés i18n FR+MG. RGPD-aligned : export complet en JSON, suppression compte propre via DeleteAccountSection existant.
 
 ---
 

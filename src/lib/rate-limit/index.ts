@@ -88,6 +88,12 @@ const signInEmailByIp = makeLimiter('signin-email-ip', { requests: 10, window: '
 const resendVerificationByEmail = makeLimiter('verify-resend-email', { requests: 3, window: '1 h' })
 const resendVerificationByIp = makeLimiter('verify-resend-ip', { requests: 10, window: '1 h' })
 
+// RGPD data export (T-052) — heavy multi-table read, downloaded as a
+// JSON blob. 1/h/user is generous : a legitimate audit doesn't need
+// more, and an abuser can't scrape competitors' data because the
+// export is keyed to the requester's own user id.
+const exportUserDataLimiter = makeLimiter('export-user-data', { requests: 1, window: '1 h' })
+
 // Transactional emails (T-034) — cap per-user per-event-type to prevent
 // storms if a service retry loop or webhook double-fires. 10/h is enough
 // for healthy activity (multiple publishes/reviews per hour shouldn't
@@ -179,6 +185,9 @@ export const rateLimiters = {
     if (!byEmail.success) return byEmail
     return check(resendVerificationByIp, ipHash)
   },
+
+  /** RGPD data export — 1/h per userId. Fail-CLOSED on null userId. */
+  exportUserData: (userId: string) => check(exportUserDataLimiter, userId),
 
   /** Transactional email — 10/h per (userId, eventType). Fail-soft caller. */
   transactionalEmail: (userId: string, eventType: string) =>

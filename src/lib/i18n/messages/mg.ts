@@ -1489,6 +1489,20 @@ export const mg: Record<MessageKey, string> = {
   'settings.notifications.toast.off': 'Nofoanana ny fanairana.',
   'settings.notifications.error':
     'Tsy nahomby ny fanavaozana ny safidy.',
+  'settings.section.data.title': 'Ny angon-drakitro',
+  'settings.section.data.lead':
+    'Alaivo amin\'ny rakitra iray ny zavatra rehetra tehirizinay momba anao (filazana, hevitra, tiana, fikarohana…).',
+  'settings.dataExport.label': 'Alaivo ny angon-drakitro',
+  'settings.dataExport.help':
+    'Rakitra JSON misy ny zavatra rehetra voatahiry momba anao : mombamomba, filazana, hevitra, tiana, fikarohana voatahiry, valim-pamantarana quiz, fisoratana WhatsApp, sy ireo fidirana 50 farany. Manaja RGPD. Fetra : indray mandeha isan\'adiny.',
+  'settings.dataExport.cta': 'Alaivo',
+  'settings.dataExport.pending': 'Manomana…',
+  'settings.dataExport.success': 'Nanomboka ny fakana.',
+  'settings.dataExport.needsAuth': 'Midira indray hakaina.',
+  'settings.dataExport.rateLimit':
+    'Vao nialainao ny angon-drakitra. Andramo afaka adiny iray.',
+  'settings.dataExport.error':
+    'Tsy afaka manao export. Andramo aty aoriana na mifandraisa amin\'ny tohana.',
   'settings.section.danger.title': 'Faritra mampidi-doza',
   'settings.section.danger.lead': 'Mamafa ny kaontinao dia tsy azo verenina.',
 

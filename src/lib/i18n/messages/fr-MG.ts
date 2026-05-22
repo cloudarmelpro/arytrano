@@ -1467,6 +1467,20 @@ export const frMG = {
   'settings.notifications.toast.off': 'Notifications désactivées.',
   'settings.notifications.error':
     'Impossible de mettre à jour la préférence.',
+  'settings.section.data.title': 'Mes données',
+  'settings.section.data.lead':
+    'Télécharge tout ce qu\'on conserve sur ton compte (annonces, avis, favoris, recherches…) en un seul fichier.',
+  'settings.dataExport.label': 'Télécharger mes données',
+  'settings.dataExport.help':
+    'Un fichier JSON listant tout ce qu\'on stocke à ton sujet : profil, annonces que tu possèdes, avis que tu as écrits, favoris, recherches sauvées, soumissions au quiz, abonnement WhatsApp, et les 50 dernières connexions. Conforme RGPD. Limite : 1 export par heure.',
+  'settings.dataExport.cta': 'Télécharger',
+  'settings.dataExport.pending': 'Préparation…',
+  'settings.dataExport.success': 'Téléchargement démarré.',
+  'settings.dataExport.needsAuth': 'Reconnecte-toi pour télécharger.',
+  'settings.dataExport.rateLimit':
+    'Tu as déjà téléchargé tes données récemment. Réessaie dans une heure.',
+  'settings.dataExport.error':
+    'Export impossible. Réessaie plus tard ou contacte le support.',
   'settings.section.danger.title': 'Zone dangereuse',
   'settings.section.danger.lead': 'Supprimer ton compte est irréversible.',
 

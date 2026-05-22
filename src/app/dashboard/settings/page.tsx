@@ -4,6 +4,7 @@ import {
   auth,
   PasswordSection,
   OAuthConnectionsSection,
+  DataExportSection,
   DeleteAccountSection,
   LoginEventsSection,
   NotificationsSection,
@@ -110,6 +111,13 @@ export default async function SettingsPage() {
         description={t('settings.section.logins.lead')}
       >
         <LoginEventsSection events={loginEvents} />
+      </Section>
+
+      <Section
+        title={t('settings.section.data.title')}
+        description={t('settings.section.data.lead')}
+      >
+        <DataExportSection />
       </Section>
 
       <Section
