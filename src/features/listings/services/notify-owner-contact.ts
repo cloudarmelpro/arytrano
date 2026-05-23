@@ -3,6 +3,7 @@ import { env } from '@/lib/env'
 import { fromPrismaLocale, type Locale } from '@/lib/i18n/config'
 import { sendTransactionalEmail } from '@/lib/email/send-transactional'
 import { buildContactReceivedEmail } from '@/lib/email/templates/contact-received'
+import { sendPushToOne } from '@/lib/push/send-push'
 
 type Channel = 'WHATSAPP' | 'PHONE'
 
@@ -13,6 +14,8 @@ export type NotifyOwnerContactInput = {
   ownerLocale: 'FR_MG' | 'MG'
   /** Owner toggle from User.contactNotificationsEnabled. */
   contactNotificationsEnabled: boolean
+  /** Mobile push token, null when owner hasn't installed the app. */
+  ownerPushToken: string | null
   listingId: string
   listingTitle: string
   channel: Channel
@@ -60,5 +63,30 @@ export async function notifyOwnerContact(
     // Defensive — sendTransactionalEmail already swallows its own
     // errors, but if a future change throws we still want the
     // contact reveal to succeed for the student.
+  }
+
+  // Mobile push, in parallel to the email. Owner sees both — they
+  // pick whichever shows up first (push is usually instant; email
+  // can lag a minute via Gmail relay). `sendPushToOne` swallows its
+  // own errors so a 5xx from Expo's API doesn't break the flow.
+  if (input.ownerPushToken) {
+    const pushTitle = localeKey === 'mg' ? 'Antso vaovao' : 'Nouveau contact'
+    const channelLabel =
+      input.channel === 'WHATSAPP' ? 'WhatsApp' : (localeKey === 'mg' ? 'finday' : 'téléphone')
+    const pushBody =
+      localeKey === 'mg'
+        ? `Misy olona naka fifandraisana amin'ny ${channelLabel} ho an'ny "${input.listingTitle}".`
+        : `Quelqu'un a demandé tes coordonnées ${channelLabel} pour « ${input.listingTitle} ».`
+    void sendPushToOne({
+      to: input.ownerPushToken,
+      title: pushTitle,
+      body: pushBody,
+      sound: 'default',
+      data: {
+        kind: 'contactReceived',
+        listingId: input.listingId,
+        channel: input.channel,
+      },
+    })
   }
 }

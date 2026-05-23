@@ -106,6 +106,13 @@ const EnvSchema = z.object({
     .regex(/^(0(\.\d+)?|1(\.0+)?)$/, 'Must be a number between 0 and 1')
     .optional(),
 
+  // --- Expo Push API (E-T22) ------------------------------
+  // Optional access token for the Expo Push API. Without it the API
+  // works (anonymous) but is rate-limited per-IP. Production should
+  // set this to lift the rate limit. Generate via the Expo dashboard
+  // → Account Settings → Access Tokens.
+  EXPO_ACCESS_TOKEN: z.string().optional(),
+
   // --- Map tiles provider (AUD-008) ------------------------
   // Stadia Maps API key for production tile delivery. Public — exposed
   // to the browser via `NEXT_PUBLIC_*`. Stadia recommends restricting

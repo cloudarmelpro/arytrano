@@ -6,6 +6,7 @@ import { errors } from '@/lib/api/errors'
 import { fromPrismaLocale } from '@/lib/i18n/config'
 import { sendTransactionalEmail } from '@/lib/email/send-transactional'
 import { buildListingPublishedEmail } from '@/lib/email/templates/listing-published'
+import { notifySavedSearchMatches } from '@/features/search/services/notify-saved-search-matches'
 
 /**
  * Listing TTL — 60 days from publication (T-049). Past this date the
@@ -36,6 +37,8 @@ export async function publishListing(ownerId: string, listingId: string): Promis
       title: true,
       slug: true,
       description: true,
+      type: true,
+      amenities: true,
       priceMonthlyMGA: true,
       cityId: true,
       neighborhoodId: true,
@@ -99,6 +102,22 @@ export async function publishListing(ownerId: string, listingId: string): Promis
     recipientEmail: listing.owner.email,
     eventType: 'listing-published',
     ...email,
+  })
+
+  // E-T22 push fanout — notify every saved-search subscriber whose
+  // filters match this newly-published listing. Fire-and-forget,
+  // never blocks the publish flow (errors swallowed internally).
+  void notifySavedSearchMatches({
+    id: listing.id,
+    slug: listing.slug,
+    ownerId: listing.owner.id,
+    type: listing.type,
+    priceMonthlyMGA: listing.priceMonthlyMGA,
+    title: listing.title,
+    description: listing.description,
+    amenities: listing.amenities,
+    city: { slug: listing.city.slug },
+    neighborhood: { slug: listing.neighborhood.slug },
   })
 
   return updated
