@@ -140,7 +140,14 @@ function QuartierBlock({
       <div className="flex flex-col gap-6">
         <div>
           <h2 className="m-0 font-serif text-[clamp(28px,3vw,40px)] font-normal leading-[1.05] tracking-[-0.018em] text-foreground">
-            {name}
+            <Link
+              // Detail landing lives under the city hub (E-T11) — has
+              // reviews, favorites awareness, Place schema, etc.
+              href={`/villes/${quartier.citySlug}/quartiers/${quartier.slug}`}
+              className="transition hover:text-primary"
+            >
+              {name}
+            </Link>
           </h2>
           <p className="mt-3.5 text-[16px] leading-[1.55] text-foreground/70">
             {t(descriptor.ambiance)}
@@ -190,7 +197,11 @@ function QuartierBlock({
               {t('quartiers.block.sample.label')}
             </span>
             <Link
-              href={`/annonces?neighborhood=${quartier.slug}`}
+              // Always scope by city — neighborhood slugs are unique
+              // PER city (e.g. "anjoma" exists in Fianarantsoa AND
+              // Toamasina), so a bare ?neighborhood= would surface
+              // wrong-city results in E-T07 multi-ville mode.
+              href={`/annonces?city=${quartier.citySlug}&neighborhood=${quartier.slug}`}
               className="text-[13.5px] font-semibold text-primary transition hover:text-primary/80 hover:underline"
             >
               {t(

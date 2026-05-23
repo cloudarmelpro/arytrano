@@ -33,10 +33,3 @@ export {
   listCitiesWithQuartierCounts,
   type CityQuartierCount,
 } from './queries/list-cities-with-quartier-counts'
-export {
-  getQuartierDetail,
-  listAllQuartiersForSitemap,
-  type QuartierDetail,
-  type QuartierDetailListing,
-  type QuartierSibling,
-} from './queries/get-quartier-detail'

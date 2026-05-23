@@ -1140,36 +1140,6 @@ export const frMG = {
   'quartiers.cta.primary': 'Faire le quiz (2 min)',
   'quartiers.cta.secondary': 'Voir toutes les annonces',
 
-  // Per-quartier detail page (/quartiers/[citySlug]/[quartierSlug])
-  'quartiers.detail.meta.title': '{quartier} à {city} — logements étudiants',
-  'quartiers.detail.meta.description':
-    'Découvre le quartier {quartier} à {city} : ambiance, transport, écoles. {count} annonces actives.',
-  'quartiers.detail.meta.description.empty':
-    'Découvre le quartier {quartier} à {city} : ambiance, transport, écoles.',
-  'quartiers.detail.breadcrumb.quartiers': 'Quartiers',
-  'quartiers.detail.lead.with.one': '{count} annonce active à {quartier}.',
-  'quartiers.detail.lead.with.other': '{count} annonces actives à {quartier}.',
-  'quartiers.detail.lead.empty':
-    'Aucune annonce active pour le moment. Repasse bientôt — nous publions une dizaine d’annonces par mois.',
-  'quartiers.detail.stats.avgPrice': 'Loyer moyen',
-  'quartiers.detail.stats.listings': 'Annonces',
-  'quartiers.detail.about.title': 'À propos de {quartier}',
-  'quartiers.detail.about.ambiance': 'Ambiance',
-  'quartiers.detail.about.walk': 'À pied',
-  'quartiers.detail.about.transport': 'Transports',
-  'quartiers.detail.about.distance': 'Distance du centre',
-  'quartiers.detail.about.empty':
-    'Description détaillée bientôt disponible pour ce quartier.',
-  'quartiers.detail.listings.title': 'Annonces récentes à {quartier}',
-  'quartiers.detail.listings.empty':
-    'Aucune annonce active dans ce quartier pour le moment.',
-  'quartiers.detail.listings.viewAll.one': 'Voir l’annonce',
-  'quartiers.detail.listings.viewAll.other': 'Voir toutes les {count} annonces',
-  'quartiers.detail.siblings.title': 'Autres quartiers à {city}',
-  'quartiers.detail.siblings.listingsCount.one': '{count} annonce',
-  'quartiers.detail.siblings.listingsCount.other': '{count} annonces',
-  'quartiers.detail.map.aria': 'Carte de {quartier}',
-
   // Quiz wizard — meta + chrome
   'quiz.meta.title': 'Quel quartier de Fianarantsoa te correspond ?',
   'quiz.meta.description':
