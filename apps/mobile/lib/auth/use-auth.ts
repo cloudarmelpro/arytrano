@@ -1,0 +1,57 @@
+import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { logout as apiLogout, login as apiLogin, register as apiRegister } from '../api/client'
+import { getAccessToken } from './token-store'
+import type { LoginRequest, RegisterRequest } from '@arytrano/shared'
+
+/**
+ * Single-source-of-truth for "is the user signed in".
+ *
+ * Reads SecureStore lazily via TanStack Query so the answer is cached
+ * across screens and re-checked when the cache is invalidated (login,
+ * logout, register). The query function returns just the presence of
+ * an access token — the actual user payload is a separate query
+ * against `/api/v1/users/me` that screens can fetch when they need it.
+ *
+ * Tokens are kept in SecureStore (Keychain / EncryptedSharedPreferences),
+ * never in TanStack's cache, so a memory leak can't expose them.
+ */
+export const AUTH_QUERY_KEY = ['auth', 'is-signed-in'] as const
+
+export function useAuth() {
+  const queryClient = useQueryClient()
+  const query = useQuery({
+    queryKey: AUTH_QUERY_KEY,
+    queryFn: async () => {
+      const token = await getAccessToken()
+      return { signedIn: token !== null }
+    },
+    // Auth state changes rarely; no need to refetch on focus.
+    staleTime: Infinity,
+  })
+
+  async function login(input: LoginRequest) {
+    await apiLogin(input)
+    await queryClient.invalidateQueries({ queryKey: AUTH_QUERY_KEY })
+  }
+
+  async function register(input: RegisterRequest) {
+    await apiRegister(input)
+    await queryClient.invalidateQueries({ queryKey: AUTH_QUERY_KEY })
+  }
+
+  async function logout() {
+    await apiLogout()
+    await queryClient.invalidateQueries({ queryKey: AUTH_QUERY_KEY })
+    // Also drop every cached query so screens don't render stale
+    // private data after the user signed out.
+    queryClient.clear()
+  }
+
+  return {
+    signedIn: query.data?.signedIn ?? false,
+    isLoading: query.isLoading,
+    login,
+    register,
+    logout,
+  }
+}

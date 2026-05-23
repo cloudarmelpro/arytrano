@@ -9,10 +9,12 @@ import {
   type ContactRequest,
   type ContactResponse,
   type LoginRequest,
+  type PublicListingDetail,
   type RegisterRequest,
   publicCitySchema,
   publicNeighborhoodSchema,
   publicListingCardSchema,
+  publicListingDetailSchema,
   contactResponseSchema,
   authTokensSchema,
 } from '@arytrano/shared'
@@ -229,6 +231,15 @@ export async function listListings(
       hasMore: Boolean(r.meta?.hasMore),
     },
   }
+}
+
+export async function getListingById(id: string): Promise<PublicListingDetail> {
+  const r = await request(
+    `/api/v1/listings/${encodeURIComponent(id)}/public`,
+    publicListingDetailSchema,
+    { anon: true },
+  )
+  return r.data
 }
 
 // ────────────────────────────────────────────────────────────────────

@@ -1,74 +1,136 @@
-import { useQuery } from '@tanstack/react-query'
-import { Text, View, ScrollView, ActivityIndicator } from 'react-native'
+import { useInfiniteQuery } from '@tanstack/react-query'
+import { useState } from 'react'
+import {
+  ActivityIndicator,
+  FlatList,
+  Pressable,
+  RefreshControl,
+  Text,
+  View,
+} from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { listCities } from '@/lib/api/client'
+import { router } from 'expo-router'
+import { listListings } from '@/lib/api/client'
+import { useAuth } from '@/lib/auth/use-auth'
+import { ListingCard } from '@/components/listings/ListingCard'
 
 /**
- * Welcome / smoke-test screen.
+ * Home — the primary discovery surface.
  *
- * Hits `GET /api/v1/cities` to prove the end-to-end pipeline works :
- *   Expo Metro → TanStack Query → fetch → web dev server → Prisma →
- *   shared schema validates the response → renders.
- *
- * Once the foundation is stable, this gets replaced by the onboarding
- * carousel + locale picker (E-T22 scope).
+ * - Cursor-based infinite scroll : fetches the next page when the
+ *   FlatList nears its end. The web's `/api/v1/listings` endpoint
+ *   already returns `meta.nextCursor` — no offset gymnastics needed.
+ * - Pull-to-refresh wired via `RefreshControl` so a user can force a
+ *   fresh fetch when a listing-of-interest finally gets posted.
+ * - Header has the brand + a Sign in / Profile pill depending on
+ *   auth state.
  */
-export default function Welcome() {
-  const { data, isLoading, error } = useQuery({
-    queryKey: ['cities'],
-    queryFn: () => listCities(),
+export default function Home() {
+  const { signedIn } = useAuth()
+  const [refreshing, setRefreshing] = useState(false)
+
+  const {
+    data,
+    isLoading,
+    isFetchingNextPage,
+    hasNextPage,
+    fetchNextPage,
+    refetch,
+    error,
+  } = useInfiniteQuery({
+    queryKey: ['listings'],
+    queryFn: ({ pageParam }) =>
+      listListings(pageParam ? { cursor: pageParam } : {}),
+    initialPageParam: undefined as string | undefined,
+    getNextPageParam: (last) => last.meta.nextCursor ?? undefined,
   })
 
+  const items = data?.pages.flatMap((p) => p.items) ?? []
+
+  async function onRefresh() {
+    setRefreshing(true)
+    try {
+      await refetch()
+    } finally {
+      setRefreshing(false)
+    }
+  }
+
   return (
-    <SafeAreaView className="flex-1 bg-background">
-      <ScrollView contentContainerClassName="px-6 py-10">
-        <Text className="font-serif text-4xl text-foreground">AryTrano</Text>
-        <Text className="mt-2 text-base text-muted-foreground">
-          Logement étudiant à Madagascar.
-        </Text>
+    <SafeAreaView className="flex-1 bg-background" edges={['top']}>
+      {/* Top bar — brand + auth chip */}
+      <View className="flex-row items-center justify-between px-5 pb-3 pt-2">
+        <Text className="font-serif text-2xl text-foreground">AryTrano</Text>
+        {signedIn ? (
+          <Pressable
+            onPress={() => router.push('/profile')}
+            className="rounded-full bg-muted px-3 py-1.5"
+            accessibilityLabel="Mon profil"
+          >
+            <Text className="text-sm font-medium text-foreground">Profil</Text>
+          </Pressable>
+        ) : (
+          <Pressable
+            onPress={() => router.push('/sign-in')}
+            className="rounded-full bg-primary px-3 py-1.5"
+            accessibilityLabel="Se connecter"
+          >
+            <Text className="text-sm font-medium text-primary-foreground">
+              Se connecter
+            </Text>
+          </Pressable>
+        )}
+      </View>
 
-        <View className="mt-10">
-          <Text className="text-xs uppercase tracking-wider text-muted-foreground">
-            Smoke test : GET /api/v1/cities
-          </Text>
-
-          {isLoading && (
-            <View className="mt-4 flex-row items-center gap-2">
-              <ActivityIndicator />
-              <Text className="text-sm text-muted-foreground">Loading…</Text>
-            </View>
-          )}
-
-          {error && (
-            <View className="mt-4 rounded-lg bg-red-50 p-3">
-              <Text className="text-sm font-semibold text-red-900">
-                Erreur API
-              </Text>
-              <Text className="mt-1 text-xs text-red-800">
-                {error instanceof Error ? error.message : 'Unknown error'}
-              </Text>
-            </View>
-          )}
-
-          {data && (
-            <View className="mt-4 flex flex-col gap-2">
-              {data.map((c) => (
-                <View
-                  key={c.id}
-                  className="rounded-lg border border-border bg-muted p-3"
-                >
-                  <Text className="text-base font-semibold text-foreground">
-                    {c.nameFr}
-                  </Text>
-                  <Text className="text-xs text-muted-foreground">
-                    {c.nameMg} · {c.lat.toFixed(4)}, {c.lng.toFixed(4)}
-                  </Text>
-                </View>
-              ))}
-            </View>
-          )}
+      {isLoading ? (
+        <View className="flex-1 items-center justify-center">
+          <ActivityIndicator />
         </View>
-      </ScrollView>
+      ) : error ? (
+        <View className="flex-1 items-center justify-center px-6">
+          <Text className="text-base font-semibold text-red-900">
+            Connexion impossible
+          </Text>
+          <Text className="mt-2 text-center text-sm text-muted-foreground">
+            Vérifie ta connexion et tire vers le bas pour réessayer.
+          </Text>
+          <Text className="mt-3 text-xs text-muted-foreground">
+            {error instanceof Error ? error.message : String(error)}
+          </Text>
+        </View>
+      ) : items.length === 0 ? (
+        <View className="flex-1 items-center justify-center px-6">
+          <Text className="text-base font-semibold text-foreground">
+            Aucune annonce pour le moment
+          </Text>
+          <Text className="mt-2 text-center text-sm text-muted-foreground">
+            On publie une dizaine d&apos;annonces par mois. Reviens bientôt.
+          </Text>
+        </View>
+      ) : (
+        <FlatList
+          data={items}
+          keyExtractor={(l) => l.id}
+          renderItem={({ item }) => <ListingCard listing={item} />}
+          contentContainerClassName="px-4 pb-8 gap-3"
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+          onEndReachedThreshold={0.5}
+          onEndReached={() => {
+            if (hasNextPage && !isFetchingNextPage) {
+              void fetchNextPage()
+            }
+          }}
+          ListFooterComponent={
+            isFetchingNextPage ? (
+              <View className="py-4">
+                <ActivityIndicator />
+              </View>
+            ) : null
+          }
+        />
+      )}
     </SafeAreaView>
   )
 }

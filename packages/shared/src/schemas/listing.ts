@@ -56,3 +56,82 @@ export const listingsListQuerySchema = z.object({
 })
 
 export type ListingsListQuery = z.infer<typeof listingsListQuerySchema>
+
+/**
+ * Public listing detail — returned by `GET /api/v1/listings/:id/public`.
+ *
+ * Mirrors `PublicListingDetail` on the server side but with two normalizations
+ * for JSON safety :
+ *  - `lat`/`lng` arrive as strings (Prisma Decimal → toString())
+ *  - `publishedAt`/`verifiedAt` arrive as ISO strings (Date → JSON)
+ */
+export const amenityEnumSchema = z.enum([
+  'WIFI',
+  'PARKING',
+  'MOTO_PARKING',
+  'HOT_WATER',
+  'WATER_TANK',
+  'GENERATOR',
+  'AIR_CONDITIONING',
+  'KITCHEN_EQUIPPED',
+  'WASHING_MACHINE',
+  'GUARD',
+  'SECURITY_GATE',
+  'TERRACE',
+  'BALCONY',
+  'GARDEN',
+  'FURNISHED_KITCHEN',
+  'PUBLIC_TRANSPORT',
+])
+export type Amenity = z.infer<typeof amenityEnumSchema>
+
+export const publicListingDetailSchema = z.object({
+  id: z.string(),
+  ownerId: z.string(),
+  slug: z.string(),
+  title: z.string(),
+  description: z.string(),
+  type: listingTypeSchema,
+  priceMonthlyMGA: z.number().int().nonnegative(),
+  surfaceM2: z.number().int().nullable(),
+  bedrooms: z.number().int().nullable(),
+  bathrooms: z.number().int().nullable(),
+  furnished: z.boolean(),
+  amenities: z.array(amenityEnumSchema),
+  customAmenities: z.array(z.string()),
+  publishedAt: z.string().datetime().nullable(),
+  verifiedAt: z.string().datetime().nullable(),
+  lat: z.string(),
+  lng: z.string(),
+  city: z.object({
+    id: z.string(),
+    slug: z.string(),
+    nameFr: z.string(),
+    nameMg: z.string(),
+  }),
+  neighborhood: z.object({
+    id: z.string(),
+    slug: z.string(),
+    nameFr: z.string(),
+    nameMg: z.string(),
+  }),
+  owner: z.object({
+    displayName: z.string(),
+    image: z.string().url().nullable(),
+    hasPhone: z.boolean(),
+    verifiedAt: z.string().datetime().nullable(),
+  }),
+  photos: z.array(
+    z.object({
+      id: z.string(),
+      url: z.string().url(),
+      width: z.number().int().positive(),
+      height: z.number().int().positive(),
+      blurhash: z.string().nullable(),
+      altFr: z.string().nullable(),
+      altMg: z.string().nullable(),
+    }),
+  ),
+})
+
+export type PublicListingDetail = z.infer<typeof publicListingDetailSchema>

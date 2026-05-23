@@ -24,6 +24,7 @@ export {
 export { listRelatedListings } from './queries/list-related-listings'
 export {
   getPublicListing,
+  getPublicListingById,
   type PublicListingDetail,
 } from './queries/get-public-listing'
 export { getListingStatusBySlug } from './queries/get-listing-status-by-slug'

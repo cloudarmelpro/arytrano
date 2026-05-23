@@ -181,3 +181,111 @@ export async function getPublicListing(
     photos: row.photos,
   }
 }
+
+/**
+ * Same projection as `getPublicListing` but resolved by listing id —
+ * the shape the mobile API uses (`GET /api/v1/listings/:id/public`).
+ * Returns null when the id doesn't match a PUBLISHED listing.
+ *
+ * The mobile client knows the listing id (from the listings list
+ * response) but doesn't have the citySlug/neighborhoodSlug/slug
+ * triple, so this is the right shape for that consumer.
+ */
+export async function getPublicListingById(
+  listingId: string,
+): Promise<PublicListingDetail | null> {
+  const row = await prisma.listing.findFirst({
+    where: { id: listingId, status: 'PUBLISHED' },
+    select: {
+      id: true,
+      ownerId: true,
+      slug: true,
+      title: true,
+      description: true,
+      type: true,
+      priceMonthlyMGA: true,
+      surfaceM2: true,
+      bedrooms: true,
+      bathrooms: true,
+      furnished: true,
+      amenities: true,
+      customAmenities: true,
+      publishedAt: true,
+      verifiedAt: true,
+      lat: true,
+      lng: true,
+      city: {
+        select: { id: true, slug: true, nameFr: true, nameMg: true, lat: true, lng: true },
+      },
+      neighborhood: {
+        select: { id: true, slug: true, nameFr: true, nameMg: true, lat: true, lng: true },
+      },
+      owner: {
+        select: {
+          name: true,
+          image: true,
+          phone: true,
+          ownerProfile: { select: { verifiedAt: true } },
+        },
+      },
+      photos: {
+        orderBy: { position: 'asc' },
+        select: {
+          id: true,
+          url: true,
+          width: true,
+          height: true,
+          blurhash: true,
+          altFr: true,
+          altMg: true,
+        },
+      },
+    },
+  })
+
+  if (!row) return null
+
+  const lat = row.lat ?? row.neighborhood.lat ?? row.city.lat
+  const lng = row.lng ?? row.neighborhood.lng ?? row.city.lng
+  const fullName = row.owner.name?.trim() ?? ''
+  const displayName = fullName ? fullName.split(/\s+/)[0]! : 'Propriétaire'
+
+  return {
+    id: row.id,
+    ownerId: row.ownerId,
+    slug: row.slug,
+    title: row.title,
+    description: row.description,
+    type: row.type,
+    priceMonthlyMGA: row.priceMonthlyMGA,
+    surfaceM2: row.surfaceM2,
+    bedrooms: row.bedrooms,
+    bathrooms: row.bathrooms,
+    furnished: row.furnished,
+    amenities: row.amenities,
+    customAmenities: row.customAmenities,
+    publishedAt: row.publishedAt,
+    verifiedAt: row.verifiedAt,
+    lat: lat.toString(),
+    lng: lng.toString(),
+    city: {
+      id: row.city.id,
+      slug: row.city.slug,
+      nameFr: row.city.nameFr,
+      nameMg: row.city.nameMg,
+    },
+    neighborhood: {
+      id: row.neighborhood.id,
+      slug: row.neighborhood.slug,
+      nameFr: row.neighborhood.nameFr,
+      nameMg: row.neighborhood.nameMg,
+    },
+    owner: {
+      displayName,
+      image: row.owner.image,
+      hasPhone: Boolean(row.owner.phone?.trim()),
+      verifiedAt: row.owner.ownerProfile?.verifiedAt ?? null,
+    },
+    photos: row.photos,
+  }
+}
