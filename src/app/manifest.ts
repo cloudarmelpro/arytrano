@@ -31,11 +31,22 @@ export default function manifest(): MetadataRoute.Manifest {
         sizes: 'any',
         type: 'image/x-icon',
       },
+      // Next's MetadataRoute.Manifest type requires one `purpose`
+      // value per entry, so we list the same asset twice. Browsers
+      // pick the maskable variant for adaptive icons (Android home
+      // screen) and the `any` variant elsewhere — required for full
+      // Lighthouse PWA installability score.
       {
         src: '/images/arytrano.png',
         sizes: '512x512',
         type: 'image/png',
         purpose: 'any',
+      },
+      {
+        src: '/images/arytrano.png',
+        sizes: '512x512',
+        type: 'image/png',
+        purpose: 'maskable',
       },
     ],
   }

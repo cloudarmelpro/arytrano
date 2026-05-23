@@ -68,9 +68,11 @@ export function ListingSearchToolbar({
           aria-label={t('toolbar.query.label')}
         >
           <Input
+            id="toolbar-query"
             type="search"
             value={q}
             onChange={(e) => setQ(e.target.value)}
+            aria-label={t('toolbar.query.label')}
             placeholder={t('toolbar.query.placeholder')}
             disabled={pending}
             minLength={2}

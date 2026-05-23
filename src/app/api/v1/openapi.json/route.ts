@@ -11,6 +11,12 @@ import { generateOpenApiSpec } from '@/lib/api/openapi'
 export function GET() {
   const spec = generateOpenApiSpec()
   return NextResponse.json(spec, {
-    headers: { 'Cache-Control': 'public, max-age=3600, s-maxage=3600' },
+    headers: {
+      'Cache-Control': 'public, max-age=3600, s-maxage=3600',
+      // The raw JSON spec has no <meta robots> escape hatch. Without
+      // X-Robots-Tag, Googlebot indexes the full endpoint surface as
+      // a public document (minor info-disclosure + crawl-budget waste).
+      'X-Robots-Tag': 'noindex',
+    },
   })
 }

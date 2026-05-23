@@ -33,16 +33,20 @@ export function ListingsViewToggle({ view }: { view: 'grid' | 'map' }) {
     })
   }
 
+  // A11y — earlier this used role="tablist"/role="tab" but that ARIA
+  // pattern mandates arrow-key navigation between tabs. The grid/map
+  // toggle is conceptually a pair of toggle buttons (only one active),
+  // which the `aria-pressed` pattern covers cleanly with no extra
+  // keyboard logic — each button stays in the Tab order naturally.
   return (
     <div
-      role="tablist"
+      role="group"
       aria-label={t('toolbar.view.label')}
       className="inline-flex h-9 items-center gap-1 rounded-md border border-border bg-background p-1"
     >
       <button
         type="button"
-        role="tab"
-        aria-selected={view === 'grid'}
+        aria-pressed={view === 'grid'}
         disabled={pending}
         onClick={() => switchTo('grid')}
         className={`inline-flex h-7 items-center gap-1.5 rounded px-2.5 text-[12.5px] font-medium transition ${
@@ -71,8 +75,7 @@ export function ListingsViewToggle({ view }: { view: 'grid' | 'map' }) {
       </button>
       <button
         type="button"
-        role="tab"
-        aria-selected={view === 'map'}
+        aria-pressed={view === 'map'}
         disabled={pending}
         onClick={() => switchTo('map')}
         className={`inline-flex h-7 items-center gap-1.5 rounded px-2.5 text-[12.5px] font-medium transition ${

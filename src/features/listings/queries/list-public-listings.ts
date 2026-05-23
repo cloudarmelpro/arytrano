@@ -2,6 +2,7 @@ import 'server-only'
 import { z } from 'zod'
 import type { Amenity, ListingType, Prisma } from '@prisma/client'
 import { prisma } from '@/lib/db'
+import { escapeLike } from '@/lib/db/like-escape'
 import { amenitySchema } from '../schemas/create-listing'
 
 /**
@@ -152,9 +153,13 @@ export async function listPublicListings(
   // a few thousand listings — same `q` URL shape, just a different
   // WHERE branch.
   if (input.q) {
+    // SEC P0 — escape ILIKE wildcards before Prisma wraps in `%...%`.
+    // A bare `q=%` matches every row; `q=%%%%...` triggers backtracking
+    // on the unindexed `description` TEXT column (effective DoS).
+    const safe = escapeLike(input.q)
     where.OR = [
-      { title: { contains: input.q, mode: 'insensitive' } },
-      { description: { contains: input.q, mode: 'insensitive' } },
+      { title: { contains: safe, mode: 'insensitive' } },
+      { description: { contains: safe, mode: 'insensitive' } },
     ]
   }
 

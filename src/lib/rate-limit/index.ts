@@ -119,6 +119,15 @@ const whatsappAlertLimiter = makeLimiter('whatsapp-alert', {
   window: '1 h',
 })
 
+// Owner listing stats (E-T21 Tier-2) — bearer-keyed, 60/min/userId.
+// Bounds a compromised or scraping-OWNER token from enumerating
+// listing ids cheaply. 60/min is generous for legitimate dashboard
+// auto-refresh + mobile-app polling.
+const listingStatsLimiter = makeLimiter('listing-stats', {
+  requests: 60,
+  window: '1 m',
+})
+
 type RateLimitResult = { success: boolean; remaining?: number; reset?: number }
 
 async function check(
@@ -200,4 +209,7 @@ export const rateLimiters = {
   /** WhatsApp alert subscription — 5/h per IP. Fails CLOSED if no IP. */
   whatsappAlert: (ipHash: string | null) =>
     check(whatsappAlertLimiter, ipHash ?? 'noip:whatsapp-alert'),
+
+  /** Owner listing stats — 60/min per userId. */
+  listingStats: (userId: string) => check(listingStatsLimiter, userId),
 }

@@ -1,6 +1,7 @@
 import 'server-only'
 import type { Prisma } from '@prisma/client'
 import { prisma } from '@/lib/db'
+import { escapeLike } from '@/lib/db/like-escape'
 import { listPublicListingsQuerySchema, type ListPublicListingsQuery } from './list-public-listings'
 
 /**
@@ -56,9 +57,10 @@ export async function listPublicListingsForMap(
     where.amenities = { hasEvery: q.amenities }
   }
   if (q.q) {
+    const safe = escapeLike(q.q)
     where.OR = [
-      { title: { contains: q.q, mode: 'insensitive' } },
-      { description: { contains: q.q, mode: 'insensitive' } },
+      { title: { contains: safe, mode: 'insensitive' } },
+      { description: { contains: safe, mode: 'insensitive' } },
     ]
   }
 

@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Map as PigeonMap, Overlay } from 'pigeon-maps'
 
 const STADIA_API_KEY = process.env.NEXT_PUBLIC_STADIA_API_KEY
@@ -54,6 +54,33 @@ export function ListingsMapClient({
   listings: MapListing[]
 }) {
   const [openQuartier, setOpenQuartier] = useState<string | null>(null)
+  // A11y — focus management on the slide-in panel. When a pin is
+  // activated, focus moves to the close button so keyboard / screen-
+  // reader users land inside the new context. Escape closes the panel
+  // and returns focus to the pin button that opened it.
+  const closeBtnRef = useRef<HTMLButtonElement>(null)
+  const pinRefs = useRef<Map<string, HTMLButtonElement | null>>(new Map())
+  useEffect(() => {
+    if (openQuartier) closeBtnRef.current?.focus()
+  }, [openQuartier])
+  function closePanel() {
+    const slug = openQuartier
+    setOpenQuartier(null)
+    // Restore focus to the originating pin so keyboard users don't
+    // get stranded on the body element.
+    if (slug) {
+      requestAnimationFrame(() => pinRefs.current.get(slug)?.focus())
+    }
+  }
+  useEffect(() => {
+    if (!openQuartier) return
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') closePanel()
+    }
+    document.addEventListener('keydown', onKey)
+    return () => document.removeEventListener('keydown', onKey)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [openQuartier])
 
   // Group by neighborhoodSlug — one Overlay per quartier with count.
   const groups = useMemo(() => {
@@ -156,8 +183,12 @@ export function ListingsMapClient({
             >
               <button
                 type="button"
+                ref={(el) => {
+                  pinRefs.current.set(g.slug, el)
+                }}
                 onClick={() => setOpenQuartier(open ? null : g.slug)}
                 aria-expanded={open}
+                aria-controls={open ? 'listings-map-panel' : undefined}
                 aria-label={`${g.nameFr} : ${g.listings.length} ${locale === 'mg' ? 'filazana' : 'annonces'}`}
                 className={`flex items-center gap-2 rounded-full px-3 py-1.5 text-[12.5px] font-bold shadow-[0_1px_2px_rgba(16,18,40,.06),0_8px_20px_-8px_rgba(16,18,40,.3)] transition ${
                   open
@@ -187,7 +218,12 @@ export function ListingsMapClient({
           const group = groups.find((g) => g.slug === openQuartier)
           if (!group) return null
           return (
-            <div className="absolute bottom-4 left-4 right-4 max-h-[60%] overflow-y-auto rounded-xl bg-white p-4 shadow-xl ring-1 ring-foreground/10 max-w-md sm:left-auto">
+            <div
+              id="listings-map-panel"
+              role="dialog"
+              aria-label={group.nameFr}
+              className="absolute bottom-4 left-4 right-4 max-h-[60%] overflow-y-auto rounded-xl bg-white p-4 shadow-xl ring-1 ring-foreground/10 max-w-md sm:left-auto"
+            >
               <div className="mb-3 flex items-baseline justify-between gap-3">
                 <h3 className="text-[15px] font-bold text-foreground">
                   {group.nameFr}{' '}
@@ -196,10 +232,14 @@ export function ListingsMapClient({
                   </span>
                 </h3>
                 <button
+                  ref={closeBtnRef}
                   type="button"
-                  onClick={() => setOpenQuartier(null)}
-                  className="text-[12px] text-muted-foreground transition hover:text-foreground"
-                  aria-label="Fermer"
+                  onClick={closePanel}
+                  // 32x32 px target + visible focus ring — matches the
+                  // 44 px guidance after factoring in the surrounding
+                  // padding row.
+                  className="flex h-8 w-8 items-center justify-center rounded text-muted-foreground transition hover:text-foreground focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                  aria-label={locale === 'mg' ? 'Hidio' : 'Fermer'}
                 >
                   ✕
                 </button>

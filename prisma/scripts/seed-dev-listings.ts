@@ -21,6 +21,18 @@ if (!connectionString) {
   throw new Error('DATABASE_URL is not set')
 }
 
+// Prod guard — a misfired CI deploy with DATABASE_URL pointed at prod
+// would silently inject 11 fake listings + a dev-owner user with the
+// shared MG phone number. Block any non-local connection string.
+if (
+  process.env.NODE_ENV === 'production' ||
+  !/localhost|127\.0\.0\.1|::1/.test(connectionString)
+) {
+  throw new Error(
+    'seed-dev-listings refuses to run against a non-localhost DATABASE_URL',
+  )
+}
+
 const prisma = new PrismaClient({
   adapter: new PrismaPg({ connectionString }),
 })

@@ -83,7 +83,7 @@ export function SaveSearchButton({ signedIn }: Props) {
       <Dialog.Trigger
         render={
           <Button type="button" variant="outline" size="sm">
-            ★ {t('savedSearch.save.cta')}
+            <span aria-hidden="true">★</span> {t('savedSearch.save.cta')}
           </Button>
         }
       />
