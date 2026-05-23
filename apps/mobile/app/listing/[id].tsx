@@ -20,7 +20,7 @@ import type {
 } from '@arytrano/shared'
 import { ApiError, getListingById, revealContact } from '@/lib/api/client'
 import { Button } from '@/components/ui/Button'
-import { useT } from '@/lib/i18n/use-locale'
+import { useLocale, useT } from '@/lib/i18n/use-locale'
 import type { MessageKey } from '@/lib/i18n/messages'
 
 const TYPE_KEY: Record<PublicListingDetail['type'], MessageKey> = {
@@ -56,6 +56,7 @@ function formatPrice(amount: number): string {
 export default function ListingDetail() {
   const { id } = useLocalSearchParams<{ id: string }>()
   const t = useT()
+  const { locale } = useLocale()
 
   const { data, isLoading, error } = useQuery({
     queryKey: ['listing', id],
@@ -182,9 +183,9 @@ export default function ListingDetail() {
           <Text className="mt-2 text-sm text-muted-foreground">
             {t(TYPE_KEY[data.type])} ·{' '}
             <Text className="font-medium text-foreground">
-              {data.neighborhood.nameFr}
+              {locale === 'mg' ? data.neighborhood.nameMg : data.neighborhood.nameFr}
             </Text>
-            , {data.city.nameFr}
+            , {locale === 'mg' ? data.city.nameMg : data.city.nameFr}
           </Text>
           <Text className="mt-3 text-2xl font-bold text-primary">
             <Text className="font-mono">{formatPrice(data.priceMonthlyMGA)}</Text>{' '}

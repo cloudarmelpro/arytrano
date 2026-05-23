@@ -30,8 +30,16 @@ export const publicListingCardSchema = z.object({
   priceMonthlyMGA: z.number().int().nonnegative(),
   publishedAt: z.string().datetime().nullable(),
   verifiedAt: z.string().datetime().nullable(),
-  city: z.object({ slug: z.string(), nameFr: z.string() }),
-  neighborhood: z.object({ slug: z.string(), nameFr: z.string() }),
+  city: z.object({
+    slug: z.string(),
+    nameFr: z.string(),
+    nameMg: z.string(),
+  }),
+  neighborhood: z.object({
+    slug: z.string(),
+    nameFr: z.string(),
+    nameMg: z.string(),
+  }),
   photo: listingPhotoSchema.nullable(),
 })
 

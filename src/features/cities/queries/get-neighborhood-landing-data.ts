@@ -79,8 +79,8 @@ function buildGetNeighborhoodLandingData() {
           priceMonthlyMGA: true,
           publishedAt: true,
           verifiedAt: true,
-          city: { select: { slug: true, nameFr: true } },
-          neighborhood: { select: { slug: true, nameFr: true } },
+          city: { select: { slug: true, nameFr: true, nameMg: true } },
+          neighborhood: { select: { slug: true, nameFr: true, nameMg: true } },
           photos: {
             take: 1,
             orderBy: { position: 'asc' },

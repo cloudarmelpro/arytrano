@@ -2,7 +2,7 @@ import { Image, Pressable, Text, View } from 'react-native'
 import { router } from 'expo-router'
 import type { PublicListingCard } from '@arytrano/shared'
 import { FavoriteButton } from './FavoriteButton'
-import { useT } from '@/lib/i18n/use-locale'
+import { useLocale, useT } from '@/lib/i18n/use-locale'
 import type { MessageKey } from '@/lib/i18n/messages'
 
 function formatPrice(amount: number): string {
@@ -38,6 +38,10 @@ export function ListingCard({
   initialFavorited?: boolean
 }) {
   const t = useT()
+  const { locale } = useLocale()
+  const cityName = locale === 'mg' ? listing.city.nameMg : listing.city.nameFr
+  const neighborhoodName =
+    locale === 'mg' ? listing.neighborhood.nameMg : listing.neighborhood.nameFr
   const price = formatPrice(listing.priceMonthlyMGA)
   return (
     <View className="overflow-hidden rounded-2xl border border-border bg-background">
@@ -72,8 +76,7 @@ export function ListingCard({
             {listing.title}
           </Text>
           <Text className="text-xs text-muted-foreground">
-            {t(TYPE_KEY[listing.type])} · {listing.neighborhood.nameFr},{' '}
-            {listing.city.nameFr}
+            {t(TYPE_KEY[listing.type])} · {neighborhoodName}, {cityName}
           </Text>
           <Text className="mt-1 text-base font-bold text-primary">
             <Text className="font-mono">{price}</Text>{' '}
