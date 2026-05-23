@@ -20,31 +20,33 @@ import type {
 } from '@arytrano/shared'
 import { ApiError, getListingById, revealContact } from '@/lib/api/client'
 import { Button } from '@/components/ui/Button'
+import { useT } from '@/lib/i18n/use-locale'
+import type { MessageKey } from '@/lib/i18n/messages'
 
-const TYPE_LABEL_FR: Record<PublicListingDetail['type'], string> = {
-  ROOM: 'Chambre',
-  STUDIO: 'Studio',
-  APARTMENT: 'Appartement',
-  HOUSE: 'Maison',
+const TYPE_KEY: Record<PublicListingDetail['type'], MessageKey> = {
+  ROOM: 'listing.detail.type.ROOM',
+  STUDIO: 'listing.detail.type.STUDIO',
+  APARTMENT: 'listing.detail.type.APARTMENT',
+  HOUSE: 'listing.detail.type.HOUSE',
 }
 
-const AMENITY_LABEL_FR: Record<Amenity, string> = {
-  WIFI: 'Wi-Fi',
-  PARKING: 'Parking voiture',
-  MOTO_PARKING: 'Parking moto',
-  HOT_WATER: 'Eau chaude',
-  WATER_TANK: 'Réservoir d’eau',
-  GENERATOR: 'Groupe électrogène',
-  AIR_CONDITIONING: 'Climatisation',
-  KITCHEN_EQUIPPED: 'Cuisine équipée',
-  WASHING_MACHINE: 'Machine à laver',
-  GUARD: 'Gardien',
-  SECURITY_GATE: 'Portail sécurisé',
-  TERRACE: 'Terrasse',
-  BALCONY: 'Balcon',
-  GARDEN: 'Jardin',
-  FURNISHED_KITCHEN: 'Cuisine meublée',
-  PUBLIC_TRANSPORT: 'Transports en commun',
+const AMENITY_KEY: Record<Amenity, MessageKey> = {
+  WIFI: 'listing.amenity.WIFI',
+  PARKING: 'listing.amenity.PARKING',
+  MOTO_PARKING: 'listing.amenity.MOTO_PARKING',
+  HOT_WATER: 'listing.amenity.HOT_WATER',
+  WATER_TANK: 'listing.amenity.WATER_TANK',
+  GENERATOR: 'listing.amenity.GENERATOR',
+  AIR_CONDITIONING: 'listing.amenity.AIR_CONDITIONING',
+  KITCHEN_EQUIPPED: 'listing.amenity.KITCHEN_EQUIPPED',
+  WASHING_MACHINE: 'listing.amenity.WASHING_MACHINE',
+  GUARD: 'listing.amenity.GUARD',
+  SECURITY_GATE: 'listing.amenity.SECURITY_GATE',
+  TERRACE: 'listing.amenity.TERRACE',
+  BALCONY: 'listing.amenity.BALCONY',
+  GARDEN: 'listing.amenity.GARDEN',
+  FURNISHED_KITCHEN: 'listing.amenity.FURNISHED_KITCHEN',
+  PUBLIC_TRANSPORT: 'listing.amenity.PUBLIC_TRANSPORT',
 }
 
 function formatPrice(amount: number): string {
@@ -53,6 +55,7 @@ function formatPrice(amount: number): string {
 
 export default function ListingDetail() {
   const { id } = useLocalSearchParams<{ id: string }>()
+  const t = useT()
 
   const { data, isLoading, error } = useQuery({
     queryKey: ['listing', id],
@@ -75,19 +78,17 @@ export default function ListingDetail() {
           : `tel:${phone}`
       Linking.openURL(url).catch(() => {
         Alert.alert(
-          'Impossible d’ouvrir',
+          t('listing.detail.contact.errorTitle'),
           res.channel === 'WHATSAPP'
-            ? 'WhatsApp n’est pas installé sur cet appareil.'
-            : 'Impossible d’ouvrir l’app téléphone.',
+            ? t('listing.detail.contact.whatsappMissing')
+            : t('listing.detail.contact.errorBody'),
         )
       })
     },
     onError: (err) => {
       const message =
-        err instanceof ApiError
-          ? err.message
-          : 'Impossible de récupérer le contact.'
-      Alert.alert('Erreur', message)
+        err instanceof ApiError ? err.message : t('listing.detail.contact.errorBody')
+      Alert.alert(t('listing.detail.contact.errorTitle'), message)
     },
   })
 
@@ -102,14 +103,14 @@ export default function ListingDetail() {
     return (
       <SafeAreaView className="flex-1 items-center justify-center bg-background px-6">
         <Text className="text-base font-semibold text-red-900">
-          Annonce introuvable
+          {t('listing.detail.notFound.title')}
         </Text>
         <Text className="mt-2 text-center text-sm text-muted-foreground">
-          Le lien est peut-être expiré ou l’annonce a été retirée.
+          {t('listing.detail.notFound.lead')}
         </Text>
         <View className="mt-6">
           <Button
-            title="Retour"
+            title={t('common.back')}
             variant="outline"
             onPress={() => router.back()}
           />
@@ -128,9 +129,11 @@ export default function ListingDetail() {
           <Pressable
             onPress={() => router.back()}
             className="p-2"
-            accessibilityLabel="Retour"
+            accessibilityLabel={t('common.back')}
           >
-            <Text className="text-base text-muted-foreground">← Retour</Text>
+            <Text className="text-base text-muted-foreground">
+              {t('common.back')}
+            </Text>
           </Pressable>
         </View>
 
@@ -157,13 +160,15 @@ export default function ListingDetail() {
               style={{ width: screenWidth, height: screenWidth * 0.75 }}
               className="items-center justify-center bg-muted"
             >
-              <Text className="text-sm text-muted-foreground">Aucune photo</Text>
+              <Text className="text-sm text-muted-foreground">
+                {t('listing.detail.noPhoto')}
+              </Text>
             </View>
           )}
           {data.verifiedAt ? (
             <View className="absolute left-4 top-4 rounded-full bg-primary px-3 py-1.5">
               <Text className="text-xs font-semibold text-primary-foreground">
-                ✓ Annonce vérifiée
+                {t('listing.detail.verified')}
               </Text>
             </View>
           ) : null}
@@ -175,7 +180,7 @@ export default function ListingDetail() {
             {data.title}
           </Text>
           <Text className="mt-2 text-sm text-muted-foreground">
-            {TYPE_LABEL_FR[data.type]} ·{' '}
+            {t(TYPE_KEY[data.type])} ·{' '}
             <Text className="font-medium text-foreground">
               {data.neighborhood.nameFr}
             </Text>
@@ -184,7 +189,7 @@ export default function ListingDetail() {
           <Text className="mt-3 text-2xl font-bold text-primary">
             <Text className="font-mono">{formatPrice(data.priceMonthlyMGA)}</Text>{' '}
             <Text className="text-sm font-normal text-muted-foreground">
-              Ar / mois
+              {t('units.perMonth')}
             </Text>
           </Text>
         </View>
@@ -192,21 +197,37 @@ export default function ListingDetail() {
         {/* Key stats strip */}
         <View className="mx-5 mt-6 flex-row flex-wrap gap-x-6 gap-y-3 rounded-2xl border border-border bg-muted/40 px-4 py-3.5">
           {data.surfaceM2 !== null && (
-            <StatPill label="Surface" value={`${data.surfaceM2} m²`} />
+            <StatPill
+              label={t('listing.detail.stat.surface')}
+              value={`${data.surfaceM2} m²`}
+            />
           )}
           {data.bedrooms !== null && (
-            <StatPill label="Chambres" value={String(data.bedrooms)} />
+            <StatPill
+              label={t('listing.detail.stat.bedrooms')}
+              value={String(data.bedrooms)}
+            />
           )}
           {data.bathrooms !== null && (
-            <StatPill label="Salles de bain" value={String(data.bathrooms)} />
+            <StatPill
+              label={t('listing.detail.stat.bathrooms')}
+              value={String(data.bathrooms)}
+            />
           )}
-          <StatPill label="Meublé" value={data.furnished ? 'Oui' : 'Non'} />
+          <StatPill
+            label={t('listing.detail.stat.furnished')}
+            value={
+              data.furnished
+                ? t('listing.detail.stat.yes')
+                : t('listing.detail.stat.no')
+            }
+          />
         </View>
 
         {/* Description */}
         <View className="mt-7 px-5">
           <Text className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-            Description
+            {t('listing.detail.description')}
           </Text>
           <Text className="text-base leading-relaxed text-foreground/80">
             {data.description}
@@ -217,7 +238,7 @@ export default function ListingDetail() {
         {data.amenities.length > 0 && (
           <View className="mt-7 px-5">
             <Text className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-              Équipements
+              {t('listing.detail.amenities')}
             </Text>
             <View className="flex-row flex-wrap gap-2">
               {data.amenities.map((a) => (
@@ -226,7 +247,7 @@ export default function ListingDetail() {
                   className="rounded-full bg-muted px-3 py-1.5"
                 >
                   <Text className="text-sm text-foreground">
-                    {AMENITY_LABEL_FR[a]}
+                    {t(AMENITY_KEY[a])}
                   </Text>
                 </View>
               ))}
@@ -239,7 +260,7 @@ export default function ListingDetail() {
           {data.owner.image ? (
             <Image
               source={{ uri: data.owner.image }}
-              accessibilityLabel="Photo propriétaire"
+              accessibilityLabel={data.owner.displayName}
               className="h-12 w-12 rounded-full"
             />
           ) : (
@@ -255,8 +276,8 @@ export default function ListingDetail() {
             </Text>
             <Text className="text-xs text-muted-foreground">
               {data.owner.verifiedAt
-                ? 'Identité vérifiée'
-                : 'Propriétaire'}
+                ? t('listing.detail.owner.verified')
+                : t('listing.detail.owner.role')}
             </Text>
           </View>
         </View>
@@ -268,14 +289,14 @@ export default function ListingDetail() {
           <View className="flex-row gap-3">
             <View className="flex-1">
               <Button
-                title="WhatsApp"
+                title={t('listing.detail.contact.whatsapp')}
                 loading={contactMutation.isPending && contactMutation.variables === 'WHATSAPP'}
                 onPress={() => contactMutation.mutate('WHATSAPP')}
               />
             </View>
             <View className="flex-1">
               <Button
-                title="Appeler"
+                title={t('listing.detail.contact.phone')}
                 variant="outline"
                 loading={contactMutation.isPending && contactMutation.variables === 'PHONE'}
                 onPress={() => contactMutation.mutate('PHONE')}
