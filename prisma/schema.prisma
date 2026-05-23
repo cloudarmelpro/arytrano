@@ -57,6 +57,15 @@ model User {
   preferredCityId String?
   preferredCity   City?   @relation(fields: [preferredCityId], references: [id], onDelete: SetNull)
 
+  // E-T22 — Expo push notification token registered by the mobile app.
+  // Shape : `ExponentPushToken[XXX]`. Sent to Expo's Push API server-
+  // side when we want to notify the user (new listings in their saved
+  // search, review prompts, etc.). `@unique` because two devices can't
+  // share the same Expo token — if the same user signs into a new
+  // device the old token gets overwritten on POST /api/v1/users/me/
+  // push-token. Nullable since OAuth web users never have one.
+  expoPushToken   String?    @unique
+
   createdAt     DateTime   @default(now())
   updatedAt     DateTime   @updatedAt
 

@@ -362,3 +362,23 @@ export async function login(body: LoginRequest): Promise<AuthTokens> {
 export async function logout(): Promise<void> {
   await clearTokens()
 }
+
+// ────────────────────────────────────────────────────────────────────
+// Push notifications — register / unregister Expo token
+// ────────────────────────────────────────────────────────────────────
+
+export async function registerExpoPushToken(token: string): Promise<void> {
+  await request(
+    '/api/v1/users/me/push-token',
+    z.object({ registered: z.literal(true) }),
+    { method: 'POST', body: { token } },
+  )
+}
+
+export async function unregisterExpoPushToken(): Promise<void> {
+  await request(
+    '/api/v1/users/me/push-token',
+    z.object({ cleared: z.literal(true) }),
+    { method: 'DELETE' },
+  )
+}

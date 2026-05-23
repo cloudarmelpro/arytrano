@@ -439,6 +439,62 @@ registry.registerPath({
 })
 
 registry.registerPath({
+  method: 'post',
+  path: '/api/v1/users/me/push-token',
+  summary: 'Register the mobile Expo push token for the bearer user',
+  description:
+    'Idempotent on the same token. Re-registering a token already owned by another user atomically migrates it (rare — happens after device factory-reset).',
+  tags: ['Profile'],
+  security: [{ [bearerAuth.name]: [] }],
+  request: {
+    body: {
+      required: true,
+      content: {
+        'application/json': {
+          schema: z.object({
+            token: z.string().openapi({
+              example: 'ExponentPushToken[xxxxxxxxxxxxxxxxxxxxxx]',
+            }),
+          }),
+        },
+      },
+    },
+  },
+  responses: {
+    200: {
+      description: 'Token stored',
+      content: {
+        'application/json': {
+          schema: z.object({ data: z.object({ registered: z.literal(true) }) }),
+        },
+      },
+    },
+    ...errorResponses,
+  },
+})
+
+registry.registerPath({
+  method: 'delete',
+  path: '/api/v1/users/me/push-token',
+  summary: "Clear the bearer user's Expo push token",
+  description:
+    'Called by the mobile client on logout so the server stops dispatching notifications to a device the user explicitly signed out of.',
+  tags: ['Profile'],
+  security: [{ [bearerAuth.name]: [] }],
+  responses: {
+    200: {
+      description: 'Token cleared',
+      content: {
+        'application/json': {
+          schema: z.object({ data: z.object({ cleared: z.literal(true) }) }),
+        },
+      },
+    },
+    ...errorResponses,
+  },
+})
+
+registry.registerPath({
   method: 'delete',
   path: '/api/v1/users/me',
   summary: 'Soft-delete the bearer user',

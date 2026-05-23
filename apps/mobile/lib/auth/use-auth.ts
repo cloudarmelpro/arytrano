@@ -1,6 +1,10 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { logout as apiLogout, login as apiLogin, register as apiRegister } from '../api/client'
 import { getAccessToken } from './token-store'
+import {
+  registerForPushNotifications,
+  unregisterFromPushNotifications,
+} from '../push/register'
 import type { LoginRequest, RegisterRequest } from '@arytrano/shared'
 
 /**
@@ -32,14 +36,24 @@ export function useAuth() {
   async function login(input: LoginRequest) {
     await apiLogin(input)
     await queryClient.invalidateQueries({ queryKey: AUTH_QUERY_KEY })
+    // Push registration is fire-and-forget — bearer is set, the
+    // registration helper handles permission prompt + token POST.
+    // Errors swallowed inside `registerForPushNotifications`.
+    void registerForPushNotifications()
   }
 
   async function register(input: RegisterRequest) {
     await apiRegister(input)
     await queryClient.invalidateQueries({ queryKey: AUTH_QUERY_KEY })
+    void registerForPushNotifications()
   }
 
   async function logout() {
+    // Clear the server-side token FIRST while we still have a valid
+    // bearer to authenticate the DELETE. If the network call fails
+    // we still proceed with local logout — losing the token on the
+    // server is acceptable, leaving the user signed in locally is not.
+    await unregisterFromPushNotifications()
     await apiLogout()
     await queryClient.invalidateQueries({ queryKey: AUTH_QUERY_KEY })
     // Also drop every cached query so screens don't render stale
