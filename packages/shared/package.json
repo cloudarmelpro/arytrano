@@ -1,0 +1,19 @@
+{
+  "name": "@arytrano/shared",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Shared Zod schemas + TypeScript types consumed by both apps/web (Next.js) and apps/mobile (Expo/React Native). Single source of truth for the API contract.",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./schemas/*": "./src/schemas/*.ts",
+    "./types/*": "./src/types/*.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "peerDependencies": {
+    "zod": "^4.0.0"
+  }
+}

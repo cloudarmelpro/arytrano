@@ -2,6 +2,9 @@
   "name": "arytrano",
   "version": "0.1.0",
   "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
   "scripts": {
     "dev": "next dev",
     "build": "prisma generate && next build",
@@ -22,6 +25,7 @@
     "prisma:studio": "prisma studio"
   },
   "dependencies": {
+    "@arytrano/shared": "^0.1.0",
     "@asteasolutions/zod-to-openapi": "^8.5.0",
     "@auth/prisma-adapter": "^2.11.2",
     "@base-ui/react": "^1.4.1",
