@@ -32,9 +32,15 @@ export const messages = {
     'home.empty.title': 'Aucune annonce pour le moment',
     'home.empty.lead':
       "On publie une dizaine d'annonces par mois. Reviens bientôt.",
+    'home.empty.filtered.title': 'Aucune annonce ne correspond',
+    'home.empty.filtered.lead':
+      "Essaie d'élargir les filtres ou efface-les pour voir tout le catalogue.",
     'home.error.title': 'Connexion impossible',
     'home.error.lead':
       'Vérifie ta connexion et tire vers le bas pour réessayer.',
+    'home.filters.label': 'Filtres :',
+    'home.filters.clear': 'Effacer',
+    'home.filters.priceMax': 'jusqu’à {amount} Ar',
 
     'onboarding.slide1.title': 'Trouve ton logement',
     'onboarding.slide1.body':
@@ -168,9 +174,15 @@ export const messages = {
     'home.empty.title': 'Tsy misy filazana amin\'izao fotoana izao',
     'home.empty.lead':
       'Manoratra filazana am-polony isam-bolana izahay. Miverena tsy ho ela.',
+    'home.empty.filtered.title': 'Tsy misy filazana mifanaraka',
+    'home.empty.filtered.lead':
+      'Halefao ny sivana na fafao mba hijery ny filazana rehetra.',
     'home.error.title': 'Tsy mety mifandray',
     'home.error.lead':
       'Jereo ny fifandraisananao ary sintony midina hanandramana indray.',
+    'home.filters.label': 'Sivana :',
+    'home.filters.clear': 'Fafao',
+    'home.filters.priceMax': 'hatramin\'ny {amount} Ar',
 
     'onboarding.slide1.title': 'Mitady toerana fonenana',
     'onboarding.slide1.body':

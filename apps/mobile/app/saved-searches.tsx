@@ -45,7 +45,7 @@ export default function SavedSearches() {
     }
   }, [authLoading, signedIn])
 
-  const { data, isLoading, error, refetch } = useQuery({
+  const { data, isLoading, error } = useQuery({
     queryKey: ['saved-searches'],
     queryFn: listSavedSearches,
     enabled: signedIn,
@@ -154,7 +154,25 @@ export default function SavedSearches() {
                 toggleMutation.mutate({ id: item.id, alertsOn: !item.alertsOn })
               }
               onDelete={() => confirmDelete(item)}
-              onRefresh={() => void refetch()}
+              onRun={() => {
+                // Build the Home filter query from the saved search.
+                // Cast through `Record<string, string>` because Expo
+                // Router only accepts string params on this typed
+                // signature — every value here serializes to a string.
+                const params: Record<string, string> = {}
+                if (item.filters.type) params.type = item.filters.type
+                if (item.filters.city) params.city = item.filters.city
+                if (item.filters.neighborhood)
+                  params.neighborhood = item.filters.neighborhood
+                if (item.filters.priceMin !== undefined)
+                  params.priceMin = String(item.filters.priceMin)
+                if (item.filters.priceMax !== undefined)
+                  params.priceMax = String(item.filters.priceMax)
+                if (item.filters.amenities && item.filters.amenities.length > 0)
+                  params.amenities = item.filters.amenities.join(',')
+                if (item.filters.q) params.q = item.filters.q
+                router.push({ pathname: '/', params })
+              }}
             />
           )}
         />
@@ -180,13 +198,13 @@ function SavedSearchRowCard({
   busy,
   onToggleAlerts,
   onDelete,
-  onRefresh,
+  onRun,
 }: {
   row: SavedSearchRow
   busy: boolean
   onToggleAlerts: () => void
   onDelete: () => void
-  onRefresh: () => void
+  onRun: () => void
 }) {
   const t = useT()
 
@@ -209,7 +227,7 @@ function SavedSearchRowCard({
 
       <View className="mt-3 flex-row flex-wrap items-center gap-2">
         <Pressable
-          onPress={onRefresh}
+          onPress={onRun}
           accessibilityLabel={`${t('savedSearches.run')} — ${row.name}`}
           disabled={busy}
           className={`h-9 items-center justify-center rounded-md bg-primary px-3.5 active:opacity-90 ${
