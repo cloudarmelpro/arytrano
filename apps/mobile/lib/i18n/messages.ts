@@ -1,0 +1,251 @@
+import type { Locale } from '@arytrano/shared'
+
+/**
+ * Mobile i18n dictionary.
+ *
+ * Scope = strings the user actually reads in the mobile app. We do
+ * NOT mirror the web's ~1700 keys — most of those drive surfaces the
+ * mobile app doesn't (admin moderation, owner dashboard, marketing
+ * landing). When a mobile screen needs a new string, add it here in
+ * BOTH locales — never default to one language.
+ *
+ * Conventions :
+ *  - keys are dot-notation, scoped by screen (`onboarding.slide1.title`)
+ *  - placeholders use `{name}` syntax — the translator inlines them
+ *  - both locales must have every key; we type-check this at compile
+ *    time via the `Messages` type below
+ */
+
+export const messages = {
+  'fr-MG': {
+    'common.appName': 'AryTrano',
+    'common.back': '← Retour',
+    'common.continue': 'Continuer',
+    'common.skip': 'Passer',
+    'common.cancel': 'Annuler',
+    'common.retry': 'Réessayer',
+    'common.signIn': 'Se connecter',
+    'common.signUp': 'Créer un compte',
+    'common.profile': 'Profil',
+
+    'home.greeting': 'Trouve ton logement étudiant',
+    'home.empty.title': 'Aucune annonce pour le moment',
+    'home.empty.lead':
+      "On publie une dizaine d'annonces par mois. Reviens bientôt.",
+    'home.error.title': 'Connexion impossible',
+    'home.error.lead':
+      'Vérifie ta connexion et tire vers le bas pour réessayer.',
+
+    'onboarding.slide1.title': 'Trouve ton logement',
+    'onboarding.slide1.body':
+      'Studios, chambres et appartements à Madagascar, dans les meilleurs quartiers étudiants.',
+    'onboarding.slide2.title': 'Contact direct',
+    'onboarding.slide2.body':
+      'Aucun intermédiaire. Tu parles directement au propriétaire via WhatsApp ou téléphone.',
+    'onboarding.slide3.title': 'Vérifié, gratuit',
+    'onboarding.slide3.body':
+      'Les annonces sont contrôlées par notre équipe. Aucune commission, aucun frais caché.',
+    'onboarding.locale.title': 'Tu préfères en quelle langue ?',
+    'onboarding.locale.fr': 'Français',
+    'onboarding.locale.mg': 'Malagasy',
+    'onboarding.cta.browse': 'Voir les annonces',
+    'onboarding.cta.signIn': 'J\'ai déjà un compte',
+
+    'signIn.title': 'Connexion',
+    'signIn.lead': 'Retrouve tes recherches sauvegardées et tes favoris.',
+    'signIn.field.email': 'Email',
+    'signIn.field.password': 'Mot de passe',
+    'signIn.cta': 'Se connecter',
+    'signIn.noAccount': 'Pas encore de compte ?',
+    'signIn.createAccount': 'Créer un compte',
+    'signIn.error.invalid': 'Email ou mot de passe incorrect.',
+    'signIn.error.network': 'Connexion impossible. Réessaie.',
+
+    'signUp.title': 'Créer un compte',
+    'signUp.lead':
+      'Sauve tes recherches, marque tes favoris, contacte les propriétaires.',
+    'signUp.field.name': 'Prénom',
+    'signUp.field.email': 'Email',
+    'signUp.field.password': 'Mot de passe',
+    'signUp.field.passwordHelper': 'Au moins 8 caractères',
+    'signUp.cta': 'Créer mon compte',
+    'signUp.haveAccount': 'Déjà un compte ?',
+    'signUp.signIn': 'Se connecter',
+    'signUp.error.exists': 'Un compte avec cet email existe déjà.',
+    'signUp.error.network': 'Inscription impossible. Réessaie.',
+
+    'profile.title': 'Mon profil',
+    'profile.row.savedSearches': 'Recherches sauvegardées',
+    'profile.row.favorites': 'Mes favoris',
+    'profile.row.settings': 'Paramètres du compte',
+    'profile.logout': 'Se déconnecter',
+    'profile.logout.confirm.title': 'Se déconnecter',
+    'profile.logout.confirm.body': 'Tu pourras te reconnecter à tout moment.',
+    'profile.comingSoon.title': 'Bientôt',
+    'profile.comingSoon.body': 'Ce flow arrive dans la prochaine version.',
+
+    'favorites.title': 'Mes favoris',
+    'favorites.empty.title': 'Aucun favori pour le moment',
+    'favorites.empty.lead':
+      'Tape sur le cœur sur une annonce pour la garder ici.',
+    'favorites.added': 'Ajouté aux favoris',
+    'favorites.removed': 'Retiré des favoris',
+    'favorites.error': 'Action impossible. Réessaie.',
+
+    'listing.detail.type.ROOM': 'Chambre',
+    'listing.detail.type.STUDIO': 'Studio',
+    'listing.detail.type.APARTMENT': 'Appartement',
+    'listing.detail.type.HOUSE': 'Maison',
+    'listing.detail.verified': '✓ Annonce vérifiée',
+    'listing.detail.stat.surface': 'Surface',
+    'listing.detail.stat.bedrooms': 'Chambres',
+    'listing.detail.stat.bathrooms': 'Salles de bain',
+    'listing.detail.stat.furnished': 'Meublé',
+    'listing.detail.stat.yes': 'Oui',
+    'listing.detail.stat.no': 'Non',
+    'listing.detail.description': 'Description',
+    'listing.detail.amenities': 'Équipements',
+    'listing.detail.contact.whatsapp': 'WhatsApp',
+    'listing.detail.contact.phone': 'Appeler',
+    'listing.detail.contact.errorTitle': 'Erreur',
+    'listing.detail.contact.errorBody':
+      'Impossible de récupérer le contact.',
+    'listing.detail.contact.whatsappMissing':
+      "WhatsApp n'est pas installé sur cet appareil.",
+    'listing.detail.notFound.title': 'Annonce introuvable',
+    'listing.detail.notFound.lead':
+      "Le lien est peut-être expiré ou l'annonce a été retirée.",
+
+    'units.ariaryPerMonth': '{amount} ariary par mois',
+    'units.perMonth': 'Ar / mois',
+  },
+  mg: {
+    'common.appName': 'AryTrano',
+    'common.back': '← Hiverina',
+    'common.continue': 'Tohizo',
+    'common.skip': 'Lalovana',
+    'common.cancel': 'Hialana',
+    'common.retry': 'Andramo indray',
+    'common.signIn': 'Hiditra',
+    'common.signUp': 'Hamorona kaonty',
+    'common.profile': 'Mombamomba',
+
+    'home.greeting': 'Mahita ny toerana fonenanao',
+    'home.empty.title': 'Tsy misy filazana amin\'izao fotoana izao',
+    'home.empty.lead':
+      'Manoratra filazana am-polony isam-bolana izahay. Miverena tsy ho ela.',
+    'home.error.title': 'Tsy mety mifandray',
+    'home.error.lead':
+      'Jereo ny fifandraisananao ary sintony midina hanandramana indray.',
+
+    'onboarding.slide1.title': 'Mitady toerana fonenana',
+    'onboarding.slide1.body':
+      'Studio, efitra, ary trano ao Madagasikara, ao amin\'ny faritra tsara indrindra ho an\'ny mpianatra.',
+    'onboarding.slide2.title': 'Mifandray mivantana',
+    'onboarding.slide2.body':
+      'Tsy misy mpanelanelana. Miresaka mivantana amin\'ny tompony amin\'ny WhatsApp na finday ianao.',
+    'onboarding.slide3.title': 'Voamarina, maimaim-poana',
+    'onboarding.slide3.body':
+      'Voadiniky ny ekipanay ny filazana. Tsy misy karama, tsy misy saran-tsoratra miafina.',
+    'onboarding.locale.title': 'Inona no fiteny tianao ?',
+    'onboarding.locale.fr': 'Frantsay',
+    'onboarding.locale.mg': 'Malagasy',
+    'onboarding.cta.browse': 'Hijery ny filazana',
+    'onboarding.cta.signIn': 'Manana kaonty aho',
+
+    'signIn.title': 'Hiditra',
+    'signIn.lead':
+      'Hahita indray ny fitadiavana voatahiry sy ny tianao ianao.',
+    'signIn.field.email': 'Mailaka',
+    'signIn.field.password': 'Tenimiafina',
+    'signIn.cta': 'Hiditra',
+    'signIn.noAccount': 'Mbola tsy manana kaonty ?',
+    'signIn.createAccount': 'Hamorona kaonty',
+    'signIn.error.invalid': 'Diso ny mailaka na tenimiafina.',
+    'signIn.error.network': 'Tsy mety. Andramo indray.',
+
+    'signUp.title': 'Hamorona kaonty',
+    'signUp.lead':
+      'Tahirizo ny fitadiavanao, mariho ny tianao, mifandraisa amin\'ny tompon-trano.',
+    'signUp.field.name': 'Anarana',
+    'signUp.field.email': 'Mailaka',
+    'signUp.field.password': 'Tenimiafina',
+    'signUp.field.passwordHelper': '8 mari-pamantarana fara-fahakeliny',
+    'signUp.cta': 'Hamorona ny kaontiko',
+    'signUp.haveAccount': 'Efa manana kaonty ?',
+    'signUp.signIn': 'Hiditra',
+    'signUp.error.exists': 'Efa misy kaonty amin\'io mailaka io.',
+    'signUp.error.network': 'Tsy mety. Andramo indray.',
+
+    'profile.title': 'Mombamomba ahy',
+    'profile.row.savedSearches': 'Fitadiavana voatahiry',
+    'profile.row.favorites': 'Ny tiako',
+    'profile.row.settings': 'Fandrindrana kaonty',
+    'profile.logout': 'Hivoaka',
+    'profile.logout.confirm.title': 'Hivoaka',
+    'profile.logout.confirm.body':
+      'Azonao atao ny miverina hiditra amin\'ny fotoana rehetra.',
+    'profile.comingSoon.title': 'Tsy ho ela',
+    'profile.comingSoon.body':
+      'Ho avy amin\'ny dingana manaraka ity asa ity.',
+
+    'favorites.title': 'Ny tiako',
+    'favorites.empty.title': 'Tsy mbola misy tianao',
+    'favorites.empty.lead':
+      'Tsindrio ny fo amin\'ny filazana iray hitahirizana azy eto.',
+    'favorites.added': 'Voapetraka amin\'ny tiana',
+    'favorites.removed': 'Voaesotra amin\'ny tiana',
+    'favorites.error': 'Tsy mety. Andramo indray.',
+
+    'listing.detail.type.ROOM': 'Efitra',
+    'listing.detail.type.STUDIO': 'Studio',
+    'listing.detail.type.APARTMENT': 'Trano fonenana',
+    'listing.detail.type.HOUSE': 'Trano',
+    'listing.detail.verified': '✓ Filazana voamarina',
+    'listing.detail.stat.surface': 'Velarana',
+    'listing.detail.stat.bedrooms': 'Efitra',
+    'listing.detail.stat.bathrooms': 'Efitrano fandroana',
+    'listing.detail.stat.furnished': 'Misy fanaka',
+    'listing.detail.stat.yes': 'Eny',
+    'listing.detail.stat.no': 'Tsia',
+    'listing.detail.description': 'Famaritana',
+    'listing.detail.amenities': 'Fitaovana',
+    'listing.detail.contact.whatsapp': 'WhatsApp',
+    'listing.detail.contact.phone': 'Antso',
+    'listing.detail.contact.errorTitle': 'Hadisoana',
+    'listing.detail.contact.errorBody': 'Tsy nahazo ny kontaka.',
+    'listing.detail.contact.whatsappMissing':
+      "Tsy voapetraka eto ny WhatsApp.",
+    'listing.detail.notFound.title': 'Tsy hita ny filazana',
+    'listing.detail.notFound.lead':
+      'Mety tapitra ny rohy na nesorina ny filazana.',
+
+    'units.ariaryPerMonth': '{amount} ariary isam-bolana',
+    'units.perMonth': 'Ar / volana',
+  },
+} as const satisfies Record<Locale, Record<string, string>>
+
+export type MessageKey = keyof (typeof messages)['fr-MG']
+
+/**
+ * Translator factory — returns a function that resolves a key against
+ * the given locale, with optional `{var}` interpolation. Falling back
+ * to the FR key when MG is missing keeps the app resilient to partial
+ * translations during development.
+ */
+export type Translator = (
+  key: MessageKey,
+  vars?: Record<string, string | number>,
+) => string
+
+export function buildTranslator(locale: Locale): Translator {
+  const dict = messages[locale]
+  const fallback = messages['fr-MG']
+  return (key, vars) => {
+    const raw = dict[key] ?? fallback[key] ?? key
+    if (!vars) return raw
+    return raw.replace(/\{(\w+)\}/g, (_, name) =>
+      name in vars ? String(vars[name]) : `{${name}}`,
+    )
+  }
+}

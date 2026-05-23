@@ -10,44 +10,29 @@ import {
 } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { router } from 'expo-router'
-import { listListings } from '@/lib/api/client'
+import { listFavorites } from '@/lib/api/client'
 import { useAuth } from '@/lib/auth/use-auth'
 import { ListingCard } from '@/components/listings/ListingCard'
 import { useT } from '@/lib/i18n/use-locale'
-import { readOnboarded } from '@/lib/i18n/store'
 
 /**
- * Home — the primary discovery surface.
- *
- * - Cursor-based infinite scroll : fetches the next page when the
- *   FlatList nears its end. The web's `/api/v1/listings` endpoint
- *   already returns `meta.nextCursor` — no offset gymnastics needed.
- * - Pull-to-refresh wired via `RefreshControl` so a user can force a
- *   fresh fetch when a listing-of-interest finally gets posted.
- * - Header has the brand + a Sign in / Profile pill depending on
- *   auth state.
+ * Favorites — bearer-required version of Home. Cursor pagination, the
+ * usual TanStack Query loop, and `initialFavorited={true}` passed to
+ * every card (by definition every item in this list IS favorited, so
+ * the heart starts filled).
  */
-export default function Home() {
-  const { signedIn } = useAuth()
+export default function Favorites() {
+  const { signedIn, isLoading: authLoading } = useAuth()
   const t = useT()
   const [refreshing, setRefreshing] = useState(false)
 
-  // Onboarding gate — first-launch users get the carousel. Once the
-  // flag is set we never redirect again. Effect runs only once on
-  // mount; if SecureStore.getItemAsync is slow the user may see a
-  // brief Home flash before the redirect, but the cost is < 200ms
-  // and avoids the white-screen-of-checking pattern.
+  // Auth gate — anon users get bounced to sign-in. Effect rather than
+  // render-phase replace so we don't throw during the first render.
   useEffect(() => {
-    let cancelled = false
-    void readOnboarded().then((seen) => {
-      if (!cancelled && !seen) {
-        router.replace('/onboarding')
-      }
-    })
-    return () => {
-      cancelled = true
+    if (!authLoading && !signedIn) {
+      router.replace('/sign-in')
     }
-  }, [])
+  }, [authLoading, signedIn])
 
   const {
     data,
@@ -58,11 +43,11 @@ export default function Home() {
     refetch,
     error,
   } = useInfiniteQuery({
-    queryKey: ['listings'],
-    queryFn: ({ pageParam }) =>
-      listListings(pageParam ? { cursor: pageParam } : {}),
+    queryKey: ['favorites'],
+    queryFn: ({ pageParam }) => listFavorites(pageParam),
     initialPageParam: undefined as string | undefined,
     getNextPageParam: (last) => last.meta.nextCursor ?? undefined,
+    enabled: signedIn,
   })
 
   const items = data?.pages.flatMap((p) => p.items) ?? []
@@ -76,34 +61,26 @@ export default function Home() {
     }
   }
 
+  if (authLoading || !signedIn) return null
+
   return (
     <SafeAreaView className="flex-1 bg-background" edges={['top']}>
-      {/* Top bar — brand + auth chip */}
-      <View className="flex-row items-center justify-between px-5 pb-3 pt-2">
-        <Text className="font-serif text-2xl text-foreground">
-          {t('common.appName')}
+      <View className="flex-row items-center justify-between px-3 pb-2 pt-1">
+        <Pressable
+          onPress={() => router.back()}
+          className="p-2"
+          accessibilityLabel={t('common.back')}
+        >
+          <Text className="text-base text-muted-foreground">
+            {t('common.back')}
+          </Text>
+        </Pressable>
+      </View>
+
+      <View className="px-5 pb-3">
+        <Text className="font-serif text-3xl text-foreground">
+          {t('favorites.title')}
         </Text>
-        {signedIn ? (
-          <Pressable
-            onPress={() => router.push('/profile')}
-            className="rounded-full bg-muted px-3 py-1.5"
-            accessibilityLabel={t('common.profile')}
-          >
-            <Text className="text-sm font-medium text-foreground">
-              {t('common.profile')}
-            </Text>
-          </Pressable>
-        ) : (
-          <Pressable
-            onPress={() => router.push('/sign-in')}
-            className="rounded-full bg-primary px-3 py-1.5"
-            accessibilityLabel={t('common.signIn')}
-          >
-            <Text className="text-sm font-medium text-primary-foreground">
-              {t('common.signIn')}
-            </Text>
-          </Pressable>
-        )}
       </View>
 
       {isLoading ? (
@@ -116,26 +93,25 @@ export default function Home() {
             {t('home.error.title')}
           </Text>
           <Text className="mt-2 text-center text-sm text-muted-foreground">
-            {t('home.error.lead')}
-          </Text>
-          <Text className="mt-3 text-xs text-muted-foreground">
             {error instanceof Error ? error.message : String(error)}
           </Text>
         </View>
       ) : items.length === 0 ? (
         <View className="flex-1 items-center justify-center px-6">
           <Text className="text-base font-semibold text-foreground">
-            {t('home.empty.title')}
+            {t('favorites.empty.title')}
           </Text>
           <Text className="mt-2 text-center text-sm text-muted-foreground">
-            {t('home.empty.lead')}
+            {t('favorites.empty.lead')}
           </Text>
         </View>
       ) : (
         <FlatList
           data={items}
           keyExtractor={(l) => l.id}
-          renderItem={({ item }) => <ListingCard listing={item} />}
+          renderItem={({ item }) => (
+            <ListingCard listing={item} initialFavorited={true} />
+          )}
           contentContainerClassName="px-4 pb-8 gap-3"
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />

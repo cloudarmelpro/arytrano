@@ -259,6 +259,42 @@ export async function revealContact(
 }
 
 // ────────────────────────────────────────────────────────────────────
+// Favorites — bearer-required
+// ────────────────────────────────────────────────────────────────────
+
+export async function listFavorites(
+  cursor?: string,
+): Promise<{ items: PublicListingCard[]; meta: PageMeta }> {
+  const path = cursor
+    ? `/api/v1/favorites?cursor=${encodeURIComponent(cursor)}`
+    : '/api/v1/favorites'
+  const r = await request(path, z.array(publicListingCardSchema))
+  return {
+    items: r.data,
+    meta: {
+      nextCursor: (r.meta?.nextCursor as string | null | undefined) ?? null,
+      hasMore: Boolean(r.meta?.hasMore),
+    },
+  }
+}
+
+/**
+ * Toggle a listing in/out of the bearer user's favorites. The server
+ * returns the resulting state — true if NOW favorited, false if NOW
+ * removed. Idempotent: calling twice flips back.
+ */
+export async function toggleFavorite(
+  listingId: string,
+): Promise<{ favorited: boolean }> {
+  const r = await request(
+    '/api/v1/favorites',
+    z.object({ favorited: z.boolean() }),
+    { method: 'POST', body: { listingId } },
+  )
+  return r.data
+}
+
+// ────────────────────────────────────────────────────────────────────
 // Auth — register / login / logout
 // ────────────────────────────────────────────────────────────────────
 

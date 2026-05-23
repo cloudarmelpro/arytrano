@@ -14,9 +14,11 @@ import { Button } from '@/components/ui/Button'
 import { Field } from '@/components/ui/Field'
 import { ApiError } from '@/lib/api/client'
 import { useAuth } from '@/lib/auth/use-auth'
+import { useT } from '@/lib/i18n/use-locale'
 
 export default function SignIn() {
   const { login } = useAuth()
+  const t = useT()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [errors, setErrors] = useState<{ email?: string; password?: string; form?: string }>({})
@@ -32,8 +34,8 @@ export default function SignIn() {
       const fieldErrors: typeof errors = {}
       for (const issue of parsed.error.issues) {
         const key = issue.path[0]
-        if (key === 'email') fieldErrors.email = 'Email invalide'
-        if (key === 'password') fieldErrors.password = 'Mot de passe requis'
+        if (key === 'email') fieldErrors.email = t('signIn.field.email')
+        if (key === 'password') fieldErrors.password = t('signIn.field.password')
       }
       setErrors(fieldErrors)
       return
@@ -48,9 +50,9 @@ export default function SignIn() {
         // Generic message — don't echo "user not found" vs "wrong
         // password" (the web does the same — protects against email
         // enumeration).
-        setErrors({ form: 'Email ou mot de passe incorrect.' })
+        setErrors({ form: t('signIn.error.invalid') })
       } else {
-        setErrors({ form: 'Connexion impossible. Réessaie.' })
+        setErrors({ form: t('signIn.error.network') })
       }
     } finally {
       setSubmitting(false)
@@ -70,19 +72,23 @@ export default function SignIn() {
           <Pressable
             onPress={() => router.back()}
             className="-ml-2 mb-6 self-start p-2"
-            accessibilityLabel="Retour"
+            accessibilityLabel={t('common.back')}
           >
-            <Text className="text-base text-muted-foreground">← Retour</Text>
+            <Text className="text-base text-muted-foreground">
+              {t('common.back')}
+            </Text>
           </Pressable>
 
-          <Text className="font-serif text-3xl text-foreground">Connexion</Text>
+          <Text className="font-serif text-3xl text-foreground">
+            {t('signIn.title')}
+          </Text>
           <Text className="mt-2 text-base text-muted-foreground">
-            Retrouve tes recherches sauvegardées et tes favoris.
+            {t('signIn.lead')}
           </Text>
 
           <View className="mt-8 flex flex-col gap-4">
             <Field
-              label="Email"
+              label={t('signIn.field.email')}
               value={email}
               onChangeText={setEmail}
               autoCapitalize="none"
@@ -92,7 +98,7 @@ export default function SignIn() {
               error={errors.email}
             />
             <Field
-              label="Mot de passe"
+              label={t('signIn.field.password')}
               value={password}
               onChangeText={setPassword}
               secureTextEntry
@@ -109,7 +115,7 @@ export default function SignIn() {
             ) : null}
 
             <Button
-              title="Se connecter"
+              title={t('signIn.cta')}
               onPress={onSubmit}
               loading={submitting}
             />
@@ -117,15 +123,15 @@ export default function SignIn() {
 
           <View className="mt-8 flex-row items-center justify-center gap-1">
             <Text className="text-sm text-muted-foreground">
-              Pas encore de compte ?
+              {t('signIn.noAccount')}
             </Text>
             <Link
               href="/sign-up"
               replace
-              accessibilityLabel="Créer un compte"
+              accessibilityLabel={t('signIn.createAccount')}
             >
               <Text className="text-sm font-semibold text-primary">
-                Créer un compte
+                {t('signIn.createAccount')}
               </Text>
             </Link>
           </View>

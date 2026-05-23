@@ -14,9 +14,11 @@ import { Button } from '@/components/ui/Button'
 import { Field } from '@/components/ui/Field'
 import { ApiError } from '@/lib/api/client'
 import { useAuth } from '@/lib/auth/use-auth'
+import { useT } from '@/lib/i18n/use-locale'
 
 export default function SignUp() {
   const { register } = useAuth()
+  const t = useT()
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -35,10 +37,10 @@ export default function SignUp() {
       const fieldErrors: typeof errors = {}
       for (const issue of parsed.error.issues) {
         const key = issue.path[0]
-        if (key === 'name') fieldErrors.name = 'Au moins 2 caractères'
-        if (key === 'email') fieldErrors.email = 'Email invalide'
+        if (key === 'name') fieldErrors.name = t('signUp.field.name')
+        if (key === 'email') fieldErrors.email = t('signUp.field.email')
         if (key === 'password')
-          fieldErrors.password = 'Au moins 8 caractères'
+          fieldErrors.password = t('signUp.field.passwordHelper')
       }
       setErrors(fieldErrors)
       return
@@ -50,7 +52,7 @@ export default function SignUp() {
       router.replace('/')
     } catch (err) {
       if (err instanceof ApiError && err.code === 'conflict') {
-        setErrors({ form: 'Un compte avec cet email existe déjà.' })
+        setErrors({ form: t('signUp.error.exists') })
       } else if (err instanceof ApiError && err.fields) {
         // Server-side validation hit something we didn't catch locally
         // (e.g. tighter password policy server-side). Surface the
@@ -64,7 +66,7 @@ export default function SignUp() {
         }
         setErrors({ ...fieldErrors, form: err.message })
       } else {
-        setErrors({ form: 'Inscription impossible. Réessaie.' })
+        setErrors({ form: t('signUp.error.network') })
       }
     } finally {
       setSubmitting(false)
@@ -84,22 +86,23 @@ export default function SignUp() {
           <Pressable
             onPress={() => router.back()}
             className="-ml-2 mb-6 self-start p-2"
-            accessibilityLabel="Retour"
+            accessibilityLabel={t('common.back')}
           >
-            <Text className="text-base text-muted-foreground">← Retour</Text>
+            <Text className="text-base text-muted-foreground">
+              {t('common.back')}
+            </Text>
           </Pressable>
 
           <Text className="font-serif text-3xl text-foreground">
-            Créer un compte
+            {t('signUp.title')}
           </Text>
           <Text className="mt-2 text-base text-muted-foreground">
-            Sauve tes recherches, marque tes favoris, contacte les
-            propriétaires.
+            {t('signUp.lead')}
           </Text>
 
           <View className="mt-8 flex flex-col gap-4">
             <Field
-              label="Prénom"
+              label={t('signUp.field.name')}
               value={name}
               onChangeText={setName}
               autoCapitalize="words"
@@ -108,7 +111,7 @@ export default function SignUp() {
               error={errors.name}
             />
             <Field
-              label="Email"
+              label={t('signUp.field.email')}
               value={email}
               onChangeText={setEmail}
               autoCapitalize="none"
@@ -118,14 +121,14 @@ export default function SignUp() {
               error={errors.email}
             />
             <Field
-              label="Mot de passe"
+              label={t('signUp.field.password')}
               value={password}
               onChangeText={setPassword}
               secureTextEntry
               autoCapitalize="none"
               autoComplete="new-password"
               textContentType="newPassword"
-              helperText="Au moins 8 caractères"
+              helperText={t('signUp.field.passwordHelper')}
               error={errors.password}
             />
 
@@ -136,7 +139,7 @@ export default function SignUp() {
             ) : null}
 
             <Button
-              title="Créer mon compte"
+              title={t('signUp.cta')}
               onPress={onSubmit}
               loading={submitting}
             />
@@ -144,11 +147,11 @@ export default function SignUp() {
 
           <View className="mt-8 flex-row items-center justify-center gap-1">
             <Text className="text-sm text-muted-foreground">
-              Déjà un compte ?
+              {t('signUp.haveAccount')}
             </Text>
-            <Link href="/sign-in" replace accessibilityLabel="Se connecter">
+            <Link href="/sign-in" replace accessibilityLabel={t('signUp.signIn')}>
               <Text className="text-sm font-semibold text-primary">
-                Se connecter
+                {t('signUp.signIn')}
               </Text>
             </Link>
           </View>
