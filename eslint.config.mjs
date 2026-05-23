@@ -12,6 +12,12 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Monorepo siblings — each app/package owns its own toolchain.
+    // apps/mobile is an Expo/React Native project (different eslint
+    // preset, CommonJS configs); packages/shared is pure TS+Zod and
+    // has nothing actionable for Next.js's ruleset.
+    "apps/**",
+    "packages/**",
   ]),
 ]);
 

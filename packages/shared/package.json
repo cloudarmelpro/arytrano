@@ -11,7 +11,8 @@
     "./types/*": "./src/types/*.ts"
   },
   "scripts": {
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "node -e \"console.log('(no tests in @arytrano/shared)')\""
   },
   "peerDependencies": {
     "zod": "^4.0.0"
