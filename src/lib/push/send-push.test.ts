@@ -23,31 +23,37 @@ function okResponse(tickets: Array<{ status: 'ok' | 'error'; id?: string }>) {
   } as Response
 }
 
+function ticket(id: string): { status: 'ok'; id: string } {
+  return { status: 'ok', id }
+}
+
 describe('sendPush', () => {
   it('no-ops on an empty messages array', async () => {
     const result = await sendPush([])
-    expect(result).toEqual({ accepted: 0, rejected: 0 })
+    expect(result).toEqual({ accepted: 0, rejected: 0, tickets: [] })
     expect(fetchMock).not.toHaveBeenCalled()
   })
 
-  it('posts a single batch when ≤ 100 messages', async () => {
-    fetchMock.mockResolvedValueOnce(
-      okResponse([
-        { status: 'ok', id: 'r1' },
-        { status: 'ok', id: 'r2' },
-      ]),
-    )
+  it('posts a single batch when ≤ 100 messages and returns ticket ids', async () => {
+    fetchMock.mockResolvedValueOnce(okResponse([ticket('r1'), ticket('r2')]))
     const result = await sendPush([
       { to: 'ExponentPushToken[A]', title: 'a' },
       { to: 'ExponentPushToken[B]', title: 'b' },
     ])
     expect(fetchMock).toHaveBeenCalledTimes(1)
-    expect(result).toEqual({ accepted: 2, rejected: 0 })
+    expect(result.accepted).toBe(2)
+    expect(result.rejected).toBe(0)
+    expect(result.tickets).toEqual([
+      { to: 'ExponentPushToken[A]', ticketId: 'r1' },
+      { to: 'ExponentPushToken[B]', ticketId: 'r2' },
+    ])
   })
 
   it('splits into 100-message batches', async () => {
     fetchMock.mockResolvedValue(
-      okResponse(Array.from({ length: 100 }, () => ({ status: 'ok' as const }))),
+      okResponse(
+        Array.from({ length: 100 }, (_, i) => ticket(`r${i}`)),
+      ),
     )
     const messages = Array.from({ length: 250 }, (_, i) => ({
       to: `ExponentPushToken[T${i}]`,
@@ -57,12 +63,12 @@ describe('sendPush', () => {
     expect(fetchMock).toHaveBeenCalledTimes(3)
   })
 
-  it('counts tickets with status=error as rejected', async () => {
+  it('counts tickets with status=error as rejected and omits them from tickets[]', async () => {
     fetchMock.mockResolvedValueOnce(
       okResponse([
-        { status: 'ok' },
+        ticket('r1'),
         { status: 'error' },
-        { status: 'ok' },
+        ticket('r3'),
       ]),
     )
     const result = await sendPush([
@@ -70,7 +76,15 @@ describe('sendPush', () => {
       { to: 'ExponentPushToken[B]' },
       { to: 'ExponentPushToken[C]' },
     ])
-    expect(result).toEqual({ accepted: 2, rejected: 1 })
+    expect(result.accepted).toBe(2)
+    expect(result.rejected).toBe(1)
+    expect(result.tickets).toHaveLength(2)
+    // The error-row was the middle message — verify the mapping
+    // didn't shift (A → r1, C → r3, NOT B → r3).
+    expect(result.tickets).toEqual([
+      { to: 'ExponentPushToken[A]', ticketId: 'r1' },
+      { to: 'ExponentPushToken[C]', ticketId: 'r3' },
+    ])
   })
 
   it('treats non-2xx HTTP as full batch rejection', async () => {
@@ -83,7 +97,7 @@ describe('sendPush', () => {
       { to: 'ExponentPushToken[A]' },
       { to: 'ExponentPushToken[B]' },
     ])
-    expect(result).toEqual({ accepted: 0, rejected: 2 })
+    expect(result).toEqual({ accepted: 0, rejected: 2, tickets: [] })
   })
 
   it('treats fetch rejection (network) as full batch rejection', async () => {
@@ -92,11 +106,11 @@ describe('sendPush', () => {
       { to: 'ExponentPushToken[A]' },
       { to: 'ExponentPushToken[B]' },
     ])
-    expect(result).toEqual({ accepted: 0, rejected: 2 })
+    expect(result).toEqual({ accepted: 0, rejected: 2, tickets: [] })
   })
 
   it('does not attach Authorization header when EXPO_ACCESS_TOKEN is unset', async () => {
-    fetchMock.mockResolvedValueOnce(okResponse([{ status: 'ok' }]))
+    fetchMock.mockResolvedValueOnce(okResponse([ticket('r1')]))
     await sendPush([{ to: 'ExponentPushToken[A]' }])
     const [, init] = fetchMock.mock.calls[0]!
     const headers = (init as RequestInit).headers as Record<string, string>

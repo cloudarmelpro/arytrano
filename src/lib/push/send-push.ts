@@ -61,21 +61,34 @@ type ExpoResponse = { data: ExpoTicket[] }
 const PUSH_ENDPOINT = 'https://exp.host/--/api/v2/push/send'
 const BATCH_SIZE = 100
 
+export type SendPushResult = {
+  accepted: number
+  rejected: number
+  /** Per-recipient ticket IDs the caller can persist for the
+   *  receipt-poll cron. The `to` token is included so the caller
+   *  can look up the user id without re-keying off the message
+   *  position in the input array. */
+  tickets: Array<{ to: string; ticketId: string }>
+}
+
 /**
  * Send a batch of push messages. Splits internally into 100-message
- * chunks (the Expo API hard limit). Returns the number of messages
- * the API accepted with `status: 'ok'`.
+ * chunks (the Expo API hard limit). Returns counts + per-message
+ * ticket ids so the caller can persist them for the receipt-poll
+ * cron (`/api/cron/push-receipts`).
  *
- * Caller doesn't need to check the return value — it's logged for
- * observability. Failures already log via console.warn.
+ * Caller doesn't need to check the return for failures — they're
+ * already logged via console.warn. The return is for persisting
+ * tickets + telemetry.
  */
 export async function sendPush(
   messages: PushMessage[],
-): Promise<{ accepted: number; rejected: number }> {
-  if (messages.length === 0) return { accepted: 0, rejected: 0 }
+): Promise<SendPushResult> {
+  if (messages.length === 0) return { accepted: 0, rejected: 0, tickets: [] }
 
   let accepted = 0
   let rejected = 0
+  const tickets: Array<{ to: string; ticketId: string }> = []
 
   for (let i = 0; i < messages.length; i += BATCH_SIZE) {
     const batch = messages.slice(i, i + BATCH_SIZE)
@@ -108,23 +121,29 @@ export async function sendPush(
         continue
       }
 
-      for (const ticket of body.data) {
-        if (ticket.status === 'ok') accepted++
-        else {
+      // Expo returns one ticket per message, in the same order. Pair
+      // each with its `to` token so the caller can persist the
+      // (userId via lookup, ticketId) tuple.
+      body.data.forEach((ticket, idx) => {
+        const msg = batch[idx]
+        if (ticket.status === 'ok' && ticket.id && msg) {
+          accepted++
+          tickets.push({ to: msg.to, ticketId: ticket.id })
+        } else {
           rejected++
           console.warn(
             '[push] ticket error',
             ticket.message ?? ticket.details?.error ?? 'unknown',
           )
         }
-      }
+      })
     } catch (err) {
       console.warn('[push] fetch threw', err)
       rejected += batch.length
     }
   }
 
-  return { accepted, rejected }
+  return { accepted, rejected, tickets }
 }
 
 /**

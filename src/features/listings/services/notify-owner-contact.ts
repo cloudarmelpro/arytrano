@@ -3,7 +3,8 @@ import { env } from '@/lib/env'
 import { fromPrismaLocale, type Locale } from '@/lib/i18n/config'
 import { sendTransactionalEmail } from '@/lib/email/send-transactional'
 import { buildContactReceivedEmail } from '@/lib/email/templates/contact-received'
-import { sendPushToOne } from '@/lib/push/send-push'
+import { sendPush } from '@/lib/push/send-push'
+import { recordTickets } from '@/lib/push/receipts'
 
 type Channel = 'WHATSAPP' | 'PHONE'
 
@@ -67,8 +68,10 @@ export async function notifyOwnerContact(
 
   // Mobile push, in parallel to the email. Owner sees both — they
   // pick whichever shows up first (push is usually instant; email
-  // can lag a minute via Gmail relay). `sendPushToOne` swallows its
-  // own errors so a 5xx from Expo's API doesn't break the flow.
+  // can lag a minute via Gmail relay). `sendPush` swallows its own
+  // errors so a 5xx from Expo's API doesn't break the flow. Tickets
+  // returned by Expo are persisted so the receipt-poll cron can
+  // clean up `DeviceNotRegistered` tokens later.
   if (input.ownerPushToken) {
     const pushTitle = localeKey === 'mg' ? 'Antso vaovao' : 'Nouveau contact'
     const channelLabel =
@@ -77,16 +80,22 @@ export async function notifyOwnerContact(
       localeKey === 'mg'
         ? `Misy olona naka fifandraisana amin'ny ${channelLabel} ho an'ny "${input.listingTitle}".`
         : `Quelqu'un a demandé tes coordonnées ${channelLabel} pour « ${input.listingTitle} ».`
-    void sendPushToOne({
-      to: input.ownerPushToken,
-      title: pushTitle,
-      body: pushBody,
-      sound: 'default',
-      data: {
-        kind: 'contactReceived',
-        listingId: input.listingId,
-        channel: input.channel,
+    void sendPush([
+      {
+        to: input.ownerPushToken,
+        title: pushTitle,
+        body: pushBody,
+        sound: 'default',
+        data: {
+          kind: 'contactReceived',
+          listingId: input.listingId,
+          channel: input.channel,
+        },
       },
-    })
+    ]).then((result) =>
+      recordTickets(
+        result.tickets.map((t) => ({ userId: input.ownerId, ticketId: t.ticketId })),
+      ),
+    )
   }
 }

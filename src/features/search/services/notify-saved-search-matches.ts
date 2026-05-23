@@ -1,6 +1,7 @@
 import 'server-only'
 import { prisma } from '@/lib/db'
 import { sendPush, type PushMessage } from '@/lib/push/send-push'
+import { recordTickets } from '@/lib/push/receipts'
 import { savedSearchFiltersSchema } from '../schemas/saved-search'
 import {
   matchesSavedSearch,
@@ -83,7 +84,12 @@ export async function notifySavedSearchMatches(
     if (matchesByUser.size === 0) return
 
     const messages: PushMessage[] = []
-    for (const [, m] of matchesByUser) {
+    // Reverse index : token → userId, for mapping the per-recipient
+    // tickets Expo returns back to a userId without re-running the
+    // matcher logic.
+    const userByToken = new Map<string, string>()
+    for (const [userId, m] of matchesByUser) {
+      userByToken.set(m.token, userId)
       const isMg = m.locale === 'MG'
       messages.push({
         to: m.token,
@@ -100,7 +106,15 @@ export async function notifySavedSearchMatches(
       })
     }
 
-    await sendPush(messages)
+    const result = await sendPush(messages)
+    // Persist ticket ids for the receipt-poll cron. `to` is the push
+    // token; userByToken maps it back to a userId.
+    await recordTickets(
+      result.tickets.flatMap((t) => {
+        const userId = userByToken.get(t.to)
+        return userId ? [{ userId, ticketId: t.ticketId }] : []
+      }),
+    )
   } catch (err) {
     console.warn('[notifySavedSearchMatches] failed', err)
   }

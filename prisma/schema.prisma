@@ -82,8 +82,31 @@ model User {
   loginEvents     LoginEvent[]
   recoveryCodes   RecoveryCode[]
   contactEvents   ContactEvent[]
+  pushReceipts    PushReceipt[]
 
   @@index([status, role])
+}
+
+/**
+ * Ticket from the Expo Push API. Persisted between send + receipt-
+ * poll (~15-30 min gap) so the cron at /api/cron/push-receipts can
+ * look up the original recipient when a `DeviceNotRegistered`
+ * receipt comes back and clear the stale token from User.
+ * Delete-on-poll : no `polledAt` column, the cron drops the row
+ * once it's handled (success or terminal error).
+ */
+model PushReceipt {
+  id        String   @id @default(cuid())
+  // Expo's receipt id (one per recipient per send). UNIQUE because
+  // Expo guarantees uniqueness across all customers.
+  ticketId  String   @unique
+  userId    String
+  sentAt    DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // The cron filter is `sentAt < now() - 15min` — index makes that scan O(log n).
+  @@index([sentAt])
 }
 
 /**
