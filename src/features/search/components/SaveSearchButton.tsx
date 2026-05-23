@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Field, FieldLabel } from '@/components/ui/field'
 import { useT } from '@/lib/i18n/client'
+import { amenitySchema } from '@/features/listings'
 import { saveSearchAction } from '../actions/saved-search'
 import type { SavedSearchFilters } from '../schemas/saved-search'
 
@@ -52,7 +53,17 @@ export function SaveSearchButton({ signedIn }: Props) {
       filters.priceMax = Number(priceMax)
     }
     if (amenities) {
-      filters.amenities = amenities.split(',').filter(Boolean).slice(0, 20)
+      // Filter against the Amenity enum — the server schema is strict,
+      // so anything not matching would round-trip a 400 and the user
+      // would lose their save. Drop unknowns silently here.
+      const valid: SavedSearchFilters['amenities'] = []
+      for (const a of amenities.split(',')) {
+        const parsed = amenitySchema.safeParse(a.trim())
+        if (parsed.success && valid && valid.length < 20) {
+          valid.push(parsed.data)
+        }
+      }
+      if (valid && valid.length > 0) filters.amenities = valid
     }
     if (q) filters.q = q
     return filters

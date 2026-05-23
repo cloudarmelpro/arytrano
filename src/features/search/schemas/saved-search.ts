@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { amenitySchema } from '@/features/listings'
 
 /**
  * Subset of /annonces query filters worth saving. Mirrors the
@@ -7,6 +8,12 @@ import { z } from 'zod'
  *
  * Stored as JSON in `SavedSearch.filters` (validated app-side at
  * read time so a schema migration doesn't strand old rows).
+ *
+ * Amenities are bound to the `Amenity` Prisma enum, not arbitrary
+ * 40-char strings. Audit finding (SEC P2): the loose shape let a
+ * client persist `["DROP TABLE…"]` — no SQL impact (Prisma escapes)
+ * but the JSON column gets polluted and the alert matcher would
+ * silently drop those rows.
  */
 export const savedSearchFiltersSchema = z.object({
   city: z.string().min(1).max(64).optional(),
@@ -14,7 +21,7 @@ export const savedSearchFiltersSchema = z.object({
   type: z.enum(['ROOM', 'STUDIO', 'APARTMENT', 'HOUSE']).optional(),
   priceMin: z.number().int().min(0).optional(),
   priceMax: z.number().int().min(0).optional(),
-  amenities: z.array(z.string().min(1).max(40)).max(20).optional(),
+  amenities: z.array(amenitySchema).max(20).optional(),
   q: z.string().min(1).max(120).optional(),
 })
 

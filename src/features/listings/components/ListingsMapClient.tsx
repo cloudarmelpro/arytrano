@@ -135,6 +135,9 @@ export function ListingsMapClient({
         attributionPrefix={false}
         provider={STADIA_API_KEY ? stadiaTileProvider : undefined}
         attribution={
+          // A11y — every `target="_blank"` link declares its
+          // out-of-context navigation via aria-label so screen-reader
+          // users hear "(opens in new tab)" before activating.
           <span className="font-sans text-[10.5px]">
             {STADIA_API_KEY ? (
               <>
@@ -144,6 +147,7 @@ export function ListingsMapClient({
                   target="_blank"
                   rel="noopener noreferrer"
                   className="underline"
+                  aria-label={locale === 'mg' ? 'Stadia Maps (misokatra amin\'ny pejy vaovao)' : 'Stadia Maps (nouvel onglet)'}
                 >
                   Stadia Maps
                 </a>
@@ -153,6 +157,7 @@ export function ListingsMapClient({
                   target="_blank"
                   rel="noopener noreferrer"
                   className="underline"
+                  aria-label={locale === 'mg' ? 'OpenStreetMap (misokatra amin\'ny pejy vaovao)' : 'OpenStreetMap (nouvel onglet)'}
                 >
                   OpenStreetMap
                 </a>
@@ -165,6 +170,7 @@ export function ListingsMapClient({
                   target="_blank"
                   rel="noopener noreferrer"
                   className="underline"
+                  aria-label={locale === 'mg' ? 'OpenStreetMap (misokatra amin\'ny pejy vaovao)' : 'OpenStreetMap (nouvel onglet)'}
                 >
                   OpenStreetMap
                 </a>
@@ -265,8 +271,19 @@ export function ListingsMapClient({
                         <span className="block truncate text-[13px] font-medium text-foreground">
                           {l.title}
                         </span>
-                        <span className="block font-mono text-[12px] text-primary">
-                          {l.priceMonthlyMGA.toLocaleString('fr-FR')} Ar
+                        <span
+                          className="block font-mono text-[12px] text-primary"
+                          // Intl.NumberFormat('fr-FR') uses U+202F as
+                          // thousands separator and screen readers
+                          // typically read it as a stream of digits.
+                          // Provide an explicit aria-label that reads
+                          // the value naturally with the currency
+                          // expanded.
+                          aria-label={`${l.priceMonthlyMGA} ariary ${locale === 'mg' ? 'isam-bolana' : 'par mois'}`}
+                        >
+                          <span aria-hidden="true">
+                            {l.priceMonthlyMGA.toLocaleString('fr-FR')} Ar
+                          </span>
                         </span>
                       </span>
                     </Link>

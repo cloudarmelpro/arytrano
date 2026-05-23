@@ -3,6 +3,7 @@ export {
   updateListingSchema,
   listingIdSchema,
   listingTypeSchema,
+  amenitySchema,
   type CreateListingInput,
   type UpdateListingInput,
 } from './schemas'

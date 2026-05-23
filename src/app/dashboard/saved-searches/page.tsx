@@ -49,7 +49,7 @@ export default async function SavedSearchesPage() {
           </p>
           <Link
             href="/annonces"
-            className="mt-5 inline-flex h-11 items-center rounded-xl bg-primary px-5 text-[14px] font-semibold text-primary-foreground transition hover:opacity-95"
+            className="mt-5 inline-flex h-11 items-center rounded-xl bg-primary px-5 text-[14px] font-semibold text-primary-foreground transition hover:opacity-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
           >
             {t('savedSearch.page.empty.cta')}
           </Link>

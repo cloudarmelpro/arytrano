@@ -16,7 +16,12 @@ import { listPublicListingsQuerySchema, type ListPublicListingsQuery } from './l
  *  - Drops cursor/order — map UI doesn't care about page order.
  */
 
-const MAP_HARD_CAP = 500
+// Lowered from 500 → 200 per audit (SEC P1) — bounds the payload an
+// abusive scraper can pull per request without affecting v1 scale
+// (Madagascar launch catalog is 50-200 listings total). When we
+// cross into multi-hundred quartiers we should add a real per-IP
+// rate-limit on `/annonces?view=map` rather than rely on the cap.
+const MAP_HARD_CAP = 200
 
 export type PublicMapListing = {
   id: string

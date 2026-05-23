@@ -93,7 +93,11 @@ export function SavedSearchRow({ id, name, filters, alertsOn }: Props) {
       <div className="flex flex-wrap items-center gap-2">
         <Link
           href={buildSearchUrl()}
-          className="inline-flex h-9 items-center rounded-md bg-primary px-3.5 text-[13px] font-semibold text-primary-foreground transition hover:opacity-95"
+          // Multiple "Lancer" buttons land in a screen-reader's link
+          // list otherwise — interpolate the search name to make each
+          // accessible name unique.
+          aria-label={`${t('savedSearch.row.run')} — ${name}`}
+          className="inline-flex h-9 items-center rounded-md bg-primary px-3.5 text-[13px] font-semibold text-primary-foreground transition hover:opacity-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
         >
           {t('savedSearch.row.run')}
         </Link>

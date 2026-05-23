@@ -16,7 +16,10 @@
  * Versioned cache name so a redeploy invalidates old entries.
  */
 
-const CACHE_VERSION = 'v1'
+// v2 — listing-detail pages no longer runtime-cached. Bumping the
+// version forces existing installs to wipe their old cache so any
+// already-stashed detail page entries are cleared on activate.
+const CACHE_VERSION = 'v2'
 const STATIC_CACHE = `arytrano-static-${CACHE_VERSION}`
 const RUNTIME_CACHE = `arytrano-runtime-${CACHE_VERSION}`
 const SHELL_URLS = ['/', '/annonces', '/favicon.ico', '/manifest.webmanifest']
@@ -69,14 +72,24 @@ self.addEventListener('fetch', (event) => {
 
   // HTML navigations : network-first, fall back to cached home on
   // failure. Keeps the user moving even when the network drops.
+  //
+  // Listing-detail pages (`/<city>/<neighborhood>/<slug>` — three
+  // segments) are NEVER runtime-cached : a listing taken down for
+  // moderation (suspended, reported, hidden) must not stay reachable
+  // offline. The /annonces index is fine — stale counts are annoying
+  // but reveal nothing that was removed for safety reasons.
   if (request.mode === 'navigate') {
+    const segments = url.pathname.split('/').filter(Boolean)
+    const isListingDetail = segments.length === 3
     event.respondWith(
       fetch(request)
         .then((response) => {
-          // Stash a copy of the response in the runtime cache for
-          // future offline navigations.
-          const copy = response.clone()
-          caches.open(RUNTIME_CACHE).then((cache) => cache.put(request, copy))
+          if (!isListingDetail) {
+            const copy = response.clone()
+            caches
+              .open(RUNTIME_CACHE)
+              .then((cache) => cache.put(request, copy))
+          }
           return response
         })
         .catch(() =>

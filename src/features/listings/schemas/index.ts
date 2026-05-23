@@ -2,6 +2,7 @@ export { listingIdSchema } from './listing-id'
 export {
   createListingSchema,
   listingTypeSchema,
+  amenitySchema,
   type CreateListingInput,
 } from './create-listing'
 export { updateListingSchema, type UpdateListingInput } from './update-listing'
