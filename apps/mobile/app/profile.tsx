@@ -68,7 +68,7 @@ export default function Profile() {
           />
           <ProfileRow
             label={t('profile.row.savedSearches')}
-            onPress={showComingSoon}
+            onPress={() => router.push('/saved-searches')}
           />
           <ProfileRow
             label={t('profile.row.settings')}

@@ -92,6 +92,20 @@ export const messages = {
     'favorites.removed': 'Retiré des favoris',
     'favorites.error': 'Action impossible. Réessaie.',
 
+    'savedSearches.title': 'Recherches sauvegardées',
+    'savedSearches.empty.title': 'Aucune recherche sauvegardée',
+    'savedSearches.empty.lead':
+      'Sauve une recherche depuis le site pour la retrouver ici et activer les alertes.',
+    'savedSearches.allListings': 'Toutes les annonces',
+    'savedSearches.run': 'Lancer',
+    'savedSearches.alerts.on': 'Alertes activées',
+    'savedSearches.alerts.off': 'Alertes désactivées',
+    'savedSearches.delete': 'Supprimer',
+    'savedSearches.delete.confirm.title': 'Supprimer cette recherche ?',
+    'savedSearches.delete.confirm.body':
+      'Tu ne recevras plus d\'alertes pour ce filtre.',
+    'savedSearches.error': 'Action impossible. Réessaie.',
+
     'listing.detail.type.ROOM': 'Chambre',
     'listing.detail.type.STUDIO': 'Studio',
     'listing.detail.type.APARTMENT': 'Appartement',
@@ -216,6 +230,20 @@ export const messages = {
     'favorites.added': 'Voapetraka amin\'ny tiana',
     'favorites.removed': 'Voaesotra amin\'ny tiana',
     'favorites.error': 'Tsy mety. Andramo indray.',
+
+    'savedSearches.title': 'Fitadiavana voatahiry',
+    'savedSearches.empty.title': 'Tsy misy fitadiavana voatahiry',
+    'savedSearches.empty.lead':
+      'Tahirizo fitadiavana iray amin\'ny site mba hahitana azy eto sy hampandeha ny fanairana.',
+    'savedSearches.allListings': 'Ny filazana rehetra',
+    'savedSearches.run': 'Alefa',
+    'savedSearches.alerts.on': 'Mavitrika ny fanairana',
+    'savedSearches.alerts.off': 'Voasakana ny fanairana',
+    'savedSearches.delete': 'Esorina',
+    'savedSearches.delete.confirm.title': 'Esorina ity fitadiavana ity ?',
+    'savedSearches.delete.confirm.body':
+      'Tsy handray fanairana intsony ho an\'ity sivana ity ianao.',
+    'savedSearches.error': 'Tsy mety. Andramo indray.',
 
     'listing.detail.type.ROOM': 'Efitra',
     'listing.detail.type.STUDIO': 'Studio',

@@ -11,12 +11,14 @@ import {
   type LoginRequest,
   type PublicListingDetail,
   type RegisterRequest,
+  type SavedSearchRow,
   publicCitySchema,
   publicNeighborhoodSchema,
   publicListingCardSchema,
   publicListingDetailSchema,
   contactResponseSchema,
   authTokensSchema,
+  savedSearchRowSchema,
 } from '@arytrano/shared'
 import { z } from 'zod'
 import { API_BASE_URL } from '../config'
@@ -256,6 +258,43 @@ export async function revealContact(
     { method: 'POST', body },
   )
   return r.data
+}
+
+// ────────────────────────────────────────────────────────────────────
+// Saved searches — bearer-required
+// ────────────────────────────────────────────────────────────────────
+
+export async function listSavedSearches(): Promise<SavedSearchRow[]> {
+  const r = await request(
+    '/api/v1/users/me/saved-searches',
+    z.array(savedSearchRowSchema),
+  )
+  return r.data
+}
+
+/**
+ * Toggle whether the alert cron fires for a saved search. Server
+ * returns the new state (echoes the requested value on success);
+ * 404 on a row that isn't owned by the bearer.
+ */
+export async function updateSavedSearchAlerts(
+  id: string,
+  alertsOn: boolean,
+): Promise<{ alertsOn: boolean }> {
+  const r = await request(
+    `/api/v1/users/me/saved-searches/${encodeURIComponent(id)}`,
+    z.object({ alertsOn: z.boolean() }),
+    { method: 'PATCH', body: { alertsOn } },
+  )
+  return r.data
+}
+
+export async function deleteSavedSearch(id: string): Promise<void> {
+  await request(
+    `/api/v1/users/me/saved-searches/${encodeURIComponent(id)}`,
+    z.object({ deleted: z.literal(true) }),
+    { method: 'DELETE' },
+  )
 }
 
 // ────────────────────────────────────────────────────────────────────

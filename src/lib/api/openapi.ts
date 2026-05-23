@@ -540,6 +540,58 @@ registry.registerPath({
   },
 })
 
+registry.registerPath({
+  method: 'patch',
+  path: '/api/v1/users/me/saved-searches/{id}',
+  summary: 'Toggle whether the alert cron fires for this saved search',
+  description:
+    '404 (not 403) when the id is not owned by the bearer — anti-leak so callers cannot probe which ids exist.',
+  tags: ['Saved searches'],
+  security: [{ [bearerAuth.name]: [] }],
+  request: {
+    params: z.object({ id: z.string() }),
+    body: {
+      required: true,
+      content: {
+        'application/json': {
+          schema: z.object({ alertsOn: z.boolean() }),
+        },
+      },
+    },
+  },
+  responses: {
+    200: {
+      description: 'Alerts state updated',
+      content: {
+        'application/json': {
+          schema: z.object({ data: z.object({ alertsOn: z.boolean() }) }),
+        },
+      },
+    },
+    ...errorResponses,
+  },
+})
+
+registry.registerPath({
+  method: 'delete',
+  path: '/api/v1/users/me/saved-searches/{id}',
+  summary: 'Hard-delete a saved search',
+  tags: ['Saved searches'],
+  security: [{ [bearerAuth.name]: [] }],
+  request: { params: z.object({ id: z.string() }) },
+  responses: {
+    200: {
+      description: 'Deleted',
+      content: {
+        'application/json': {
+          schema: z.object({ data: z.object({ deleted: z.literal(true) }) }),
+        },
+      },
+    },
+    ...errorResponses,
+  },
+})
+
 // ────────────────────────────────────────────────────────────────────
 // Owner-side endpoints — listing stats, review responses
 // ────────────────────────────────────────────────────────────────────
