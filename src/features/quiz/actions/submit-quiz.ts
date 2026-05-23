@@ -1,102 +1,67 @@
 'use server'
 
 import { headers } from 'next/headers'
-import { prisma } from '@/lib/db'
+import { ApiError } from '@/lib/api/errors'
 import { extractRequestInfo } from '@/lib/auth/request-info'
-import { rateLimiters } from '@/lib/rate-limit'
-import { quizAnswersSchema } from '../schemas/quiz-answer'
-import { z } from 'zod'
+import { submitQuiz, submitQuizSchema } from '../services/submit-quiz'
+import {
+  subscribeQuizEmail,
+  subscribeQuizEmailSchema,
+} from '../services/subscribe-quiz-email'
 
 /**
- * Persist a completed quiz. Anonymous — no auth required. Called by
- * the client wizard right after the user sees their results so we
- * capture submissions even if they bounce before email opt-in.
+ * Server-action wrappers — thin transport bindings around the
+ * `submitQuiz` + `subscribeQuizEmail` services. Same services power
+ * the REST endpoints under `/api/v1/quiz/*`, keeping web + mobile
+ * behavior identical.
  *
- * Returns the submission id so the optional email-capture flow can
- * update the same row instead of creating a new one (cleaner data,
- * no duplicate rows per user-session).
+ * Both actions are anonymous — no auth required. The action layer
+ * resolves `ipHash` + `locale` from request headers and forwards them
+ * to the service.
  */
-const submitSchema = z.object({
-  answers: quizAnswersSchema,
-  recommendedSlugs: z.array(z.string().min(1).max(64)).min(1).max(8),
-})
 
 export async function submitQuizAction(input: {
   answers: unknown
   recommendedSlugs: unknown
 }): Promise<{ ok: true; submissionId: string } | { ok: false }> {
-  const parsed = submitSchema.safeParse(input)
+  const parsed = submitQuizSchema.safeParse(input)
   if (!parsed.success) return { ok: false }
 
   const h = await headers()
   const { ipHash } = extractRequestInfo(h)
   const locale = h.get('x-locale') === 'mg' ? 'mg' : 'fr-MG'
 
-  const limit = await rateLimiters.quizSubmit(ipHash)
-  if (!limit.success) return { ok: false }
-
   try {
-    const row = await prisma.quizSubmission.create({
-      data: {
-        locale,
-        email: null,
-        answers: parsed.data.answers,
-        recommendedSlugs: parsed.data.recommendedSlugs,
-        ipHash,
-      },
-      select: { id: true },
-    })
-    return { ok: true, submissionId: row.id }
-  } catch {
+    const result = await submitQuiz({ data: parsed.data, ipHash, locale })
+    return { ok: true, submissionId: result.submissionId }
+  } catch (err) {
     // Best-effort analytics — never break the user's results display
-    // because the insert failed. The client ignores the return value
-    // in the no-email path; it only matters if email opt-in needs the id.
+    // because the insert failed. Both rate-limit and DB errors land here.
+    if (err instanceof ApiError) return { ok: false }
     return { ok: false }
   }
 }
 
-/**
- * Attach an email to a previously-submitted quiz row. Called when the
- * user types an email on the results page and clicks subscribe.
- *
- * Idempotent on the email value but only allowed when the row's email
- * is currently NULL — prevents an attacker who guesses a submission id
- * from overwriting someone else's address.
- */
-const subscribeSchema = z.object({
-  submissionId: z.string().min(20).max(40), // cuid bounds
-  email: z
-    .string()
-    .trim()
-    .toLowerCase()
-    .email()
-    .max(254),
-})
-
 export async function subscribeQuizEmailAction(input: {
   submissionId: unknown
   email: unknown
-}): Promise<{ ok: true } | { ok: false; error: 'invalid' | 'rate_limit' | 'unavailable' }> {
-  const parsed = subscribeSchema.safeParse(input)
+}): Promise<
+  { ok: true } | { ok: false; error: 'invalid' | 'rate_limit' | 'unavailable' }
+> {
+  const parsed = subscribeQuizEmailSchema.safeParse(input)
   if (!parsed.success) return { ok: false, error: 'invalid' }
 
   const h = await headers()
   const { ipHash } = extractRequestInfo(h)
 
-  const limit = await rateLimiters.quizSubmit(ipHash)
-  if (!limit.success) return { ok: false, error: 'rate_limit' }
-
   try {
-    // Conditional update: only set email when it's currently null.
-    // updateMany lets us express the WHERE clause cleanly; count=0
-    // means the row was already claimed (or doesn't exist).
-    const result = await prisma.quizSubmission.updateMany({
-      where: { id: parsed.data.submissionId, email: null },
-      data: { email: parsed.data.email },
-    })
-    if (result.count === 0) return { ok: false, error: 'unavailable' }
+    await subscribeQuizEmail({ data: parsed.data, ipHash })
     return { ok: true }
-  } catch {
+  } catch (err) {
+    if (err instanceof ApiError) {
+      if (err.code === 'rate_limited') return { ok: false, error: 'rate_limit' }
+      return { ok: false, error: 'unavailable' }
+    }
     return { ok: false, error: 'unavailable' }
   }
 }
