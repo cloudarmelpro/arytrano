@@ -1153,6 +1153,36 @@ export const mg: Record<MessageKey, string> = {
   'quartiers.cta.primary': 'Manaova fanontaniana (2 min)',
   'quartiers.cta.secondary': 'Hijery ny filazana rehetra',
 
+  // Per-quartier detail page (/quartiers/[citySlug]/[quartierSlug])
+  'quartiers.detail.meta.title': '{quartier} ao {city} — toerana ho an\'ny mpianatra',
+  'quartiers.detail.meta.description':
+    'Fantaro ny faritra {quartier} ao {city} : toetra, fitaterana, sekoly. {count} filazana mavitrika.',
+  'quartiers.detail.meta.description.empty':
+    'Fantaro ny faritra {quartier} ao {city} : toetra, fitaterana, sekoly.',
+  'quartiers.detail.breadcrumb.quartiers': 'Faritra',
+  'quartiers.detail.lead.with.one': '{count} filazana mavitrika ao {quartier}.',
+  'quartiers.detail.lead.with.other': '{count} filazana mavitrika ao {quartier}.',
+  'quartiers.detail.lead.empty':
+    'Tsy misy filazana mavitrika amin\'izao fotoana izao. Miverena tsy ho ela — manoratra filazana am-polony isam-bolana izahay.',
+  'quartiers.detail.stats.avgPrice': 'Hofa antonony',
+  'quartiers.detail.stats.listings': 'Filazana',
+  'quartiers.detail.about.title': 'Momba an\'i {quartier}',
+  'quartiers.detail.about.ambiance': 'Toetra',
+  'quartiers.detail.about.walk': 'An-tongotra',
+  'quartiers.detail.about.transport': 'Fitaterana',
+  'quartiers.detail.about.distance': 'Halaviran\'ny afovoany',
+  'quartiers.detail.about.empty':
+    'Famaritana feno hipoitra tsy ho ela ho an\'ity faritra ity.',
+  'quartiers.detail.listings.title': 'Filazana faramparany ao {quartier}',
+  'quartiers.detail.listings.empty':
+    'Tsy misy filazana mavitrika ao amin\'ity faritra ity amin\'izao fotoana izao.',
+  'quartiers.detail.listings.viewAll.one': 'Jereo ny filazana',
+  'quartiers.detail.listings.viewAll.other': 'Jereo ny filazana {count} rehetra',
+  'quartiers.detail.siblings.title': 'Faritra hafa ao {city}',
+  'quartiers.detail.siblings.listingsCount.one': '{count} filazana',
+  'quartiers.detail.siblings.listingsCount.other': '{count} filazana',
+  'quartiers.detail.map.aria': 'Sarintany an\'i {quartier}',
+
   // Quiz wizard — meta + chrome
   'quiz.meta.title':
     'Inona no faritra mifanaraka aminao any Fianarantsoa ?',

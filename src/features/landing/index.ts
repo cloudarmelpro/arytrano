@@ -26,6 +26,7 @@ export { QuartiersMap } from './components/QuartiersMap'
 export { QuartiersJump } from './components/QuartiersJump'
 export { QuartiersBlocks } from './components/QuartiersBlocks'
 export { QuartiersQuizCta } from './components/QuartiersQuizCta'
+export { QuartierDetailMap } from './components/QuartierDetailMap'
 export type {
   NeighborhoodOption,
   CityOption,
