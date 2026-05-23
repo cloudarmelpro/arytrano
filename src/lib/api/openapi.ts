@@ -540,6 +540,186 @@ registry.registerPath({
   },
 })
 
+// ────────────────────────────────────────────────────────────────────
+// Owner-side endpoints — listing stats, review responses
+// ────────────────────────────────────────────────────────────────────
+
+registry.registerPath({
+  method: 'get',
+  path: '/api/v1/listings/{id}/stats',
+  summary: 'Owner stats for one listing',
+  description:
+    'Total + 30-day contact event counts (split by WhatsApp / Phone), review totals, and the 5 most recent contacts (channel + timestamp + has-known-viewer flag — no PII). Owner-only.',
+  tags: ['Listings'],
+  security: [{ [bearerAuth.name]: [] }],
+  request: { params: z.object({ id: z.string() }) },
+  responses: {
+    200: {
+      description: 'Listing stats',
+      content: { 'application/json': { schema: z.object({ data: z.unknown() }) } },
+    },
+    ...errorResponses,
+  },
+})
+
+registry.registerPath({
+  method: 'post',
+  path: '/api/v1/reviews/{id}/response',
+  summary: 'Owner publishes (or updates) their reply to a review',
+  description:
+    'Idempotent — upserts the `Review.ownerResponse` column. Non-owners get 404 (not 403) to avoid disclosing which review IDs exist.',
+  tags: ['Reviews'],
+  security: [{ [bearerAuth.name]: [] }],
+  request: {
+    params: z.object({ id: z.string() }),
+    body: {
+      required: true,
+      content: {
+        'application/json': {
+          schema: z.object({ body: z.string().min(10).max(1000) }),
+        },
+      },
+    },
+  },
+  responses: {
+    200: {
+      description: 'Response saved',
+      content: { 'application/json': { schema: z.object({ data: z.object({ ok: z.literal(true) }) }) } },
+    },
+    ...errorResponses,
+  },
+})
+
+registry.registerPath({
+  method: 'delete',
+  path: '/api/v1/reviews/{id}/response',
+  summary: "Owner removes their reply to a review",
+  tags: ['Reviews'],
+  security: [{ [bearerAuth.name]: [] }],
+  request: { params: z.object({ id: z.string() }) },
+  responses: {
+    200: {
+      description: 'Response removed',
+      content: { 'application/json': { schema: z.object({ data: z.object({ deleted: z.literal(true) }) }) } },
+    },
+    ...errorResponses,
+  },
+})
+
+// ────────────────────────────────────────────────────────────────────
+// Quiz (anonymous, rate-limited)
+// ────────────────────────────────────────────────────────────────────
+
+const QuizAnswersSchema = z
+  .object({
+    budget: z.enum(['lt150k', '150_250k', '250_400k', 'gte400k']),
+    school: z.enum(['university', 'lycee', 'unsure']),
+    housingType: z.enum(['ROOM', 'STUDIO', 'APARTMENT', 'any']),
+    vibe: z.enum(['calm', 'lively', 'mixed']),
+    mobility: z.enum(['walk', 'taxibe', 'car']),
+    priority: z.enum(['price', 'school', 'calm', 'social']),
+  })
+  .openapi('QuizAnswers')
+
+registry.registerPath({
+  method: 'post',
+  path: '/api/v1/quiz/submit',
+  summary: 'Record a completed quartier-matching quiz',
+  description:
+    'Anonymous. Persists answers + recommended quartier slugs and returns the submission id, which the client can later pass to /quiz/subscribe-email to attach an email.',
+  tags: ['Quiz'],
+  request: {
+    body: {
+      required: true,
+      content: {
+        'application/json': {
+          schema: z.object({
+            answers: QuizAnswersSchema,
+            recommendedSlugs: z.array(z.string()).min(1).max(8),
+          }),
+        },
+      },
+    },
+  },
+  responses: {
+    200: {
+      description: 'Quiz recorded',
+      content: {
+        'application/json': {
+          schema: z.object({ data: z.object({ submissionId: z.string() }) }),
+        },
+      },
+    },
+    ...errorResponses,
+  },
+})
+
+registry.registerPath({
+  method: 'post',
+  path: '/api/v1/quiz/subscribe-email',
+  summary: 'Attach an email to a previously-submitted quiz',
+  description:
+    'Anonymous, but the submissionId must still have a null email — returns 404 if already claimed (prevents an attacker who guesses a submission id from overwriting someone else\'s address).',
+  tags: ['Quiz'],
+  request: {
+    body: {
+      required: true,
+      content: {
+        'application/json': {
+          schema: z.object({
+            submissionId: z.string(),
+            email: z.string().email(),
+          }),
+        },
+      },
+    },
+  },
+  responses: {
+    200: {
+      description: 'Email attached',
+      content: { 'application/json': { schema: z.object({ data: z.object({ ok: z.literal(true) }) }) } },
+    },
+    ...errorResponses,
+  },
+})
+
+// ────────────────────────────────────────────────────────────────────
+// WhatsApp alerts (anonymous)
+// ────────────────────────────────────────────────────────────────────
+
+registry.registerPath({
+  method: 'post',
+  path: '/api/v1/whatsapp-alerts/subscribe',
+  summary: 'Subscribe a Madagascar phone to WhatsApp listing alerts',
+  description:
+    'Anonymous, rate-limited per IP. Idempotent — re-subscribing returns `{ alreadySubscribed: true }`. Re-sub also clears unsubscribedAt so a user who opted out can opt back in without admin intervention.',
+  tags: ['Alerts'],
+  request: {
+    body: {
+      required: true,
+      content: {
+        'application/json': {
+          schema: z.object({
+            phone: z.string().openapi({ example: '+261341234567' }),
+            quartierSlug: z.string().optional(),
+          }),
+        },
+      },
+    },
+  },
+  responses: {
+    200: {
+      description: 'Subscribed (new or updated)',
+      content: {
+        'application/json': {
+          schema: z.object({ data: z.object({ alreadySubscribed: z.boolean() }) }),
+        },
+      },
+    },
+    ...errorResponses,
+  },
+})
+
 /**
  * Generate the full OpenAPI 3.1 document. Called by the
  * `/api/v1/openapi.json` route handler.
@@ -567,6 +747,9 @@ export function generateOpenApiSpec() {
       { name: 'Profile', description: 'Current user' },
       { name: 'Favorites', description: 'User-saved listings' },
       { name: 'Saved searches', description: 'User-saved search filters' },
+      { name: 'Reviews', description: 'Tenant reviews + owner responses' },
+      { name: 'Quiz', description: 'Quartier-matching quiz' },
+      { name: 'Alerts', description: 'WhatsApp broadcast opt-in' },
     ],
   })
 }

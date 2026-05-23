@@ -27,6 +27,15 @@ describe('generateOpenApiSpec', () => {
     expect(paths).toContain('/api/v1/users/me')
   })
 
+  it('documents the Tier-2 endpoints', () => {
+    const paths = Object.keys(spec.paths ?? {})
+    expect(paths).toContain('/api/v1/listings/{id}/stats')
+    expect(paths).toContain('/api/v1/reviews/{id}/response')
+    expect(paths).toContain('/api/v1/quiz/submit')
+    expect(paths).toContain('/api/v1/quiz/subscribe-email')
+    expect(paths).toContain('/api/v1/whatsapp-alerts/subscribe')
+  })
+
   it('documents the auth flow', () => {
     const paths = Object.keys(spec.paths ?? {})
     expect(paths).toContain('/api/v1/auth/register')
