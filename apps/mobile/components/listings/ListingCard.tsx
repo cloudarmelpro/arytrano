@@ -4,6 +4,7 @@ import type { PublicListingCard } from '@arytrano/shared'
 import { FavoriteButton } from './FavoriteButton'
 import { useLocale, useT } from '@/lib/i18n/use-locale'
 import type { MessageKey } from '@/lib/i18n/messages'
+import { cloudinaryThumb } from '@/lib/cloudinary'
 
 function formatPrice(amount: number): string {
   // Manual thousand-grouping with regular space, NOT Intl.fr-FR which
@@ -54,7 +55,7 @@ export function ListingCard({
         <View className="aspect-[4/3] w-full bg-muted">
           {listing.photo ? (
             <Image
-              source={{ uri: listing.photo.url }}
+              source={{ uri: cloudinaryThumb(listing.photo.url) }}
               accessibilityLabel={listing.photo.altFr ?? listing.title}
               className="h-full w-full"
               resizeMode="cover"

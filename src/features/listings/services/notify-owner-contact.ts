@@ -73,13 +73,19 @@ export async function notifyOwnerContact(
   // returned by Expo are persisted so the receipt-poll cron can
   // clean up `DeviceNotRegistered` tokens later.
   if (input.ownerPushToken) {
+    // Security P1-2 : push payload bodies travel through Expo's
+    // infrastructure logs AND are visible on the recipient's lock
+    // screen. Don't interpolate `listingTitle` — combined with
+    // `data.listingId` it would let anyone with screen access (or
+    // anyone reading Expo's customer logs) link a contact event to
+    // a specific listing. The mobile app reads `data.listingId` and
+    // opens the right detail screen so the owner sees the title
+    // INSIDE the app, not on the lock screen.
     const pushTitle = localeKey === 'mg' ? 'Antso vaovao' : 'Nouveau contact'
-    const channelLabel =
-      input.channel === 'WHATSAPP' ? 'WhatsApp' : (localeKey === 'mg' ? 'finday' : 'téléphone')
     const pushBody =
       localeKey === 'mg'
-        ? `Misy olona naka fifandraisana amin'ny ${channelLabel} ho an'ny "${input.listingTitle}".`
-        : `Quelqu'un a demandé tes coordonnées ${channelLabel} pour « ${input.listingTitle} ».`
+        ? "Misy olona te-hifandray aminao momba ny filazanao. Sokafy ny app hijerena."
+        : "Quelqu'un veut te contacter à propos de ton annonce. Ouvre l'app pour voir."
     void sendPush([
       {
         to: input.ownerPushToken,

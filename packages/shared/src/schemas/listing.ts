@@ -95,7 +95,12 @@ export type Amenity = z.infer<typeof amenityEnumSchema>
 
 export const publicListingDetailSchema = z.object({
   id: z.string(),
-  ownerId: z.string(),
+  // Security P1-3 : the mobile `/api/v1/listings/:id/public` endpoint
+  // strips this field. We keep it OPTIONAL here so callers that DO
+  // get it (e.g. web internal callers using the same schema) can
+  // still read it, but the mobile parser doesn't reject a payload
+  // that legitimately omits it.
+  ownerId: z.string().optional(),
   slug: z.string(),
   title: z.string(),
   description: z.string(),

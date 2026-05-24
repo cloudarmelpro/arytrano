@@ -39,21 +39,34 @@ export async function setExpoPushToken(
   if (!isExpoPushToken(token)) {
     throw errors.validation('Invalid Expo push token')
   }
-  // Transaction so the "claim the token away from any previous owner"
-  // step is atomic with the assignment. Without it a race between
-  // two devices that received the same token (rare but possible on
-  // device factory-reset) could leave both rows pointing at it,
-  // violating @unique on the next write.
-  await prisma.$transaction([
-    prisma.user.updateMany({
-      where: { expoPushToken: token, NOT: { id: userId } },
-      data: { expoPushToken: null },
-    }),
-    prisma.user.update({
-      where: { id: userId },
-      data: { expoPushToken: token },
-    }),
-  ])
+
+  // Security P1-1 : REJECT collision instead of silent migration. The
+  // previous behavior was "last-claim-wins" — any authenticated user
+  // who guessed/sniffed an ExponentPushToken[...] string could POST
+  // it as theirs, the DB transaction would null the legitimate
+  // owner's row, and all future pushes would route to the attacker.
+  //
+  // New behavior : check ownership first. If the token belongs to
+  // ANOTHER user, return 409 — the legitimate owner stays in place
+  // and the attacker has to prove control of the device differently
+  // (which they can't, by design).
+  //
+  // The genuine "factory reset" / "device transferred" case still
+  // works : the previous user's app eventually issues DELETE
+  // /push-token (on logout or app uninstall via DeviceNotRegistered
+  // cleanup), freeing the token for the new device to claim.
+  const existing = await prisma.user.findUnique({
+    where: { expoPushToken: token },
+    select: { id: true },
+  })
+  if (existing && existing.id !== userId) {
+    throw errors.conflict('Token already registered to another account')
+  }
+
+  await prisma.user.update({
+    where: { id: userId },
+    data: { expoPushToken: token },
+  })
 }
 
 export async function clearExpoPushToken(userId: string): Promise<void> {

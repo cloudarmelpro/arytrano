@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Map as PigeonMap, Overlay } from 'pigeon-maps'
+import { cloudinaryPanelThumb } from '@/lib/images/cloudinary-transform'
 
 const STADIA_API_KEY = process.env.NEXT_PUBLIC_STADIA_API_KEY
 const STADIA_STYLE = process.env.NEXT_PUBLIC_STADIA_STYLE ?? 'alidade_smooth'
@@ -260,8 +261,11 @@ export function ListingsMapClient({
                       {l.photoUrl ? (
                         // eslint-disable-next-line @next/next/no-img-element
                         <img
-                          src={l.photoUrl}
+                          src={cloudinaryPanelThumb(l.photoUrl)}
                           alt=""
+                          width={48}
+                          height={48}
+                          loading="lazy"
                           className="h-12 w-12 shrink-0 rounded-md object-cover"
                         />
                       ) : (

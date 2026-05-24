@@ -96,6 +96,8 @@ export const messages = {
       'Tape sur le cœur sur une annonce pour la garder ici.',
     'favorites.added': 'Ajouté aux favoris',
     'favorites.removed': 'Retiré des favoris',
+    'favorites.action.add': 'Ajouter aux favoris',
+    'favorites.action.remove': 'Retirer des favoris',
     'favorites.error': 'Action impossible. Réessaie.',
 
     'savedSearches.title': 'Recherches sauvegardées',
@@ -241,6 +243,8 @@ export const messages = {
       'Tsindrio ny fo amin\'ny filazana iray hitahirizana azy eto.',
     'favorites.added': 'Voapetraka amin\'ny tiana',
     'favorites.removed': 'Voaesotra amin\'ny tiana',
+    'favorites.action.add': 'Ampio amin\'ny tiana',
+    'favorites.action.remove': 'Esory amin\'ny tiana',
     'favorites.error': 'Tsy mety. Andramo indray.',
 
     'savedSearches.title': 'Fitadiavana voatahiry',

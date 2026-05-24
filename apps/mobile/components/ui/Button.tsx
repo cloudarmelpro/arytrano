@@ -57,6 +57,13 @@ export function Button({
     <Pressable
       {...rest}
       disabled={loading || disabled}
+      // A11y P0-2 : ensure VoiceOver/TalkBack always reads the button's
+      // intent even when the spinner replaces the visible label. The
+      // `busy` state tells screen readers an action is in flight so
+      // they can chirp the appropriate "loading" sound.
+      accessibilityRole="button"
+      accessibilityLabel={title}
+      accessibilityState={{ busy: loading, disabled: loading || disabled }}
       className={`flex-row items-center justify-center rounded-xl ${v.container} ${s.container} ${
         loading || disabled ? 'opacity-50' : ''
       }`}

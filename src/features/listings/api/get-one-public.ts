@@ -27,6 +27,13 @@ export const GET = withErrorHandling(
     if (!listing) {
       throw errors.notFound('Listing not found')
     }
-    return ok(listing)
+    // Security P1-3 : strip `ownerId` for the anonymous mobile
+    // endpoint. It's used by the web detail page (Server Component
+    // with session context) to gate owner-only UI, but the mobile
+    // /public path never reads it — exposing it lets a scraper
+    // build an owner→listing graph (fanout for harassment, etc.).
+    const { ownerId, ...publicProjection } = listing
+    void ownerId
+    return ok(publicProjection)
   },
 )

@@ -3,6 +3,7 @@ import { z } from 'zod'
 import { ok, withErrorHandling } from '@/lib/api/response'
 import { requireBearer } from '@/lib/api/bearer'
 import { errors } from '@/lib/api/errors'
+import { rateLimiters } from '@/lib/rate-limit'
 import {
   clearExpoPushToken,
   setExpoPushToken,
@@ -21,6 +22,12 @@ const tokenBodySchema = z.object({
  */
 export const POST = withErrorHandling(async (req: Request) => {
   const payload = await requireBearer(req)
+  // Security P1-1 : rate-limit token claims so a sniffed token can't
+  // be spam-rotated to a different account. 3/min/user.
+  const rl = await rateLimiters.pushTokenRegister(payload.sub)
+  if (!rl.success) {
+    throw errors.rateLimited('Too many push-token register attempts')
+  }
   const body = (await req.json().catch(() => ({}))) as unknown
   const parsed = tokenBodySchema.safeParse(body)
   if (!parsed.success) {

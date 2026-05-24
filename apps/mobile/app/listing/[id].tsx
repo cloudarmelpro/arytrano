@@ -22,6 +22,7 @@ import { ApiError, getListingById, revealContact } from '@/lib/api/client'
 import { Button } from '@/components/ui/Button'
 import { useLocale, useT } from '@/lib/i18n/use-locale'
 import type { MessageKey } from '@/lib/i18n/messages'
+import { cloudinaryDetail } from '@/lib/cloudinary'
 
 const TYPE_KEY: Record<PublicListingDetail['type'], MessageKey> = {
   ROOM: 'listing.detail.type.ROOM',
@@ -149,7 +150,7 @@ export default function ListingDetail() {
               keyExtractor={(p) => p.id}
               renderItem={({ item }) => (
                 <Image
-                  source={{ uri: item.url }}
+                  source={{ uri: cloudinaryDetail(item.url) }}
                   accessibilityLabel={item.altFr ?? data.title}
                   style={{ width: screenWidth, height: screenWidth * 0.75 }}
                   resizeMode="cover"

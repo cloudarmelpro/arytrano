@@ -128,6 +128,15 @@ const listingStatsLimiter = makeLimiter('listing-stats', {
   window: '1 m',
 })
 
+// Push token register (E-T22 audit P1-1) — bearer-keyed, 3/min/user.
+// Bounds an attacker spamming token claims after sniffing one off a
+// lock-screen or screenshot. Legitimate flow registers once per
+// sign-in + occasionally on token rotation, so 3/min is generous.
+const pushTokenRegisterLimiter = makeLimiter('push-token-register', {
+  requests: 3,
+  window: '1 m',
+})
+
 type RateLimitResult = { success: boolean; remaining?: number; reset?: number }
 
 async function check(
@@ -212,4 +221,8 @@ export const rateLimiters = {
 
   /** Owner listing stats — 60/min per userId. */
   listingStats: (userId: string) => check(listingStatsLimiter, userId),
+
+  /** Push token registration — 3/min per userId. Anti token-claim spam. */
+  pushTokenRegister: (userId: string) =>
+    check(pushTokenRegisterLimiter, userId),
 }

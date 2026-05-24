@@ -91,12 +91,18 @@ export async function notifySavedSearchMatches(
     for (const [userId, m] of matchesByUser) {
       userByToken.set(m.token, userId)
       const isMg = m.locale === 'MG'
+      // Security P1-2 : strip `searchName` from the body — saved-
+      // search names are user-written strings that may contain
+      // private hints (neighborhood, budget, etc.). The body travels
+      // through Expo's infra logs AND surfaces on the lock screen.
+      // The mobile app reads `data.savedSearchId` (if we add it) or
+      // just navigates to the listing detail.
       messages.push({
         to: m.token,
         title: isMg ? 'Filazana vaovao' : 'Nouvelle annonce',
         body: isMg
-          ? `Misy filazana vaovao mifanaraka amin'ny "${m.searchName}".`
-          : `Une nouvelle annonce correspond à « ${m.searchName} ».`,
+          ? 'Misy filazana vaovao mifanaraka amin\'ny fitadiavanao.'
+          : 'Une nouvelle annonce correspond à ta recherche.',
         sound: 'default',
         data: {
           kind: 'savedSearchMatch',

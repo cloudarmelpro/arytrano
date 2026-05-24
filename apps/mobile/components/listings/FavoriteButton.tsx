@@ -27,7 +27,8 @@ import { useT } from '@/lib/i18n/use-locale'
 export function FavoriteButton({
   listingId,
   initialFavorited = false,
-  size = 36,
+  // A11y P0-1 — iOS HIG requires ≥44pt touch target. Was 36.
+  size = 44,
 }: {
   listingId: string
   initialFavorited?: boolean
@@ -68,9 +69,15 @@ export function FavoriteButton({
     <Pressable
       onPress={onPress}
       accessibilityRole="button"
-      accessibilityState={{ selected: favorited }}
+      // A11y P0-4 : `checked` is the correct toggle state ; `selected`
+      // is reserved for tab-bar items. Label uses the action-tense
+      // ("Ajouter / Retirer") describing what THIS tap will do, not
+      // the past tense which described what the LAST tap already did.
+      accessibilityState={{ checked: favorited, busy: mutation.isPending }}
       accessibilityLabel={
-        favorited ? t('favorites.removed') : t('favorites.added')
+        favorited
+          ? t('favorites.action.remove')
+          : t('favorites.action.add')
       }
       // Visual : circle with a heart character. `♥` outlines naturally
       // on white when the state is off, fills primary when on.
