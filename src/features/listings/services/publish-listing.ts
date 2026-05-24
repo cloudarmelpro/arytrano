@@ -6,7 +6,7 @@ import { errors } from '@/lib/api/errors'
 import { fromPrismaLocale } from '@/lib/i18n/config'
 import { sendTransactionalEmail } from '@/lib/email/send-transactional'
 import { buildListingPublishedEmail } from '@/lib/email/templates/listing-published'
-import { notifySavedSearchMatches } from '@/features/search/services/notify-saved-search-matches'
+import { notifySavedSearchMatches } from '@/features/search/server'
 
 /**
  * Listing TTL — 60 days from publication (T-049). Past this date the
