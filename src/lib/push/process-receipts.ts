@@ -52,6 +52,12 @@ export async function processPushReceipts(): Promise<ProcessReceiptsResult> {
   const ready = await prisma.pushReceipt.findMany({
     where: { sentAt: { lt: minAge, gte: maxAge } },
     select: { id: true, ticketId: true, userId: true },
+    // Perf P2 : FIFO drain. Without explicit orderBy the heap-scan
+    // returns rows in undefined order — when the table holds more
+    // than 1000 eligible rows, old receipts near the 24h Expo
+    // retention boundary might never be polled, leaving
+    // DeviceNotRegistered tokens alive forever. Oldest first.
+    orderBy: { sentAt: 'asc' },
     // 1000 is Expo's batch limit; doing more than one batch per run
     // would risk timing out a 10s serverless function. If we ever
     // ship volumes that demand more, switch the cron to run more

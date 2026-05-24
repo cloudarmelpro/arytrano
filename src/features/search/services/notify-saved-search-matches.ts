@@ -122,6 +122,11 @@ export async function notifySavedSearchMatches(
       }),
     )
   } catch (err) {
-    console.warn('[notifySavedSearchMatches] failed', err)
+    // Sec P1-5 : log only the message — Prisma errors include
+    // bound query values which can leak userId.
+    console.warn(
+      '[notifySavedSearchMatches] failed',
+      err instanceof Error ? err.message : String(err),
+    )
   }
 }

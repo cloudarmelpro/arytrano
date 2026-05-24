@@ -2,13 +2,13 @@ import { useMutation, useQuery } from '@tanstack/react-query'
 import {
   ActivityIndicator,
   Alert,
-  Dimensions,
   FlatList,
   Image,
   Linking,
   Pressable,
   ScrollView,
   Text,
+  useWindowDimensions,
   View,
 } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
@@ -97,7 +97,7 @@ export default function ListingDetail() {
   if (isLoading) {
     return (
       <SafeAreaView className="flex-1 items-center justify-center bg-background">
-        <ActivityIndicator />
+        <ActivityIndicator accessibilityLabel={t('common.loading')} />
       </SafeAreaView>
     )
   }
@@ -121,7 +121,10 @@ export default function ListingDetail() {
     )
   }
 
-  const screenWidth = Dimensions.get('window').width
+  // Perf P2 : `useWindowDimensions` subscribes to dimension changes
+  // so the gallery re-layouts on rotation / split-screen resize.
+  // Previously a one-shot `Dimensions.get` snapshot captured at mount.
+  const { width: screenWidth } = useWindowDimensions()
 
   return (
     <SafeAreaView className="flex-1 bg-background" edges={['top']}>
@@ -131,6 +134,7 @@ export default function ListingDetail() {
           <Pressable
             onPress={() => router.back()}
             className="p-2"
+            accessibilityRole="button"
             accessibilityLabel={t('common.back')}
           >
             <Text className="text-base text-muted-foreground">
@@ -148,10 +152,19 @@ export default function ListingDetail() {
               pagingEnabled
               showsHorizontalScrollIndicator={false}
               keyExtractor={(p) => p.id}
-              renderItem={({ item }) => (
+              renderItem={({ item, index }) => (
                 <Image
                   source={{ uri: cloudinaryDetail(item.url) }}
-                  accessibilityLabel={item.altFr ?? data.title}
+                  // A11y P1-2 : announce photo position so screen-
+                  // reader users know they're on photo 2 of 5, not
+                  // just hearing the alt text on every swipe.
+                  accessibilityLabel={`${item.altFr ?? data.title} — ${t(
+                    'listing.detail.photo.counter',
+                    {
+                      current: index + 1,
+                      total: data.photos.length,
+                    },
+                  )}`}
                   style={{ width: screenWidth, height: screenWidth * 0.75 }}
                   resizeMode="cover"
                 />
@@ -188,7 +201,16 @@ export default function ListingDetail() {
             </Text>
             , {locale === 'mg' ? data.city.nameMg : data.city.nameFr}
           </Text>
-          <Text className="mt-3 text-2xl font-bold text-primary">
+          {/* A11y P2-2 : the visible price uses thousand-space
+              separators which screen readers handle awkwardly.
+              Override with an aria-label that reads the raw number
+              followed by the spoken-out "ariary par mois" string. */}
+          <Text
+            className="mt-3 text-2xl font-bold text-primary"
+            accessibilityLabel={t('units.ariaryPerMonth', {
+              amount: String(data.priceMonthlyMGA),
+            })}
+          >
             <Text className="font-mono">{formatPrice(data.priceMonthlyMGA)}</Text>{' '}
             <Text className="text-sm font-normal text-muted-foreground">
               {t('units.perMonth')}

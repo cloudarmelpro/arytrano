@@ -47,7 +47,13 @@ export async function recordTickets(
       skipDuplicates: true,
     })
   } catch (err) {
-    console.warn('[push] recordTickets failed', err)
+    // Sec P1-5 : log only the message/code, never the raw error
+    // (Prisma errors include the query + bound values which can
+    // contain userId / push token PII).
+    console.warn(
+      '[push] recordTickets failed',
+      err instanceof Error ? err.message : String(err),
+    )
   }
 }
 
@@ -94,7 +100,10 @@ export async function fetchReceipts(
         out.set(id, receipt)
       }
     } catch (err) {
-      console.warn('[push] getReceipts threw', err)
+      console.warn(
+        '[push] getReceipts threw',
+        err instanceof Error ? err.message : String(err),
+      )
     }
   }
 

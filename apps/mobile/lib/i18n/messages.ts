@@ -20,6 +20,7 @@ export const messages = {
   'fr-MG': {
     'common.appName': 'AryTrano',
     'common.back': '← Retour',
+    'common.loading': 'Chargement…',
     'common.continue': 'Continuer',
     'common.skip': 'Passer',
     'common.cancel': 'Annuler',
@@ -56,6 +57,7 @@ export const messages = {
     'onboarding.locale.mg': 'Malagasy',
     'onboarding.cta.browse': 'Voir les annonces',
     'onboarding.cta.signIn': 'J\'ai déjà un compte',
+    'onboarding.slide.progress': 'Diapositive {current} sur {total}',
 
     'signIn.title': 'Connexion',
     'signIn.lead': 'Retrouve tes recherches sauvegardées et tes favoris.',
@@ -138,6 +140,7 @@ export const messages = {
     'listing.detail.notFound.lead':
       "Le lien est peut-être expiré ou l'annonce a été retirée.",
     'listing.detail.noPhoto': 'Aucune photo',
+    'listing.detail.photo.counter': 'Photo {current} sur {total}',
     'listing.detail.owner.verified': 'Identité vérifiée',
     'listing.detail.owner.role': 'Propriétaire',
 
@@ -164,6 +167,7 @@ export const messages = {
   mg: {
     'common.appName': 'AryTrano',
     'common.back': '← Hiverina',
+    'common.loading': 'Mizotra…',
     'common.continue': 'Tohizo',
     'common.skip': 'Lalovana',
     'common.cancel': 'Hialana',
@@ -200,6 +204,7 @@ export const messages = {
     'onboarding.locale.mg': 'Malagasy',
     'onboarding.cta.browse': 'Hijery ny filazana',
     'onboarding.cta.signIn': 'Manana kaonty aho',
+    'onboarding.slide.progress': 'Pejy {current} amin\'ny {total}',
 
     'signIn.title': 'Hiditra',
     'signIn.lead':
@@ -284,6 +289,7 @@ export const messages = {
     'listing.detail.notFound.lead':
       'Mety tapitra ny rohy na nesorina ny filazana.',
     'listing.detail.noPhoto': 'Tsy misy sary',
+    'listing.detail.photo.counter': 'Sary {current} amin\'ny {total}',
     'listing.detail.owner.verified': 'Voamarina ny mombamomba',
     'listing.detail.owner.role': 'Tompon-trano',
 

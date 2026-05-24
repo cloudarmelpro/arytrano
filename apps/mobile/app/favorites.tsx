@@ -69,6 +69,7 @@ export default function Favorites() {
         <Pressable
           onPress={() => router.back()}
           className="p-2"
+          accessibilityRole="button"
           accessibilityLabel={t('common.back')}
         >
           <Text className="text-base text-muted-foreground">
@@ -85,7 +86,7 @@ export default function Favorites() {
 
       {isLoading ? (
         <View className="flex-1 items-center justify-center">
-          <ActivityIndicator />
+          <ActivityIndicator accessibilityLabel={t('common.loading')} />
         </View>
       ) : error ? (
         <View className="flex-1 items-center justify-center px-6">

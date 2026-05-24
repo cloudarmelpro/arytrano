@@ -82,7 +82,10 @@ export async function recordContactClick(input: {
     data: {
       listingId: listing.id,
       channel: input.channel,
-      ipHash: input.ipHash ?? 'unknown',
+      // Sec P2-3 : match the rate-limit sentinel exactly
+      // (`noip:contact`) so analytics queries on stored ipHash align
+      // with the bucket the limiter uses. Was 'unknown' before.
+      ipHash: input.ipHash ?? 'noip:contact',
       uaHash,
       viewerId: input.viewerId,
     },

@@ -230,7 +230,7 @@ export default function Home() {
 
       {isLoading ? (
         <View className="flex-1 items-center justify-center">
-          <ActivityIndicator />
+          <ActivityIndicator accessibilityLabel={t('common.loading')} />
         </View>
       ) : error ? (
         <View className="flex-1 items-center justify-center px-6">

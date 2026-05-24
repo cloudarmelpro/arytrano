@@ -1,12 +1,10 @@
 import 'server-only'
 import { ok, withErrorHandling } from '@/lib/api/response'
 import { requireBearer } from '@/lib/api/bearer'
-import { errors } from '@/lib/api/errors'
+import { assertCuidShape } from '@/lib/api/id-regex'
 import { respondToReviewSchema } from '../schemas/create-review'
 import { respondToReview } from '../services/respond-to-review'
 import { deleteOwnerResponse } from '../services/delete-owner-response'
-
-const reviewIdRegex = /^[a-z0-9]{20,40}$/
 
 /**
  * POST /api/v1/reviews/:id/response — listing owner posts (or updates)
@@ -20,7 +18,7 @@ export function makeRespondHandler() {
     async (req: Request, ctx: { params: Promise<{ id: string }> }) => {
       const payload = await requireBearer(req)
       const { id } = await ctx.params
-      if (!reviewIdRegex.test(id)) throw errors.validation('ID invalide')
+      assertCuidShape(id, 'Review not found')
       const body = (await req.json().catch(() => ({}))) as { body?: string }
       const input = respondToReviewSchema.parse({ reviewId: id, body: body.body })
       await respondToReview({ ownerId: payload.sub, data: input })
@@ -38,7 +36,7 @@ export function makeDeleteResponseHandler() {
     async (req: Request, ctx: { params: Promise<{ id: string }> }) => {
       const payload = await requireBearer(req)
       const { id } = await ctx.params
-      if (!reviewIdRegex.test(id)) throw errors.validation('ID invalide')
+      assertCuidShape(id, 'Review not found')
       await deleteOwnerResponse({ ownerId: payload.sub, reviewId: id })
       return ok({ deleted: true })
     },

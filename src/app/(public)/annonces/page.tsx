@@ -16,7 +16,6 @@ import {
 import { SaveSearchButton } from '@/features/search'
 import { listCitiesWithNeighborhoods } from '@/features/geo'
 import { listCitiesWithCounts } from '@/features/landing/server'
-import { prisma } from '@/lib/db'
 import { getFavoritedListingIds } from '@/features/favorites/server'
 import { auth } from '@/features/auth'
 import { getLocale } from '@/lib/i18n/get-locale'
@@ -58,16 +57,20 @@ function hasAnyFilter(sp: Awaited<SearchParams>) {
  * Lookup a city's localized name by slug, for metadata + H1 interpolation.
  * Returns null when the slug doesn't match a seeded city — caller falls
  * back to the city-less generic title.
+ *
+ * Perf P1 : was a dedicated `prisma.city.findUnique` that ran on EVERY
+ * filtered request, in addition to the parallel `listCitiesWithNeighborhoods`
+ * in the page body. Now reads from the same cached call — React's
+ * render-tree cache dedupes within a single request, so generateMetadata
+ * + the page body share one query result.
  */
 async function getCityLabel(
   citySlug: string | undefined,
   locale: string,
 ): Promise<string | null> {
   if (!citySlug) return null
-  const city = await prisma.city.findUnique({
-    where: { slug: citySlug },
-    select: { nameFr: true, nameMg: true },
-  })
+  const cities = await listCitiesWithNeighborhoods()
+  const city = cities.find((c) => c.slug === citySlug)
   if (!city) return null
   return locale === 'mg' ? city.nameMg : city.nameFr
 }

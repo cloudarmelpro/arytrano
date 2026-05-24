@@ -45,7 +45,14 @@ export const GET = withErrorHandling(async (req: Request) => {
   const isHotPath =
     !q.cursor && !q.type && !q.city && !q.neighborhood && !q.priceMin && !q.priceMax && !q.sort && !q.amenities && !q.q
   if (isHotPath) {
-    res.headers.set('Cache-Control', 'public, max-age=60, s-maxage=60')
+    // Perf P1 : stale-while-revalidate lets the CDN serve the cached
+    // payload immediately while refetching in the background,
+    // eliminating the periodic ~200-400 ms cold-origin hit visible
+    // to the first mobile client after TTL expiry.
+    res.headers.set(
+      'Cache-Control',
+      'public, max-age=60, s-maxage=60, stale-while-revalidate=30',
+    )
   }
   return res as NextResponse
 })

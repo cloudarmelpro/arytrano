@@ -138,7 +138,11 @@ export async function sendPush(
         }
       })
     } catch (err) {
-      console.warn('[push] fetch threw', err)
+      // Sec P1-5 : strip raw err to avoid token leak in logs.
+      console.warn(
+        '[push] fetch threw',
+        err instanceof Error ? err.message : String(err),
+      )
       rejected += batch.length
     }
   }

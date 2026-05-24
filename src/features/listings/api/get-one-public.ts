@@ -1,9 +1,8 @@
 import 'server-only'
 import { ok, withErrorHandling } from '@/lib/api/response'
 import { errors } from '@/lib/api/errors'
+import { assertCuidShape } from '@/lib/api/id-regex'
 import { getPublicListingById } from '../queries/get-public-listing'
-
-const listingIdRegex = /^[a-z0-9]{20,40}$/
 
 /**
  * GET /api/v1/listings/:id/public — anonymous-friendly listing detail.
@@ -20,9 +19,7 @@ const listingIdRegex = /^[a-z0-9]{20,40}$/
 export const GET = withErrorHandling(
   async (_req: Request, ctx: { params: Promise<{ id: string }> }) => {
     const { id } = await ctx.params
-    if (!listingIdRegex.test(id)) {
-      throw errors.notFound('Listing not found')
-    }
+    assertCuidShape(id, 'Listing not found')
     const listing = await getPublicListingById(id)
     if (!listing) {
       throw errors.notFound('Listing not found')

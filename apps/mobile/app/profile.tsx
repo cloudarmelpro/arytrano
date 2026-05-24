@@ -50,6 +50,7 @@ export default function Profile() {
         <Pressable
           onPress={() => router.back()}
           className="-ml-2 mb-4 self-start p-2"
+          accessibilityRole="button"
           accessibilityLabel={t('common.back')}
         >
           <Text className="text-base text-muted-foreground">
@@ -119,12 +120,24 @@ function ProfileRow({
   return (
     <Pressable
       onPress={onPress}
-      accessibilityRole="button"
+      // A11y P1-4 : navigation rows that route to a new screen are
+      // semantically links, not buttons. Lets TalkBack offer the
+      // expected swipe-right link affordance.
+      accessibilityRole="link"
       accessibilityLabel={label}
       className="flex-row items-center justify-between rounded-2xl border border-border bg-background px-4 py-4 active:bg-muted"
     >
       <Text className="text-base text-foreground">{label}</Text>
-      <Text className="text-base text-muted-foreground">›</Text>
+      {/* A11y P3-2 : chevron is decorative; the row's label already
+          conveys the action. Hide from a11y tree so VoiceOver doesn't
+          read "right-pointing angle bracket". */}
+      <Text
+        className="text-base text-muted-foreground"
+        accessibilityElementsHidden={true}
+        importantForAccessibility="no"
+      >
+        ›
+      </Text>
     </Pressable>
   )
 }
@@ -141,7 +154,8 @@ function LocalePill({
   return (
     <Pressable
       onPress={onPress}
-      accessibilityRole="button"
+      // A11y P2-3 : radio, not button (mutually-exclusive 2-option picker).
+      accessibilityRole="radio"
       accessibilityState={{ selected: active }}
       accessibilityLabel={label}
       className={`flex-1 items-center rounded-xl border px-4 py-3 ${

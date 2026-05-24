@@ -26,7 +26,10 @@ export const GET = withErrorHandling(
       throw errors.notFound('City not found')
     }
     const res = ok(neighborhoods)
-    res.headers.set('Cache-Control', 'public, max-age=300, s-maxage=300')
+    res.headers.set(
+      'Cache-Control',
+      'public, max-age=300, s-maxage=300, stale-while-revalidate=120',
+    )
     return res as NextResponse
   },
 )

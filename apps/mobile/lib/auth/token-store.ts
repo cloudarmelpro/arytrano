@@ -18,12 +18,22 @@ const ACCESS_KEY = 'arytrano.accessToken'
 const REFRESH_KEY = 'arytrano.refreshToken'
 const EXPIRES_KEY = 'arytrano.accessExpiresAt'
 
+// Sec P2-5 : pin the Keychain access policy explicitly. Default on
+// iOS is `AFTER_FIRST_UNLOCK` — fine for tokens but worth being
+// explicit so an iCloud Keychain restore on a different device
+// doesn't silently migrate the refresh token to a new phone.
+// WHEN_UNLOCKED_THIS_DEVICE_ONLY = stays on this device, requires
+// unlock for every read.
+const SECURE_STORE_OPTS: SecureStore.SecureStoreOptions = {
+  keychainAccessible: SecureStore.WHEN_UNLOCKED_THIS_DEVICE_ONLY,
+}
+
 export async function saveTokens(tokens: AuthTokens): Promise<void> {
   const expiresAt = Date.now() + tokens.expiresIn * 1000
   await Promise.all([
-    SecureStore.setItemAsync(ACCESS_KEY, tokens.accessToken),
-    SecureStore.setItemAsync(REFRESH_KEY, tokens.refreshToken),
-    SecureStore.setItemAsync(EXPIRES_KEY, String(expiresAt)),
+    SecureStore.setItemAsync(ACCESS_KEY, tokens.accessToken, SECURE_STORE_OPTS),
+    SecureStore.setItemAsync(REFRESH_KEY, tokens.refreshToken, SECURE_STORE_OPTS),
+    SecureStore.setItemAsync(EXPIRES_KEY, String(expiresAt), SECURE_STORE_OPTS),
   ])
 }
 

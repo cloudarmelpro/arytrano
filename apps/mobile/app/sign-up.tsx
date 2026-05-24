@@ -86,6 +86,7 @@ export default function SignUp() {
           <Pressable
             onPress={() => router.back()}
             className="-ml-2 mb-6 self-start p-2"
+            accessibilityRole="button"
             accessibilityLabel={t('common.back')}
           >
             <Text className="text-base text-muted-foreground">

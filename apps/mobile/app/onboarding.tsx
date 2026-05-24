@@ -126,11 +126,22 @@ export default function Onboarding() {
           onViewableItemsChanged={onViewable}
         />
 
-        {/* Dots indicator */}
-        <View className="flex-row items-center justify-center gap-2 py-4">
+        {/* Dots indicator — A11y P1-1 : the visible dots are decorative
+            (the wrapping View carries the progress announcement) so
+            screen reader users know which slide they're on. */}
+        <View
+          accessibilityRole="text"
+          accessibilityLabel={t('onboarding.slide.progress', {
+            current: index + 1,
+            total: SLIDES.length,
+          })}
+          className="flex-row items-center justify-center gap-2 py-4"
+        >
           {SLIDES.map((_, i) => (
             <View
               key={i}
+              importantForAccessibility="no"
+              accessibilityElementsHidden={true}
               className={`h-2 rounded-full transition-all ${
                 i === index ? 'w-6 bg-primary' : 'w-2 bg-muted'
               }`}
@@ -183,7 +194,10 @@ function LocalePill({
   return (
     <Pressable
       onPress={onPress}
-      accessibilityRole="button"
+      // A11y P2-3 : a 2-option mutually-exclusive picker is a radio
+      // group, not a pair of buttons. `selected` + `radio` matches
+      // what TalkBack/VoiceOver expect for this UX.
+      accessibilityRole="radio"
       accessibilityState={{ selected: active }}
       accessibilityLabel={label}
       className={`flex-1 items-center rounded-xl border px-4 py-3 ${

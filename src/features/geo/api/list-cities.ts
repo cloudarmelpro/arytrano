@@ -14,6 +14,9 @@ export const GET = withErrorHandling(async () => {
   const res = ok(cities)
   // Catalog data turns over slowly (seeded ~once per quarter when we
   // add a city). 5min public CDN cache is the right floor.
-  res.headers.set('Cache-Control', 'public, max-age=300, s-maxage=300')
+  res.headers.set(
+    'Cache-Control',
+    'public, max-age=300, s-maxage=300, stale-while-revalidate=120',
+  )
   return res as NextResponse
 })

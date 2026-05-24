@@ -24,10 +24,23 @@ export const runtime = 'nodejs'
 
 export async function GET(request: Request) {
   if (!env.CRON_SECRET) {
+    // Sec P1-4 : emit a Sentry breadcrumb so missing CRON_SECRET in
+    // prod surfaces in the dashboard instead of silently disabling
+    // the cron for weeks.
+    Sentry.captureMessage('Cron disabled (CRON_SECRET missing)', {
+      level: 'error',
+      tags: { cron: 'push-receipts', issue: 'disabled' },
+    })
     return NextResponse.json({ ok: false, error: 'cron_disabled' }, { status: 503 })
   }
   const auth = request.headers.get('authorization')
   if (auth !== `Bearer ${env.CRON_SECRET}`) {
+    // Wrong secret = the scheduler config drifted. Surface in
+    // Sentry — the job has effectively stopped running.
+    Sentry.captureMessage('Cron auth failed (bad bearer)', {
+      level: 'warning',
+      tags: { cron: 'push-receipts', auth: 'failed' },
+    })
     return NextResponse.json({ ok: false, error: 'unauthorized' }, { status: 401 })
   }
 

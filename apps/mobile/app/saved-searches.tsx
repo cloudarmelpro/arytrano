@@ -101,6 +101,7 @@ export default function SavedSearches() {
         <Pressable
           onPress={() => router.back()}
           className="p-2"
+          accessibilityRole="button"
           accessibilityLabel={t('common.back')}
         >
           <Text className="text-base text-muted-foreground">
@@ -117,7 +118,7 @@ export default function SavedSearches() {
 
       {isLoading ? (
         <View className="flex-1 items-center justify-center">
-          <ActivityIndicator />
+          <ActivityIndicator accessibilityLabel={t('common.loading')} />
         </View>
       ) : error ? (
         <View className="flex-1 items-center justify-center px-6">
@@ -228,6 +229,9 @@ function SavedSearchRowCard({
       <View className="mt-3 flex-row flex-wrap items-center gap-2">
         <Pressable
           onPress={onRun}
+          // A11y P1-4 : "Lancer" navigates to /annonces with the
+          // saved filters applied — it's a link, not a button.
+          accessibilityRole="link"
           accessibilityLabel={`${t('savedSearches.run')} — ${row.name}`}
           disabled={busy}
           className={`h-9 items-center justify-center rounded-md bg-primary px-3.5 active:opacity-90 ${
@@ -253,15 +257,26 @@ function SavedSearchRowCard({
               : 'border-border bg-background'
           } ${busy ? 'opacity-50' : ''}`}
         >
-          <Text
-            className={`text-[12.5px] font-medium ${
-              row.alertsOn ? 'text-primary' : 'text-muted-foreground'
-            }`}
+          {/* A11y P1-3 : visible emoji + label, but the parent
+              Pressable's accessibilityLabel is the source of truth
+              for screen readers — wrap them in an inner View that
+              hides from the a11y tree so TalkBack doesn't read
+              "cloche, Alertes activées" verbatim. */}
+          <View
+            accessibilityElementsHidden={true}
+            importantForAccessibility="no-hide-descendants"
+            className="flex-row items-center"
           >
-            {row.alertsOn
-              ? `🔔 ${t('savedSearches.alerts.on')}`
-              : `🔕 ${t('savedSearches.alerts.off')}`}
-          </Text>
+            <Text
+              className={`text-[12.5px] font-medium ${
+                row.alertsOn ? 'text-primary' : 'text-muted-foreground'
+              }`}
+            >
+              {row.alertsOn
+                ? `🔔 ${t('savedSearches.alerts.on')}`
+                : `🔕 ${t('savedSearches.alerts.off')}`}
+            </Text>
+          </View>
         </Pressable>
 
         <Pressable
