@@ -15,8 +15,10 @@ config.resolver.nodeModulesPaths = [
   path.resolve(projectRoot, 'node_modules'),
   path.resolve(workspaceRoot, 'node_modules'),
 ]
-// Hoisting safety : disable symlinks (NativeWind has historical
-// issues with symlinks on Windows; we use file: links instead).
-config.resolver.disableHierarchicalLookup = true
+// Note : we previously set `resolver.disableHierarchicalLookup = true`
+// but expo-doctor (SDK 54) flags it as a mismatch. The default
+// (hierarchical lookup ON) is required for NativeWind + Reanimated
+// 4 to resolve their internal Node module deps via the standard
+// node_modules walk.
 
 module.exports = withNativeWind(config, { input: './global.css' })

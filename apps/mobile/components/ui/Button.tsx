@@ -63,7 +63,7 @@ export function Button({
       // they can chirp the appropriate "loading" sound.
       accessibilityRole="button"
       accessibilityLabel={title}
-      accessibilityState={{ busy: loading, disabled: loading || disabled }}
+      accessibilityState={{ busy: loading, disabled: Boolean(loading || disabled) }}
       className={`flex-row items-center justify-center rounded-xl ${v.container} ${s.container} ${
         loading || disabled ? 'opacity-50' : ''
       }`}
