@@ -295,7 +295,7 @@ After=docker.service
 [Service]
 Type=oneshot
 EnvironmentFile=/etc/arytrano/backup.env
-ExecStart=/opt/arytrano/scripts/backup-db.sh
+ExecStart=/opt/arytrano/apps/web/scripts/backup-db.sh
 User=root
 ```
 
@@ -330,7 +330,7 @@ Description=AryTrano backup freshness check
 [Service]
 Type=oneshot
 EnvironmentFile=/etc/arytrano/backup.env
-ExecStart=/opt/arytrano/scripts/check-backup-freshness.sh
+ExecStart=/opt/arytrano/apps/web/scripts/check-backup-freshness.sh
 User=root
 ```
 
@@ -355,7 +355,7 @@ sudo systemctl enable --now arytrano-backup-check.timer
 ### 8.6 Test backup manually
 
 ```bash
-sudo -E /opt/arytrano/scripts/backup-db.sh
+sudo -E /opt/arytrano/apps/web/scripts/backup-db.sh
 rclone lsf r2:arytrano-backups/daily/
 ```
 

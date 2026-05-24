@@ -16,71 +16,101 @@ Cross-cutting infrastructure lives in `lib/`.
 
 ## Folder structure
 
+This repo is a **monorepo** with three top-level workspaces. Every path
+in the rest of this document is relative to **`apps/web/`** unless
+otherwise noted — i.e. when the doc says `src/features/...`, the real
+path is `apps/web/src/features/...`.
+
 ```
-src/
-├── app/                              # Next.js App Router — routes only, thin
-│   ├── (public)/                     # Public marketing + search + listing detail
-│   ├── (auth)/                       # Sign in / sign up
-│   ├── dashboard/                    # Owner dashboard (authenticated)
-│   ├── admin/                        # Admin moderation (role-gated)
-│   └── api/
-│       ├── v1/                       # Public REST API (mobile, partners)
-│       │   ├── auth/
-│       │   ├── listings/
-│       │   ├── search/
-│       │   └── ...                   # Mirrors feature surface
-│       └── webhooks/
-│           └── goalpay/              # Payment webhook handler (server-only)
+arytrano/                             # Monorepo root
+├── apps/
+│   ├── web/                          # Next.js app — see tree below
+│   └── mobile/                       # Expo / React Native app (E-T22)
 │
-├── features/                         # Domain modules (vertical slices)
-│   ├── listings/
-│   │   ├── services/                 # ⭐ Pure business logic — source of truth
-│   │   │   ├── create-listing.ts     #    Pure functions: input → DB → result type
-│   │   │   ├── publish-listing.ts    #    No HTTP, no Next.js bindings
-│   │   │   └── ...
-│   │   ├── actions/                  # 'use server' — wrap services for web forms
-│   │   ├── api/                      # REST route handlers — wrap services for /api/v1/
-│   │   ├── queries/                  # Read-side data fetchers (shared web + API)
-│   │   ├── schemas/                  # Zod schemas (shared everywhere)
-│   │   ├── components/               # React components (web only)
-│   │   ├── types.ts                  # Domain types
-│   │   └── index.ts                  # Public surface (single import entry)
+├── packages/
+│   └── shared/                       # Zod schemas + types consumed by web + mobile
+│
+├── docker-compose.yml                # Postgres dev container — shared infra
+├── package.json                      # Workspace orchestrator (pass-through scripts)
+├── README.md / CLAUDE.md / ARCHITECTURE.md / AGENTS.md / TICKETS.md
+└── .git/
+```
+
+The web app at `apps/web/` follows this internal structure :
+
+```
+apps/web/
+├── src/
+│   ├── app/                          # Next.js App Router — routes only, thin
+│   │   ├── (public)/                 # Public marketing + search + listing detail
+│   │   ├── (auth)/                   # Sign in / sign up
+│   │   ├── dashboard/                # Owner dashboard (authenticated)
+│   │   ├── admin/                    # Admin moderation (role-gated)
+│   │   └── api/
+│   │       ├── v1/                   # Public REST API (mobile, partners)
+│   │       │   ├── auth/
+│   │       │   ├── listings/
+│   │       │   ├── search/
+│   │       │   └── ...               # Mirrors feature surface
+│   │       └── webhooks/
+│   │           └── goalpay/          # Payment webhook handler (server-only)
 │   │
-│   ├── auth/
-│   ├── reviews/
-│   ├── favorites/
-│   ├── reports/
-│   ├── search/
-│   ├── geo/
-│   └── payments/                     # GoalPay adapter, PaymentProvider interface
+│   ├── features/                     # Domain modules (vertical slices)
+│   │   ├── listings/
+│   │   │   ├── services/             # ⭐ Pure business logic — source of truth
+│   │   │   │   ├── create-listing.ts #    Pure functions: input → DB → result type
+│   │   │   │   ├── publish-listing.ts#    No HTTP, no Next.js bindings
+│   │   │   │   └── ...
+│   │   │   ├── actions/              # 'use server' — wrap services for web forms
+│   │   │   ├── api/                  # REST route handlers — wrap services for /api/v1/
+│   │   │   ├── queries/              # Read-side data fetchers (shared web + API)
+│   │   │   ├── schemas/              # Zod schemas (shared everywhere)
+│   │   │   ├── components/           # React components (web only)
+│   │   │   ├── types.ts              # Domain types
+│   │   │   └── index.ts              # Public surface (single import entry)
+│   │   │
+│   │   ├── auth/
+│   │   ├── reviews/
+│   │   ├── favorites/
+│   │   ├── reports/
+│   │   ├── search/
+│   │   ├── geo/
+│   │   └── payments/                 # GoalPay adapter, PaymentProvider interface
+│   │
+│   ├── lib/                          # Cross-cutting infrastructure (web-only)
+│   │   ├── db/                       # Prisma client
+│   │   ├── auth/                     # Auth.js config (web) + token verify (mobile)
+│   │   ├── api/                      # API helpers — response shape, error format, auth middleware
+│   │   ├── env.ts                    # Zod-typed env vars
+│   │   ├── i18n/                     # Locale config + t() helper
+│   │   ├── seo/                      # Metadata helpers, structured data
+│   │   ├── images/                   # Cloudinary helpers, EXIF strip
+│   │   ├── push/                     # Expo Push API client + receipt polling
+│   │   └── payments/                 # PaymentProvider interface (impl lives in features/payments)
+│   │
+│   ├── components/
+│   │   ├── ui/                       # shadcn primitives (button, input, dialog…)
+│   │   └── shared/                   # Cross-feature shared components (Header, Footer…)
+│   │
+│   └── styles/
 │
-├── lib/                              # Cross-cutting infrastructure
-│   ├── db/                           # Prisma client
-│   ├── auth/                         # Auth.js config (web) + token verify (mobile)
-│   ├── api/                          # API helpers — response shape, error format, auth middleware
-│   ├── env.ts                        # Zod-typed env vars
-│   ├── i18n/                         # Locale config + t() helper
-│   ├── seo/                          # Metadata helpers, structured data
-│   ├── images/                       # Cloudinary helpers, EXIF strip
-│   └── payments/                     # PaymentProvider interface (impl lives in features/payments)
+├── prisma/                           # Schema, migrations, seed — web-only
+│   ├── schema.prisma
+│   ├── seed.ts
+│   └── migrations/
 │
-├── components/
-│   ├── ui/                           # shadcn primitives (button, input, dialog…)
-│   └── shared/                       # Cross-feature shared components (Header, Footer…)
+├── public/                           # Static assets + project docs
+│   └── docs/                         # Runbooks, AryTrano.docx, etc.
 │
-├── styles/
-└── messages/
-    ├── fr-MG.json
-    └── mg.json
-
-prisma/
-├── schema.prisma
-├── seed.ts
-└── migrations/
-
-design-system/                        # Tokens, generated docs, Storybook (later)
-public/docs/                          # Project docs (AryTrano.docx, etc.)
+├── package.json                      # Web deps (Next, Prisma, Auth.js…) + scripts
+├── next.config.ts / tsconfig.json / etc.
+└── .env
 ```
+
+**Code shared between web and mobile** lives in `packages/shared/`:
+Zod schemas for API request/response shapes, the bilingual `Locale`
+union, the `ApiSuccess<T> / ApiFailure` envelopes. Pure TS + Zod, zero
+side-effect imports (no `server-only`, no Prisma).
 
 ---
 
