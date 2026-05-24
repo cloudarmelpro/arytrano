@@ -525,7 +525,71 @@ curl -H "Authorization: Bearer $CRON_SECRET" https://arytrano.mg/api/cron/listin
 # { "ok": true, "warned": N, "expired": N, "failed": 0 }
 ```
 
-### 10b.5 Adding new crons
+### 10b.5 Push-receipt polling cron (E-T22)
+
+Polls the Expo Push API every 30 minutes for receipts of recent push
+notifications, then clears `User.expoPushToken` for any device whose
+receipt comes back as `DeviceNotRegistered` (uninstall). Without this
+the column accumulates dead tokens and we waste API calls fanning out
+to phones that no longer have the app.
+
+`/etc/systemd/system/arytrano-cron-push-receipts.service` :
+```ini
+[Unit]
+Description=AryTrano — push receipt polling cron
+After=network-online.target
+
+[Service]
+Type=oneshot
+EnvironmentFile=/etc/arytrano/app.env
+ExecStart=/usr/bin/curl -fsS -H "Authorization: Bearer ${CRON_SECRET}" https://arytrano.mg/api/cron/push-receipts
+User=root
+```
+
+`/etc/systemd/system/arytrano-cron-push-receipts.timer` :
+```ini
+[Unit]
+Description=Run push-receipt polling every 30 minutes
+
+[Timer]
+# Receipts are available ~15-30 min after send and Expo keeps them
+# for 24h, so a 30 min cadence is the sweet spot — we recover every
+# receipt even if a single run is skipped.
+OnCalendar=*:0/30
+Persistent=true
+RandomizedDelaySec=60
+
+[Install]
+WantedBy=timers.target
+```
+
+Enable + verify :
+```bash
+sudo systemctl daemon-reload
+sudo systemctl enable --now arytrano-cron-push-receipts.timer
+sudo systemctl list-timers | grep arytrano-cron-push-receipts
+# Next run should show up within 30 min.
+
+# Manual test :
+curl -H "Authorization: Bearer $CRON_SECRET" https://arytrano.mg/api/cron/push-receipts
+# { "ok": true, "polled": N, "delivered": N, "deviceNotRegistered": N,
+#   "otherErrors": 0, "staleDeleted": 0 }
+```
+
+Watch the first 24h after enabling — `deviceNotRegistered` counts
+will spike once dev/staging tokens that pointed at uninstalled
+Expo Go sessions get swept. After the initial cleanup the steady-
+state count is typically <1% of `polled` (most users keep the app
+installed).
+
+For prod observability, the `otherErrors` counter is where
+configuration issues surface (e.g. `MismatchSenderId` if FCM creds
+get rotated without updating EAS). Sentry catches the cron-level
+failures but not the per-receipt ones — those only show in the
+Next.js server logs as `[push] receipt non-actionable error <code>`.
+Worth tailing for the first deploy.
+
+### 10b.6 Adding new crons
 
 Same pattern : `/api/cron/<name>/route.ts` checks the Bearer secret +
 runs an orchestrator, with a matching systemd `.service` + `.timer`
