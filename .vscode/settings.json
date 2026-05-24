@@ -1,0 +1,24 @@
+{
+  "//": "Project-wide VS Code settings — make TS editor experience match CLI",
+
+  "typescript.tsdk": "apps/web/node_modules/typescript/lib",
+  "typescript.enablePromptUseWorkspaceTsdk": true,
+
+  "//tsdk-note": "VS Code defaults to its bundled TS version which can differ from the project's. Pointing tsdk at apps/web/node_modules/typescript means the TS service uses the SAME version `npx tsc --noEmit` does — so editor squiggles match CLI errors.",
+
+  "//apps-mobile-note": "When you open a file under apps/mobile/, the TS Language Server walks up from the file to find the nearest tsconfig.json (apps/mobile/tsconfig.json) and uses ITS compilerOptions. Same for apps/web/ and packages/shared/. No per-folder config needed.",
+
+  "eslint.workingDirectories": [
+    { "directory": "apps/web", "changeProcessCWD": true },
+    { "directory": "apps/mobile", "changeProcessCWD": true },
+    { "directory": "packages/shared", "changeProcessCWD": true }
+  ],
+
+  "//eslint-note": "ESLint extension needs to know each app/package owns its own eslint config (or lack thereof). Without changeProcessCWD it would try to apply web's eslint.config.mjs to mobile files (impossible — mobile has no eslint config and uses different RN-flavored rules).",
+
+  "typescript.tsserver.exclude": ["**/node_modules/**", "**/.next/**", "**/.expo/**"],
+
+  "files.associations": {
+    "*.css": "tailwindcss"
+  }
+}
