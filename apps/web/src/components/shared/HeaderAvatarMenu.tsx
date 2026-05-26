@@ -37,16 +37,21 @@ export function HeaderAvatarMenu({
     <Menu.Root>
       <Menu.Trigger
         aria-label={t('header.avatarMenu.aria')}
-        className="group inline-flex h-10 items-center gap-2 rounded-md border border-border bg-background/80 pl-1 pr-3 text-sm font-medium text-foreground shadow-sm backdrop-blur transition hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring data-popup-open:shadow-md"
+        className="group inline-flex cursor-pointer items-center gap-2.5 rounded-md text-left text-white outline-none transition hover:opacity-90 focus-visible:ring-2 focus-visible:ring-white/50 focus-visible:ring-offset-2 focus-visible:ring-offset-primary"
       >
-        <Avatar className="h-8 w-8 ring-1 ring-border">
+        <Avatar className="h-10 w-10 ring-2 ring-white/30">
           {image && <AvatarImage src={image} alt={name ?? email} />}
-          <AvatarFallback className="text-xs font-semibold text-primary">
+          <AvatarFallback className="bg-white text-[13px] font-semibold text-primary">
             {initial}
           </AvatarFallback>
         </Avatar>
-        <span className="hidden sm:inline">
-          {firstName ?? email.split('@')[0]}
+        <span className="hidden min-w-0 flex-col leading-tight sm:flex">
+          <span className="truncate text-[13.5px] font-semibold text-white">
+            {name ?? firstName ?? email.split('@')[0]}
+          </span>
+          <span className="truncate text-[11.5px] font-medium text-white/65">
+            {email}
+          </span>
         </span>
         <svg
           width="14"
@@ -58,7 +63,7 @@ export function HeaderAvatarMenu({
           strokeLinecap="round"
           strokeLinejoin="round"
           aria-hidden="true"
-          className="text-muted-foreground transition group-data-popup-open:rotate-180"
+          className="ml-0.5 text-white/70 transition group-data-popup-open:rotate-180"
         >
           <polyline points="6 9 12 15 18 9" />
         </svg>

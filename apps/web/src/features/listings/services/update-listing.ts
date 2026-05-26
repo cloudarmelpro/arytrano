@@ -40,6 +40,7 @@ export async function updateListing(
     ...(input.description !== undefined && { description: input.description }),
     ...(input.type !== undefined && { type: input.type }),
     ...(input.priceMonthlyMGA !== undefined && { priceMonthlyMGA: input.priceMonthlyMGA }),
+    ...(input.cautionMonths !== undefined && { cautionMonths: input.cautionMonths }),
     ...(input.cityId !== undefined && { cityId: input.cityId }),
     ...(input.neighborhoodId !== undefined && { neighborhoodId: input.neighborhoodId }),
     ...(input.surfaceM2 !== undefined && { surfaceM2: input.surfaceM2 }),

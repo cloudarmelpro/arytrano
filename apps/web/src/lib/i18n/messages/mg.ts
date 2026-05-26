@@ -17,6 +17,114 @@ export const mg: Record<MessageKey, string> = {
   'common.home': 'Fandraisana',
   'common.perMonth': '/volana',
   'common.learnMore': 'Hahafantatra bebe kokoa',
+  'common.cancel': 'Hialaina',
+
+  // Lease (E-T26)
+  'lease.wizard.eyebrow': 'Bail',
+  'lease.wizard.title': 'Manao sonia bail amin\'ny mpanofa',
+  'lease.wizard.lead':
+    'Fenoy ny mombamomba ny bail ho an\'ny « {listing} ». Aorian\'ny fandoavanao, mandray fanasana ny mpanofa hanao sonia.',
+  'lease.wizard.step1.title': 'Ny mpanofa',
+  'lease.wizard.step1.help':
+    'Ataovy ny email-n\'ny kaonty AryTrano-n\'ny mpanofa — raha tsy mbola manana izy, asaivo mamorona kaonty ao amin\'ny arytrano.mg aloha.',
+  'lease.wizard.step2.title': 'Ny fepetra',
+  'lease.wizard.step2.help':
+    'Hofa isam-bolana, antoka, daty fanombohana ary faharetana. Ny antoka dia ho an\'ny tompon-trano — AryTrano tsy mitazona.',
+  'lease.wizard.step3.title': 'Famintinana sy fandoavana',
+  'lease.wizard.step3.help':
+    'Halefa any amin\'ny GoalPay ianao mba handoavana ny saran\'ny sonia AryTrano ho an\'ny « {listing} ».',
+  'lease.fields.tenantEmail': 'Email-n\'ny mpanofa',
+  'lease.fields.tenantEmail.help':
+    'Ny mpanofa dia tsy maintsy efa manana kaonty AryTrano amin\'io email io.',
+  'lease.fields.monthlyRent': 'Hofa isam-bolana (Ar)',
+  'lease.fields.monthlyRent.help':
+    'Vola alefan\'ny mpanofa anao isam-bolana. AryTrano tsy maka commission amin\'ny hofa.',
+  'lease.fields.caution': 'Antoka (Ar)',
+  'lease.fields.caution.help':
+    'Tatitra antoka. Ataovy 0 raha tsy maka antoka ianao. Misy commission 8% amin\'ity vola ity.',
+  'lease.fields.startDate': 'Daty fanombohana',
+  'lease.fields.durationMonths': 'Faharetana (volana)',
+  'lease.fields.durationMonths.help': 'Hatramin\'ny 60 volana (5 taona).',
+  'lease.caution.derived.none': 'Tsy misy antoka amin\'ity filazana ity',
+  'lease.caution.derived.months': '{count} volana × hofa',
+  'lease.fees.signature': 'Saran\'ny sonia AryTrano',
+  'lease.fees.commission': 'Commission antoka (8%)',
+  'lease.fees.total': 'Tontaliny aloa izao',
+  'lease.cta.payAndSign': 'Aloa ary manao sonia',
+  'lease.cta.microcopy':
+    'Halefa any amin\'ny GoalPay ianao. Ny bail dia mavitrika aorian\'ny faneken\'ny mpanofa.',
+
+  'lease.list.eyebrow': 'Ireo bail-ko',
+  'lease.list.title': 'Ny bail-nao ao amin\'ny AryTrano',
+  'lease.list.empty.title': 'Mbola tsy misy bail.',
+  'lease.list.empty.body':
+    'Rehefa manao sonia bail amin\'ny mpanofa ianao, hipoitra eto izy. Afaka manomboka bail vaovao avy amin\'ny pejy filazana voafoaka ianao.',
+  'lease.list.row.asOwner': 'Tompon-trano',
+  'lease.list.row.asTenant': 'Mpanofa',
+  'lease.list.row.owner': 'Tompon-trano: {name}',
+  'lease.list.row.tenant': 'Mpanofa: {name}',
+  'lease.list.row.perMonth': '/volana',
+
+  'lease.detail.eyebrow': 'Bail',
+  'lease.detail.field.monthlyRent': 'Hofa isam-bolana',
+  'lease.detail.field.caution': 'Antoka',
+  'lease.detail.field.startDate': 'Daty fanombohana',
+  'lease.detail.field.duration': 'Faharetana',
+  'lease.detail.field.durationValue': '{count} volana',
+  'lease.detail.parties.title': 'Ireo mpiantoka amin\'ny bail',
+  'lease.detail.parties.owner': 'Tompon-trano',
+  'lease.detail.parties.tenant': 'Mpanofa',
+  'lease.detail.signedAt': 'Vita sonia',
+
+  'lease.tenant.title': 'Asain\'ny tompon-trano hianao hanao sonia',
+  'lease.tenant.help':
+    'Jereo ny fepetra etsy ambony. Raha tsara daholo, ekeo ny bail mba ho lasa mavitrika.',
+  'lease.tenant.cta.accept': 'Ekena ary atao sonia',
+  'lease.tenant.cta.refuse': 'Lavina',
+  'lease.tenant.refuse.reason.label': 'Antony nandavana (tsy voatery)',
+  'lease.tenant.refuse.reason.placeholder':
+    'Oh: hafa amin\'ny fifanarahana am-bava',
+  'lease.tenant.refuse.confirm': 'Hamafiso ny fandavana',
+  'lease.owner.waiting':
+    'Tsy maintsy manaiky ny bail i {name} mba ho lasa mavitrika. Hampandrenesina anao isika rehefa vita sonia.',
+
+  'lease.status.DRAFT': 'Drafy',
+  'lease.status.PENDING_TENANT': 'Miandry ny mpanofa',
+  'lease.status.ACTIVE': 'Mavitrika',
+  'lease.status.REFUSED': 'Nolavina',
+  'lease.status.TERMINATED': 'Vita',
+  'lease.status.DISPUTED': 'Misy ady',
+
+  // Server Action + REST handler error messages
+  'lease.error.notAuthenticated': 'Tsy voamarina.',
+  'lease.error.ownerOnly':
+    'Ny tompon-trano ihany no mahay manao sonia bail.',
+  'lease.error.rateLimit':
+    'Be loatra ny fangatahana bail. Andramo afaka ora iray.',
+  'lease.error.invalidFields': 'Saisina diso.',
+  'lease.error.listingNotFound': 'Tsy hita ny filazana.',
+  'lease.error.listingNotOwned': 'Tsy ianao no tompon\'ity filazana ity.',
+  'lease.error.listingNotRentable':
+    'Tsy mety ho amin\'ny sonia ity filazana ity (toetra : {status}).',
+  'lease.error.tenantNotFound':
+    'Tsy misy kaonty AryTrano amin\'io email io. Asaivo mamorona kaonty ao amin\'ny arytrano.mg ny mpanofa, dia miverena eto.',
+  'lease.error.tenantIsOwner':
+    'Tsy afaka manao sonia bail amin\'ny tenanao ianao.',
+  'lease.error.existingLease':
+    'Efa misy bail mandeha amin\'ity filazana ity (toetra : {status}).',
+  'lease.error.leaseNotFound': 'Tsy hita ny bail.',
+  'lease.error.notTenant': 'Tsy ianao no mpanofa voatondro amin\'ity bail ity.',
+  'lease.error.cannotSign':
+    'Tsy azo ataony sonia intsony ity bail ity (toetra : {status}).',
+  'lease.error.cannotRefuse':
+    'Tsy azo lavina intsony ity bail ity (toetra : {status}).',
+  'lease.error.payloadTooLarge': 'Lehibe loatra ny data nalefa.',
+  'sidebar.myLeases': 'Ireo bail-ko',
+  'sidebar.section.tenant': 'Mpanofa',
+  'dashboard.editListing.section.lease.title': 'Manao sonia bail',
+  'dashboard.editListing.section.lease.lead':
+    'Nahita mpanofa ianao ? Ofisialy ny bail amin\'ny AryTrano mba hanombohana ny Contrat AryTrano (PDF, fanorenana toetra, fanelanelanana).',
+  'dashboard.editListing.section.lease.cta': 'Manomboka bail',
 
   // Legal pages (placeholder v0.5)
   'legal.eyebrow': 'Filazana ara-dalàna',
@@ -249,7 +357,28 @@ export const mg: Record<MessageKey, string> = {
   'filters.price.label': 'Tetibola isam-bolana (Ar)',
   'filters.price.separator': '→',
   'filters.price.hint': 'Enter mba hampihatra',
+  'filters.price.range.aria': 'Salan\'ny vidiny isam-bolana',
+  'filters.price.from': 'Manomboka amin\'ny',
+  'filters.price.to': 'Hatramin\'ny',
+  'filters.price.unit': 'Ar/volana',
+  'filters.price.max.plus': '+',
   'filters.reset': 'Avadika',
+  'filters.chips.aria': 'Sivana mavitrika',
+  'filters.chips.remove': 'Esory ity sivana ity',
+  'filters.chips.clearAll': 'Foanana daholo',
+  'annonces.search.aria': 'Hanaja ny fikarohana',
+  'annonces.search.city.label': 'Tanàna',
+  'annonces.search.city.all': 'Ny tanàna rehetra',
+  'annonces.search.quartier.label': 'Faritra',
+  'annonces.search.quartier.all': 'Ny faritra rehetra',
+  'annonces.search.type.label': 'Karazana',
+  'annonces.search.type.all': 'Ny karazana rehetra',
+  'annonces.search.cta': 'Hitady',
+  'annonces.mapPreview.cta': 'Jereo amin\'ny sarintany',
+  'annonces.mapPreview.backCta': 'Miverena amin\'ny lisitra',
+  'annonces.mapPreview.empty': 'Tsy misy doka azo asiana sarintany',
+  'annonces.mapPreview.count.one': 'Doka {count} misy toerana',
+  'annonces.mapPreview.count.other': 'Doka {count} misy toerana',
   'filters.sidebar.title': 'Sivana',
   'toolbar.search.label': 'Fitadiavana :',
   'toolbar.query.label': 'Fitadiavana amin\'ny teny fototra',
@@ -273,6 +402,7 @@ export const mg: Record<MessageKey, string> = {
 
   // Card
   'card.perMonth': '/ volana',
+  'card.caution': 'Antoka : {count} volana ({amount})',
   'card.noPhoto': 'Tsy misy sary',
 
   // Detail page
@@ -485,6 +615,10 @@ export const mg: Record<MessageKey, string> = {
   'landing.hero.microStats': 'Doka {count} · {verified} tompony voamarina',
 
   // Trust strip — title + sous-titre
+  'landing.trust.eyebrow': 'Nahoana AryTrano',
+  'landing.trust.heading': 'Hofan-trano, tsy misy fanahy ratsy.',
+  'landing.trust.lead':
+    'Tsy misy doka sandoka, tsy misy sarany miafina, tsy misy fandoavam-bola alohan\'ny fitsidihana. Ny tompony sy ny sary tsirairay dia jerena alohan\'ny famoahana.',
   'landing.trust.verified.title': 'Fanamarinana ataon\'olona',
   'landing.trust.verified.subtitle': 'Karatra + acte voasivana',
   'landing.trust.photos.title': 'Sary voaaro',
@@ -919,16 +1053,31 @@ export const mg: Record<MessageKey, string> = {
     'Hamoaha filazana ao anatin’ny minitra vitsivitsy, mahazo fangatahana mivantana amin’ny WhatsApp, mitazona ny fifandraisana mivantana amin’ny mpianatra. Tsy misy commission amin’ny hofa, na oviana na oviana.',
   'proprietaires.hero.ctaPrimary': 'Hamoaka filazana',
   'proprietaires.hero.ctaSecondary': 'Hijery ny tolotra',
+  'proprietaires.hero.ctaMicrocopy':
+    'Avoaka latsaky ny 5 minitra · Tsy mila karatra bankaty',
+  'proprietaires.hero.trustpill1': 'Fianarantsoa · Antananarivo',
+  'proprietaires.hero.trustpill2': 'Bilingue FR / MG',
+  'proprietaires.hero.trustpill3': 'Fanamarinana ao anatin\'ny 24-48h',
+  'proprietaires.hero.trustpill.activeOwners.one': 'tompon-trano mavitrika',
+  'proprietaires.hero.trustpill.activeOwners.other': 'tompon-trano mavitrika',
+  'proprietaires.hero.notif.title': 'Hafatra vaovao',
+  'proprietaires.hero.notif.body': 'Mialy R. · 2 minitra lasa',
   'proprietaires.hero.stat1.n': '0 Ar',
-  'proprietaires.hero.stat1.label': 'commission na sara-pisoratana anarana',
-  'proprietaires.hero.stat2.n': '24-48h',
-  'proprietaires.hero.stat2.label': 'fotoana fanamarinana ny filazana',
-  'proprietaires.hero.stat3.n': '1 isa-1',
-  'proprietaires.hero.stat3.label': 'voamarina an-tanana ny tompon-trano tsirairay',
+  'proprietaires.hero.stat1.label': 'Hamoahana ny filazanao',
+  'proprietaires.hero.stat2.n': '−78 %',
+  'proprietaires.hero.stat2.label': 'Tahirim-bola vs agence',
+  'proprietaires.hero.stat3.n': '100 %',
+  'proprietaires.hero.stat3.label': 'Ny hofa dia ho anao',
 
-  'proprietaires.preview.url': 'arytrano.mg/publier',
+  'proprietaires.preview.url': 'arytrano.mg/annonces/...',
   'proprietaires.preview.step': 'Dingana 3/4',
   'proprietaires.preview.title': 'Faritao ny trano',
+  'proprietaires.preview.verified': 'Voamarina',
+  'proprietaires.preview.live': 'Filazana mavitrika',
+  'proprietaires.preview.subtitle': 'Fianarantsoa · Faritry ny mpianatra',
+  'proprietaires.preview.stats.views': '128 fijery',
+  'proprietaires.preview.stats.contacts': '8 fifandraisana',
+  'proprietaires.preview.stats.posted': 'Navoaka 3 andro lasa',
   'proprietaires.preview.field.type': 'Karazana',
   'proprietaires.preview.field.typeV': 'Studio voakemba',
   'proprietaires.preview.field.quartier': 'Faritra',
@@ -989,25 +1138,83 @@ export const mg: Record<MessageKey, string> = {
   'proprietaires.verif.card.row.rating': 'Fitarainana',
   'proprietaires.verif.card.row.ratingV': 'Iray tsindry, amin’ny filazana tsirairay',
 
-  'proprietaires.pricing.eyebrow': 'Ny tolotra v0.5',
-  'proprietaires.pricing.title': 'Maimaim-poana hanombohana.',
+  'proprietaires.pricing.eyebrow': 'Vidiny',
+  'proprietaires.pricing.title': 'Mandoa ianao rehefa misy hofa.',
   'proprietaires.pricing.lead':
-    'Mandritra ny beta, ny famoahana filazana amin’ny AryTrano dia tsy mandoa na inona na inona. Tsy misy commission amin’ny hofa, tsy mila karatra bankaty.',
+    'Maimaim-poana ny famoahana filazana. AryTrano dia mandray vola ihany rehefa misy bail vita sonia amin’ny pejy — tsy mihatra amin’ny hofanao, tsy mihatra amin’ny mpianatra.',
   'proprietaires.pricing.disclaimer':
-    'Tsy misy commission amin’ny hofa — na izao na rahatrizay. Izay ampanirakin’ny mpianatra aminao no azonao.',
-  'proprietaires.pricing.standard.name': 'Beta v0.5',
-  'proprietaires.pricing.standard.price': '0 Ar',
-  'proprietaires.pricing.standard.sub': 'Mandritra ny beta',
-  'proprietaires.pricing.standard.f1': 'Famoronana kaonty + fanamarinana an-tanana',
-  'proprietaires.pricing.standard.f2': 'Filazana voadinika tsirairay amin’ny ekipanay',
-  'proprietaires.pricing.standard.f3': 'Fangatahana avy amin’ny mpianatra mivantana amin’ny WhatsApp',
-  'proprietaires.pricing.standard.f4': 'Sary tsy misy data manokana (fiarovana)',
-  'proprietaires.pricing.standard.f5': 'Fifandraisana voaaro amin’ny scraping',
-  'proprietaires.pricing.standard.cta': 'Hamorona kaontiko tompon-trano',
-  'proprietaires.pricing.roadmap.eyebrow': 'Roadmap',
-  'proprietaires.pricing.roadmap.body':
-    'Aoriana, ho avy ny safidy karama : marika « Voamarina » mafy kokoa sy fanitarana ny fahitana ny filazana. Foana azo safidiana, tsy mihatra amin’ny hofa, tsy mihatra amin’ny mpianatra.',
-  'proprietaires.pricing.priceSuffix': '',
+    'Tsy misy commission amin’ny hofa — na izao na rahatrizay. Ny vidim-pikarakarana success-based dia indray mandeha isaky ny bail vita sonia, ho takalon’ny Contrat AryTrano.',
+
+  // Card 1 — Publication (maimaim-poana)
+  'proprietaires.pricing.publication.eyebrow': 'Famoahana filazana',
+  'proprietaires.pricing.publication.price': '0 Ar',
+  'proprietaires.pricing.publication.sub':
+    'Mandritra ny fotoana rehetra. Tsy mila karatra bankaty.',
+  'proprietaires.pricing.publication.f1':
+    'Filazana tsy voafetra, fotoana tsy voafetra',
+  'proprietaires.pricing.publication.f2':
+    'Marika tompon-trano voamarina (KYC fototra)',
+  'proprietaires.pricing.publication.f3':
+    'Fifandraisana mivantana amin’ny WhatsApp amin’ny mpanofa',
+  'proprietaires.pricing.publication.f4':
+    'Sary voaaro (EXIF voasaringitra, fiarovana)',
+  'proprietaires.pricing.publication.f5':
+    'Antontan’isa fototra (fijery, fifandraisana)',
+  'proprietaires.pricing.publication.h3':
+    'Tsy mandoa na inona na inona ny famoahana filazana.',
+  'proprietaires.pricing.publication.cta': 'Hamorona kaonty maimaim-poana',
+
+  // Card 2 — Rehefa misy hofa (success-based)
+  'proprietaires.pricing.success.badge': 'Hanasaina',
+  'proprietaires.pricing.success.eyebrow': 'Rehefa misy hofa',
+  'proprietaires.pricing.success.price': '15 000 Ar',
+  'proprietaires.pricing.success.priceSuffix': '+ 8% antoka',
+  'proprietaires.pricing.success.sub': 'isaky ny bail vita sonia amin’ny AryTrano',
+  'proprietaires.pricing.success.f1':
+    'Bail PDF avoakan’ny rafitra (tsy mila notaire)',
+  'proprietaires.pricing.success.f2':
+    'Fanorenana toetra elektronika voafanana (sary + horonan-tsary)',
+  'proprietaires.pricing.success.f3':
+    'Tapakila isam-bolana avoakan’ny rafitra ho an’ny mpanofa',
+  'proprietaires.pricing.success.f4':
+    'Fanelanelanan’AryTrano raha misy ady momba ny antoka',
+  'proprietaires.pricing.success.f5':
+    'Marika « Tompon-trano azo itokisana » aorian’ny bail 3 tsy misy ady',
+  'proprietaires.pricing.success.example':
+    'Oh : antoka 500 000 Ar → 15 000 + 40 000 = 55 000 Ar',
+  'proprietaires.pricing.success.h3': 'Mandoa rehefa vita sonia ny bail.',
+  'proprietaires.pricing.success.cta': 'Manomboka izao',
+
+  // Dingana 4
+  'proprietaires.pricing.flow.eyebrow': 'Ahoana no fomba fiasany',
+  'proprietaires.pricing.flow.title':
+    'Manomboka amin’ny famoahana ka hatramin’ny bail vita sonia, dingana 4.',
+  'proprietaires.pricing.flow.step1':
+    'Mamoaka ny filazanao ianao — maimaim-poana, tsy voafetra, tsy mifamatotra.',
+  'proprietaires.pricing.flow.step2':
+    'Mandefa hafatra anao ny mpanofa amin’ny pejy.',
+  'proprietaires.pricing.flow.step3':
+    'Fitsidihana, fifanarahana am-bava — manao sonia amin’ny AryTrano.',
+  'proprietaires.pricing.flow.step4':
+    'Mandoa 15 000 Ar + 8% antoka — manomboka ny Contrat AryTrano.',
+
+  // Fampitahana amin’ny agence
+  'proprietaires.pricing.comparison.eyebrow': 'Mitaha amin’ny agence',
+  'proprietaires.pricing.comparison.title':
+    'Mora kokoa lavitra noho ny agence tantanan-trano mahazatra.',
+  'proprietaires.pricing.comparison.agency.label': 'Agence tantanan-trano',
+  'proprietaires.pricing.comparison.agency.amount': '125 000 – 250 000 Ar',
+  'proprietaires.pricing.comparison.agency.note':
+    '50 hatramin’ny 100% amin’ny iray volana hofa (amin’ny hofa 250 000 Ar/volana).',
+  'proprietaires.pricing.comparison.arytrano.label': 'AryTrano',
+  'proprietaires.pricing.comparison.arytrano.amount': '~55 000 Ar',
+  'proprietaires.pricing.comparison.arytrano.note':
+    '15 000 Ar + 8% antoka (amin’ny antoka 500 000 Ar) — anaty kontraty PDF + fanelanelanana.',
+  'proprietaires.pricing.comparison.savings':
+    'Tahirim-bola antonony : ~195 000 Ar isaky ny hofa (-78%).',
+  'proprietaires.pricing.comparison.savingsPercent': '−78',
+  'proprietaires.pricing.comparison.savingsLabel':
+    'Tahirim-bola antonony isaky ny hofa',
 
   'proprietaires.faq.eyebrow': 'Fanontaniana avy amin’ny tompon-trano',
   'proprietaires.faq.title': 'Valianay mivantana ianao.',
@@ -1023,12 +1230,13 @@ export const mg: Record<MessageKey, string> = {
   'proprietaires.faq.q4.q': 'Ahoana no fitantanako ny fangatahana ?',
   'proprietaires.faq.q4.a':
     'Tonga amin’ny WhatsApp-nao ny hafatra. Misy stats ihany koa amin’ny dashboard.',
-  'proprietaires.faq.q5.q': 'Inona no hitranga raha mahita mpanofa aho ?',
+  'proprietaires.faq.q5.q':
+    'Nahoana no mandoa 15 000 Ar + 8% antoka rehefa mamita sonia ?',
   'proprietaires.faq.q5.a':
-    'Hovaina ho « Voa-hofa » ao amin’ny dashboard. Tsy misy commission, tsy misy taratasy.',
-  'proprietaires.faq.q6.q': 'Raha tsy mandoa ny mpanofa ?',
+    'Izany no manomboka ny « Contrat AryTrano » : kontraty PDF avoakan’ny rafitra maimaim-poana (mihatsara ~30 000 Ar amin’ny notaire), fanorenana toetra elektronika voafanana, tapakila isam-bolana avoakan’ny rafitra, ary fanelanelanana raha misy ady momba ny antoka. Raha tsy misy izany vidim-pikarakarana izany, tsy afaka manolotra ireo zavatra ireo izahay. Mitaha amin’ny agence mahazatra (50-100% amin’ny iray volana hofa), efa ho 4× mora kokoa. Tsy misy commission amin’ny hofanao — 100% n’ny vola alefan’ny mpanofa isam-bolana no azonao.',
+  'proprietaires.faq.q6.q': 'Raha tsy mandoa hofa ny mpanofa ?',
   'proprietaires.faq.q6.a':
-    'AryTrano tsy mitantana ny fifandraisana bail/fandoavam-bola — anjaranao sy ny mpanofa izany. Raha misy olana, soraty aminay : afaka mihaino, manamarika ny mpanofa ho an’ny tompon-trano hoavy, ary manolotra torohevitra. Tsy misy serivisy ara-dalàna amin’ny v0.5.',
+    'AryTrano dia tsy manantitra ny fandoavan’ny mpanofa isam-bolana — anjaranao sy ny mpanofa izany. Raha misy tsy fandoavana, afaka manokatra ady ianao avy amin’ny dashboard : mijery ny tantaran’ny Contrat AryTrano (sonia, tapakila isam-bolana) izahay, manamarika ny mpanofa ho an’ny tompon-trano hoavy, ary mahay mitarika anao amin’ny fomba ara-dalàna eo an-toerana. Ny antoka dia mijanona ho ampihatra arakaraka ny fepetra ao amin’ny bail.',
 
   'proprietaires.finalCta.title': 'Vonona hamoaka ?',
   'proprietaires.finalCta.lead': '5 mn. Tsy misy saran’asa. Validation 24-48 ora.',
@@ -1131,6 +1339,7 @@ export const mg: Record<MessageKey, string> = {
   'quartiers.lead.empty':
     'Mbola eo am-piomanana ny faritra ho an\'ny mpianatra ao {city}. Miverena indray manaraka, na zaha ny tanàna hafa etsy ambony.',
   'quartiers.cityNav.aria': 'Hanova tanàna',
+  'quartiers.jump.eyebrow': 'Mitsidiha faritra',
   'quartiers.stats.quartiers.label': 'Faritra voarakitra',
   'quartiers.stats.listings.label': 'Filazana misy',
   'quartiers.block.dataCell.avgPrice': 'Salan’ny hofa',
@@ -1348,6 +1557,7 @@ export const mg: Record<MessageKey, string> = {
   'status.UNAVAILABLE': 'Tsy malalaka',
   'status.SUSPENDED': 'Naatoatoana',
   'status.DELETED': 'Voafafa',
+  'status.RENTED': 'Voa-hofa',
 
   // Account sidebar
   'sidebar.myAccount': 'Ny kaontiko',
@@ -1543,6 +1753,9 @@ export const mg: Record<MessageKey, string> = {
   'listingForm.type.label': 'Karazana trano',
   'listingForm.type.placeholder': 'Misafidiana',
   'listingForm.price.label': 'Vidiny isam-bolana (Ar)',
+  'listingForm.cautionMonths.label': 'Antoka takiana',
+  'listingForm.cautionMonths.help':
+    'Mahazatra eto Madagasikara : 2-3 volana. Ny antoka dia mitovy ho an\'ny hofa rehetra amin\'ity filazana ity.',
   'listingForm.city.label': 'Tanàna',
   'listingForm.city.placeholder': 'Misafidiana tanàna',
   'listingForm.neighborhood.label': 'Faritra',

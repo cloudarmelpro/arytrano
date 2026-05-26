@@ -14,6 +14,9 @@ export type TransactionalEventType =
   | 'contact-received'
   | 'cin-approved'
   | 'cin-rejected'
+  | 'lease-invite-tenant'
+  | 'lease-tenant-signed'
+  | 'lease-tenant-refused'
 
 /**
  * Wrap `sendEmail` with per-user-per-event rate limiting (T-034). Used by

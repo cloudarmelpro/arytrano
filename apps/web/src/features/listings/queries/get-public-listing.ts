@@ -26,6 +26,7 @@ export type PublicListingDetail = {
   description: string
   type: ListingType
   priceMonthlyMGA: number
+  cautionMonths: number
   surfaceM2: number | null
   bedrooms: number | null
   bathrooms: number | null
@@ -91,6 +92,7 @@ export async function getPublicListing(
       description: true,
       type: true,
       priceMonthlyMGA: true,
+      cautionMonths: true,
       surfaceM2: true,
       bedrooms: true,
       bathrooms: true,
@@ -150,6 +152,7 @@ export async function getPublicListing(
     description: row.description,
     type: row.type,
     priceMonthlyMGA: row.priceMonthlyMGA,
+    cautionMonths: row.cautionMonths,
     surfaceM2: row.surfaceM2,
     bedrooms: row.bedrooms,
     bathrooms: row.bathrooms,
@@ -204,6 +207,7 @@ export async function getPublicListingById(
       description: true,
       type: true,
       priceMonthlyMGA: true,
+      cautionMonths: true,
       surfaceM2: true,
       bedrooms: true,
       bathrooms: true,
@@ -258,6 +262,7 @@ export async function getPublicListingById(
     description: row.description,
     type: row.type,
     priceMonthlyMGA: row.priceMonthlyMGA,
+    cautionMonths: row.cautionMonths,
     surfaceM2: row.surfaceM2,
     bedrooms: row.bedrooms,
     bathrooms: row.bathrooms,

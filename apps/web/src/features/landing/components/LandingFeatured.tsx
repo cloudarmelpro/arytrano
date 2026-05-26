@@ -50,12 +50,6 @@ export function LandingFeatured({
               {t('landing.featured.lead')}
             </p>
           </div>
-          <Link
-            href="/annonces"
-            className="text-sm font-medium text-primary transition hover:text-primary/80"
-          >
-            {t('landing.featured.viewMap')}
-          </Link>
         </header>
 
         <div
@@ -78,9 +72,9 @@ export function LandingFeatured({
                 aria-selected={isActive}
                 aria-controls="featured-panel"
                 onClick={() => setTab(tabKey)}
-                className={`inline-flex h-9 cursor-pointer items-center rounded-full px-4 text-sm font-medium transition ${isActive
-                  ? 'bg-foreground text-background'
-                  : 'bg-muted text-foreground hover:bg-muted/80'
+                className={`inline-flex h-8 cursor-pointer items-center rounded-xl px-4 text-xs font-medium transition ${isActive
+                  ? 'bg-[oklch(0.16_0.025_281)] text-background'
+                  : 'text-foreground'
                   }`}
               >
                 {t(labelKey)}
@@ -99,7 +93,7 @@ export function LandingFeatured({
               {t('landing.featured.tab.empty')}
             </p>
           ) : (
-            <ul className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            <ul className="grid gap-6 sm:grid-cols-3 lg:grid-cols-4">
               {filtered.map((l) => (
                 <PublicListingCard
                   key={l.id}
@@ -111,15 +105,6 @@ export function LandingFeatured({
               ))}
             </ul>
           )}
-        </div>
-
-        <div className="flex justify-end">
-          <Link
-            href="/annonces"
-            className="inline-flex h-10 items-center rounded-xl bg-primary px-6 text-sm text-primary-foreground shadow-sm transition hover:opacity-95"
-          >
-            {t(viewAllKey, { count: totalPublished })}
-          </Link>
         </div>
       </div>
     </section>

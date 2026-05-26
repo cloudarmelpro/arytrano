@@ -27,7 +27,7 @@ export function QuartiersHero({
   const t = getT(locale)
   const isEmpty = quartiersCount === 0
   return (
-    <section className="bg-background pt-16 pb-10 lg:pt-20 lg:pb-12">
+    <section className="bg-background pt-10 pb-10">
       <div className="mx-auto grid max-w-[1280px] items-end gap-12 px-6 lg:grid-cols-[1.5fr_1fr] lg:px-10">
         <div>
           <span className="text-[12px] font-semibold uppercase tracking-[0.14em] text-primary">

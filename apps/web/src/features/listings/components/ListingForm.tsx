@@ -35,6 +35,16 @@ type FormValues = z.input<typeof createListingSchema>
 
 const LISTING_TYPES: ReadonlyArray<FormValues['type']> = ['ROOM', 'STUDIO', 'APARTMENT', 'HOUSE']
 
+// Caution policy options (E-T26) — Madagascar standard practice is 1-3
+// months of rent. 0 = no caution (some bailleurs). 4+ is rare and would
+// signal "we don't trust the platform" — keep the list short on purpose.
+const CAUTION_MONTHS_OPTIONS: ReadonlyArray<{ value: string; label: string }> = [
+  { value: '0', label: 'Pas de caution' },
+  { value: '1', label: '1 mois de loyer' },
+  { value: '2', label: '2 mois de loyer' },
+  { value: '3', label: '3 mois de loyer' },
+]
+
 export type ListingFormProps =
   | {
       mode: 'create'
@@ -66,6 +76,7 @@ export function ListingForm(props: ListingFormProps) {
             description: '',
             type: 'ROOM',
             priceMonthlyMGA: undefined as unknown as number,
+            cautionMonths: 2,
             cityId: '',
             neighborhoodId: '',
             surfaceM2: undefined,
@@ -90,6 +101,7 @@ export function ListingForm(props: ListingFormProps) {
       fd.append('description', values.description)
       fd.append('type', values.type)
       fd.append('priceMonthlyMGA', String(values.priceMonthlyMGA))
+      fd.append('cautionMonths', String(values.cautionMonths ?? 2))
       fd.append('cityId', values.cityId)
       fd.append('neighborhoodId', values.neighborhoodId)
       if (values.surfaceM2) fd.append('surfaceM2', String(values.surfaceM2))
@@ -214,6 +226,50 @@ export function ListingForm(props: ListingFormProps) {
                   aria-invalid={fieldState.invalid}
                 />
                 {fieldState.invalid && <FieldError id="listing-price-error" errors={[fieldState.error]} />}
+              </Field>
+            )}
+          />
+        </div>
+
+        <div className="grid gap-5 md:grid-cols-2">
+          <Controller
+            name="cautionMonths"
+            control={form.control}
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel htmlFor="listing-caution-months">
+                  {t('listingForm.cautionMonths.label')}
+                </FieldLabel>
+                <Select
+                  value={String(field.value ?? 2)}
+                  onValueChange={(v) =>
+                    field.onChange(v === null ? undefined : Number(v))
+                  }
+                  items={CAUTION_MONTHS_OPTIONS}
+                >
+                  <SelectTrigger
+                    id="listing-caution-months"
+                    className="h-10 w-full"
+                  >
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {CAUTION_MONTHS_OPTIONS.map((o) => (
+                      <SelectItem key={o.value} value={o.value}>
+                        {o.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FieldDescription>
+                  {t('listingForm.cautionMonths.help')}
+                </FieldDescription>
+                {fieldState.invalid && (
+                  <FieldError
+                    id="listing-caution-months-error"
+                    errors={[fieldState.error]}
+                  />
+                )}
               </Field>
             )}
           />

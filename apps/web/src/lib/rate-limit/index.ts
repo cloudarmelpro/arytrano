@@ -128,6 +128,16 @@ const listingStatsLimiter = makeLimiter('listing-stats', {
   window: '1 m',
 })
 
+// Initiate lease (E-T26) — 5/h/userId. Each call writes a Lease + Payment
+// to DB AND hits GoalPay outbound. A hijacked session or a buggy retry
+// loop on the wizard would burn through GoalPay quota + clutter the
+// dashboard. 5/h is generous for legitimate use (one lease per listing,
+// few re-tries on transient errors).
+const initiateLeaseLimiter = makeLimiter('lease-initiate', {
+  requests: 5,
+  window: '1 h',
+})
+
 // Push token register (E-T22 audit P1-1) — bearer-keyed, 3/min/user.
 // Bounds an attacker spamming token claims after sniffing one off a
 // lock-screen or screenshot. Legitimate flow registers once per
@@ -171,6 +181,9 @@ export const rateLimiters = {
 
   /** Create listing (DRAFT) — 10 / 1h / userId */
   createListing: (userId: string) => check(createListingLimiter, userId),
+
+  /** Initiate lease (E-T26) — 5/h/userId. Bearer-keyed via userId. */
+  initiateLease: (userId: string) => check(initiateLeaseLimiter, userId),
 
   /** Report submission — 10 / 1h / IP overall + 3 / 1h / (IP, listing) anti-pile-on. */
   report: async (ipHash: string, listingId: string): Promise<RateLimitResult> => {

@@ -91,6 +91,7 @@ export default async function EditListingPage({
             description: listing.description,
             type: listing.type,
             priceMonthlyMGA: Number(listing.priceMonthlyMGA),
+            cautionMonths: listing.cautionMonths,
             cityId: listing.cityId,
             neighborhoodId: listing.neighborhoodId,
             surfaceM2: listing.surfaceM2 ?? undefined,
@@ -114,6 +115,31 @@ export default async function EditListingPage({
         </header>
         <ListingActions listingId={listing.id} status={listing.status} layout="row" />
       </section>
+
+      {/* E-T26 — Sign-lease CTA, surfaced only when the listing is
+          PUBLISHED (only listing state where a tenant can be matched).
+          Always one click away from the editing surface; encourages
+          owners to formalize a match they've already discussed off-
+          platform. */}
+      {listing.status === 'PUBLISHED' ? (
+        <section className="border-t border-border pt-8">
+          <header className="mb-5 flex flex-col gap-1">
+            <h2 className="text-base font-semibold text-foreground">
+              {t('dashboard.editListing.section.lease.title')}
+            </h2>
+            <p className="text-sm text-muted-foreground">
+              {t('dashboard.editListing.section.lease.lead')}
+            </p>
+          </header>
+          <Link
+            href={`/dashboard/listings/${listing.id}/lease/new`}
+            className="inline-flex h-11 items-center gap-2 rounded-xl bg-primary px-5 text-[14px] font-semibold text-primary-foreground transition hover:bg-primary/90"
+          >
+            {t('dashboard.editListing.section.lease.cta')}
+            <span aria-hidden>→</span>
+          </Link>
+        </section>
+      ) : null}
 
       <section className="border-t border-border pt-8">
         <header className="mb-5 flex flex-col gap-1">

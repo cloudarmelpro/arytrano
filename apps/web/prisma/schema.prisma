@@ -83,6 +83,10 @@ model User {
   recoveryCodes   RecoveryCode[]
   contactEvents   ContactEvent[]
   pushReceipts    PushReceipt[]
+  // E-T26 — leases the user owns (as landlord) and leases where they
+  // are the tenant. Two separate relations via `@relation` name.
+  ownerLeases     Lease[]            @relation("OwnerLeases")
+  tenantLeases    Lease[]            @relation("TenantLeases")
 
   @@index([status, role])
 }
@@ -297,6 +301,12 @@ model Listing {
   // saves bytes, avoids Decimal/string interop bugs in JS, and matches
   // the Zod schema that already validates the input as a positive int.
   priceMonthlyMGA Int
+  // E-T26 — caution policy declared at listing time. Stored as a
+  // multiplier on `priceMonthlyMGA`. Standard Madagascar housing
+  // practice : 1-3 months. The actual caution amount (in Ariary) is
+  // derived at lease-signing time = priceMonthlyMGA × cautionMonths,
+  // never re-asked from the owner. Set to 0 if no caution is required.
+  cautionMonths   Int           @default(2)
   surfaceM2       Int?
   bedrooms        Int?
   bathrooms       Int?
@@ -352,6 +362,7 @@ model Listing {
   reviews       Review[]
   favorites     Favorite[]
   payments      Payment[]
+  leases        Lease[]
 
   // Slug is unique PER neighborhood (matches the URL path
   // /[city]/[neighborhood]/[slug]) so the same slug can recur across
@@ -411,6 +422,7 @@ enum ListingStatus {
   UNAVAILABLE
   SUSPENDED
   DELETED
+  RENTED       // E-T26 — bail actif sur la plateforme, masqué de la grille publique
 }
 
 model ListingPhoto {
@@ -600,25 +612,44 @@ model SavedSearch {
 // PaymentEvent is an immutable audit trail: INSERT only.
 // ============================================================
 
+// `idempotencyKey` is the merchant-side reference we generate (cuid)
+// and pass to GoalPay as their `reference` field. GoalPay echoes it
+// back in webhook payloads (`data.reference`), so we use it as the
+// idempotency anchor for webhook lookups.
+//
+// `providerTxId` stores GoalPay's `order_reference` (returned by the
+// init endpoint and echoed in webhooks as `data.order_reference`).
+// Nullable until the init response is recorded.
+//
+// `amountMGA` is `Int` per memory `project_mga_no_subunit` — Ariary
+// has no subunit, `iraimbilanja` is defunct. GoalPay's API works in
+// integer Ariary too.
 model Payment {
-  id             String           @id @default(cuid())
-  userId         String
-  listingId      String?
-  idempotencyKey String           @unique
-  provider       PaymentProviderName
-  providerTxId   String?
-  amountMGA      Decimal          @db.Decimal(12, 2)
-  purpose        PaymentPurpose
-  status         PaymentStatus    @default(INITIATED)
-  payerPhone     String?          // E.164
-  createdAt      DateTime         @default(now())
+  id                 String           @id @default(cuid())
+  userId             String
+  listingId          String?
+  idempotencyKey     String           @unique
+  provider           PaymentProviderName
+  providerTxId       String?          @unique
+  amountMGA          Int
+  purpose            PaymentPurpose
+  status             PaymentStatus    @default(INITIATED)
+  payerPhone         String?          // E.164
+  createdAt          DateTime         @default(now())
+  // Expiry of the GoalPay checkout link (createdAt + 10 min, per docs).
+  // Used by the E-T20 reconciliation cron to mark stuck INITIATED rows.
+  expiresAt          DateTime?
+  // Set on the first webhook arrival, regardless of status. Audit trail.
+  webhookReceivedAt  DateTime?
+  // Set when status transitions to CONFIRMED (a successful payment).
+  completedAt        DateTime?
 
   user    User           @relation(fields: [userId], references: [id], onDelete: Restrict)
   listing Listing?       @relation(fields: [listingId], references: [id], onDelete: SetNull)
   events  PaymentEvent[]
+  lease   Lease?
 
   @@index([userId, createdAt(sort: Desc)])
-  @@index([providerTxId])
   @@index([status, createdAt])
 }
 
@@ -627,17 +658,21 @@ enum PaymentProviderName {
 }
 
 enum PaymentPurpose {
-  PREMIUM_LISTING
-  FEATURED_PLACEMENT
-  // future: DEPOSIT, FIRST_MONTH (à valider légalement)
+  PREMIUM_LISTING       // legacy (superseded by LEASE_SUCCESS_FEE in v2 model)
+  FEATURED_PLACEMENT    // legacy (superseded)
+  LEASE_SUCCESS_FEE     // E-T26 — 15k Ar + 8% caution per signed lease
+  // future: DEPOSIT, FIRST_MONTH (à valider légalement — E-T18 frozen)
 }
 
 enum PaymentStatus {
-  INITIATED
-  PENDING
-  CONFIRMED
-  FAILED
-  REFUNDED
+  INITIATED        // POST to GoalPay sent, checkout_url returned, awaiting user
+  PENDING          // Reserved for future async states (not used by GoalPay v1)
+  CONFIRMED        // Webhook payment.success received + verified
+  FAILED           // Webhook payment.failed received
+  CANCELED         // Webhook payment.canceled received (user abandoned)
+  EXPIRED          // Webhook payment.expired received (10 min checkout TTL)
+  REFUND_PENDING   // Admin opened a manual refund (GoalPay has no refund API)
+  REFUNDED         // Manual refund confirmed via GoalPay support
 }
 
 model PaymentEvent {
@@ -650,6 +685,67 @@ model PaymentEvent {
   payment Payment @relation(fields: [paymentId], references: [id], onDelete: Cascade)
 
   @@index([paymentId, occurredAt])
+}
+
+// ============================================================
+// LEASES — E-T26 (success-based monetization)
+//
+// A Lease materializes the agreement between an owner and a tenant
+// for a specific listing. It is the contractual event that triggers
+// the AryTrano success fee (15 000 Ar + 8% of caution).
+//
+// State machine :
+//   DRAFT             — owner started the wizard, no payment yet
+//   PENDING_TENANT    — owner paid the signature fee; tenant must accept
+//   ACTIVE            — both parties signed; Listing.status flipped to RENTED
+//   REFUSED           — tenant refused → manual refund flow (REFUND_PENDING on Payment)
+//   TERMINATED        — lease ended naturally at the end of its term
+//   DISPUTED          — open dispute (E-T27 arbitrage)
+// ============================================================
+
+model Lease {
+  id                   String       @id @default(cuid())
+  listingId            String
+  ownerId              String
+  tenantId             String
+  monthlyRentMGA       Int
+  cautionMGA           Int          @default(0)
+  startDate            DateTime
+  durationMonths       Int
+  // Computed at creation from CONSTANTS:
+  //   signatureFeeMGA      = LEASE_SIGNATURE_FEE_MGA (default 15 000)
+  //   cautionCommissionMGA = floor(cautionMGA × CAUTION_COMMISSION_RATE)
+  // Stored on the row so historical leases reflect the fee structure
+  // at the time of signing (audit trail). Don't recompute from current
+  // constants — fees may change over time.
+  signatureFeeMGA      Int
+  cautionCommissionMGA Int
+  paymentId            String?      @unique
+  status               LeaseStatus  @default(DRAFT)
+  ownerSignedAt        DateTime?    // set when payment CONFIRMED
+  tenantSignedAt       DateTime?    // set when tenant accepts
+  terminatedAt         DateTime?
+  createdAt            DateTime     @default(now())
+  updatedAt            DateTime     @updatedAt
+
+  listing Listing  @relation(fields: [listingId], references: [id], onDelete: Restrict)
+  owner   User     @relation("OwnerLeases", fields: [ownerId], references: [id], onDelete: Restrict)
+  tenant  User     @relation("TenantLeases", fields: [tenantId], references: [id], onDelete: Restrict)
+  payment Payment? @relation(fields: [paymentId], references: [id])
+
+  @@index([listingId])
+  @@index([ownerId, status])
+  @@index([tenantId, status])
+  @@index([status, createdAt])
+}
+
+enum LeaseStatus {
+  DRAFT             // owner draft, no payment yet
+  PENDING_TENANT    // owner signed + paid; tenant must accept
+  ACTIVE            // both parties signed
+  REFUSED           // tenant refused → refund flow
+  TERMINATED        // lease ended (TERMINATED at end of durationMonths)
+  DISPUTED          // E-T27 arbitrage open
 }
 
 // Editorial testimonials shown on marketing surfaces (landing owner

@@ -335,10 +335,16 @@ export const authConfig = {
               : null
       if (!method) return
 
+      // `events.signIn` runs during the OAuth/magic-link callback request,
+      // so `headers()` returns the incoming request headers — same source
+      // we'd get from a Request object in the credentials path. This is
+      // what lets the connection-history UI display the browser/OS
+      // instead of "Appareil inconnu" for Google/Facebook sign-ins.
+      const h = await headers().catch(() => null)
       await recordLoginEvent({
         userId: user.id,
         authMethod: method,
-        // No request access from events.signIn — IP / UA will be null.
+        headers: h ?? undefined,
       }).catch((err) => console.error('[recordLoginEvent event]', err))
     },
   },

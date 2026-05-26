@@ -14,6 +14,8 @@ const CLASSES: Record<ListingStatus, string> = {
   UNAVAILABLE: 'bg-secondary/40 text-secondary-foreground',
   SUSPENDED: 'bg-destructive/10 text-destructive',
   DELETED: 'bg-destructive/10 text-destructive',
+  // E-T26 — bail signé sur la plateforme, annonce masquée du grid public
+  RENTED: 'bg-primary/10 text-primary',
 }
 
 export function ListingStatusBadge({ status }: { status: ListingStatus }) {

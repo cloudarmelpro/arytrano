@@ -50,9 +50,12 @@ export type MapListing = {
 export function ListingsMapClient({
   locale,
   listings,
+  aspectClassName,
 }: {
   locale: 'fr-MG' | 'mg'
   listings: MapListing[]
+  /** Override the default 16:8 aspect — used by the sidebar variant (square). */
+  aspectClassName?: string
 }) {
   const [openQuartier, setOpenQuartier] = useState<string | null>(null)
   // A11y — focus management on the slide-in panel. When a pin is
@@ -126,7 +129,11 @@ export function ListingsMapClient({
   }, [groups])
 
   return (
-    <div className="relative aspect-[16/8] w-full overflow-hidden rounded-2xl border border-border bg-muted max-[720px]:aspect-[4/3]">
+    <div
+      className={`relative w-full overflow-hidden rounded-xl border border-border bg-muted ${
+        aspectClassName ?? 'aspect-[16/8] max-[720px]:aspect-[4/3]'
+      }`}
+    >
       <PigeonMap
         key={`${Math.round(center[0] * 10)}:${Math.round(center[1] * 10)}`}
         defaultCenter={center}

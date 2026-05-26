@@ -2296,45 +2296,488 @@ expoPushToken String? @unique
 
 ## 💰 v2 — Monétisation
 
-Objectif : revenus durables. Stratégie : monétiser le côté propriétaire (subscription + boost), garder gratuit côté étudiant.
+> **Modèle décidé 2026-05-25** (après décente terrain Fianarantsoa) :
+> - **Locataire = gratuit à vie.** Aucun frais à aucun moment.
+> - **Propriétaire = compte unique** (pas de tiers Free/Pro). Toutes les fonctionnalités accessibles à tous.
+> - **AryTrano facture success-based** : `15 000 Ar fixe + 8% de la caution` (si caution existe) par **bail signé sur la plateforme**.
+> - **Livrable contre les 15k+8%** : le **« Contrat AryTrano »** — PDF juridique généré, état des lieux numérique horodaté (photos entrée+sortie), reçus mensuels auto, arbitrage AryTrano en cas de litige caution, badge « Propriétaire de confiance ».
+> - **Anti-disintermédiation** : pas de verrous techniques (impossibles à petite échelle) — la valeur du Contrat AryTrano (économie notaire + arbitrage + reputation) rend la signature on-platform rationnelle pour le proprio.
+>
+> **Subscriptions / boost à la carte / badge one-time sont supersedés** par ce modèle (cf E-T16/E-T17/E-T23 dépréciés ci-dessous). Ils pourront être réactivés en v2.5+ si la traction du success-based révèle un besoin de revenu récurrent.
+>
+> **Math cible (~6 mois)** : 50 baux/mois × 55k Ar (15k + 40k de 8% caution moyenne 500k) ≈ **2,75M Ar/mois (~$580 USD)**. Bootstrap-viable.
+>
+> **Stratégie reste** : monétiser côté propriétaire, gratuit côté étudiant.
+
+### Pricing communication (public)
+
+#### E-T25 · Pricing block public sur `/proprietaires`
+**En tant qu'**équipe AryTrano
+**Je veux** afficher le nouveau modèle de pricing success-based sur la page propriétaires publique
+**Afin de** valider le message auprès des proprios avant tout investissement infra paiement, et préparer le funnel d'acquisition
+
+**Implementation outline**
+1. Refondre la section Pricing actuelle de `ProprietairesPage.tsx` (qui affiche « Beta v0.5 — Gratuit ») avec le nouveau modèle
+2. Layout : 2 cards côte à côte
+   - **Card 1 — « Publication »** : 0 Ar, illimité, badge confiance, stats basiques, durée illimitée. CTA « Créer mon compte gratuit »
+   - **Card 2 — « Quand tu loues »** : 15 000 Ar + 8% caution. En échange : Contrat AryTrano PDF, état des lieux numérique, arbitrage caution, badge confiance renforcé, reçus mensuels auto. CTA « Voir un exemple de Contrat AryTrano »
+3. Section explicative en dessous : « Tu paies seulement quand tu loues, pas quand tu publies » + diagramme du flow (publier → contact → visite → signer sur AryTrano → frais déclenchés)
+4. FAQ entry à ajouter : « Pourquoi je paye 15k+8% à la signature ? » avec explication courte du Contrat AryTrano
+5. Comparatif vs agences classiques (qui prennent 50-100% d'un mois en frais d'agence) → mise en valeur du tarif AryTrano
+6. Pas de paiement réel, pas de backend — UI marketing only
+7. Aucun changement DB
+
+**Files créés**
+- (aucun — refonte de l'existant)
+
+**Files modifiés**
+- `apps/web/src/features/static-pages/proprietaires/ProprietairesPage.tsx` — section `<Pricing>`
+- `apps/web/src/features/static-pages/proprietaires/faq-items.ts` — ajouter FAQ pricing
+- `apps/web/src/lib/i18n/messages/fr-MG.ts` + `mg.ts` — nouvelles clés `proprietaires.pricing.*` :
+  - `.publication.title` / `.price` / `.features.*` / `.cta`
+  - `.success.title` / `.price` / `.priceSub` / `.features.*` / `.cta`
+  - `.comparison.title` / `.body` (vs agences)
+  - `.faq.whyPay.q` / `.faq.whyPay.a`
+  - `.flow.step1` / `.flow.step2` / `.flow.step3` / `.flow.step4`
+
+**API endpoints** : aucun
+
+**Dependencies** : aucun (pur UI)
+
+**Tests**
+- Visuel : 2 cards lisibles desktop + mobile
+- A11y : labels heading hierarchy, contraste WCAG AA sur les CTAs
+
+**Edge cases**
+- Pas applicable (rendu statique)
+
+**A11y**
+- Tarifs en font tabular-nums
+- Iconographie de support (pas de couleur seule comme signal)
+
+**Effort estimé** : ~3 heures
+
+**Priorité** : P0 (premier pas v2 — validation marché avant tout code backend) · **Statut** : 📋 todo
+
+---
+
+#### E-T26 · Lease signature on-platform + success-based fee
+**En tant que** propriétaire et locataire qui ont trouvé un accord
+**Je veux** signer numériquement le bail sur AryTrano et déclencher le paiement du frais de service
+**Afin de** formaliser la location avec preuve juridique + activer le Contrat AryTrano
+
+**Implementation outline**
+1. Flow user :
+   - Propriétaire sur sa page de gestion d'annonce → bouton « J'ai un locataire à signer »
+   - Wizard 3 étapes :
+     1. **Inviter locataire** : email ou téléphone du locataire (créer compte si pas existant)
+     2. **Conditions** : loyer mensuel, caution montant, date début, durée bail, charges incluses
+     3. **Récap + paiement** : affiche `15 000 Ar + 8% × {caution} = {total} Ar`, owner accepte CGV, redirect GoalPay
+   - Webhook success → status Lease `PENDING_TENANT_SIGNATURE`, email locataire « Le proprio a signé, à toi »
+   - Locataire reçoit email/SMS → log in → accepte / refuse les conditions → signe à son tour
+   - Si refus → Lease annulé, refund automatique au proprio
+   - Si signature locataire → status `ACTIVE` → Contrat AryTrano généré (cf E-T27)
+2. Pricing :
+   - `LEASE_SIGNATURE_FEE_MGA` = 15 000 (env var)
+   - `CAUTION_COMMISSION_RATE` = 0.08 (env var)
+   - Si caution = 0 → seulement 15 000 Ar
+   - Frais payé en UN paiement combiné au moment de la signature owner
+3. Model `Lease` :
+   - `id`, `listingId`, `ownerId`, `tenantId`, `monthlyRentMGA Int`, `cautionMGA Int @default(0)`
+   - `startDate`, `durationMonths Int`
+   - `signatureFeeMGA Int`, `cautionCommissionMGA Int`, `paymentId` FK
+   - `status` enum (DRAFT, PENDING_TENANT, ACTIVE, REFUSED, TERMINATED, DISPUTED)
+   - `ownerSignedAt`, `tenantSignedAt`, `terminatedAt?`
+   - Audit fields
+4. Side-effects à `Lease.status = ACTIVE` :
+   - `Listing.status` passe en `RENTED` (nouveau enum value, hide de la grille publique)
+   - Trigger event downstream pour E-T27 (génération PDF + setup état des lieux)
+5. Pas de listing supprimée tant que Lease ACTIVE (FK Restrict)
+6. Anti-disintermédiation soft : email mensuel au proprio « Ton annonce est toujours visible, est-elle louée ? » avec CTA `signer maintenant` ou `marquer louée hors plateforme` (option 2 = honnêteté, 0 Ar mais réputation note)
+7. Rate-limit : initiate lease 5/h/proprio (anti-spam)
+8. Le frais combiné `signatureFee + cautionCommission` est versé d'un coup à AryTrano via GoalPay → Pas d'escrow, AryTrano NE GARDE JAMAIS la caution elle-même
+
+**Files créés**
+- `prisma/migrations/<ts>_add_lease/migration.sql`
+- `apps/web/src/features/leases/schemas/lease-input.ts` (Zod)
+- `apps/web/src/features/leases/services/initiate-lease.ts`
+- `apps/web/src/features/leases/services/owner-sign-lease.ts`
+- `apps/web/src/features/leases/services/tenant-sign-lease.ts`
+- `apps/web/src/features/leases/services/refuse-lease.ts`
+- `apps/web/src/features/leases/services/calculate-fees.ts` (pure : `(rentMGA, cautionMGA) → { signature, commission, total }`)
+- `apps/web/src/features/leases/actions/initiate-lease.ts`
+- `apps/web/src/features/leases/actions/sign-lease.ts`
+- `apps/web/src/features/leases/queries/get-lease-by-id.ts`
+- `apps/web/src/features/leases/queries/list-user-leases.ts`
+- `apps/web/src/features/leases/components/LeaseWizard.tsx` (client, 3 steps)
+- `apps/web/src/features/leases/components/LeaseStep1Tenant.tsx`
+- `apps/web/src/features/leases/components/LeaseStep2Terms.tsx`
+- `apps/web/src/features/leases/components/LeaseStep3Recap.tsx`
+- `apps/web/src/features/leases/components/LeaseStatusBadge.tsx`
+- `apps/web/src/app/dashboard/listings/[id]/lease/new/page.tsx`
+- `apps/web/src/app/dashboard/leases/[id]/page.tsx`
+- `apps/web/src/app/dashboard/leases/page.tsx` (liste mes baux)
+- `apps/web/src/app/api/v1/leases/route.ts`
+- `apps/web/src/app/api/v1/leases/[id]/sign/route.ts`
+- `apps/web/src/features/leases/__tests__/calculate-fees.test.ts`
+- `apps/web/src/features/leases/__tests__/initiate-lease.test.ts`
+- `apps/web/src/lib/email/templates/lease-invite-tenant-{fr,mg}.ts`
+- `apps/web/src/lib/email/templates/lease-signed-{fr,mg}.ts`
+- `apps/web/src/lib/email/templates/lease-refused-{fr,mg}.ts`
+
+**Files modifiés**
+- `prisma/schema.prisma` : nouveau model `Lease` + enum `LeaseStatus` + ajout `RENTED` à `ListingStatus`
+- `apps/web/src/lib/env.ts` : `LEASE_SIGNATURE_FEE_MGA`, `CAUTION_COMMISSION_RATE`
+- `apps/web/src/lib/rate-limit/index.ts` : `initiateLease` (5/h/userId)
+- `apps/web/src/features/payments/schemas/payment-purpose.ts` : ajouter `LEASE_SUCCESS_FEE` à l'enum
+- `apps/web/prisma/schema.prisma` : `Payment.amountMGA` `Decimal(12,2)` → `Int` (corriger memory violation MGA no subunit)
+
+**DB schema**
+```prisma
+model Lease {
+  id                   String       @id @default(cuid())
+  listingId            String
+  ownerId              String
+  tenantId             String
+  monthlyRentMGA       Int
+  cautionMGA           Int          @default(0)
+  startDate            DateTime
+  durationMonths       Int
+  signatureFeeMGA      Int          // typiquement 15000
+  cautionCommissionMGA Int          // 8% × cautionMGA
+  paymentId            String?      @unique
+  status               LeaseStatus  @default(DRAFT)
+  ownerSignedAt        DateTime?
+  tenantSignedAt       DateTime?
+  terminatedAt         DateTime?
+  createdAt            DateTime     @default(now())
+  updatedAt            DateTime     @updatedAt
+
+  listing Listing  @relation(fields: [listingId], references: [id], onDelete: Restrict)
+  owner   User     @relation("OwnerLeases", fields: [ownerId], references: [id], onDelete: Restrict)
+  tenant  User     @relation("TenantLeases", fields: [tenantId], references: [id], onDelete: Restrict)
+  payment Payment? @relation(fields: [paymentId], references: [id])
+
+  @@index([listingId])
+  @@index([ownerId, status])
+  @@index([tenantId, status])
+  @@index([status, createdAt])
+}
+
+enum LeaseStatus {
+  DRAFT                 // proprio rédige, locataire pas encore invité
+  PENDING_TENANT        // proprio a signé+payé, attend locataire
+  ACTIVE                // les 2 ont signé
+  REFUSED               // locataire a refusé → refund proprio
+  TERMINATED            // bail terminé normalement (fin de durée)
+  DISPUTED              // litige en cours (arbitrage E-T27)
+}
+
+// Add to ListingStatus enum:
+enum ListingStatus {
+  // ... existants
+  RENTED  // bail actif, masqué de la grille publique
+}
+```
+
+**API endpoints**
+- `POST /api/v1/leases` — owner initiate (auth)
+- `GET /api/v1/leases/:id` — viewer must be owner or tenant
+- `POST /api/v1/leases/:id/sign` — tenant signs (auth, must be invited)
+- `POST /api/v1/leases/:id/refuse` — tenant refuses (triggers refund)
+
+**i18n keys nouvelles**
+- `lease.wizard.title` / `.step1.title` / `.step2.title` / `.step3.title`
+- `lease.fields.tenantEmail` / `.tenantPhone` / `.monthlyRent` / `.caution` / `.startDate` / `.durationMonths`
+- `lease.fees.signature` (« Frais de signature ») / `.fees.commission` (« Commission caution (8%) ») / `.fees.total`
+- `lease.cta.payAndSign` (« Signer et payer ») / `.cta.sendToTenant`
+- `lease.cgv.accept`
+- `lease.status.draft` / `.pendingTenant` / `.active` / `.refused` / `.terminated` / `.disputed`
+- `lease.tenant.title` (« Un propriétaire t'invite à signer un bail ») / `.tenant.cta.accept` / `.cta.refuse`
+- `lease.email.invite.subject` / `.body*`
+- `lease.email.signed.subject`
+- `lease.email.refused.subject`
+
+**Dependencies**
+- E-T15 (PaymentProvider) doit précéder
+- E-T27 (Contrat AryTrano) consomme `Lease.status = ACTIVE` mais peut être codé en parallèle
+
+**Tests**
+- `calculate-fees.test.ts` : pure function — caution=0 → seulement signature · caution=500k → 15k + 40k = 55k · arrondi cohérent
+- `initiate-lease.test.ts` : créer lease en DRAFT → payment initié · webhook success → PENDING_TENANT
+- `tenant-sign.test.ts` : tenant ACCEPT → status ACTIVE + listing RENTED · REFUSE → refund + status REFUSED
+- `idempotency.test.ts` : double-click signature owner → 1 seul payment row (idempotency key)
+- E2E sandbox : flow complet owner → tenant → ACTIVE
+
+**Edge cases**
+- Listing supprimée entre initiate et tenant sign → refund auto + email
+- Tenant n'a pas de compte → invitation via magic link (auth feature existante)
+- Tenant met > 7j à signer → reminder email J+3, J+7 ; au-delà → DRAFT auto-cancelled + refund proprio
+- Caution = 0 (proprio sans caution) → seulement 15k facturés, pas de 8%
+- Owner essaye d'initier 2 baux sur la même listing (double-booking) → rejeter le 2e si premier en PENDING_TENANT ou ACTIVE
+- Refund partiel non supporté v1 (tout ou rien)
+- Si webhook GoalPay timeout/manqué → cron de reconciliation (E-T20) repolling
+
+**A11y**
+- Wizard avec progress indicator + steps labelled
+- Validation inline (montants, dates) avec aria-describedby
+- Bouton « Payer et signer » disabled pendant transaction
+- Confirmation modal accessible
+
+**Security**
+- Frais calculés côté serveur (jamais accepter du client)
+- Anti rate-limit initiate
+- Owner ne peut signer que ses propres listings
+- Tenant ne peut signer que les baux où il est invité
+- Audit trail Payment.metadata { leaseId, computedFees }
+
+**Effort estimé** : ~2 semaines (après E-T15)
+
+**Priorité** : P0 (cœur du modèle revenu) · **Statut** : 📋 todo
+
+---
+
+#### E-T27 · « Contrat AryTrano » — livrable PDF + état des lieux + arbitrage
+**En tant que** propriétaire et locataire qui ont signé un bail
+**Je veux** recevoir un Contrat AryTrano (PDF juridique + état des lieux numérique horodaté + service d'arbitrage caution)
+**Afin de** matérialiser la valeur des 15k+8% payés et avoir une preuve formelle de l'accord
+
+**Implementation outline**
+1. **Génération PDF du contrat de bail** :
+   - À `Lease.status = ACTIVE` (les 2 ont signé), trigger background job
+   - Template HTML conformité juridique MG (à valider avec juriste local) avec : parties, logement, loyer, caution, durée, conditions standard
+   - Render via `puppeteer-core` headless ou `react-pdf` (eval lequel : puppeteer plus flexible mais plus lourd)
+   - Upload Cloudinary (private folder, signed URLs avec expiry 7j)
+   - Email aux 2 parties avec PDF attaché + lien permanent dans leur dashboard
+2. **État des lieux numérique** :
+   - Page `/dashboard/leases/[id]/inventory` accessible aux 2 parties
+   - Wizard upload : photos de chaque pièce (cuisine, chambre, salle de bain, etc.) — min 1 par room, max 10
+   - Vidéo optionnelle 30s max
+   - Notes texte par photo (« mur cuisine taché 3cm² »)
+   - À `Lease.status = ACTIVE` initial = état d'ENTRÉE obligatoire (force le proprio + locataire à co-uploader avant remise des clés)
+   - À `Lease.status = TERMINATED` = état de SORTIE obligatoire (déclenche la libération de la caution côté proprio)
+   - Toutes les photos `image_metadata: false, exif: false` (per memory cloudinary) + watermark horodatage + ID lease
+   - Storage : `InventoryItem` model (leaseId, phase ENTRY/EXIT, roomKey, photoUrls[], video?, notes, uploadedAt, uploadedBy)
+3. **Arbitrage caution (litige)** :
+   - À fin de bail, si désaccord → owner ou tenant clique « Ouvrir un litige » sur la page lease
+   - Form : raison du litige, montant en jeu, attachements (photos / messages)
+   - Status `Lease → DISPUTED`
+   - Notif admin (Slack + email)
+   - Page `/admin/disputes` : admin voit états entrée + sortie côte à côte, lit les claims, tranche
+   - Décision admin enregistrée + email aux 2 parties + status passe `TERMINATED` (ou refund partial enclenché si applicable)
+   - SLA cible : décision sous 7j
+   - Note : AryTrano ne reverse pas d'argent (pas escrow) ; l'arbitrage produit un verdict moral + reputation impact (badge « Propriétaire de confiance » peut être retiré si verdict défavorable répété)
+4. **Badge « Propriétaire de confiance »** :
+   - Auto-attribué après 3 baux ACTIVE sans litige
+   - Visible sur PublicListingCard + page détail
+   - Boost de visibilité +30% dans le tri par défaut (sort `newest` + multiplier sur position)
+   - Retiré après 2 litiges perdus (admin decision)
+5. **Reçus mensuels auto** :
+   - Cron mensuel `cron/generate-monthly-receipts.ts` 
+   - Pour chaque Lease ACTIVE, génère un reçu PDF mensuel (mois écoulé) → upload Cloudinary → email tenant + owner
+   - Reçu liste : mois concerné, loyer payé, lease ID, signatures originales référencées
+   - Status « payé » présumé (AryTrano ne vérifie pas le paiement réel — c'est juste un récapitulatif administratif que les 2 parties peuvent contester)
+
+**Files créés**
+- `apps/web/src/features/leases/services/generate-lease-pdf.ts`
+- `apps/web/src/features/leases/services/generate-monthly-receipt.ts`
+- `apps/web/src/features/leases/services/open-dispute.ts`
+- `apps/web/src/features/leases/services/resolve-dispute.ts` (admin)
+- `apps/web/src/features/inventory/services/upload-inventory-item.ts`
+- `apps/web/src/features/inventory/services/validate-inventory-phase.ts`
+- `apps/web/src/features/inventory/queries/get-inventory-by-lease.ts`
+- `apps/web/src/features/inventory/components/InventoryUploader.tsx`
+- `apps/web/src/features/inventory/components/InventoryViewer.tsx`
+- `apps/web/src/features/inventory/components/RoomCard.tsx`
+- `apps/web/src/features/disputes/components/DisputeForm.tsx`
+- `apps/web/src/features/disputes/components/DisputeResolveForm.tsx` (admin)
+- `apps/web/src/app/dashboard/leases/[id]/inventory/page.tsx`
+- `apps/web/src/app/dashboard/leases/[id]/dispute/page.tsx`
+- `apps/web/src/app/admin/disputes/page.tsx`
+- `apps/web/src/app/admin/disputes/[leaseId]/page.tsx`
+- `apps/web/src/app/api/cron/generate-monthly-receipts/route.ts`
+- `apps/web/src/lib/invoicing/lease-pdf-template.tsx` (or .html if puppeteer)
+- `apps/web/src/lib/invoicing/monthly-receipt-template.tsx`
+- `apps/web/src/lib/email/templates/contract-ready-{fr,mg}.ts`
+- `apps/web/src/lib/email/templates/dispute-opened-{fr,mg}.ts`
+- `apps/web/src/lib/email/templates/dispute-resolved-{fr,mg}.ts`
+- `apps/web/src/features/leases/__tests__/generate-lease-pdf.test.ts`
+- `apps/web/src/features/disputes/__tests__/resolve-dispute.test.ts`
+
+**Files modifiés**
+- `prisma/schema.prisma` : nouveau model `InventoryItem` + model `Dispute`
+- `apps/web/src/components/shared/AdminSidebar.tsx` : lien « Litiges »
+- `vercel.json` : cron monthly receipts (1er du mois 06:00 UTC)
+- `apps/web/src/lib/env.ts` : `CONTRACT_TEMPLATE_VERSION` (versionner les templates pour audit légal)
+
+**DB schema**
+```prisma
+model InventoryItem {
+  id          String          @id @default(cuid())
+  leaseId     String
+  phase       InventoryPhase  // ENTRY | EXIT
+  roomKey     String          // kitchen | bedroom | bathroom | living | other-X
+  photoUrls   String[]
+  videoUrl    String?
+  notes       String?         @db.Text
+  uploadedAt  DateTime        @default(now())
+  uploadedBy  String          // userId
+
+  lease Lease @relation(fields: [leaseId], references: [id], onDelete: Cascade)
+
+  @@index([leaseId, phase])
+}
+
+enum InventoryPhase {
+  ENTRY
+  EXIT
+}
+
+model Dispute {
+  id              String         @id @default(cuid())
+  leaseId         String         @unique
+  openedById      String
+  reason          String         @db.Text
+  claimedAmountMGA Int           @default(0)
+  attachmentUrls  String[]
+  status          DisputeStatus  @default(OPEN)
+  resolution      String?        @db.Text
+  resolvedById    String?
+  resolvedAt      DateTime?
+  createdAt       DateTime       @default(now())
+
+  lease    Lease @relation(fields: [leaseId], references: [id], onDelete: Cascade)
+  openedBy User  @relation("DisputesOpened", fields: [openedById], references: [id], onDelete: Restrict)
+  resolvedBy User? @relation("DisputesResolved", fields: [resolvedById], references: [id], onDelete: Restrict)
+
+  @@index([status, createdAt])
+}
+
+enum DisputeStatus {
+  OPEN
+  IN_REVIEW
+  RESOLVED_OWNER  // verdict en faveur du proprio
+  RESOLVED_TENANT // verdict en faveur du locataire
+  RESOLVED_SPLIT  // chacun a tort partiellement
+}
+```
+
+**API endpoints**
+- `POST /api/v1/leases/:id/inventory/:phase` — upload inventory item (auth, must be owner or tenant)
+- `GET /api/v1/leases/:id/inventory` — fetch all inventory items for lease
+- `POST /api/v1/leases/:id/dispute` — open dispute (auth)
+- `POST /api/v1/admin/disputes/:id/resolve` — admin only
+- `GET /api/v1/leases/:id/contract.pdf` — signed download URL (Cloudinary signed)
+- `POST /api/cron/generate-monthly-receipts` — Bearer secret
+
+**i18n keys nouvelles** (préfixe `lease.contract.*`, `inventory.*`, `dispute.*`)
+- Contract : `.contract.ready.title` / `.ready.body` / `.download.cta`
+- Inventory : `.inventory.title` / `.phase.entry` / `.phase.exit` / `.room.kitchen` / `.bedroom` / `.bathroom` / `.living` / `.upload.cta` / `.requirements`
+- Dispute : `.dispute.open.cta` / `.open.form.reason` / `.amount` / `.status.open` / `.inReview` / `.resolved.*`
+- Admin : `.admin.disputes.title` / `.tableHeaders.*` / `.resolve.verdict.*`
+- Emails : `.email.contractReady.*` / `.dispute.opened.*` / `.dispute.resolved.*`
+
+**Dependencies**
+- E-T26 (Lease model + ACTIVE status) doit précéder
+- Cloudinary EXIF strip per memory `feedback_exif_strip_explicit`
+- E-T15 NOT directly needed (cet ticket ne touche pas le paiement)
+- Validation légale du template de bail MG (juriste à briefer) avant production
+
+**Tests**
+- `generate-lease-pdf.test.ts` : input Lease ACTIVE → PDF généré valide (parse back to verify content)
+- `resolve-dispute.test.ts` : admin verdict RESOLVED_TENANT → email envoyé, status updated, badge proprio impacté
+- `validate-inventory-phase.test.ts` : ENTRY incomplet (room manquante) → reject
+- E2E : créer Lease → upload entry inventory → terminate → upload exit → ouvrir dispute → admin resolve
+
+**Edge cases**
+- Lease ACTIVE > N mois sans état des lieux ENTRY → reminder J+7, blocage status après J+14 (statut suspendu)
+- Photo upload échoue (réseau MG) → retry client + queue offline (PWA)
+- Dispute ouverte 6 mois après terminate → accepter mais flagger « hors délai standard »
+- Admin tente de résoudre dispute pas in-review → erreur 409
+- PDF generation timeout (puppeteer slow) → retry async, email envoyé après
+- Cloudinary down → fallback en attente, retry cron
+
+**A11y**
+- Wizard inventory accessible (steps + drag-drop input file avec keyboard fallback)
+- PDF downloadable avec `aria-label` descriptif
+- Dispute form labels explicits
+- Admin resolve form avec radio group (verdict) + textarea (raisonnement)
+
+**Security**
+- Photos `image_metadata: false, exif: false` Cloudinary (anti-leak GPS / device)
+- Signed URLs avec TTL 7j pour les PDFs (anti-link-sharing public)
+- Admin dispute resolution = ADMIN role only + audit log
+- Upload size limit 5MB par photo, 20MB par vidéo
+- Rate-limit upload inventory 20/h/userId
+
+**Legal/Compliance**
+- Template de bail à faire valider par juriste MG (conformité Code du Bail Madagascar)
+- CGU section « Service d'arbitrage » à rédiger (limites de responsabilité AryTrano + caractère non-contraignant juridiquement du verdict — c'est une médiation, pas une décision judiciaire)
+- Reçus mensuels : usage administratif uniquement, pas une preuve de paiement légale
+
+**Effort estimé** : ~3 semaines (1 sem PDF + état des lieux, 1 sem dispute admin, 1 sem reçus + tests + validation légale template)
+
+**Priorité** : P0 (livrable contre les 15k+8% — sans ça le modèle est vide) · **Statut** : 📋 todo
+
+---
 
 ### Paiement infra
 
-#### E-T15 · Intégration GoalPay (PaymentProvider abstraction)
+#### E-T15 · Intégration GoalPay (PaymentProvider abstraction) — REWRITTEN 2026-05-25 with actual GoalPay API
 **En tant qu'**équipe AryTrano
 **Je veux** une intégration au provider Mobile Money local (GoalPay) qui peut être swappée si on change d'avis (Voaray, Efaina, Papi, Orange Money direct)
 **Afin de** ne pas être verrouillé à un seul provider
 
-**Implementation outline**
+> **⚠️ Surface API GoalPay réelle (vérifiée 2026-05-25 sur https://goalpay.pro/docs/api/integrations)** :
+> - **UN seul endpoint** : `POST https://api.goalpay.pro/api/payement/service` (initiation)
+> - **PAS d'API refund** — process manuel via support GoalPay (`goalpay.mg@gmail.com` / WhatsApp `+261 34 23 041 65`)
+> - **PAS d'API lookup/status check** — notre seul signal = le webhook
+> - **PAS de sandbox documenté** — tester en prod avec montants minimaux (100 Ar)
+> - **Webhook events** : `payment.success` / `payment.failed` / `payment.canceled` / `payment.expired`
+> - **Signature webhook** : header `x-gpay-signature`, HMAC-SHA256 du raw body, hex digest
+> - **Auth init** : token `TGP_*` dans le BODY (pas un header), JAMAIS exposé côté client
+> - **Currency** : `"Ar"` only, montants en Int Ariary (matche memory `project_mga_no_subunit`)
+> - **Expiry checkout** : 10 minutes (au-delà → event `payment.expired`)
+
+**Implementation outline (révisée)**
 1. Définir `PaymentProvider` interface dans `lib/payments/types.ts` :
-   - `initiatePayment(input: { amountMGA: number, eventType, metadata }): Promise<{ providerTxId, paymentUrl }>`
-   - `verifyWebhook(headers, rawBody): { valid: boolean, parsed?: { providerTxId, status, signature } }`
-   - `refund(providerTxId, amountMGA?): Promise<{ ok, refundId }>`
-   - `lookup(providerTxId): Promise<{ status, amountMGA, channel }>`
+   - `initiatePayment(input)` → returns `{ providerTxId (= GoalPay order_reference), checkoutUrl, expiresInMinutes }`
+   - `verifyWebhookSignature(rawBody, signatureHeader): boolean` (timing-safe)
+   - `parseWebhook(rawBody)` → typed event payload
+   - **Pas de** `refund()` ni `lookup()` (non supportés par GoalPay)
 2. Implémenter `features/payments/goalpay/` :
-   - `client.ts` (HTTP adapter avec retries + timeout 30s)
-   - `signature.ts` (HMAC verification per GoalPay docs)
+   - `client.ts` (fetch wrapper avec timeout 30s, no retry — GoalPay init est idempotent côté merchant via notre `reference`)
+   - `signature.ts` (HMAC-SHA256 verify avec `crypto.timingSafeEqual`)
    - `provider.ts` (implements PaymentProvider)
 3. Service layer `features/payments/services/` :
-   - `initiate-badge-payment.ts`, `initiate-boost-payment.ts`, `initiate-subscription-payment.ts`
-   - `record-webhook-event.ts` (idempotent, replay-safe via UNIQUE constraint on providerTxId)
-   - `refund-payment.ts`
+   - `initiate-payment.ts` (générique, prend `purpose` + `amountMGA` + métadonnées)
+   - `record-webhook-event.ts` (idempotent state machine via UNIQUE `idempotencyKey` ET status guards)
 4. Route webhook `/api/webhooks/goalpay/route.ts` :
-   - Verify signature (reject 401 si invalid)
-   - Idempotency : check si providerTxId déjà traité → 200 noop
-   - Update Payment row + trigger downstream service (verify listing badge, activate boost, etc.)
-   - Return 200 OK rapidement (< 5s) sinon GoalPay retry
-5. Model `Payment` :
-   - `provider` enum (GOALPAY, VOARAY, ...)
-   - `providerTxId UNIQUE`
-   - `amountMGA Int` (per memory MGA no subunit)
-   - `status` enum (INITIATED, PROCESSING, SUCCESS, FAILED, REFUNDED, REFUNDING)
-   - `eventType` enum (BADGE_VERIFIED, BOOST, SUBSCRIPTION)
-   - `userId`, `listingId?`, `metadata Json`
-   - Audit fields createdAt, updatedAt, completedAt
+   - 1) Verify signature (reject 401 si invalid)
+   - 2) Parse body via Zod (reject 400 si schema invalid)
+   - 3) Look up Payment by `data.reference` (= our `idempotencyKey`)
+   - 4) Idempotency : si status déjà CONFIRMED/FAILED/CANCELED/EXPIRED → 200 noop
+   - 5) Update Payment.status + audit PaymentEvent row + trigger downstream (E-T26 callback)
+   - 6) Return 200 OK rapidement (< 5s) sinon GoalPay retry
+5. Model `Payment` (révisé — déjà partiellement en place) :
+   - `idempotencyKey` UNIQUE (= notre `reference` envoyé à GoalPay et reçu en retour dans webhook)
+   - `providerTxId` (= GoalPay `order_reference`, nullable jusqu'au retour de l'init)
+   - `amountMGA Int` ← **fix Decimal→Int** per memory `project_mga_no_subunit`
+   - `status` enum (INITIATED, PENDING, CONFIRMED, FAILED, REFUND_PENDING, REFUNDED, EXPIRED, CANCELED)
+   - `purpose` enum (PREMIUM_LISTING, FEATURED_PLACEMENT déjà ; ajouter LEASE_SUCCESS_FEE pour E-T26)
+   - `completedAt DateTime?` (set au webhook success)
+   - `expiresAt DateTime?` (createdAt + 10 min, info pour cron de reconciliation E-T20)
+   - `webhookReceivedAt DateTime?` (audit)
 6. Rate-limit `initiatePayment` 10/h/userId pour anti-spam
-7. Tests : webhook replay attack rejected (idempotency works), signature tampering rejected, refund flow, partial refund (v1 full only)
-8. Documentation runbook `public/docs/runbook-payments.md` : que faire si GoalPay down, comment refund manuellement, escalation
+7. Tests :
+   - `signature.test.ts` : HMAC valide passe, tampering body → invalid, missing header → invalid
+   - `record-webhook-event.test.ts` : premier appel insert audit + update status, 2e appel même reference → noop, status transitions guard
+   - `parse-webhook.test.ts` : Zod schema rejette payload malformé
+8. Documentation runbook `public/docs/runbook-payments.md` :
+   - Que faire si GoalPay down (queuing? circuit breaker?)
+   - **Process refund manuel** : contacter GoalPay support + admin update DB status to REFUNDED
+   - Comment tester en prod (100 Ar minimum)
+   - Escalation contacts
 
 **Files créés**
 - `src/lib/payments/types.ts`
@@ -2519,10 +2962,12 @@ model ReconciliationRun {
 
 ### Offres payantes propriétaire
 
-#### E-T23 · Badge « Vérifié » payant (10k Ar one-time)
-**En tant que** propriétaire
-**Je veux** payer 10 000 Ar pour obtenir un badge « Vérifié renforcé » qui boost ma visibilité et signale aux étudiants que j'ai validé une identité étendue
-**Afin de** me démarquer et accélérer mes locations
+#### E-T23 · ~~Badge « Vérifié » payant (10k Ar one-time)~~ — SUPERSEDED
+**Statut** : ⚠️ **Superseded par E-T26+E-T27 (2026-05-25)**. Le modèle success-based remplace le badge one-time : le badge « Propriétaire de confiance » est désormais **gratuit + automatique** après 3 baux signés sans litige (cf E-T27). Plus de paiement séparé pour la vérification d'identité (qui reste une étape gratuite côté KYC standard). Conserver ce ticket pour traçabilité historique.
+
+~~**En tant que** propriétaire~~
+~~**Je veux** payer 10 000 Ar pour obtenir un badge « Vérifié renforcé » qui boost ma visibilité et signale aux étudiants que j'ai validé une identité étendue~~
+~~**Afin de** me démarquer et accélérer mes locations~~
 
 **Implementation outline**
 1. Flow utilisateur :
@@ -2622,10 +3067,12 @@ enum VerificationStatus {
 
 ---
 
-#### E-T16 · Annonces premium (boost top of list)
-**En tant que** propriétaire
-**Je veux** payer pour mettre mon annonce en haut des résultats de recherche pendant N jours
-**Afin de** maximiser ma visibilité pendant la haute saison étudiante
+#### E-T16 · ~~Annonces premium (boost top of list)~~ — SUPERSEDED
+**Statut** : ⚠️ **Superseded par E-T26+E-T27 (2026-05-25)**. Le modèle success-based remplace le boost à la carte : le boost de visibilité +30% est désormais **gratuit + automatique** pour les propriétaires titulaires du badge « Propriétaire de confiance » (3 baux ACTIVE sans litige, cf E-T27). Garder cet ancien ticket pour traçabilité — pourra être réactivé en v2.5+ si on identifie un besoin de boost ponctuel additionnel.
+
+~~**En tant que** propriétaire~~
+~~**Je veux** payer pour mettre mon annonce en haut des résultats de recherche pendant N jours~~
+~~**Afin de** maximiser ma visibilité pendant la haute saison étudiante~~
 
 **Implementation outline**
 1. Pricing tiers configurables env :
@@ -2726,10 +3173,12 @@ model ListingBoost {
 
 ---
 
-#### E-T17 · Subscription propriétaire actif (10k Ar/mois/annonce)
-**En tant que** propriétaire avec plusieurs annonces actives
-**Je veux** payer un forfait mensuel par annonce pour rester publié
-**Afin de** professionnaliser ma gestion locative
+#### E-T17 · ~~Subscription propriétaire actif (10k Ar/mois/annonce)~~ — SUPERSEDED
+**Statut** : ⚠️ **Superseded par E-T26+E-T27 (2026-05-25)**. Décision après décente terrain : pas d'abonnement récurrent en v2 (friction billing trop élevée pour proprios MG). Le modèle success-based (`15 000 Ar + 8% caution / bail signé`) remplace la subscription. Réactivable en v2.5+ si le success-based révèle un besoin de MRR additionnel (ex: pros volumineux à qui on offrirait un plan « 0% commission + frais fixe »). Garder ce ticket pour traçabilité.
+
+~~**En tant que** propriétaire avec plusieurs annonces actives~~
+~~**Je veux** payer un forfait mensuel par annonce pour rester publié~~
+~~**Afin de** professionnaliser ma gestion locative~~
 
 **Implementation outline**
 1. Pricing : 10 000 Ar/mois/annonce active · prix configurable env
@@ -2937,7 +3386,7 @@ enum SubscriptionStatus {
 
 **Dependencies**
 - E-T15 (Payment model)
-- E-T17 (Subscription model) — pour MRR
+- E-T26 (Lease model — pour calcul revenu success-based ; remplace E-T17 deprecated)
 - T-022 (Admin) ✅
 
 **Tests**

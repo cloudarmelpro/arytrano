@@ -11,6 +11,117 @@ export const frMG = {
   'common.home': 'Accueil',
   'common.perMonth': '/mois',
   'common.learnMore': 'En savoir plus',
+  'common.cancel': 'Annuler',
+
+  // Lease wizard + detail (E-T26)
+  'lease.wizard.eyebrow': 'Bail',
+  'lease.wizard.title': 'Signer un bail avec ton locataire',
+  'lease.wizard.lead':
+    'Renseigne les infos du bail pour « {listing} ». Après ton paiement, ton locataire reçoit une invitation pour signer à son tour.',
+  'lease.wizard.step1.title': 'Le locataire',
+  'lease.wizard.step1.help':
+    'Indique l’email du compte AryTrano du locataire — s’il n’en a pas, demande-lui de s’inscrire d’abord sur arytrano.mg.',
+  'lease.wizard.step2.title': 'Les conditions',
+  'lease.wizard.step2.help':
+    'Loyer mensuel, caution, date de début et durée. La caution reste due au propriétaire — AryTrano ne la garde pas.',
+  'lease.wizard.step3.title': 'Récapitulatif et paiement',
+  'lease.wizard.step3.help':
+    'Tu vas être redirigé vers GoalPay pour payer les frais de signature AryTrano de l’annonce « {listing} ».',
+  'lease.fields.tenantEmail': 'Email du locataire',
+  'lease.fields.tenantEmail.help':
+    'Le locataire doit déjà avoir un compte AryTrano avec cet email.',
+  'lease.fields.monthlyRent': 'Loyer mensuel (Ar)',
+  'lease.fields.monthlyRent.help':
+    'Montant que le locataire te paie chaque mois. AryTrano ne prend aucune commission sur le loyer.',
+  'lease.fields.caution': 'Caution (Ar)',
+  'lease.fields.caution.help':
+    'Montant de la caution. Mets 0 si tu n’en prends pas. Une commission de 8% s’applique sur ce montant.',
+  'lease.fields.startDate': 'Date de début',
+  'lease.fields.durationMonths': 'Durée (mois)',
+  'lease.fields.durationMonths.help': 'Maximum 60 mois (5 ans).',
+  'lease.caution.derived.none': 'Aucune caution sur cette annonce',
+  'lease.caution.derived.months': '{count} mois × loyer',
+  'lease.fees.signature': 'Frais de signature AryTrano',
+  'lease.fees.commission': 'Commission caution (8%)',
+  'lease.fees.total': 'Total à payer maintenant',
+  'lease.cta.payAndSign': 'Payer et signer',
+  'lease.cta.microcopy':
+    'Tu seras redirigé vers GoalPay. Le bail s’active après l’acceptation du locataire.',
+
+  // Lease list (/dashboard/leases)
+  'lease.list.eyebrow': 'Mes baux',
+  'lease.list.title': 'Tes baux sur AryTrano',
+  'lease.list.empty.title': 'Aucun bail pour l’instant.',
+  'lease.list.empty.body':
+    'Quand tu signes un bail avec un locataire, il apparaît ici. Tu peux démarrer un nouveau bail depuis la page d’une annonce publiée.',
+  'lease.list.row.asOwner': 'Propriétaire',
+  'lease.list.row.asTenant': 'Locataire',
+  'lease.list.row.owner': 'Propriétaire : {name}',
+  'lease.list.row.tenant': 'Locataire : {name}',
+  'lease.list.row.perMonth': '/mois',
+
+  // Lease detail (/dashboard/leases/[id])
+  'lease.detail.eyebrow': 'Bail',
+  'lease.detail.field.monthlyRent': 'Loyer mensuel',
+  'lease.detail.field.caution': 'Caution',
+  'lease.detail.field.startDate': 'Date de début',
+  'lease.detail.field.duration': 'Durée',
+  'lease.detail.field.durationValue': '{count} mois',
+  'lease.detail.parties.title': 'Parties au bail',
+  'lease.detail.parties.owner': 'Propriétaire',
+  'lease.detail.parties.tenant': 'Locataire',
+  'lease.detail.signedAt': 'A signé',
+
+  // Tenant action area on the detail page
+  'lease.tenant.title': 'Un propriétaire t’invite à signer',
+  'lease.tenant.help':
+    'Vérifie les conditions ci-dessus. Si tout est correct, accepte le bail pour le rendre actif.',
+  'lease.tenant.cta.accept': 'Accepter et signer',
+  'lease.tenant.cta.refuse': 'Refuser',
+  'lease.tenant.refuse.reason.label': 'Raison du refus (optionnel)',
+  'lease.tenant.refuse.reason.placeholder':
+    'Ex : conditions différentes de l’accord verbal',
+  'lease.tenant.refuse.confirm': 'Confirmer le refus',
+  'lease.owner.waiting':
+    '{name} doit accepter ce bail pour qu’il devienne actif. Tu seras notifié à la signature.',
+
+  // Lease status badge labels
+  'lease.status.DRAFT': 'Brouillon',
+  'lease.status.PENDING_TENANT': 'En attente locataire',
+  'lease.status.ACTIVE': 'Actif',
+  'lease.status.REFUSED': 'Refusé',
+  'lease.status.TERMINATED': 'Terminé',
+  'lease.status.DISPUTED': 'Litige',
+
+  // Server Action + REST handler error messages (A6 audit fix)
+  'lease.error.notAuthenticated': 'Non authentifié.',
+  'lease.error.ownerOnly': 'Seuls les propriétaires peuvent signer un bail.',
+  'lease.error.rateLimit':
+    'Trop de demandes de bail. Réessaie dans une heure.',
+  'lease.error.invalidFields': 'Champs invalides.',
+  'lease.error.listingNotFound': 'Annonce introuvable.',
+  'lease.error.listingNotOwned':
+    'Tu n’es pas le propriétaire de cette annonce.',
+  'lease.error.listingNotRentable':
+    'Cette annonce n’est pas disponible à la signature (statut : {status}).',
+  'lease.error.tenantNotFound':
+    'Aucun compte AryTrano avec cet email. Demande à ton locataire de créer un compte sur arytrano.mg, puis reviens ici.',
+  'lease.error.tenantIsOwner': 'Tu ne peux pas signer un bail avec toi-même.',
+  'lease.error.existingLease':
+    'Un bail est déjà en cours sur cette annonce (statut : {status}).',
+  'lease.error.leaseNotFound': 'Bail introuvable.',
+  'lease.error.notTenant': 'Tu n’es pas le locataire désigné sur ce bail.',
+  'lease.error.cannotSign':
+    'Ce bail ne peut plus être signé (statut : {status}).',
+  'lease.error.cannotRefuse':
+    'Ce bail ne peut plus être refusé (statut : {status}).',
+  'lease.error.payloadTooLarge': 'Charge utile trop volumineuse.',
+  'sidebar.myLeases': 'Mes baux',
+  'sidebar.section.tenant': 'Locataire',
+  'dashboard.editListing.section.lease.title': 'Signer un bail',
+  'dashboard.editListing.section.lease.lead':
+    'Tu as trouvé un locataire ? Formalise le bail sur AryTrano pour activer le Contrat AryTrano (PDF généré, état des lieux, arbitrage).',
+  'dashboard.editListing.section.lease.cta': 'Démarrer un bail',
 
   // ── Legal pages (placeholder v0.5 — to be reviewed by counsel) ──
   'legal.eyebrow': 'Mentions légales',
@@ -244,8 +355,29 @@ export const frMG = {
   'filters.price.label': 'Budget mensuel (Ar)',
   'filters.price.separator': '→',
   'filters.price.hint': 'Entrée pour appliquer',
+  'filters.price.range.aria': 'Plage de prix mensuel',
+  'filters.price.from': 'À partir de',
+  'filters.price.to': "Jusqu'à",
+  'filters.price.unit': 'Ar/mois',
+  'filters.price.max.plus': '+',
   'filters.reset': 'Réinitialiser',
   'filters.sidebar.title': 'Filtres',
+  'filters.chips.aria': 'Filtres actifs',
+  'filters.chips.remove': 'Retirer ce filtre',
+  'filters.chips.clearAll': 'Tout effacer',
+  'annonces.search.aria': 'Affiner la recherche',
+  'annonces.search.city.label': 'Ville',
+  'annonces.search.city.all': 'Toutes les villes',
+  'annonces.search.quartier.label': 'Quartier',
+  'annonces.search.quartier.all': 'Tous les quartiers',
+  'annonces.search.type.label': 'Type',
+  'annonces.search.type.all': 'Tous les types',
+  'annonces.search.cta': 'Rechercher',
+  'annonces.mapPreview.cta': 'Voir sur la carte',
+  'annonces.mapPreview.backCta': 'Retour à la liste',
+  'annonces.mapPreview.empty': 'Aucune annonce à cartographier',
+  'annonces.mapPreview.count.one': '{count} annonce localisée',
+  'annonces.mapPreview.count.other': '{count} annonces localisées',
   'toolbar.search.label': 'Recherche :',
   'toolbar.query.label': 'Recherche par mots-clés',
   'toolbar.query.placeholder': 'Mot-clé (ex. meublé, balcon, calme…)',
@@ -268,6 +400,7 @@ export const frMG = {
 
   // Card
   'card.perMonth': '/ mois',
+  'card.caution': 'Caution : {count} mois ({amount})',
   'card.noPhoto': 'Pas de photo',
 
   // Detail page
@@ -482,6 +615,10 @@ export const frMG = {
   'landing.hero.microStats': '{count} annonces · {verified} proprios vérif.',
 
   // Trust strip — titre + sous-titre court
+  'landing.trust.eyebrow': 'Pourquoi AryTrano',
+  'landing.trust.heading': 'La location, sans mauvaise surprise.',
+  'landing.trust.lead':
+    'Pas de fausses annonces, pas de frais cachés, pas de paiement avant visite. Chaque propriétaire et chaque photo passent en revue avant publication.',
   'landing.trust.verified.title': 'Vérification humaine',
   'landing.trust.verified.subtitle': 'Pièce + acte contrôlés',
   'landing.trust.photos.title': 'Photos protégées',
@@ -904,16 +1041,31 @@ export const frMG = {
     'Publie ton annonce en quelques minutes, reçois les demandes directement sur WhatsApp, garde le contact direct avec les étudiants. Aucune commission sur les loyers, jamais.',
   'proprietaires.hero.ctaPrimary': 'Publier une annonce',
   'proprietaires.hero.ctaSecondary': 'Voir l’offre',
+  'proprietaires.hero.ctaMicrocopy':
+    'Publié en moins de 5 minutes · Aucune carte demandée',
+  'proprietaires.hero.trustpill1': 'Fianarantsoa · Antananarivo',
+  'proprietaires.hero.trustpill2': 'Bilingue FR / MG',
+  'proprietaires.hero.trustpill3': 'Validation sous 24-48h',
+  'proprietaires.hero.trustpill.activeOwners.one': 'propriétaire actif',
+  'proprietaires.hero.trustpill.activeOwners.other': 'propriétaires actifs',
+  'proprietaires.hero.notif.title': 'Nouveau message',
+  'proprietaires.hero.notif.body': 'Mialy R. · il y a 2 min',
   'proprietaires.hero.stat1.n': '0 Ar',
-  'proprietaires.hero.stat1.label': 'commission ni frais d’inscription',
-  'proprietaires.hero.stat2.n': '24-48h',
-  'proprietaires.hero.stat2.label': 'délai de validation d’une annonce',
-  'proprietaires.hero.stat3.n': '1 par 1',
-  'proprietaires.hero.stat3.label': 'chaque propriétaire validé manuellement',
+  'proprietaires.hero.stat1.label': 'Pour publier ton annonce',
+  'proprietaires.hero.stat2.n': '−78 %',
+  'proprietaires.hero.stat2.label': 'D’économie vs frais d’agence',
+  'proprietaires.hero.stat3.n': '100 %',
+  'proprietaires.hero.stat3.label': 'Du loyer reste à toi',
 
-  'proprietaires.preview.url': 'arytrano.mg/publier',
+  'proprietaires.preview.url': 'arytrano.mg/annonces/...',
   'proprietaires.preview.step': 'Étape 3 sur 4',
   'proprietaires.preview.title': 'Décris ton logement',
+  'proprietaires.preview.verified': 'Vérifiée',
+  'proprietaires.preview.live': 'Annonce active',
+  'proprietaires.preview.subtitle': 'Fianarantsoa · Quartier étudiant',
+  'proprietaires.preview.stats.views': '128 vues',
+  'proprietaires.preview.stats.contacts': '8 contacts',
+  'proprietaires.preview.stats.posted': 'Publiée il y a 3 j',
   'proprietaires.preview.field.type': 'Type',
   'proprietaires.preview.field.typeV': 'Studio meublé',
   'proprietaires.preview.field.quartier': 'Quartier',
@@ -974,25 +1126,81 @@ export const frMG = {
   'proprietaires.verif.card.row.rating': 'Signalement',
   'proprietaires.verif.card.row.ratingV': 'À un clic, sur chaque annonce',
 
-  'proprietaires.pricing.eyebrow': 'L’offre v0.5',
-  'proprietaires.pricing.title': 'Gratuit pour démarrer.',
+  'proprietaires.pricing.eyebrow': 'Tarification',
+  'proprietaires.pricing.title': 'Tu paies seulement quand tu loues.',
   'proprietaires.pricing.lead':
-    'Pendant la beta, publier ton annonce sur AryTrano ne coûte rien. Aucune commission sur le loyer, aucune carte demandée.',
+    'Publier ton annonce ne te coûte rien. AryTrano se rémunère uniquement lorsqu’un bail est signé sur la plateforme — jamais sur ton loyer, jamais à l’étudiant.',
   'proprietaires.pricing.disclaimer':
-    'Aucune commission sur les loyers — ni maintenant, ni jamais. Ce que l’étudiant t’envoie, c’est ce que tu touches.',
-  'proprietaires.pricing.standard.name': 'Beta v0.5',
-  'proprietaires.pricing.standard.price': '0 Ar',
-  'proprietaires.pricing.standard.sub': 'Pendant la beta',
-  'proprietaires.pricing.standard.f1': 'Création de compte + validation manuelle',
-  'proprietaires.pricing.standard.f2': 'Annonces validées 1 par 1 par notre équipe',
-  'proprietaires.pricing.standard.f3': 'Demandes des étudiants directement sur WhatsApp',
-  'proprietaires.pricing.standard.f4': 'Photos sans métadonnées privées (anti-fuite)',
-  'proprietaires.pricing.standard.f5': 'Contact protégé contre le scraping',
-  'proprietaires.pricing.standard.cta': 'Créer mon compte propriétaire',
-  'proprietaires.pricing.roadmap.eyebrow': 'Roadmap',
-  'proprietaires.pricing.roadmap.body':
-    'Plus tard, des options payantes optionnelles arriveront : badge « Vérifié » renforcé et placement boosté de l’annonce. Toujours optionnel, jamais sur le loyer, jamais facturé à l’étudiant.',
-  'proprietaires.pricing.priceSuffix': '',
+    'Aucune commission sur les loyers — ni maintenant, ni jamais. Le frais success-based est facturé une fois par bail signé, en échange du Contrat AryTrano.',
+
+  // Card 1 — Publication (gratuit)
+  'proprietaires.pricing.publication.eyebrow': 'Publication',
+  'proprietaires.pricing.publication.price': '0 Ar',
+  'proprietaires.pricing.publication.sub': 'Pour toujours. Aucune carte demandée.',
+  'proprietaires.pricing.publication.f1':
+    'Annonces illimitées, durée illimitée',
+  'proprietaires.pricing.publication.f2':
+    'Badge propriétaire vérifié (KYC standard)',
+  'proprietaires.pricing.publication.f3':
+    'Contact direct WhatsApp avec les locataires',
+  'proprietaires.pricing.publication.f4':
+    'Photos protégées (EXIF strippé, anti-fuite)',
+  'proprietaires.pricing.publication.f5':
+    'Statistiques basiques (vues, contacts)',
+  'proprietaires.pricing.publication.h3': 'Publier ne coûte rien.',
+  'proprietaires.pricing.publication.cta': 'Créer mon compte gratuit',
+
+  // Card 2 — Quand tu loues (success-based)
+  'proprietaires.pricing.success.badge': 'Recommandé',
+  'proprietaires.pricing.success.eyebrow': 'Quand tu loues',
+  'proprietaires.pricing.success.price': '15 000 Ar',
+  'proprietaires.pricing.success.priceSuffix': '+ 8% caution',
+  'proprietaires.pricing.success.sub': 'par bail signé sur AryTrano',
+  'proprietaires.pricing.success.f1':
+    'Contrat de bail PDF généré (économise le notaire)',
+  'proprietaires.pricing.success.f2':
+    'État des lieux numérique horodaté (photos + vidéo)',
+  'proprietaires.pricing.success.f3':
+    'Reçus mensuels de paiement loyer automatiques',
+  'proprietaires.pricing.success.f4':
+    'Arbitrage AryTrano en cas de litige sur la caution',
+  'proprietaires.pricing.success.f5':
+    'Badge « Propriétaire de confiance » après 3 baux sans litige',
+  'proprietaires.pricing.success.example':
+    'Ex : caution 500 000 Ar → 15 000 + 40 000 = 55 000 Ar',
+  'proprietaires.pricing.success.h3': 'Tu paies à la signature du bail.',
+  'proprietaires.pricing.success.cta': 'Démarrer maintenant',
+
+  // Flow — 4 steps
+  'proprietaires.pricing.flow.eyebrow': 'Comment ça marche',
+  'proprietaires.pricing.flow.title':
+    'De la publication au bail signé, en 4 étapes.',
+  'proprietaires.pricing.flow.step1':
+    'Tu publies ton annonce — gratuit, illimité, aucun engagement.',
+  'proprietaires.pricing.flow.step2':
+    'Un locataire t’envoie un message via la plateforme.',
+  'proprietaires.pricing.flow.step3':
+    'Visite, accord verbal — tu signes le bail numériquement sur AryTrano.',
+  'proprietaires.pricing.flow.step4':
+    'Tu paies 15 000 Ar + 8% caution — ton Contrat AryTrano s’active.',
+
+  // Comparatif vs agences
+  'proprietaires.pricing.comparison.eyebrow': 'Comparé aux agences',
+  'proprietaires.pricing.comparison.title':
+    'Beaucoup moins cher qu’une agence immobilière classique.',
+  'proprietaires.pricing.comparison.agency.label': 'Agence immobilière',
+  'proprietaires.pricing.comparison.agency.amount': '125 000 – 250 000 Ar',
+  'proprietaires.pricing.comparison.agency.note':
+    '50 à 100 % d’un mois de loyer en frais d’agence (sur loyer 250 000 Ar/mois).',
+  'proprietaires.pricing.comparison.arytrano.label': 'AryTrano',
+  'proprietaires.pricing.comparison.arytrano.amount': '~55 000 Ar',
+  'proprietaires.pricing.comparison.arytrano.note':
+    '15 000 Ar + 8% caution (sur caution 500 000 Ar) — incluant contrat PDF + arbitrage.',
+  'proprietaires.pricing.comparison.savings':
+    'Économie moyenne : ~195 000 Ar par location (-78 %).',
+  'proprietaires.pricing.comparison.savingsPercent': '−78',
+  'proprietaires.pricing.comparison.savingsLabel':
+    'Économie moyenne par location',
 
   'proprietaires.faq.eyebrow': 'Questions de propriétaires',
   'proprietaires.faq.title': 'On vous répond direct.',
@@ -1008,12 +1216,13 @@ export const frMG = {
   'proprietaires.faq.q4.q': 'Comment je gère les demandes ?',
   'proprietaires.faq.q4.a':
     'Tu reçois les messages directement sur WhatsApp avec la référence de l’annonce. Tu vois aussi les stats (vues, contacts, favoris) dans ton dashboard.',
-  'proprietaires.faq.q5.q': 'Que se passe-t-il si je trouve un locataire ?',
+  'proprietaires.faq.q5.q':
+    'Pourquoi je paie 15 000 Ar + 8 % de caution à la signature ?',
   'proprietaires.faq.q5.a':
-    'Tu mets ton annonce en « Loué » depuis ton dashboard. Aucune commission, aucune paperasse côté AryTrano. Tu signes ton bail librement avec l’étudiant.',
-  'proprietaires.faq.q6.q': 'Et si un locataire fait défaut ?',
+    'C’est ce qui active ton « Contrat AryTrano » : un bail PDF généré gratuitement (évite ~30 000 Ar de notaire), un état des lieux numérique horodaté, des reçus mensuels automatiques, et notre service d’arbitrage si litige sur la caution. Sans ce frais, on ne pourrait pas couvrir ces livrables. Comparé à une agence classique (50-100 % d’un mois de loyer), c’est environ 4× moins cher. Aucune commission sur ton loyer — tu touches 100 % de ce que paie le locataire chaque mois.',
+  'proprietaires.faq.q6.q': 'Et si un locataire fait défaut sur le loyer ?',
   'proprietaires.faq.q6.a':
-    'AryTrano ne gère pas les relations bail/paiement — c’est entre toi et le locataire. Si tu rencontres un problème, écris-nous : on peut t’écouter, signaler le locataire pour les futurs propriétaires, et te donner des conseils pratiques. Pas de service juridique en v0.5.',
+    'AryTrano ne garantit pas le paiement mensuel du loyer — c’est entre toi et le locataire. En cas de défaut, tu peux ouvrir un litige depuis ton dashboard : on examine l’historique du Contrat AryTrano (signatures, reçus mensuels), on signale le locataire pour les futurs propriétaires, et on peut t’orienter vers des recours légaux locaux. La caution reste un levier que tu peux utiliser selon les conditions du bail.',
 
   'proprietaires.finalCta.title': 'Prêt à publier ?',
   'proprietaires.finalCta.lead': '5 minutes. Aucun frais. Validation sous 24-48h.',
@@ -1118,6 +1327,7 @@ export const frMG = {
   'quartiers.lead.empty':
     'On est en train de cartographier les quartiers étudiants de {city}. Reviens dans quelques semaines, ou explore les autres villes ci-dessus.',
   'quartiers.cityNav.aria': 'Changer de ville',
+  'quartiers.jump.eyebrow': 'Aller au quartier',
   'quartiers.stats.quartiers.label': 'Quartiers couverts',
   'quartiers.stats.listings.label': 'Annonces actives',
   'quartiers.block.dataCell.avgPrice': 'Loyer moyen',
@@ -1329,6 +1539,7 @@ export const frMG = {
   'status.UNAVAILABLE': 'Indisponible',
   'status.SUSPENDED': 'Suspendue',
   'status.DELETED': 'Supprimée',
+  'status.RENTED': 'Louée',
 
   // Account sidebar
   'sidebar.myAccount': 'Mon compte',
@@ -1524,6 +1735,9 @@ export const frMG = {
   'listingForm.type.label': 'Type de logement',
   'listingForm.type.placeholder': 'Choisir',
   'listingForm.price.label': 'Prix par mois (Ar)',
+  'listingForm.cautionMonths.label': 'Caution demandée',
+  'listingForm.cautionMonths.help':
+    'Standard à Madagascar : 2-3 mois. La caution est figée pour toutes les locations de cette annonce.',
   'listingForm.city.label': 'Ville',
   'listingForm.city.placeholder': 'Choisir une ville',
   'listingForm.neighborhood.label': 'Quartier',

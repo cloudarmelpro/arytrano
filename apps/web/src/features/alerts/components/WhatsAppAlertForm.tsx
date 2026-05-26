@@ -75,36 +75,39 @@ export function WhatsAppAlertForm() {
     <div>
       <form
         onSubmit={handleSubmit}
-        className="flex items-stretch gap-0 rounded-xl border border-border bg-muted/40 p-1"
+        className="flex flex-col gap-2 sm:flex-row sm:items-stretch sm:gap-0 sm:rounded-xl sm:border sm:border-border sm:bg-muted/40 sm:p-1"
         noValidate
       >
         <fieldset disabled={pending} className="contents">
-          <span className="inline-flex items-center gap-2 border-r border-border px-3 text-[14px] font-semibold text-foreground/80">
-            <Icon name="whatsapp" size={16} /> +261
-          </span>
-          <label htmlFor="footer-newsletter-phone" className="sr-only">
-            {t('footerV3.newsletter.phoneLabel')}
-          </label>
-          <input
-            id="footer-newsletter-phone"
-            type="tel"
-            inputMode="tel"
-            autoComplete="tel-national"
-            value={phone}
-            onChange={(e) => {
-              setPhone(e.target.value)
-              if (status.type === 'error') setStatus({ type: 'idle' })
-            }}
-            placeholder={t('footerV3.newsletter.phonePlaceholder')}
-            aria-invalid={status.type === 'error'}
-            aria-describedby={
-              status.type === 'error' ? 'footer-newsletter-error' : undefined
-            }
-            className="h-11 min-w-0 flex-1 bg-transparent px-3.5 text-[14.5px] font-medium text-foreground outline-none placeholder:text-muted-foreground disabled:opacity-60"
-          />
+          {/* Phone group — its own pill on mobile, merges into the row on sm+ */}
+          <div className="flex min-w-0 flex-1 items-stretch rounded-xl border border-border bg-muted/40 p-1 sm:rounded-none sm:border-0 sm:bg-transparent sm:p-0">
+            <span className="inline-flex shrink-0 items-center gap-2 border-r border-border px-3 text-[14px] font-semibold text-foreground/80">
+              <Icon name="whatsapp" size={16} /> +261
+            </span>
+            <label htmlFor="footer-newsletter-phone" className="sr-only">
+              {t('footerV3.newsletter.phoneLabel')}
+            </label>
+            <input
+              id="footer-newsletter-phone"
+              type="tel"
+              inputMode="tel"
+              autoComplete="tel-national"
+              value={phone}
+              onChange={(e) => {
+                setPhone(e.target.value)
+                if (status.type === 'error') setStatus({ type: 'idle' })
+              }}
+              placeholder={t('footerV3.newsletter.phonePlaceholder')}
+              aria-invalid={status.type === 'error'}
+              aria-describedby={
+                status.type === 'error' ? 'footer-newsletter-error' : undefined
+              }
+              className="h-11 min-w-0 flex-1 bg-transparent px-3.5 text-[14.5px] font-medium text-foreground outline-none placeholder:text-muted-foreground disabled:opacity-60"
+            />
+          </div>
           <button
             type="submit"
-            className="inline-flex h-11 items-center gap-1.5 rounded-lg bg-primary px-4 text-[13.5px] font-semibold text-primary-foreground transition hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-70"
+            className="inline-flex h-11 w-full shrink-0 items-center justify-center gap-1.5 rounded-lg bg-primary px-4 text-[13.5px] font-semibold text-primary-foreground transition hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-70 sm:w-auto"
           >
             {pending
               ? t('footerV3.newsletter.submitting')

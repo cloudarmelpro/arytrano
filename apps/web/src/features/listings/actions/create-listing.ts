@@ -38,6 +38,7 @@ export async function createListingAction(
       description: formData.get('description'),
       type: formData.get('type'),
       priceMonthlyMGA: formData.get('priceMonthlyMGA'),
+      cautionMonths: formData.get('cautionMonths') ?? undefined,
       cityId: formData.get('cityId'),
       neighborhoodId: formData.get('neighborhoodId'),
       surfaceM2: formData.get('surfaceM2') || undefined,

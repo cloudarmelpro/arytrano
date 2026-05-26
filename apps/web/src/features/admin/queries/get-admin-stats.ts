@@ -46,6 +46,7 @@ export async function getAdminStats(): Promise<AdminStats> {
     UNAVAILABLE: 0,
     SUSPENDED: 0,
     DELETED: 0,
+    RENTED: 0,
   }
   for (const row of listingsByStatus) {
     const c = row._count._all

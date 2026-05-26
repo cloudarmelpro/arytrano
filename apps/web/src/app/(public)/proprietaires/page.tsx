@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { ProprietairesPage } from '@/features/static-pages'
 import { PROPRIETAIRES_FAQ_ITEMS } from '@/features/static-pages/proprietaires/faq-items'
+import { getLandingStats } from '@/features/landing/server'
 import { getLocale } from '@/lib/i18n/get-locale'
 import { getT } from '@/lib/i18n/translate'
 import { localeAlternates } from '@/lib/seo/alternates'
@@ -24,7 +25,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function ProprietairesRoute() {
-  const locale = await getLocale()
+  const [locale, stats] = await Promise.all([getLocale(), getLandingStats()])
   const t = getT(locale)
   const faqJsonLd = {
     '@context': 'https://schema.org',
@@ -45,7 +46,10 @@ export default async function ProprietairesRoute() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: safeJsonLd(faqJsonLd) }}
       />
-      <ProprietairesPage locale={locale} />
+      <ProprietairesPage
+        locale={locale}
+        activeOwners={stats.verifiedOwners}
+      />
     </>
   )
 }

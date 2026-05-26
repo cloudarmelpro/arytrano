@@ -32,13 +32,13 @@ export function QuartiersCityNav({
   return (
     <section
       aria-label={t('quartiers.cityNav.aria')}
-      className="border-b border-border bg-muted/40"
+      className="bg-background"
     >
-      <div className="mx-auto flex max-w-[1280px] flex-col gap-3 px-6 py-4 lg:flex-row lg:items-center lg:gap-5 lg:px-10">
-        <span className="shrink-0 text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+      <div className="mx-auto flex max-w-[1280px] flex-col gap-4 px-6 pt-6 pb-2 lg:flex-row lg:items-baseline lg:gap-8 lg:px-10 lg:pt-8">
+        <span className="shrink-0 text-[12px] font-semibold uppercase tracking-[0.14em] text-foreground">
           {t('quartiers.cityNav.aria')}
         </span>
-        <nav className="flex flex-wrap gap-2">
+        <nav className="flex flex-wrap items-baseline gap-x-6 gap-y-2">
           {cities.map((city) => {
             const active = city.slug === activeCitySlug
             const empty = city.quartierCount === 0
@@ -48,20 +48,18 @@ export function QuartiersCityNav({
                 key={city.slug}
                 href={`/quartiers/${city.slug}`}
                 aria-current={active ? 'page' : undefined}
-                className={`inline-flex h-9 items-center gap-1.5 rounded-full px-3.5 text-[13px] font-semibold transition ${
+                className={`inline-flex items-baseline gap-1.5 text-[14px] font-semibold tracking-[-0.01em] transition ${
                   active
-                    ? 'bg-primary text-primary-foreground'
+                    ? 'text-primary'
                     : empty
-                      ? 'border border-border bg-transparent text-muted-foreground hover:bg-muted/60 hover:text-foreground'
-                      : 'border border-border bg-background text-foreground hover:bg-muted'
+                      ? 'text-foreground/45 hover:text-foreground/70'
+                      : 'text-foreground/65 hover:text-foreground'
                 }`}
               >
                 <span>{label}</span>
                 <span
-                  className={`font-mono text-[11px] ${
-                    active
-                      ? 'text-primary-foreground/80'
-                      : 'text-muted-foreground'
+                  className={`font-mono text-[11px] tabular-nums ${
+                    active ? 'text-primary/70' : 'text-foreground/40'
                   }`}
                 >
                   {city.quartierCount}

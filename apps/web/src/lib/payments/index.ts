@@ -1,7 +1,7 @@
 export type {
   PaymentProvider,
-  InitiateDepositInput,
-  InitiateDepositResult,
-  Transaction,
+  InitiatePaymentInput,
+  InitiatePaymentResult,
   WebhookEvent,
+  WebhookEventType,
 } from './types'

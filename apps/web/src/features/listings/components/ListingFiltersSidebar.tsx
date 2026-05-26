@@ -1,239 +1,192 @@
 'use client'
 
-import { useMemo, useTransition } from 'react'
-import { useRouter, useSearchParams, usePathname } from 'next/navigation'
+import { useEffect, useMemo, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
-import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Separator } from '@/components/ui/separator'
+import { Slider } from '@/components/ui/slider'
 import { useT } from '@/lib/i18n/client'
-import { AMENITY_CATALOG, AmenityIcon } from '../amenities'
+import { useUrlFilters } from '@/lib/hooks/use-url-filters'
+import { formatAriary } from '@/lib/format/currency'
+import { AMENITY_CATALOG } from '../amenities'
 
-const LISTING_TYPES = ['ROOM', 'STUDIO', 'APARTMENT', 'HOUSE'] as const
+// UX cap — covers premium housing rentals on the platform. URL/schema
+// allow up to 100M Ar for the rare luxury case; visitors who need that
+// can still type values directly (kept as a soft cap on the slider only).
+const PRICE_MIN = 0
+const PRICE_MAX = 10_000_000
+const PRICE_STEP = 50_000
+const PRICE_LARGE_STEP = 500_000
 
 /**
- * Left-sidebar filter panel (Booking / Leboncoin pattern).
+ * Left-sidebar filter panel — card-style, sticky on lg, Booking-grade UX.
  *
- * Sections:
- *   - Type — radio-style row of toggleable chips (single-select per
- *     existing schema; clicking the active value unsets it back to "all")
- *   - Prix — min/max inputs side-by-side
- *   - Reset button at the bottom when any filter is active
+ * Sections (separated by Separator):
+ *   - Prix — range slider (Base UI) with live Ariary readout + 3M+ overflow
+ *   - Équipements — multi-select checkbox list (AND-semantic)
  *
- * URL is the source of truth for all values — every change pushes a
- * `router.replace` with the updated query string, scroll preserved.
+ * Type lives in the `<ResultsSearchStrip>` above the page (city +
+ * quartier + type pivot), so the sidebar focuses on the refining
+ * filters that aren't part of the primary scope picker.
+ *
+ * URL is the source of truth. The price slider keeps a local draft so
+ * dragging is buttery; URL only updates on pointerup (`onValueCommitted`)
+ * which avoids a router.replace per pixel of drag.
  */
 export function ListingFiltersSidebar() {
-  const router = useRouter()
-  const pathname = usePathname()
-  const params = useSearchParams()
+  const { params, pending, updateMultiple, updateParam, reset } = useUrlFilters()
   const t = useT()
-  const [pending, startTransition] = useTransition()
 
-  const typeOptions = useMemo(
-    () =>
-      LISTING_TYPES.map((value) => ({
-        value,
-        label: t(`listing.type.${value}` as const),
-      })),
-    [t],
-  )
-
-  const currentType = params.get('type') ?? ''
-  const currentPriceMin = params.get('priceMin') ?? ''
-  const currentPriceMax = params.get('priceMax') ?? ''
-  // Note: neighborhood is handled in the top toolbar; we don't surface
-  // it here. `hasActiveFilter` still includes it so the reset button
-  // appears whenever ANY filter is active across the whole page.
   const currentNeighborhood = params.get('neighborhood') ?? ''
-  // Amenities live in the URL as a comma-separated string — we parse
-  // them into a Set for O(1) "is this one checked?" lookups in render.
+  const urlPriceMin = clamp(Number(params.get('priceMin')) || PRICE_MIN, PRICE_MIN, PRICE_MAX)
+  const urlPriceMax = clamp(
+    params.get('priceMax') ? Number(params.get('priceMax')) : PRICE_MAX,
+    PRICE_MIN,
+    PRICE_MAX,
+  )
   const currentAmenities = useMemo(
     () => new Set((params.get('amenities') ?? '').split(',').filter(Boolean)),
     [params],
   )
 
+  // Local draft of the price slider — committed to URL only on pointerup.
+  const [priceDraft, setPriceDraft] = useState<[number, number]>([
+    urlPriceMin,
+    urlPriceMax,
+  ])
+
+  // Re-sync local draft if URL changes externally (reset, browser back).
+  useEffect(() => {
+    setPriceDraft([urlPriceMin, urlPriceMax])
+  }, [urlPriceMin, urlPriceMax])
+
+  const priceTouched =
+    priceDraft[0] !== PRICE_MIN || priceDraft[1] !== PRICE_MAX
   const hasActiveFilter =
-    Boolean(currentType || currentNeighborhood || currentPriceMin || currentPriceMax) ||
+    Boolean(currentNeighborhood) ||
+    priceTouched ||
     currentAmenities.size > 0
 
-  function updateParam(key: string, value: string) {
-    const next = new URLSearchParams(params.toString())
-    if (value) next.set(key, value)
-    else next.delete(key)
-    next.delete('cursor') // any filter change resets cursor to page 1
-    const qs = next.toString()
-    startTransition(() => {
-      router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false })
+  function commitPrice([min, max]: [number, number]) {
+    updateMultiple({
+      priceMin: min !== PRICE_MIN ? String(min) : null,
+      priceMax: max !== PRICE_MAX ? String(max) : null,
     })
-  }
-
-  function toggleType(value: string) {
-    // Re-clicking the active value clears the filter (back to "all").
-    updateParam('type', value === currentType ? '' : value)
   }
 
   function toggleAmenity(value: string) {
     const next = new Set(currentAmenities)
     if (next.has(value)) next.delete(value)
     else next.add(value)
-    // URL: comma-separated; empty set removes the param entirely.
-    updateParam('amenities', Array.from(next).join(','))
-  }
-
-  function reset() {
-    startTransition(() => {
-      router.replace(pathname, { scroll: false })
-    })
+    updateParam('amenities', next.size ? Array.from(next).join(',') : null)
   }
 
   return (
-    <aside
-      aria-busy={pending}
-      className="flex flex-col gap-6 lg:border-r lg:border-border lg:pr-6"
-    >
-      <header className="flex items-center justify-between">
-        <h2 className="text-sm font-semibold uppercase tracking-wider text-foreground">
-          {t('filters.sidebar.title')}
-        </h2>
-        {hasActiveFilter && (
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={reset}
-            disabled={pending}
-            className="h-7 px-2 text-xs text-muted-foreground"
-          >
-            {t('filters.reset')}
-          </Button>
-        )}
-      </header>
+    <aside aria-busy={pending}>
+      <div className="overflow-hidden rounded-xl border border-border bg-background shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
+        <header className="flex items-center justify-between px-5 py-4">
+          <h2 className="text-[15px] font-bold tracking-[-0.01em] text-foreground">
+            {t('filters.sidebar.title')}
+          </h2>
+          {hasActiveFilter && (
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={reset}
+              disabled={pending}
+              className="h-7 px-2 text-[12px] font-medium text-primary hover:bg-primary/5 hover:text-primary"
+            >
+              {t('filters.reset')}
+            </Button>
+          )}
+        </header>
 
-      {/* Type — vertically stacked toggleable chips */}
-      <section className="flex flex-col gap-2">
-        <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-          {t('filters.type.label')}
-        </p>
-        <div className="flex flex-wrap gap-2">
-          <button
-            type="button"
-            onClick={() => updateParam('type', '')}
-            disabled={pending}
-            aria-pressed={!currentType}
-            className={`inline-flex h-7 items-center rounded-md px-2.5 text-[11px] font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-60 ${
-              !currentType
-                ? 'bg-primary text-primary-foreground'
-                : 'border border-border bg-background text-foreground hover:bg-muted'
-            }`}
-          >
-            {t('filters.type.all')}
-          </button>
-          {typeOptions.map((o) => {
-            const active = o.value === currentType
-            return (
-              <button
-                key={o.value}
-                type="button"
-                onClick={() => toggleType(o.value)}
-                disabled={pending}
-                aria-pressed={active}
-                className={`inline-flex h-7 items-center rounded-md px-2.5 text-[11px] font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-60 ${
-                  active
-                    ? 'bg-primary text-primary-foreground'
-                    : 'border border-border bg-background text-foreground hover:bg-muted'
-                }`}
-              >
-                {o.label}
-              </button>
-            )
-          })}
-        </div>
-      </section>
+        <Separator />
 
-      {/* Price range */}
-      <section className="flex flex-col gap-2">
-        <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-          {t('filters.price.label')}
-        </p>
-        <div className="flex items-center gap-2">
-          <Input
-            key={`min-${currentPriceMin}`}
-            id="filter-price-min"
-            type="number"
-            inputMode="numeric"
-            min={0}
-            step={10000}
-            placeholder={t('filters.priceMin.placeholder')}
-            aria-label={t('filters.priceMin.label')}
-            defaultValue={currentPriceMin}
-            onBlur={(e) => updateParam('priceMin', e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') {
-                e.preventDefault()
-                updateParam('priceMin', e.currentTarget.value)
+        {/* Price slider */}
+        <section className="flex flex-col gap-4 px-5 py-5">
+          <div className="flex items-baseline justify-between gap-2">
+            <p className="text-[12px] font-semibold uppercase tracking-[0.08em] text-foreground/70">
+              {t('filters.price.label')}
+            </p>
+            <span className="text-[11px] text-muted-foreground">
+              {t('filters.price.unit')}
+            </span>
+          </div>
+          <div className="flex items-baseline justify-between font-mono text-[13.5px] font-semibold tabular-nums text-foreground">
+            <span>{formatAriary(priceDraft[0])}</span>
+            <span className="text-foreground/40">→</span>
+            <span>
+              {formatAriary(priceDraft[1])}
+            </span>
+          </div>
+          <Slider.Root
+            value={priceDraft}
+            min={PRICE_MIN}
+            max={PRICE_MAX}
+            step={PRICE_STEP}
+            largeStep={PRICE_LARGE_STEP}
+            disabled={pending}
+            aria-label={t('filters.price.range.aria')}
+            onValueChange={(v) => {
+              if (Array.isArray(v) && v.length === 2) {
+                setPriceDraft([v[0]!, v[1]!])
               }
             }}
-            disabled={pending}
-            className="h-9 flex-1"
-          />
-          <span className="text-xs text-muted-foreground">{t('filters.price.separator')}</span>
-          <Input
-            key={`max-${currentPriceMax}`}
-            id="filter-price-max"
-            type="number"
-            inputMode="numeric"
-            min={0}
-            step={10000}
-            placeholder={t('filters.priceMax.placeholder')}
-            aria-label={t('filters.priceMax.label')}
-            defaultValue={currentPriceMax}
-            onBlur={(e) => updateParam('priceMax', e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') {
-                e.preventDefault()
-                updateParam('priceMax', e.currentTarget.value)
+            onValueCommitted={(v) => {
+              if (Array.isArray(v) && v.length === 2) {
+                commitPrice([v[0]!, v[1]!])
               }
             }}
-            disabled={pending}
-            className="h-9 flex-1"
-          />
-        </div>
-        <p className="text-[11px] text-muted-foreground">{t('filters.price.hint')}</p>
-      </section>
+          >
+            <Slider.Control>
+              <Slider.Track>
+                <Slider.Indicator />
+              </Slider.Track>
+              <Slider.Thumb />
+              <Slider.Thumb />
+            </Slider.Control>
+          </Slider.Root>
+        </section>
 
-      {/* Amenities — multi-select checkboxes. AND-semantic: a listing
-         must include EVERY checked amenity (Prisma `hasEvery`).
-         Compact sizing: tighter padding, smaller icon container, no
-         outer rounded chip (just clean rows). */}
-      <section className="flex flex-col gap-2">
-        <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-          {t('filters.amenities.label')}
-        </p>
-        <ul className="flex flex-col">
-          {AMENITY_CATALOG.map((a) => {
-            const checked = currentAmenities.has(a.value)
-            return (
-              <li key={a.value}>
-                <Label
-                  className="cursor-pointer rounded-md px-1.5 py-1 font-normal transition hover:bg-muted data-[checked=true]:text-foreground"
-                  data-checked={checked}
-                >
-                  <Checkbox
-                    checked={checked}
-                    onCheckedChange={() => toggleAmenity(a.value)}
-                    disabled={pending}
-                  />
-                  <span className="inline-flex h-4 w-4 shrink-0 items-center justify-center text-muted-foreground [&_svg]:h-3.5 [&_svg]:w-3.5">
-                    <AmenityIcon amenity={a.value} />
-                  </span>
-                  <span className="text-[11px] leading-tight">{t(a.labelKey)}</span>
-                </Label>
-              </li>
-            )
-          })}
-        </ul>
-      </section>
+        <Separator />
+
+        {/* Amenities */}
+        <section className="flex flex-col gap-3 px-5 py-5">
+          <p className="text-[12px] font-semibold uppercase tracking-[0.08em] text-foreground/70">
+            {t('filters.amenities.label')}
+          </p>
+          <ul className="flex flex-col gap-0.5">
+            {AMENITY_CATALOG.map((a) => {
+              const checked = currentAmenities.has(a.value)
+              return (
+                <li key={a.value}>
+                  <Label
+                    className="cursor-pointer rounded-md py-1.5 font-normal transition data-[checked=true]:text-foreground"
+                    data-checked={checked}
+                  >
+                    <Checkbox
+                      checked={checked}
+                      onCheckedChange={() => toggleAmenity(a.value)}
+                      disabled={pending}
+                    />
+                    <span className="leading-tight">
+                      {t(a.labelKey)}
+                    </span>
+                  </Label>
+                </li>
+              )
+            })}
+          </ul>
+        </section>
+      </div>
     </aside>
   )
+}
+
+function clamp(n: number, min: number, max: number): number {
+  if (!Number.isFinite(n)) return min
+  return Math.max(min, Math.min(max, n))
 }

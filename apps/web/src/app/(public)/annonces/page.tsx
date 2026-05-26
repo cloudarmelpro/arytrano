@@ -8,10 +8,11 @@ import {
 import { PublicListingCard } from '@/features/listings'
 import {
   ListingFiltersSidebar,
-  ListingSearchToolbar,
-  CityTabs,
+  UnifiedToolbar,
+  ListingSortButtons,
+  ActiveFiltersChips,
+  ResultsSearchStrip,
   ListingsMapClient,
-  ListingsViewToggle,
 } from '@/features/listings'
 import { SaveSearchButton } from '@/features/search'
 import { listCitiesWithNeighborhoods } from '@/features/geo'
@@ -121,13 +122,11 @@ export default async function PublicListingsPage({
     q: sp.q || undefined,
   })
   const query = parsed.success ? parsed.data : {}
-  const viewMode: 'grid' | 'map' = sp.view === 'map' ? 'map' : 'grid'
 
-  // Fetch the listings + neighborhood list + session in parallel —
-  // neighborhoods power the filter dropdown, listings are the page payload,
-  // and the session lets us mark already-favorited cards.
-  // For map view, fetch ALL matching listings (capped at 500) so every
-  // quartier shows its true count — pagination is meaningless on a map.
+  // Fetch the listings + map points + neighborhood list + session in
+  // parallel. Map points (capped at 500) power the sidebar mini-map;
+  // they share the same filters as the grid so the map and the list
+  // always reflect the same search.
   const [
     { items, nextCursor, hasMore },
     mapItems,
@@ -135,14 +134,8 @@ export default async function PublicListingsPage({
     cityCounts,
     session,
   ] = await Promise.all([
-    viewMode === 'grid'
-      ? listPublicListings(query)
-      : Promise.resolve({ items: [], nextCursor: null, hasMore: false } as Awaited<
-          ReturnType<typeof listPublicListings>
-        >),
-    viewMode === 'map'
-      ? listPublicListingsForMap(query)
-      : Promise.resolve([] as Awaited<ReturnType<typeof listPublicListingsForMap>>),
+    listPublicListings(query),
+    listPublicListingsForMap(query),
     listCitiesWithNeighborhoods(),
     // CityTabs counts. Separate query (cached 5min) — `listCitiesWith
     // Neighborhoods` doesn't aggregate, and we don't want to fold the
@@ -183,18 +176,16 @@ export default async function PublicListingsPage({
       })
     : t('annonces.title')
 
-  // CityTabs preserves the user's other filters (type, price, sort,
-  // amenities) but drops `city`, `neighborhood`, and `cursor` — the
-  // pill itself sets the city and pagination/neighborhood scoping
-  // belongs to the new city, not the previous one.
-  const cityTabsParams = new URLSearchParams()
-  if (sp.type) cityTabsParams.set('type', sp.type)
-  if (sp.priceMin) cityTabsParams.set('priceMin', sp.priceMin)
-  if (sp.priceMax) cityTabsParams.set('priceMax', sp.priceMax)
-  if (sp.sort) cityTabsParams.set('sort', sp.sort)
-  if (sp.amenities) cityTabsParams.set('amenities', sp.amenities)
-  if (sp.q) cityTabsParams.set('q', sp.q)
-  if (sp.view) cityTabsParams.set('view', sp.view)
+  // Build CityOption[] for the ResultsSearchStrip (city + nested
+  // quartiers, localized). Same shape the landing hero uses.
+  const cityOptions = cities.map((c) => ({
+    slug: c.slug,
+    label: locale === 'mg' ? c.nameMg : c.nameFr,
+    neighborhoods: c.neighborhoods.map((n) => ({
+      slug: n.slug,
+      label: locale === 'mg' ? n.nameMg : n.nameFr,
+    })),
+  }))
 
   // Single SET lookup per card avoids N+1 favorite queries.
   const favoritedIds = await getFavoritedListingIds(
@@ -218,7 +209,7 @@ export default async function PublicListingsPage({
 
   return (
     <div className="mx-auto max-w-[1280px] px-6 py-12 lg:px-10">
-      <header className="mb-8 flex flex-col gap-3">
+      <header className="mb-6 flex flex-col gap-3">
         <nav
           aria-label="Breadcrumb"
           className="flex items-center gap-2 text-[12px] font-medium text-muted-foreground"
@@ -232,61 +223,53 @@ export default async function PublicListingsPage({
         <h1 className="font-serif text-[clamp(32px,3.8vw,52px)] font-normal leading-[1.05] tracking-[-0.025em] text-foreground">
           {pageTitle}
         </h1>
-        <p className="max-w-2xl text-[14.5px] text-foreground/70">
-          <strong className="text-foreground">{items.length}</strong>{' '}
-          {t(items.length <= 1 ? 'annonces.count.one' : 'annonces.count.other', {
-            count: items.length,
-          })}{' '}
-          {filterActive ? null : t('annonces.lead')}
-        </p>
+        {!filterActive && (
+          <p className="max-w-2xl text-[14.5px] text-foreground/70">
+            {t(items.length <= 1 ? 'annonces.count.one' : 'annonces.count.other', {
+              count: items.length,
+            })}{' '}
+            {t('annonces.lead')}
+          </p>
+        )}
+        <ActiveFiltersChips locale={locale} neighborhoods={neighborhoods} />
       </header>
 
-      {/* City pills row (E-T07). Lets a visitor switch city filter in
-          one click without touching URL params. The "Tous" pill clears
-          ?city= ; clicking another city replaces it AND drops the
-          stale neighborhood slug (neighborhood slugs are unique per
-          city — keeping one across city change would produce zero
-          results). */}
-      <CityTabs
-        locale={locale}
-        cities={cityTabs}
-        activeCitySlug={activeCity?.slug ?? null}
-        totalCount={totalListingCount}
-        currentParams={cityTabsParams}
-      />
+      {/* Results search strip — city / quartier / type pivot row.
+          Replaces the CityTabs pill row : same affordance + adds
+          quartier + type in one place, Booking-results-bar style. */}
+      <ResultsSearchStrip cities={cityOptions} />
 
-      {/* Top toolbar — neighborhood autocomplete on the left, sort on
-          the right + Save search dialog on the far right (E-T09).
-          The Grid/Map toggle (E-T10) sits between the toolbar and the
-          Save-search button so the visitor's eye flows naturally :
-          filter → switch view → save. */}
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <ListingSearchToolbar neighborhoods={neighborhoods} />
-        <div className="flex items-center gap-2">
-          <ListingsViewToggle view={viewMode} />
-          <SaveSearchButton signedIn={Boolean(session?.user)} />
-        </div>
-      </div>
+      {/* Toolbar — keyword search + sort. City/quartier/type live in
+          the strip above; this is the "secondary refine" row. */}
+      <UnifiedToolbar />
 
-      {/* Two-column layout: filters sidebar + results main */}
+      {/* Two-column layout: sidebar (live map + filters) + results main */}
       <div className="grid gap-8 lg:grid-cols-[18rem_1fr]">
-        <ListingFiltersSidebar />
+        <div className="flex flex-col gap-4 lg:sticky lg:top-24 lg:self-start">
+          {mapItems.length > 0 ? (
+            <ListingsMapClient
+              locale={locale}
+              listings={mapItems}
+              aspectClassName="aspect-[16/10]"
+            />
+          ) : null}
+          <ListingFiltersSidebar />
+        </div>
 
         <main className="flex min-w-0 flex-col gap-4">
-          {viewMode === 'map' ? (
-            mapItems.length === 0 ? (
-              <div className="rounded-md border border-dashed border-border bg-muted/30 p-12 text-center">
-                <p className="text-base font-medium">
-                  {t('annonces.map.empty.title')}
-                </p>
-                <p className="mt-2 text-sm text-muted-foreground">
-                  {t('annonces.map.empty.lead')}
-                </p>
-              </div>
-            ) : (
-              <ListingsMapClient locale={locale} listings={mapItems} />
-            )
-          ) : items.length === 0 ? (
+          {/* Results bar — count on left, save-search + sort on right */}
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <p className="text-[13.5px] text-foreground/70">
+              {t(items.length <= 1 ? 'annonces.count.one' : 'annonces.count.other', {
+                count: items.length,
+              })}
+            </p>
+            <div className="flex items-center gap-2">
+              <ListingSortButtons />
+              <SaveSearchButton signedIn={Boolean(session?.user)} />
+            </div>
+          </div>
+          {items.length === 0 ? (
             <div className="rounded-md border border-dashed border-border bg-muted/30 p-12 text-center">
               <p className="text-base font-medium">
                 {filterActive

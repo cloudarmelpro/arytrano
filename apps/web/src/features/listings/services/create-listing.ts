@@ -35,6 +35,7 @@ export async function createListing(
         description: input.description,
         type: input.type,
         priceMonthlyMGA: input.priceMonthlyMGA,
+        cautionMonths: input.cautionMonths ?? 2,
         surfaceM2: input.surfaceM2 ?? null,
         bedrooms: input.bedrooms ?? null,
         bathrooms: input.bathrooms ?? null,

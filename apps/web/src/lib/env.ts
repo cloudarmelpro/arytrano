@@ -53,9 +53,19 @@ const EnvSchema = z.object({
   CLOUDINARY_UPLOAD_PRESET: z.string().optional(),
 
   // --- GoalPay (v2 — payments) ------------------------------
-  GOALPAY_API_TOKEN_DEV: z.string().optional(),
-  GOALPAY_WEBHOOK_SECRET: z.string().optional(),
-  GOALPAY_BASE_URL: z.string().url().default('https://donation.goalpay.pro'),
+  // Merchant access token (starts with `TGP_`). Sent in the request
+  // body's `access` field — NEVER exposed to the client. No sandbox
+  // is documented; both dev and prod use the same merchant account.
+  GOALPAY_ACCESS_TOKEN: requiredInProd('GOALPAY_ACCESS_TOKEN is required in production'),
+  // HMAC-SHA256 shared secret used to verify the `x-gpay-signature`
+  // header on inbound webhooks. Configured in the GoalPay merchant
+  // dashboard. Without this, the webhook route refuses all callbacks
+  // (fail-closed) — never log or expose this value.
+  GOALPAY_WEBHOOK_SECRET: requiredInProd('GOALPAY_WEBHOOK_SECRET is required in production'),
+  // Base URL of the GoalPay API. Default = production. There is no
+  // documented sandbox — testing happens against prod with minimal
+  // amounts (100 Ar).
+  GOALPAY_BASE_URL: z.string().url().default('https://api.goalpay.pro'),
 
   // --- PII encryption (v0.5 — OwnerProfile.cin) -------------
   PII_ENCRYPTION_KEY: base64Key32.optional(),

@@ -105,6 +105,18 @@ export function PublicListingCard({
               {t('card.perMonth')}
             </span>
           </p>
+          {/* E-T26 — caution disclosure, calmly muted so it doesn't
+              compete with the rent number. Hidden when no caution. */}
+          {listing.cautionMonths > 0 ? (
+            <p className="mt-0.5 text-[11.5px] text-foreground/55">
+              {t('card.caution', {
+                count: listing.cautionMonths,
+                amount: formatAriary(
+                  listing.priceMonthlyMGA * listing.cautionMonths,
+                ),
+              })}
+            </p>
+          ) : null}
         </div>
       </article>
     </li>

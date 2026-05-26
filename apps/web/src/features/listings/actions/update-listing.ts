@@ -35,7 +35,7 @@ export async function updateListingAction(
   // Build a partial object from FormData; only include keys that were sent.
   const raw: Record<string, FormDataEntryValue | FormDataEntryValue[] | undefined> = {}
   for (const key of [
-    'title', 'description', 'type', 'priceMonthlyMGA',
+    'title', 'description', 'type', 'priceMonthlyMGA', 'cautionMonths',
     'cityId', 'neighborhoodId', 'surfaceM2', 'bedrooms', 'bathrooms', 'furnished',
   ] as const) {
     const v = formData.get(key)

@@ -49,6 +49,16 @@ export const createListingSchema = z.object({
     .int('Le prix doit être un entier')
     .positive('Le prix doit être positif')
     .max(100_000_000, 'Prix invalide'),
+  // E-T26 — caution declared as a multiplier on the monthly rent.
+  // 0 = no caution (some bailleurs MG don't take one). Range 0-3
+  // covers standard Madagascar practice.
+  cautionMonths: z.coerce
+    .number({ message: 'Nombre de mois de caution' })
+    .int('Nombre de mois entier')
+    .min(0, 'Au moins 0')
+    .max(3, '3 mois maximum')
+    .optional()
+    .default(2),
   cityId: z.string().min(1, 'Choisis une ville'),
   neighborhoodId: z.string().min(1, 'Choisis un quartier'),
   surfaceM2: z.coerce.number().int().positive().max(10_000).optional(),

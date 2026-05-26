@@ -1,6 +1,7 @@
 import { Badge } from '@/components/ui/badge'
 import { linkProviderAction } from '../actions/link-oauth'
 import { UnlinkOAuthButton } from './UnlinkOAuthButton'
+import { OAUTH_ICONS } from './oauth-icons'
 
 export type OAuthConnectionsProps = {
   googleEnabled: boolean
@@ -27,8 +28,17 @@ export function OAuthConnectionsSection({
         if (!enabled) return null
         const isLinked = linked.some((l) => l.provider === p.id)
         return (
-          <li key={p.id} className="flex items-center justify-between py-3 first:pt-0 last:pb-0">
+          <li
+            key={p.id}
+            className="flex items-center justify-between gap-3 py-3 first:pt-0 last:pb-0"
+          >
             <div className="flex items-center gap-3">
+              <span
+                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-border bg-background"
+                aria-hidden
+              >
+                {OAUTH_ICONS[p.id]}
+              </span>
               <span className="text-sm font-medium">{p.label}</span>
               <Badge
                 variant={isLinked ? 'secondary' : 'outline'}

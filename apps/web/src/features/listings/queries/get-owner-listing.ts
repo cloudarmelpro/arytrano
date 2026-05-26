@@ -12,6 +12,7 @@ export type OwnerListingDetail = {
   type: ListingType
   status: ListingStatus
   priceMonthlyMGA: number
+  cautionMonths: number
   surfaceM2: number | null
   bedrooms: number | null
   bathrooms: number | null
@@ -56,6 +57,7 @@ export async function getOwnerListing(
       type: true,
       status: true,
       priceMonthlyMGA: true,
+      cautionMonths: true,
       surfaceM2: true,
       bedrooms: true,
       bathrooms: true,
