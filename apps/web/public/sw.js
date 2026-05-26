@@ -16,13 +16,19 @@
  * Versioned cache name so a redeploy invalidates old entries.
  */
 
-// v2 — listing-detail pages no longer runtime-cached. Bumping the
-// version forces existing installs to wipe their old cache so any
-// already-stashed detail page entries are cleared on activate.
-const CACHE_VERSION = 'v2'
+// v3 — adds /offline to the install shell so the SW can serve a
+// dedicated offline page when both network and runtime cache miss.
+// Bump invalidates v2 caches so old installs get the new shell entry.
+const CACHE_VERSION = 'v3'
 const STATIC_CACHE = `arytrano-static-${CACHE_VERSION}`
 const RUNTIME_CACHE = `arytrano-runtime-${CACHE_VERSION}`
-const SHELL_URLS = ['/', '/annonces', '/favicon.ico', '/manifest.webmanifest']
+const SHELL_URLS = [
+  '/',
+  '/annonces',
+  '/offline',
+  '/favicon.ico',
+  '/manifest.webmanifest',
+]
 
 self.addEventListener('install', (event) => {
   // Skip waiting so the new SW activates immediately on the next
@@ -93,8 +99,13 @@ self.addEventListener('fetch', (event) => {
           return response
         })
         .catch(() =>
+          // Network failed. Try the requested URL first, then the home
+          // shell, then the dedicated /offline page. Only return a raw
+          // 503 if even /offline isn't cached (first visit + dropped
+          // network mid-install — rare edge).
           caches
             .match(request)
+            .then((match) => match ?? caches.match('/offline'))
             .then((match) => match ?? caches.match('/'))
             .then((response) => response ?? new Response('Offline', { status: 503 })),
         ),

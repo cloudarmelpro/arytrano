@@ -105,6 +105,17 @@ function IconMegaphone() {
   )
 }
 
+function IconCash() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <rect x="3" y="6" width="18" height="12" rx="2" />
+      <circle cx="12" cy="12" r="2.5" />
+      <path d="M7 9v.01" />
+      <path d="M17 15v.01" />
+    </svg>
+  )
+}
+
 function IconBarChart() {
   return (
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -131,6 +142,13 @@ const buildSections = (openReports: number): Section[] => [
     labelKey: 'admin.section.dashboard',
     items: [
       { href: '/admin', labelKey: 'admin.nav.overview', icon: <IconLayout /> },
+      // Surface revenue right under the overview — daily admin needs to
+      // glance at "did we get paid" alongside "is anything broken".
+      {
+        href: '/admin/revenue',
+        labelKey: 'admin.nav.revenue',
+        icon: <IconCash />,
+      },
     ],
   },
   {

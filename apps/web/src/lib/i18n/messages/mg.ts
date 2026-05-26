@@ -2057,7 +2057,57 @@ export const mg: Record<MessageKey, string> = {
   'admin.nav.testimonials': 'Fijoroana ho vavolombelona',
   'admin.nav.whatsappAlerts': 'Fanairana WhatsApp',
   'admin.nav.quizAnalytics': 'Antontan-tarehimarika quiz',
+  'admin.nav.revenue': 'Vola miditra',
+
+  // PWA offline fallback (E-T13)
+  'offline.title': 'Toa tsy mifandray amin\'ny tambajotra ianao',
+  'offline.lead':
+    'Mitahiry kopia eo an-toerana ny AryTrano mba hahafahanao mizaha tranonkala na tsy misy aza ny tambajotra. Mifandraisa amin\'ny internet hahitanao ireo annonces vaovao.',
+  'offline.cta.home': 'Mankany amin\'ny pejy fototra',
+  'offline.cta.retry': 'Andramana indray',
+  'offline.footer':
+    'Raha mitohy ny olana, jereo ny wifi na ny data finday.',
   'admin.headerLink': 'Admin',
+
+  // Admin revenue dashboard (E-T19 v0.5 — success-fee tracker)
+  'admin.revenue.title': 'Vola miditra',
+  'admin.revenue.lead':
+    'Fanaraha-maso ny saran-tsoratra sy ny commission caution noraisin\'ny AryTrano. Tsy raisina afa-tsy ireo paiements CONFIRMED — ny refunds + disputes dia jerena mitokana.',
+  'admin.revenue.kpi.heading': 'Mariky ny vola miditra',
+  'admin.revenue.kpi.thisMonth': 'Volana ity',
+  'admin.revenue.kpi.thisMonth.hint': '{count} paiements voamarina',
+  'admin.revenue.kpi.lastMonth': 'Volana lasa',
+  'admin.revenue.kpi.lastMonth.hint': '{count} paiements voamarina',
+  'admin.revenue.kpi.vsLastMonth': 'noho ny volana lasa',
+  'admin.revenue.kpi.allTime': 'Totaly hatrany',
+  'admin.revenue.kpi.allTime.hint': '{count} paiements hatramin\'ny nidirana',
+  'admin.revenue.kpi.signedThisMonth': 'Bail vita sonia ity volana ity',
+  'admin.revenue.kpi.signedThisMonth.hint':
+    'Bail nivadika ho ACTIVE — mariky ny fahasalamana ny modely.',
+  'admin.revenue.health.heading': 'Fahasalaman\'ny modely',
+  'admin.revenue.kpi.disputeRate': 'Tahan\'ny fifandirana',
+  'admin.revenue.kpi.disputeRate.hint':
+    'Ny ampahany amin\'ny bail tsy vita (DISPUTED / total ACTIVE + TERMINATED + DISPUTED).',
+  'admin.revenue.kpi.disputeRate.na': 'N/A',
+  'admin.revenue.kpi.refundQueue': 'Filaharan\'ny refunds',
+  'admin.revenue.kpi.refundQueue.hint':
+    'REFUND_PENDING + REFUNDED. Tsy maintsy hokarakaraina amin\'ny tanana miaraka amin\'ny GoalPay.',
+  'admin.revenue.status.title': 'Paiements isaky ny sata',
+  'admin.revenue.status.caption':
+    'Fizarana ny paiements LEASE_SUCCESS_FEE isaky ny sata.',
+  'admin.revenue.status.column.status': 'Sata',
+  'admin.revenue.status.column.count': 'Isa',
+  'admin.revenue.status.empty': 'Tsy misy paiement voarakitra hatreto.',
+  'admin.revenue.recent.title': 'Paiements farany',
+  'admin.revenue.recent.caption':
+    'Ireo paiements LEASE_SUCCESS_FEE 30 farany, manomboka amin\'ny vaovao indrindra.',
+  'admin.revenue.recent.column.date': 'Daty',
+  'admin.revenue.recent.column.listing': 'Annonce',
+  'admin.revenue.recent.column.status': 'Sata',
+  'admin.revenue.recent.column.amount': 'Vidiny',
+  'admin.revenue.recent.row.noListing': '(annonce voafafa)',
+  'admin.revenue.recent.empty':
+    'Tsy mbola misy paiement — ho feno ny tabilao raha vao misy bail vita sonia.',
 
   // Admin Quiz analytics (T-043)
   'admin.quiz.page.title': 'Antontan-tarehimarika ny quiz faritra',

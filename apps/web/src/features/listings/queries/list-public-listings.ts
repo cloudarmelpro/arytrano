@@ -147,12 +147,13 @@ export async function listPublicListings(
   if (input.amenities && input.amenities.length > 0) {
     where.amenities = { hasEvery: input.amenities }
   }
-  // E-T14 full-text search. Pragmatic v1 impl : Prisma's
-  // `contains` mode insensitive on title + description. At Madagascar
-  // launch scale (~50-200 listings) this is instantaneous. Upgrade
-  // to a `tsvector` generated column + GIN index when volume crosses
-  // a few thousand listings — same `q` URL shape, just a different
-  // WHERE branch.
+  // E-T14 full-text search.
+  // Prisma's `contains` insensitive on title + description; Postgres
+  // resolves the scan via the pg_trgm GIN indexes added in migration
+  // 20260526200000_listing_fts_pg_trgm. Works for substring matches
+  // ("studi" -> "Studio Andrainjato"). If we ever need ranked relevance
+  // ordering we can promote to tsvector + ts_rank — the `q` URL shape
+  // stays the same.
   if (input.q) {
     // SEC P0 — escape ILIKE wildcards before Prisma wraps in `%...%`.
     // A bare `q=%` matches every row; `q=%%%%...` triggers backtracking

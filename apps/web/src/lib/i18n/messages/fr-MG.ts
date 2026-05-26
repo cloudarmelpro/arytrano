@@ -2040,7 +2040,57 @@ export const frMG = {
   'admin.nav.testimonials': 'Témoignages',
   'admin.nav.whatsappAlerts': 'Alertes WhatsApp',
   'admin.nav.quizAnalytics': 'Quiz analytics',
+  'admin.nav.revenue': 'Revenus',
+
+  // PWA offline fallback (E-T13)
+  'offline.title': 'Tu sembles hors ligne',
+  'offline.lead':
+    'AryTrano garde une copie locale du site pour t\'aider à naviguer même sans signal. Connecte-toi à internet pour voir les nouvelles annonces.',
+  'offline.cta.home': 'Aller à l\'accueil',
+  'offline.cta.retry': 'Réessayer',
+  'offline.footer':
+    'Si le problème persiste, vérifie ton wifi ou tes données mobiles.',
   'admin.headerLink': 'Admin',
+
+  // Admin revenue dashboard (E-T19 v0.5 — success-fee tracker)
+  'admin.revenue.title': 'Revenus',
+  'admin.revenue.lead':
+    'Suivi des frais de signature et commissions caution encaissés par AryTrano. Ne compte que les paiements CONFIRMÉS — les refunds + disputes sont surveillés à part.',
+  'admin.revenue.kpi.heading': 'Indicateurs revenus',
+  'admin.revenue.kpi.thisMonth': 'Ce mois',
+  'admin.revenue.kpi.thisMonth.hint': '{count} paiements confirmés',
+  'admin.revenue.kpi.lastMonth': 'Mois précédent',
+  'admin.revenue.kpi.lastMonth.hint': '{count} paiements confirmés',
+  'admin.revenue.kpi.vsLastMonth': 'vs mois précédent',
+  'admin.revenue.kpi.allTime': 'Total cumulé',
+  'admin.revenue.kpi.allTime.hint': '{count} paiements depuis le lancement',
+  'admin.revenue.kpi.signedThisMonth': 'Baux signés ce mois',
+  'admin.revenue.kpi.signedThisMonth.hint':
+    'Leases passés en ACTIVE — l\'indicateur santé du modèle.',
+  'admin.revenue.health.heading': 'Santé du modèle',
+  'admin.revenue.kpi.disputeRate': 'Taux de litige',
+  'admin.revenue.kpi.disputeRate.hint':
+    'Part des baux jamais finalisés (DISPUTED / total ACTIVE + TERMINATED + DISPUTED).',
+  'admin.revenue.kpi.disputeRate.na': 'N/A',
+  'admin.revenue.kpi.refundQueue': 'File refunds',
+  'admin.revenue.kpi.refundQueue.hint':
+    'REFUND_PENDING + REFUNDED. À traiter manuellement avec GoalPay.',
+  'admin.revenue.status.title': 'Paiements par statut',
+  'admin.revenue.status.caption':
+    'Distribution des paiements LEASE_SUCCESS_FEE par statut.',
+  'admin.revenue.status.column.status': 'Statut',
+  'admin.revenue.status.column.count': 'Nombre',
+  'admin.revenue.status.empty': 'Aucun paiement enregistré pour l\'instant.',
+  'admin.revenue.recent.title': 'Derniers paiements',
+  'admin.revenue.recent.caption':
+    'Les 30 derniers paiements LEASE_SUCCESS_FEE, du plus récent au plus ancien.',
+  'admin.revenue.recent.column.date': 'Date',
+  'admin.revenue.recent.column.listing': 'Annonce',
+  'admin.revenue.recent.column.status': 'Statut',
+  'admin.revenue.recent.column.amount': 'Montant',
+  'admin.revenue.recent.row.noListing': '(annonce supprimée)',
+  'admin.revenue.recent.empty':
+    'Aucun paiement encore — le tableau se remplira dès le premier bail signé.',
 
   // Admin Quiz analytics (T-043)
   'admin.quiz.page.title': 'Analytics du quiz quartier',
