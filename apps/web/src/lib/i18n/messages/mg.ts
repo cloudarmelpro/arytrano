@@ -335,6 +335,7 @@ export const mg: Record<MessageKey, string> = {
   'annonces.count.hasMore': '(maro hafa)',
   'annonces.empty.title': 'Mbola tsy misy trano.',
   'annonces.empty.title.city': 'Mbola tsy misy trano ao {city}.',
+  'annonces.map.empty': 'Tsy misy filazana eo amin\'ny sarintany miaraka amin\'ireo sivana.',
   // E-T07 city tabs
   'annonces.cityTabs.all': 'Rehetra',
   'annonces.cityTabs.aria': 'Sivanao araka ny tanàna',

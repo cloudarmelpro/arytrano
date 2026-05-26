@@ -13,6 +13,7 @@ import {
   ActiveFiltersChips,
   ResultsSearchStrip,
   ListingsMapClient,
+  ListingsViewToggle,
 } from '@/features/listings'
 import { SaveSearchButton } from '@/features/search'
 import { listCitiesWithNeighborhoods } from '@/features/geo'
@@ -193,6 +194,10 @@ export default async function PublicListingsPage({
     items.map((l) => l.id),
   )
   const filterActive = hasAnyFilter(sp)
+  // E-T10 — `?view=map` switches the grid for a full-width map view.
+  // Default (no `?view=`) stays grid so the SEO-indexable listing cards
+  // remain the canonical content of /annonces.
+  const isMapView = sp.view === 'map'
   const buildPageHref = (cursor: string) => {
     const next = new URLSearchParams()
     if (sp.type) next.set('type', sp.type)
@@ -243,10 +248,12 @@ export default async function PublicListingsPage({
           the strip above; this is the "secondary refine" row. */}
       <UnifiedToolbar />
 
-      {/* Two-column layout: sidebar (live map + filters) + results main */}
+      {/* Two-column layout: sidebar (live map + filters) + results main.
+          E-T10 — when ?view=map, swap the embedded sidebar map for a
+          full-width map, hide the grid, keep the filters sidebar. */}
       <div className="grid gap-8 lg:grid-cols-[18rem_1fr]">
         <div className="flex flex-col gap-4 lg:sticky lg:top-24 lg:self-start">
-          {mapItems.length > 0 ? (
+          {!isMapView && mapItems.length > 0 ? (
             <ListingsMapClient
               locale={locale}
               listings={mapItems}
@@ -257,19 +264,43 @@ export default async function PublicListingsPage({
         </div>
 
         <main className="flex min-w-0 flex-col gap-4">
-          {/* Results bar — count on left, save-search + sort on right */}
+          {/* Results bar — count on left, view toggle + sort + save on right */}
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <p className="text-[13.5px] text-foreground/70">
               {t(items.length <= 1 ? 'annonces.count.one' : 'annonces.count.other', {
                 count: items.length,
               })}
             </p>
-            <div className="flex items-center gap-2">
-              <ListingSortButtons />
+            <div className="flex flex-wrap items-center gap-2">
+              <ListingsViewToggle view={isMapView ? 'map' : 'grid'} />
+              {!isMapView ? <ListingSortButtons /> : null}
               <SaveSearchButton signedIn={Boolean(session?.user)} />
             </div>
           </div>
-          {items.length === 0 ? (
+          {isMapView ? (
+            mapItems.length === 0 ? (
+              <div className="rounded-md border border-dashed border-border bg-muted/30 p-12 text-center">
+                <p className="text-base font-medium">
+                  {t('annonces.map.empty')}
+                </p>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  {t('annonces.empty.filtered.lead')}
+                </p>
+              </div>
+            ) : (
+              <div className="overflow-hidden rounded-2xl border border-border">
+                <ListingsMapClient
+                  locale={locale}
+                  listings={mapItems}
+                  aspectClassName="aspect-[16/12] sm:aspect-[16/9] lg:aspect-[16/8]"
+                />
+              </div>
+            )
+          ) : null}
+          {/* Cards grid + pagination — hidden in map view. SEO still
+              picks up the cards via the non-default `?view=grid` URL
+              (canonical /annonces is the grid variant). */}
+          {isMapView ? null : items.length === 0 ? (
             <div className="rounded-md border border-dashed border-border bg-muted/30 p-12 text-center">
               <p className="text-base font-medium">
                 {filterActive

@@ -2,6 +2,12 @@ import 'server-only'
 import { prisma } from '@/lib/db'
 import { sendPush, type PushMessage } from '@/lib/push/send-push'
 import { recordTickets } from '@/lib/push/receipts'
+import { env } from '@/lib/env'
+import { formatAriary } from '@/lib/format/currency'
+import { sendTransactionalEmail } from '@/lib/email/send-transactional'
+import { sanitizeEmailHeaderValue } from '@/lib/email/sanitize-header'
+import { buildSavedSearchMatchEmail } from '@/lib/email/templates/saved-search-match'
+import { fromPrismaLocale } from '@/lib/i18n/config'
 import { savedSearchFiltersSchema } from '../schemas/saved-search'
 import {
   matchesSavedSearch,
@@ -38,8 +44,31 @@ export type ListingForFanout = ListingForMatching & {
   id: string
   slug: string
   ownerId: string
+  // Localized labels used by the email fallback. NOT used by push (which
+  // sends a deliberately generic body to avoid leaking targeting info on
+  // the lock screen — see Security P1-2 note below).
+  cityNameFr: string
+  cityNameMg: string
+  neighborhoodNameFr: string
+  neighborhoodNameMg: string
 }
 
+/**
+ * Fan out alerts (push OR email) to every saved-search subscriber whose
+ * filters match the just-published listing.
+ *
+ * E-T09 — split delivery channel by `user.expoPushToken`:
+ *   - user has push token  → Expo push (existing behaviour)
+ *   - user has NO push token (web-only) → transactional email fallback
+ *
+ * Push and email never both fire for the same user — push wins when
+ * available. Email is per-user rate-limited (10/h via
+ * sendTransactionalEmail), the same bucket all other transactional
+ * mails share.
+ *
+ * One subscriber with N matching saved searches still gets ONE
+ * notification (dedupe by userId, first match wins).
+ */
 export async function notifySavedSearchMatches(
   listing: ListingForFanout,
 ): Promise<void> {
@@ -47,8 +76,7 @@ export async function notifySavedSearchMatches(
     const candidates = await prisma.savedSearch.findMany({
       where: {
         alertsOn: true,
-        user: { expoPushToken: { not: null } },
-        // Don't push the listing's own owner — they obviously know
+        // Don't notify the listing's own owner — they obviously know
         // about it.
         userId: { not: listing.ownerId },
       },
@@ -57,25 +85,36 @@ export async function notifySavedSearchMatches(
         filters: true,
         name: true,
         user: {
-          select: { id: true, expoPushToken: true, locale: true },
+          select: {
+            id: true,
+            email: true,
+            name: true,
+            expoPushToken: true,
+            locale: true,
+          },
         },
       },
     })
 
-    // Dedupe : Map<userId, { token, locale, savedSearchName }> — first
-    // matching saved-search wins (we use its name in the message body).
-    const matchesByUser = new Map<
-      string,
-      { token: string; locale: 'FR_MG' | 'MG'; searchName: string }
-    >()
+    type Match = {
+      userId: string
+      email: string
+      displayName: string
+      expoPushToken: string | null
+      locale: 'FR_MG' | 'MG'
+      searchName: string
+    }
+    const matchesByUser = new Map<string, Match>()
     for (const candidate of candidates) {
-      if (!candidate.user.expoPushToken) continue
       if (matchesByUser.has(candidate.user.id)) continue
       const parsed = savedSearchFiltersSchema.safeParse(candidate.filters)
       if (!parsed.success) continue
       if (!matchesSavedSearch(listing, parsed.data)) continue
       matchesByUser.set(candidate.user.id, {
-        token: candidate.user.expoPushToken,
+        userId: candidate.user.id,
+        email: candidate.user.email,
+        displayName: candidate.user.name ?? 'locataire',
+        expoPushToken: candidate.user.expoPushToken,
         locale: candidate.user.locale,
         searchName: candidate.name,
       })
@@ -83,44 +122,88 @@ export async function notifySavedSearchMatches(
 
     if (matchesByUser.size === 0) return
 
-    const messages: PushMessage[] = []
-    // Reverse index : token → userId, for mapping the per-recipient
-    // tickets Expo returns back to a userId without re-running the
-    // matcher logic.
-    const userByToken = new Map<string, string>()
-    for (const [userId, m] of matchesByUser) {
-      userByToken.set(m.token, userId)
-      const isMg = m.locale === 'MG'
-      // Security P1-2 : strip `searchName` from the body — saved-
-      // search names are user-written strings that may contain
-      // private hints (neighborhood, budget, etc.). The body travels
-      // through Expo's infra logs AND surfaces on the lock screen.
-      // The mobile app reads `data.savedSearchId` (if we add it) or
-      // just navigates to the listing detail.
-      messages.push({
-        to: m.token,
-        title: isMg ? 'Filazana vaovao' : 'Nouvelle annonce',
-        body: isMg
-          ? 'Misy filazana vaovao mifanaraka amin\'ny fitadiavanao.'
-          : 'Une nouvelle annonce correspond à ta recherche.',
-        sound: 'default',
-        data: {
-          kind: 'savedSearchMatch',
-          listingId: listing.id,
-          listingSlug: listing.slug,
-        },
-      })
+    // Split by delivery channel.
+    const pushMatches: Match[] = []
+    const emailMatches: Match[] = []
+    for (const m of matchesByUser.values()) {
+      if (m.expoPushToken) pushMatches.push(m)
+      else emailMatches.push(m)
     }
 
-    const result = await sendPush(messages)
-    // Persist ticket ids for the receipt-poll cron. `to` is the push
-    // token; userByToken maps it back to a userId.
-    await recordTickets(
-      result.tickets.flatMap((t) => {
-        const userId = userByToken.get(t.to)
-        return userId ? [{ userId, ticketId: t.ticketId }] : []
-      }),
-    )
+    // --- Push channel (existing) -----------------------------------
+    if (pushMatches.length > 0) {
+      const messages: PushMessage[] = []
+      // Reverse index : token → userId, for mapping the per-recipient
+      // tickets Expo returns back to a userId.
+      const userByToken = new Map<string, string>()
+      for (const m of pushMatches) {
+        if (!m.expoPushToken) continue
+        userByToken.set(m.expoPushToken, m.userId)
+        const isMg = m.locale === 'MG'
+        // Security P1-2 : strip `searchName` from the body — saved-
+        // search names are user-written strings that may contain
+        // private hints (neighborhood, budget, etc.). The body travels
+        // through Expo's infra logs AND surfaces on the lock screen.
+        messages.push({
+          to: m.expoPushToken,
+          title: isMg ? 'Filazana vaovao' : 'Nouvelle annonce',
+          body: isMg
+            ? 'Misy filazana vaovao mifanaraka amin\'ny fitadiavanao.'
+            : 'Une nouvelle annonce correspond à ta recherche.',
+          sound: 'default',
+          data: {
+            kind: 'savedSearchMatch',
+            listingId: listing.id,
+            listingSlug: listing.slug,
+          },
+        })
+      }
+      const result = await sendPush(messages)
+      await recordTickets(
+        result.tickets.flatMap((t) => {
+          const userId = userByToken.get(t.to)
+          return userId ? [{ userId, ticketId: t.ticketId }] : []
+        }),
+      )
+    }
+
+    // --- Email channel (E-T09 fallback) ----------------------------
+    if (emailMatches.length > 0) {
+      const baseUrl = env.AUTH_URL.replace(/\/$/, '')
+      // Sanitize once — caller passes the raw listing title from DB.
+      // Memory `feedback_email_header_injection`: never let raw user
+      // strings flow into a Subject header without CRLF stripping.
+      const safeTitle = sanitizeEmailHeaderValue(listing.title)
+      const listingUrl = `${baseUrl}/annonces/${listing.slug}`
+      const manageSearchUrl = `${baseUrl}/dashboard/saved-searches`
+
+      for (const m of emailMatches) {
+        const isMg = m.locale === 'MG'
+        const locationLabel = isMg
+          ? listing.neighborhoodNameMg
+          : listing.neighborhoodNameFr
+        const built = buildSavedSearchMatchEmail(
+          fromPrismaLocale(m.locale),
+          {
+            recipientName: sanitizeEmailHeaderValue(m.displayName),
+            listingTitle: safeTitle,
+            locationLabel,
+            monthlyRentFormatted: formatAriary(listing.priceMonthlyMGA),
+            listingUrl,
+            manageSearchUrl,
+          },
+        )
+        // Fire-and-forget; sendTransactionalEmail is fail-soft.
+        void sendTransactionalEmail({
+          recipientId: m.userId,
+          recipientEmail: m.email,
+          eventType: 'saved-search-match',
+          subject: built.subject,
+          html: built.html,
+          text: built.text,
+        })
+      }
+    }
   } catch (err) {
     // Sec P1-5 : log only the message — Prisma errors include
     // bound query values which can leak userId.

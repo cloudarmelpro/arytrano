@@ -43,8 +43,10 @@ export async function publishListing(ownerId: string, listingId: string): Promis
       cityId: true,
       neighborhoodId: true,
       status: true,
-      city: { select: { slug: true } },
-      neighborhood: { select: { slug: true } },
+      city: { select: { slug: true, nameFr: true, nameMg: true } },
+      neighborhood: {
+        select: { slug: true, nameFr: true, nameMg: true },
+      },
       owner: { select: { id: true, email: true, name: true, locale: true } },
       _count: { select: { photos: true } },
     },
@@ -118,6 +120,13 @@ export async function publishListing(ownerId: string, listingId: string): Promis
     amenities: listing.amenities,
     city: { slug: listing.city.slug },
     neighborhood: { slug: listing.neighborhood.slug },
+    // E-T09 — localized labels used by the email fallback for web-only
+    // subscribers (push subscribers get a generic body — see Security
+    // P1-2 in notify-saved-search-matches).
+    cityNameFr: listing.city.nameFr,
+    cityNameMg: listing.city.nameMg,
+    neighborhoodNameFr: listing.neighborhood.nameFr,
+    neighborhoodNameMg: listing.neighborhood.nameMg,
   })
 
   return updated

@@ -333,6 +333,7 @@ export const frMG = {
   'annonces.count.hasMore': '(plus disponibles)',
   'annonces.empty.title': "Aucune annonce pour l'instant.",
   'annonces.empty.title.city': "Aucune annonce pour l'instant à {city}.",
+  'annonces.map.empty': 'Aucune annonce sur la carte avec ces filtres.',
   // City tabs above the filter row
   'annonces.cityTabs.all': 'Toutes',
   'annonces.cityTabs.aria': 'Filtrer par ville',

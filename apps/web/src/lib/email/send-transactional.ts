@@ -17,6 +17,7 @@ export type TransactionalEventType =
   | 'lease-invite-tenant'
   | 'lease-tenant-signed'
   | 'lease-tenant-refused'
+  | 'saved-search-match'
 
 /**
  * Wrap `sendEmail` with per-user-per-event rate limiting (T-034). Used by
