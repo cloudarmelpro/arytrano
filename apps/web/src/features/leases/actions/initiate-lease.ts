@@ -47,13 +47,12 @@ export async function initiateLeaseAction(
   // schema can stay strict typed (`z.number().int()`, `z.coerce.date()`).
   let input
   try {
-    // H2 audit fix: caution is derived server-side in `initiate-lease.ts`
-    // from the listing's `cautionMonths` × `priceMonthlyMGA`, so the
-    // wizard never sends a separate `cautionMGA` field.
+    // H2 + SEC-H2 audit fix: BOTH `cautionMGA` and `monthlyRentMGA` are
+    // derived server-side in `initiate-lease.ts` from the listing —
+    // owner cannot fudge either by manipulating the form payload.
     input = initiateLeaseInputSchema.parse({
       listingId: formData.get('listingId'),
       tenantEmail: formData.get('tenantEmail'),
-      monthlyRentMGA: Number(formData.get('monthlyRentMGA') ?? 0),
       startDate: formData.get('startDate'),
       durationMonths: Number(formData.get('durationMonths') ?? 0),
     })

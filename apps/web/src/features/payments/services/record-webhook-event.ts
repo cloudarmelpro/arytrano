@@ -1,7 +1,9 @@
 import 'server-only'
+import * as Sentry from '@sentry/nextjs'
 import { prisma } from '@/lib/db'
 import type { PaymentPurpose, PaymentStatus } from '@prisma/client'
 import type { WebhookEvent } from '@/lib/payments/types'
+import { stripC0FromJson } from '@/lib/format/strip-c0'
 
 /**
  * Idempotent state machine for recording an inbound GoalPay webhook.
@@ -68,6 +70,14 @@ export async function recordWebhookEvent(
   })
 
   if (!existing) {
+    // SEC-L1 audit fix — capture to Sentry so HMAC-valid events for
+    // unknown references stay forensically visible (could be a stale
+    // dev event hitting prod, or a race we accept — we want to know).
+    Sentry.captureMessage('webhook event for unknown reference', {
+      level: 'warning',
+      tags: { kind: 'unknown_reference' },
+      extra: { reference: event.reference, event: event.event },
+    })
     return { kind: 'unknown_reference', reference: event.reference }
   }
 
@@ -100,13 +110,20 @@ export async function recordWebhookEvent(
   const targetStatus = eventToStatus[event.event]
   const now = new Date()
 
+  // SEC-M4 audit fix — scrub C0 controls (U+0000 etc.) from the
+  // provider payload before it hits JSONB. Postgres rejects NUL bytes
+  // and may misbehave on other C0 codes; a single rogue byte from a
+  // provider quirk would flip a valid `payment.success` event into a
+  // 500. HMAC validates origin, not hygiene.
+  const safePayload = stripC0FromJson(event) as unknown as object
+
   // Idempotent path : already terminal → record audit only.
   if (TERMINAL_STATUSES.has(existing.status)) {
     await prisma.paymentEvent.create({
       data: {
         paymentId: existing.id,
         status: targetStatus,
-        rawPayload: event as unknown as object,
+        rawPayload: safePayload,
       },
     })
     return {
@@ -131,7 +148,7 @@ export async function recordWebhookEvent(
       data: {
         paymentId: existing.id,
         status: targetStatus,
-        rawPayload: event as unknown as object,
+        rawPayload: safePayload,
       },
     }),
   ])

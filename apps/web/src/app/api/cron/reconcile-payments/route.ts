@@ -1,6 +1,9 @@
 import { NextResponse } from 'next/server'
+import crypto from 'node:crypto'
 import * as Sentry from '@sentry/nextjs'
 import { env } from '@/lib/env'
+import { extractRequestInfo } from '@/lib/auth/request-info'
+import { rateLimiters } from '@/lib/rate-limit'
 import { reconcileStuckPayments } from '@/features/payments'
 
 /**
@@ -18,15 +21,40 @@ import { reconcileStuckPayments } from '@/features/payments'
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
 
+/**
+ * Constant-time bearer comparison.
+ * - Returns false immediately on length mismatch (avoids `timingSafeEqual` throw).
+ * - Uses `crypto.timingSafeEqual` to avoid byte-by-byte short-circuit leaks.
+ */
+function bearerEquals(received: string | null, expected: string): boolean {
+  if (!received) return false
+  const want = `Bearer ${expected}`
+  if (received.length !== want.length) return false
+  return crypto.timingSafeEqual(Buffer.from(received), Buffer.from(want))
+}
+
 export async function GET(request: Request) {
-  if (!env.CRON_SECRET) {
+  // SEC-H3 audit fix — rate-limit BEFORE secret check, so brute-force
+  // probes burn through the bucket without any 401/503 signal that
+  // would tell the attacker the endpoint exists.
+  const { ipHash } = extractRequestInfo(request.headers)
+  const rl = await rateLimiters.cronAccess(ipHash)
+  if (!rl.success) {
     return NextResponse.json(
-      { ok: false, error: 'cron_disabled' },
-      { status: 503 },
+      { ok: false, error: 'unauthorized' },
+      { status: 401 },
     )
   }
-  const auth = request.headers.get('authorization')
-  if (auth !== `Bearer ${env.CRON_SECRET}`) {
+
+  // SEC-H3 audit fix — fail-CLOSED with 401 (NOT 503) when CRON_SECRET
+  // is unset, so an unauthenticated probe cannot distinguish
+  // "endpoint exists but misconfigured" from "wrong secret".
+  // SEC-H1 audit fix — constant-time compare to prevent byte-by-byte
+  // timing leaks of the secret.
+  if (
+    !env.CRON_SECRET ||
+    !bearerEquals(request.headers.get('authorization'), env.CRON_SECRET)
+  ) {
     return NextResponse.json(
       { ok: false, error: 'unauthorized' },
       { status: 401 },

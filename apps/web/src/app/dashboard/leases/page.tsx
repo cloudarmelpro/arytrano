@@ -70,10 +70,12 @@ export default async function LeasesListPage() {
                     <p className="mt-1 text-[12.5px] text-foreground/65">
                       {role === 'owner'
                         ? t('lease.list.row.tenant', {
-                            name: counterpart.name ?? counterpart.email,
+                            name:
+                              counterpart.name ?? t('lease.list.row.asTenant'),
                           })
                         : t('lease.list.row.owner', {
-                            name: counterpart.name ?? counterpart.email,
+                            name:
+                              counterpart.name ?? t('lease.list.row.asOwner'),
                           })}
                     </p>
                   </div>

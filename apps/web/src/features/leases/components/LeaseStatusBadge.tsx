@@ -6,6 +6,10 @@ import { useT } from '@/lib/i18n/client'
 /**
  * Visual badge for a Lease.status. Mirrors the editorial palette from
  * the rest of AryTrano — soft tinted backgrounds, no loud colors.
+ *
+ * A11Y-H2 audit fix — every variant now carries a `border border-current`
+ * so the shape stays visible in Windows High Contrast / forced-colors
+ * mode (where the tinted backgrounds collapse to system colors).
  */
 const CLASSES: Record<LeaseStatus, string> = {
   DRAFT: 'bg-muted/50 text-muted-foreground',
@@ -20,7 +24,8 @@ export function LeaseStatusBadge({ status }: { status: LeaseStatus }) {
   const t = useT()
   return (
     <span
-      className={`inline-flex h-7 items-center rounded-md px-2.5 text-[11.5px] font-semibold uppercase tracking-[0.08em] ${CLASSES[status]}`}
+      role="status"
+      className={`inline-flex h-7 items-center rounded-md border border-current/30 px-2.5 text-[11.5px] font-semibold uppercase tracking-[0.08em] ${CLASSES[status]}`}
     >
       {t(`lease.status.${status}` as const)}
     </span>

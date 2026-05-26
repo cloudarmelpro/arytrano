@@ -124,7 +124,8 @@ export default async function LeaseDetailPage({
               </p>
               {lease.ownerSignedAt ? (
                 <p className="mt-1 text-[11.5px] font-medium text-emerald-700">
-                  ✓ {t('lease.detail.signedAt')}
+                  <span aria-hidden>✓</span>{' '}
+                  <span>{t('lease.detail.signedAt')}</span>
                 </p>
               ) : null}
             </dd>
@@ -142,7 +143,8 @@ export default async function LeaseDetailPage({
               </p>
               {lease.tenantSignedAt ? (
                 <p className="mt-1 text-[11.5px] font-medium text-emerald-700">
-                  ✓ {t('lease.detail.signedAt')}
+                  <span aria-hidden>✓</span>{' '}
+                  <span>{t('lease.detail.signedAt')}</span>
                 </p>
               ) : null}
             </dd>

@@ -41,9 +41,14 @@ export async function sendTransactionalEmail(opts: {
     opts.eventType,
   )
   if (!rl.success) {
-    console.warn(
-      `[email] rate-limited (${opts.eventType}) for user ${opts.recipientId}`,
-    )
+    // SEC-M6 audit fix — never ship userId/email to prod stdout (PII).
+    // Sentry already captures unhandled errors elsewhere; for rate-limit
+    // events we only need event-type counts on the dev console.
+    if (process.env.NODE_ENV !== 'production') {
+      console.warn(
+        `[email] rate-limited (${opts.eventType}) for user ${opts.recipientId}`,
+      )
+    }
     return
   }
   try {

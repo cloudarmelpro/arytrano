@@ -9,10 +9,10 @@ vi.mock('@/lib/db', () => ({
   prisma: {
     payment: {
       findMany: vi.fn(),
-      update: vi.fn(),
+      updateMany: vi.fn(),
     },
     paymentEvent: {
-      create: vi.fn(),
+      createMany: vi.fn(),
     },
     $transaction: vi.fn(),
   },
@@ -24,12 +24,19 @@ import * as Sentry from '@sentry/nextjs'
 
 beforeEach(() => {
   vi.clearAllMocks()
+  // Bulk path: $transaction returns [updateManyResult, createManyResult].
   vi.mocked(prisma.$transaction).mockImplementation(
     async (ops: unknown) => {
-      if (Array.isArray(ops)) return Promise.all(ops)
+      if (Array.isArray(ops)) {
+        // Resolve each op so any inner mock returns flow through.
+        const resolved = await Promise.all(ops)
+        return resolved
+      }
       throw new Error('Unexpected $transaction shape in test')
     },
   )
+  vi.mocked(prisma.payment.updateMany).mockResolvedValue({ count: 0 } as never)
+  vi.mocked(prisma.paymentEvent.createMany).mockResolvedValue({ count: 0 } as never)
 })
 
 describe('reconcileStuckPayments', () => {
@@ -43,42 +50,41 @@ describe('reconcileStuckPayments', () => {
     expect(Sentry.captureMessage).not.toHaveBeenCalled()
   })
 
-  it('marks each stuck Payment EXPIRED and audits with reconciliation_cron source', async () => {
-    vi.mocked(prisma.payment.findMany).mockResolvedValue([
-      { id: 'p1' },
-      { id: 'p2' },
-    ] as never)
-
-    const result = await reconcileStuckPayments()
-
-    expect(result).toEqual({ scanned: 2, markedExpired: 2 })
-    expect(prisma.$transaction).toHaveBeenCalledTimes(2)
-  })
-
-  it('surfaces per-row failures to Sentry without aborting the batch', async () => {
+  it('issues a single bulk updateMany + createMany transaction for the whole batch', async () => {
     vi.mocked(prisma.payment.findMany).mockResolvedValue([
       { id: 'p1' },
       { id: 'p2' },
       { id: 'p3' },
     ] as never)
-    // Make the second row's transaction throw.
-    let calls = 0
-    vi.mocked(prisma.$transaction).mockImplementation(async (ops) => {
-      calls += 1
-      if (calls === 2) throw new Error('simulated FK race')
-      if (Array.isArray(ops)) return Promise.all(ops)
-      return []
-    })
+    vi.mocked(prisma.payment.updateMany).mockResolvedValue({ count: 3 } as never)
+    vi.mocked(prisma.paymentEvent.createMany).mockResolvedValue({ count: 3 } as never)
 
     const result = await reconcileStuckPayments()
 
-    expect(result.scanned).toBe(3)
-    expect(result.markedExpired).toBe(2) // p1 + p3, p2 failed
+    expect(result).toEqual({ scanned: 3, markedExpired: 3 })
+    // PERF-M2 — one transaction regardless of batch size.
+    expect(prisma.$transaction).toHaveBeenCalledOnce()
+    expect(prisma.payment.updateMany).toHaveBeenCalledOnce()
+    expect(prisma.paymentEvent.createMany).toHaveBeenCalledOnce()
+  })
+
+  it('surfaces a batch failure to Sentry without throwing', async () => {
+    vi.mocked(prisma.payment.findMany).mockResolvedValue([
+      { id: 'p1' },
+      { id: 'p2' },
+    ] as never)
+    vi.mocked(prisma.$transaction).mockRejectedValueOnce(new Error('simulated DB blip'))
+
+    const result = await reconcileStuckPayments()
+
+    expect(result.scanned).toBe(2)
+    expect(result.markedExpired).toBe(0)
     expect(Sentry.captureException).toHaveBeenCalledOnce()
   })
 
   it('captures a warning to Sentry when any rows were expired', async () => {
     vi.mocked(prisma.payment.findMany).mockResolvedValue([{ id: 'p1' }] as never)
+    vi.mocked(prisma.payment.updateMany).mockResolvedValue({ count: 1 } as never)
 
     await reconcileStuckPayments()
 

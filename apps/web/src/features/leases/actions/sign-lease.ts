@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache'
 import { auth } from '@/features/auth'
 import { getLocale } from '@/lib/i18n/get-locale'
 import { getT } from '@/lib/i18n/translate'
+import { rateLimiters } from '@/lib/rate-limit'
 import { tenantSignLease } from '../services/tenant-sign-lease'
 import { refuseLease } from '../services/refuse-lease'
 
@@ -31,6 +32,12 @@ export async function tenantSignLeaseAction(
   const session = await auth()
   if (!session?.user?.id) {
     return { ok: false, message: t('lease.error.notAuthenticated') }
+  }
+
+  // SEC-M2 audit fix — bound stolen-bearer enumeration / runaway client.
+  const rl = await rateLimiters.leaseAction(session.user.id)
+  if (!rl.success) {
+    return { ok: false, message: t('lease.error.rateLimit') }
   }
 
   const leaseId = formData.get('leaseId')
@@ -74,6 +81,12 @@ export async function tenantRefuseLeaseAction(
   const session = await auth()
   if (!session?.user?.id) {
     return { ok: false, message: t('lease.error.notAuthenticated') }
+  }
+
+  // SEC-M2 audit fix — bound stolen-bearer enumeration / runaway client.
+  const rl = await rateLimiters.leaseAction(session.user.id)
+  if (!rl.success) {
+    return { ok: false, message: t('lease.error.rateLimit') }
   }
 
   const leaseId = formData.get('leaseId')

@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import * as Sentry from '@sentry/nextjs'
 import { goalPayProvider, recordWebhookEvent } from '@/features/payments'
 import { applyLeasePaymentSideEffect } from '@/features/leases'
 
@@ -38,13 +39,24 @@ export const dynamic = 'force-dynamic'
  * about the endpoint's auth surface. No side effects, no DB hit.
  */
 export async function GET() {
-  return NextResponse.json(
-    { ok: true, endpoint: 'goalpay-webhook' },
-    { status: 200 },
-  )
+  // SEC-L5 audit fix — minimal response. The previous body advertised
+  // which provider was wired (`endpoint: 'goalpay-webhook'`) — useful
+  // for an attacker fingerprinting the stack. GoalPay's verifier only
+  // checks the 200, not the payload.
+  return NextResponse.json({ ok: true }, { status: 200 })
 }
 
 export async function POST(request: Request) {
+  // SEC-M1 audit fix — bound the buffer BEFORE running HMAC over it.
+  // Without this an attacker can POST hundreds of MB of garbage and
+  // burn Node memory + CPU before the signature check rejects them.
+  // GoalPay's real payloads sit comfortably under 4 KB; 32 KB is a
+  // generous ceiling.
+  const len = Number(request.headers.get('content-length') ?? 0)
+  if (len > 32_768) {
+    return NextResponse.json({ error: 'too_large' }, { status: 413 })
+  }
+
   // Read the raw body BEFORE any parsing — HMAC must be computed over
   // the exact bytes received. Calling `request.json()` first would
   // re-serialize and invalidate the signature.
@@ -91,13 +103,16 @@ export async function POST(request: Request) {
 
   switch (outcome.kind) {
     case 'mismatch':
-      // We could 200 to stop retries, but 422 surfaces the divergence
-      // in GoalPay's dashboard so a human can investigate. Either is
-      // defensible — picking 422 for visibility during early prod.
-      return NextResponse.json(
-        { error: 'mismatch', reason: outcome.reason },
-        { status: 422 },
-      )
+      // SEC-L2 audit fix — DON'T leak the mismatch reason in the response.
+      // HMAC-valid callers are GoalPay (no need for hints) and any
+      // future bypass should not gain free reconnaissance on what
+      // tripped the check. Reason still goes to Sentry for human triage.
+      Sentry.captureMessage('webhook mismatch', {
+        level: 'warning',
+        tags: { kind: 'mismatch', reason: outcome.reason },
+        extra: { paymentId: outcome.paymentId },
+      })
+      return NextResponse.json({ error: 'mismatch' }, { status: 422 })
     case 'applied':
     case 'noop':
     case 'unknown_reference':

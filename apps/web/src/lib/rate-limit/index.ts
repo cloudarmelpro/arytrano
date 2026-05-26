@@ -138,6 +138,17 @@ const initiateLeaseLimiter = makeLimiter('lease-initiate', {
   window: '1 h',
 })
 
+// SEC-M2 audit fix — lease accept/refuse rate limit. Cheaper than
+// initiate (no GoalPay call) but still hits Prisma + JWT verify +
+// tokenVersion read; an enumerated bearer can burn CPU iterating
+// leaseIds. 20/h/userId is generous for legitimate use (rarely more
+// than 1-2 actions on a real lease) and tight enough to throttle
+// stolen-token scans.
+const leaseActionLimiter = makeLimiter('lease-action', {
+  requests: 20,
+  window: '1 h',
+})
+
 // Push token register (E-T22 audit P1-1) — bearer-keyed, 3/min/user.
 // Bounds an attacker spamming token claims after sniffing one off a
 // lock-screen or screenshot. Legitimate flow registers once per
@@ -145,6 +156,15 @@ const initiateLeaseLimiter = makeLimiter('lease-initiate', {
 const pushTokenRegisterLimiter = makeLimiter('push-token-register', {
   requests: 3,
   window: '1 m',
+})
+
+// Cron access (SEC-H3) — 30/h per IP. The cron endpoint is keyed off a
+// shared CRON_SECRET; rate-limiting bounds brute-force enumeration of
+// the secret. Legitimate use is one call per hour from the scheduler,
+// so 30/h is generous and still tight enough to slow attackers.
+const cronAccessLimiter = makeLimiter('cron-access', {
+  requests: 30,
+  window: '1 h',
 })
 
 type RateLimitResult = { success: boolean; remaining?: number; reset?: number }
@@ -184,6 +204,9 @@ export const rateLimiters = {
 
   /** Initiate lease (E-T26) — 5/h/userId. Bearer-keyed via userId. */
   initiateLease: (userId: string) => check(initiateLeaseLimiter, userId),
+
+  /** Lease accept/refuse (E-T26) — 20/h/userId. Tenant-side actions. */
+  leaseAction: (userId: string) => check(leaseActionLimiter, userId),
 
   /** Report submission — 10 / 1h / IP overall + 3 / 1h / (IP, listing) anti-pile-on. */
   report: async (ipHash: string, listingId: string): Promise<RateLimitResult> => {
@@ -238,4 +261,8 @@ export const rateLimiters = {
   /** Push token registration — 3/min per userId. Anti token-claim spam. */
   pushTokenRegister: (userId: string) =>
     check(pushTokenRegisterLimiter, userId),
+
+  /** Cron secret probe — 30/h per IP. Fail-CLOSED on null IP. */
+  cronAccess: (ipHash: string | null) =>
+    check(cronAccessLimiter, ipHash ?? 'noip:cron-access'),
 }

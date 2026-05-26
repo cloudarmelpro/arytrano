@@ -49,39 +49,42 @@ export async function reconcileStuckPayments(opts?: {
 
   if (stuck.length === 0) return { scanned: 0, markedExpired: 0 }
 
-  // Update + audit each one. Transaction per row keeps a single failure
-  // from rolling back the whole batch; the cron retries naturally
-  // on the next tick.
+  // PERF-M2 audit fix — bulk `updateMany` + `createMany` in a single
+  // transaction. The previous serial loop made one round-trip per row
+  // (~10-20ms each on a hosted DB); at 500 stuck payments that's
+  // 5-10s of wall time, dangerously close to serverless cron timeouts.
+  // Now we issue exactly two SQL statements regardless of batch size.
+  const ids = stuck.map((p) => p.id)
+  const now = new Date()
+  const ranAtIso = now.toISOString()
+  const auditRows = ids.map((id) => ({
+    paymentId: id,
+    status: 'EXPIRED' as const,
+    rawPayload: {
+      source: 'reconciliation_cron',
+      reason: `stuck >${minutes}min in INITIATED/PENDING`,
+      ranAt: ranAtIso,
+    },
+  }))
+
   let markedExpired = 0
-  for (const p of stuck) {
-    try {
-      await prisma.$transaction([
-        prisma.payment.update({
-          where: { id: p.id },
-          data: { status: 'EXPIRED', webhookReceivedAt: new Date() },
-        }),
-        prisma.paymentEvent.create({
-          data: {
-            paymentId: p.id,
-            status: 'EXPIRED',
-            rawPayload: {
-              source: 'reconciliation_cron',
-              reason: `stuck >${minutes}min in INITIATED/PENDING`,
-              ranAt: new Date().toISOString(),
-            },
-          },
-        }),
-      ])
-      markedExpired += 1
-    } catch (err) {
-      // M5 audit fix — surface per-row failures to Sentry instead of
-      // swallowing silently. The batch continues so one bad row never
-      // poisons the whole tick.
-      Sentry.captureException(err, {
-        tags: { cron: 'reconcile-stuck-payments', step: 'expire-one' },
-        extra: { paymentId: p.id, minutes },
-      })
-    }
+  try {
+    const [updateResult] = await prisma.$transaction([
+      prisma.payment.updateMany({
+        where: { id: { in: ids } },
+        data: { status: 'EXPIRED', webhookReceivedAt: now },
+      }),
+      prisma.paymentEvent.createMany({ data: auditRows }),
+    ])
+    markedExpired = updateResult.count
+  } catch (err) {
+    // Single transaction failure means none of the rows flipped — surface
+    // the whole batch to Sentry so an admin can investigate. The cron
+    // will retry naturally on the next tick.
+    Sentry.captureException(err, {
+      tags: { cron: 'reconcile-stuck-payments', step: 'expire-batch' },
+      extra: { scanned: stuck.length, minutes },
+    })
   }
 
   // M4 audit fix — alert when ANY rows were expired so an admin can

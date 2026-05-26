@@ -36,7 +36,10 @@ export function UnifiedToolbar() {
         type="search"
         value={q}
         onChange={(e) => setQ(e.target.value)}
-        aria-label={t('toolbar.query.label')}
+        // A11Y-M6 audit fix — the wrapping <form role="search" aria-label="...">
+        // already provides an accessible name for this widget. Duplicating
+        // aria-label on the input caused screen readers to announce the
+        // label twice on focus.
         placeholder={t('toolbar.query.placeholder')}
         disabled={pending}
         minLength={2}

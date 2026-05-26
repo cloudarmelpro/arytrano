@@ -1,6 +1,12 @@
 /**
  * E-T26 — Lease success-fee configuration.
  *
+ * SEC-L6 audit note — CLIENT-SAFE MODULE. Imported by `LeaseWizard.tsx`
+ * (a Client Component) for the live fee recap. Do NOT put secrets,
+ * provider keys, or any server-only constants in this file — they
+ * would ship to the client bundle. Server-only fee logic belongs in
+ * `services/` next to the Prisma calls that consume it.
+ *
  * These are PUBLIC business constants (visible on the /proprietaires
  * pricing page). Stored as code, not env, so a deploy misconfiguration
  * can't quietly debit a different amount than what the marketing page

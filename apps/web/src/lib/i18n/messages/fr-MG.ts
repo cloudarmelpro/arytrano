@@ -18,6 +18,8 @@ export const frMG = {
   'lease.wizard.title': 'Signer un bail avec ton locataire',
   'lease.wizard.lead':
     'Renseigne les infos du bail pour « {listing} ». Après ton paiement, ton locataire reçoit une invitation pour signer à son tour.',
+  'lease.wizard.progress': 'Étape {current} sur {total}',
+  'lease.wizard.feeRecap.label': 'Récapitulatif des frais',
   'lease.wizard.step1.title': 'Le locataire',
   'lease.wizard.step1.help':
     'Indique l’email du compte AryTrano du locataire — s’il n’en a pas, demande-lui de s’inscrire d’abord sur arytrano.mg.',
@@ -82,6 +84,8 @@ export const frMG = {
   'lease.tenant.refuse.reason.placeholder':
     'Ex : conditions différentes de l’accord verbal',
   'lease.tenant.refuse.confirm': 'Confirmer le refus',
+  'lease.tenant.outcome.signed': 'Bail accepté. Mise à jour de la page…',
+  'lease.tenant.outcome.refused': 'Bail refusé. Mise à jour de la page…',
   'lease.owner.waiting':
     '{name} doit accepter ce bail pour qu’il devienne actif. Tu seras notifié à la signature.',
 
@@ -364,6 +368,7 @@ export const frMG = {
   'filters.sidebar.title': 'Filtres',
   'filters.chips.aria': 'Filtres actifs',
   'filters.chips.remove': 'Retirer ce filtre',
+  'filters.chips.removeNamed': 'Retirer le filtre {filter}',
   'filters.chips.clearAll': 'Tout effacer',
   'annonces.search.aria': 'Affiner la recherche',
   'annonces.search.city.label': 'Ville',
@@ -1872,6 +1877,8 @@ export const frMG = {
   'oauth.unlink': 'Délier',
   'oauth.unlinkConfirm': 'Confirmer le déliement',
   'oauth.cannotUnlink': 'Tu ne peux pas délier ta dernière méthode de connexion.',
+  'oauth.unlinkHint.needPassword':
+    'Ajoute un mot de passe avant de délier ta dernière connexion.',
 
   // Login events section
   'loginEvents.empty': 'Aucune connexion enregistrée pour l\'instant.',

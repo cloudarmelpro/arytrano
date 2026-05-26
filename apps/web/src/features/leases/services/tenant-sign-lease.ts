@@ -34,6 +34,13 @@ export async function tenantSignLease(
       status: true,
       tenantId: true,
       listingId: true,
+      // SEC-M5 audit fix — defense in depth: re-verify the linked Payment
+      // is CONFIRMED before activating. The state machine should already
+      // guarantee this (only the CONFIRMED webhook moves DRAFT→PENDING_TENANT),
+      // but a future bug elsewhere (admin tool, manual SQL fix, replay)
+      // that promotes a DRAFT to PENDING_TENANT without payment confirming
+      // must NOT let the tenant sign without AryTrano being paid.
+      payment: { select: { status: true } },
       owner: {
         select: { id: true, name: true, email: true, locale: true },
       },
@@ -52,6 +59,17 @@ export async function tenantSignLease(
       kind: 'invalid_status',
       leaseId,
       currentStatus: lease.status,
+    }
+  }
+
+  // SEC-M5 — Payment must be CONFIRMED. If it isn't, we surface the
+  // payment status as the "current status" so observability still
+  // captures the divergence.
+  if (!lease.payment || lease.payment.status !== 'CONFIRMED') {
+    return {
+      kind: 'invalid_status',
+      leaseId,
+      currentStatus: `payment=${lease.payment?.status ?? 'missing'}`,
     }
   }
 

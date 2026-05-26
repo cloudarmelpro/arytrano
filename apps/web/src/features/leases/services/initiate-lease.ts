@@ -147,7 +147,10 @@ export async function initiateLease(
         listingId: listing.id,
         ownerId,
         tenantId: tenant.id,
-        monthlyRentMGA: input.monthlyRentMGA,
+        // SEC-H2 audit fix — `monthlyRentMGA` is sourced from the
+        // listing, NEVER from form input. An owner cannot write a
+        // contract value that diverges from the published listing price.
+        monthlyRentMGA: listing.priceMonthlyMGA,
         cautionMGA,
         startDate: input.startDate,
         durationMonths: input.durationMonths,

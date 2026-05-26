@@ -24,6 +24,8 @@ export const mg: Record<MessageKey, string> = {
   'lease.wizard.title': 'Manao sonia bail amin\'ny mpanofa',
   'lease.wizard.lead':
     'Fenoy ny mombamomba ny bail ho an\'ny « {listing} ». Aorian\'ny fandoavanao, mandray fanasana ny mpanofa hanao sonia.',
+  'lease.wizard.progress': 'Dingana {current} amin\'ny {total}',
+  'lease.wizard.feeRecap.label': 'Famintinana ny saran-tsoratra',
   'lease.wizard.step1.title': 'Ny mpanofa',
   'lease.wizard.step1.help':
     'Ataovy ny email-n\'ny kaonty AryTrano-n\'ny mpanofa — raha tsy mbola manana izy, asaivo mamorona kaonty ao amin\'ny arytrano.mg aloha.',
@@ -85,6 +87,8 @@ export const mg: Record<MessageKey, string> = {
   'lease.tenant.refuse.reason.placeholder':
     'Oh: hafa amin\'ny fifanarahana am-bava',
   'lease.tenant.refuse.confirm': 'Hamafiso ny fandavana',
+  'lease.tenant.outcome.signed': 'Voaray ny fifanarahana. Manavao ny pejy…',
+  'lease.tenant.outcome.refused': 'Nolavina ny fifanarahana. Manavao ny pejy…',
   'lease.owner.waiting':
     'Tsy maintsy manaiky ny bail i {name} mba ho lasa mavitrika. Hampandrenesina anao isika rehefa vita sonia.',
 
@@ -365,6 +369,7 @@ export const mg: Record<MessageKey, string> = {
   'filters.reset': 'Avadika',
   'filters.chips.aria': 'Sivana mavitrika',
   'filters.chips.remove': 'Esory ity sivana ity',
+  'filters.chips.removeNamed': 'Esory ny sivana {filter}',
   'filters.chips.clearAll': 'Foanana daholo',
   'annonces.search.aria': 'Hanaja ny fikarohana',
   'annonces.search.city.label': 'Tanàna',
@@ -1890,6 +1895,8 @@ export const mg: Record<MessageKey, string> = {
   'oauth.unlink': 'Esory',
   'oauth.unlinkConfirm': 'Hamafiso ny fanesorana',
   'oauth.cannotUnlink': 'Tsy azonao esorina ny fomba fidirana farany.',
+  'oauth.unlinkHint.needPassword':
+    'Manampia teny miafina alohan\'ny hanesoranao ny fidirana farany.',
 
   // Login events
   'loginEvents.empty': 'Mbola tsy misy fidirana voasoratra.',

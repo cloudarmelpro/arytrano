@@ -1,5 +1,7 @@
 import 'server-only'
 import { Prisma } from '@prisma/client'
+import { after } from 'next/server'
+import * as Sentry from '@sentry/nextjs'
 import { prisma } from '@/lib/db'
 import type { PaymentStatus } from '@prisma/client'
 import { env } from '@/lib/env'
@@ -133,17 +135,45 @@ export async function applyLeasePaymentSideEffect(
     throw err
   }
 
-  // Fire-and-forget tenant invite email. `sendTransactionalEmail`
-  // catches its own errors per design — the lease transition must
-  // remain durable even if SMTP hiccups.
-  await notifyTenantInvite({
+  // PERF-H2 audit fix — defer the SMTP round-trip via `after()` from
+  // `next/server` so the webhook response is flushed to GoalPay BEFORE
+  // we wait on the email provider. Without this, a slow SMTP push
+  // (200ms-2s typical) holds the webhook 200 open, triggers GoalPay's
+  // retry timer, and the retried delivery would send a second invite
+  // email (sendTransactional's rate-limit catches storms but not
+  // legitimate retries within the bucket).
+  //
+  // `after()` schedules the work to run after the response is flushed
+  // (only valid inside a request scope — the webhook route is the only
+  // caller in production). In tests or other non-request contexts it
+  // throws; we fall back to fire-and-forget so the service stays usable
+  // outside Next's request lifecycle. Errors are reported to Sentry so
+  // a stuck email doesn't surface as a 500 on the webhook path.
+  const emailInput = {
     leaseId: lease.id,
     tenant: lease.tenant,
     ownerName: lease.owner.name ?? lease.owner.email,
     listingTitle: lease.listing.title,
     monthlyRentMGA: lease.monthlyRentMGA,
     cautionMGA: lease.cautionMGA,
-  })
+  }
+  const deferEmail = async () => {
+    try {
+      await notifyTenantInvite(emailInput)
+    } catch (err) {
+      Sentry.captureException(err, {
+        tags: { kind: 'lease-invite-tenant-after' },
+        extra: { leaseId: lease.id },
+      })
+    }
+  }
+  try {
+    after(deferEmail)
+  } catch {
+    // Out-of-request-scope (tests, future non-HTTP callers). Run inline
+    // as fire-and-forget; we explicitly drop the floating promise.
+    void deferEmail()
+  }
 
   return { kind: 'lease_now_pending_tenant', leaseId: lease.id }
 }

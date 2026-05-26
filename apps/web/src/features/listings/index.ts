@@ -36,5 +36,8 @@ export { UnifiedToolbar } from './components/UnifiedToolbar'
 export { ListingSortButtons } from './components/ListingSortButtons'
 export { ActiveFiltersChips } from './components/ActiveFiltersChips'
 export { ResultsSearchStrip } from './components/ResultsSearchStrip'
-export { CityTabs, type CityTab } from './components/CityTabs'
+// CityTabs intentionally NOT re-exported here. It's a Server Component
+// that imports `getT` (server-only path) — surfacing it via the barrel
+// poisons every Client Component bundle that touches the barrel.
+// Server pages import directly from `./components/CityTabs` if they need it.
 export { AMENITY_CATALOG, AmenityIcon } from './amenities'

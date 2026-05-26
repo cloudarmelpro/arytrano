@@ -72,7 +72,11 @@ function SliderThumb({
     <SliderPrimitive.Thumb
       data-slot="slider-thumb"
       className={cn(
-        'block size-5 shrink-0 rounded-full border-2 border-primary bg-background shadow-sm outline-none transition focus-visible:ring-4 focus-visible:ring-primary/25 data-dragging:scale-110 data-dragging:cursor-grabbing data-disabled:cursor-not-allowed data-disabled:opacity-50',
+        // A11Y-M3 audit fix — focus ring uses solid `primary` (not 25%
+        // opacity) so the indicator hits WCAG 1.4.11 (≥3:1 contrast for
+        // UI components). The thinner ring (2px instead of 4px) keeps
+        // the visual weight balanced against the 20px thumb.
+        'block size-5 shrink-0 rounded-full border-2 border-primary bg-background shadow-sm outline-none transition focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 data-dragging:scale-110 data-dragging:cursor-grabbing data-disabled:cursor-not-allowed data-disabled:opacity-50',
         className,
       )}
       {...props}

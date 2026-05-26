@@ -4,6 +4,7 @@ import { prisma } from '@/lib/db'
 import { env } from '@/lib/env'
 import { sendTransactionalEmail } from '@/lib/email/send-transactional'
 import { sanitizeEmailHeaderValue } from '@/lib/email/sanitize-header'
+import { stripC0ControlChars } from '@/lib/format/strip-c0'
 import { buildLeaseTenantRefusedEmail } from '@/lib/email/templates/lease-tenant-refused'
 import { fromPrismaLocale } from '@/lib/i18n/config'
 
@@ -24,17 +25,6 @@ export type RefuseLeaseOutcome =
   | { kind: 'not_found'; leaseId: string }
   | { kind: 'not_tenant'; leaseId: string }
   | { kind: 'invalid_status'; leaseId: string; currentStatus: string }
-
-/**
- * Strip C0 control characters (U+0000 to U+001F) — PostgreSQL JSONB
- * rejects U+0000 and may misbehave on others when the value flows
- * into a `Json` column. Whitespace-substitute keeps the visible note
- * intact for human reviewers without truncating useful context.
- */
-const C0_CONTROL_CHARS = new RegExp('[\\u0000-\\u001F]', 'g')
-function stripC0ControlChars(s: string): string {
-  return s.replace(C0_CONTROL_CHARS, ' ').trim()
-}
 
 export async function refuseLease(
   leaseId: string,
@@ -80,7 +70,7 @@ export async function refuseLease(
   }
 
   // M3 audit fix — sanitize once at the boundary, use everywhere.
-  const sanitizedNote = stripC0ControlChars(reason).slice(0, 500)
+  const sanitizedNote = stripC0ControlChars(reason).trim().slice(0, 500)
 
   const ops: Prisma.PrismaPromise<unknown>[] = [
     prisma.lease.update({

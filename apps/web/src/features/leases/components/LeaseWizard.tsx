@@ -71,10 +71,16 @@ export function LeaseWizard({
       {/* Section 1 — Locataire */}
       <section className="flex flex-col gap-5">
         <header>
-          <span className="font-mono text-[12px] font-semibold tracking-[0.12em] text-primary">
+          <span
+            aria-hidden
+            className="font-mono text-[12px] font-semibold tracking-[0.12em] text-primary"
+          >
             01 / 03
           </span>
           <h2 className="mt-2 font-serif text-[clamp(22px,2.4vw,30px)] font-normal leading-[1.15] tracking-[-0.02em] text-foreground">
+            <span className="sr-only">
+              {t('lease.wizard.progress', { current: 1, total: 3 })} —{' '}
+            </span>
             {t('lease.wizard.step1.title')}
           </h2>
           <p className="mt-1.5 text-[14px] leading-[1.55] text-foreground/65">
@@ -94,13 +100,21 @@ export function LeaseWizard({
                 required
                 placeholder="locataire@example.mg"
                 autoComplete="email"
+                aria-invalid={(fieldErrors.tenantEmail?.length ?? 0) > 0}
+                aria-describedby={
+                  fieldErrors.tenantEmail?.length
+                    ? 'lease-tenantEmail-error'
+                    : 'lease-tenantEmail-help'
+                }
               />
-              <FieldDescription>
+              <FieldDescription id="lease-tenantEmail-help">
                 {t('lease.fields.tenantEmail.help')}
               </FieldDescription>
-              {fieldErrors.tenantEmail?.map((m) => (
-                <FieldError key={m}>{m}</FieldError>
-              ))}
+              {fieldErrors.tenantEmail?.length ? (
+                <FieldError id="lease-tenantEmail-error">
+                  {fieldErrors.tenantEmail.join(' · ')}
+                </FieldError>
+              ) : null}
             </Field>
           </FieldGroup>
         </fieldset>
@@ -109,10 +123,16 @@ export function LeaseWizard({
       {/* Section 2 — Conditions */}
       <section className="flex flex-col gap-5 border-t border-border pt-10">
         <header>
-          <span className="font-mono text-[12px] font-semibold tracking-[0.12em] text-primary">
+          <span
+            aria-hidden
+            className="font-mono text-[12px] font-semibold tracking-[0.12em] text-primary"
+          >
             02 / 03
           </span>
           <h2 className="mt-2 font-serif text-[clamp(22px,2.4vw,30px)] font-normal leading-[1.15] tracking-[-0.02em] text-foreground">
+            <span className="sr-only">
+              {t('lease.wizard.progress', { current: 2, total: 3 })} —{' '}
+            </span>
             {t('lease.wizard.step2.title')}
           </h2>
           <p className="mt-1.5 text-[14px] leading-[1.55] text-foreground/65">
@@ -122,10 +142,10 @@ export function LeaseWizard({
         <fieldset disabled={pending} className="contents">
           <FieldGroup>
             {/* Rent + caution are pre-filled from the listing and shown
-                read-only here so the owner can verify but not edit.
-                A hidden `monthlyRentMGA` field carries the value to the
-                Server Action without giving the owner an input to fudge. */}
-            <input type="hidden" name="monthlyRentMGA" value={monthlyRentMGA} />
+                read-only here. SEC-H2 audit fix: no hidden field carries
+                `monthlyRentMGA` to the server — the service reads
+                `listing.priceMonthlyMGA` server-side as the single
+                source of truth. */}
             <dl className="grid gap-4 rounded-2xl border border-border bg-muted/30 p-5 sm:grid-cols-2">
               <div>
                 <dt className="text-[11px] font-semibold uppercase tracking-[0.12em] text-foreground/55">
@@ -165,10 +185,18 @@ export function LeaseWizard({
                     type="date"
                     required
                     min={todayIso()}
+                    aria-invalid={(fieldErrors.startDate?.length ?? 0) > 0}
+                    aria-describedby={
+                      fieldErrors.startDate?.length
+                        ? 'lease-startDate-error'
+                        : undefined
+                    }
                   />
-                  {fieldErrors.startDate?.map((m) => (
-                    <FieldError key={m}>{m}</FieldError>
-                  ))}
+                  {fieldErrors.startDate?.length ? (
+                    <FieldError id="lease-startDate-error">
+                      {fieldErrors.startDate.join(' · ')}
+                    </FieldError>
+                  ) : null}
                 </Field>
                 <Field>
                   <FieldLabel htmlFor="lease-duration">
@@ -184,13 +212,21 @@ export function LeaseWizard({
                     step={1}
                     required
                     defaultValue={12}
+                    aria-invalid={(fieldErrors.durationMonths?.length ?? 0) > 0}
+                    aria-describedby={
+                      fieldErrors.durationMonths?.length
+                        ? 'lease-duration-error'
+                        : 'lease-duration-help'
+                    }
                   />
-                  <FieldDescription>
+                  <FieldDescription id="lease-duration-help">
                     {t('lease.fields.durationMonths.help')}
                   </FieldDescription>
-                  {fieldErrors.durationMonths?.map((m) => (
-                    <FieldError key={m}>{m}</FieldError>
-                  ))}
+                  {fieldErrors.durationMonths?.length ? (
+                    <FieldError id="lease-duration-error">
+                      {fieldErrors.durationMonths.join(' · ')}
+                    </FieldError>
+                  ) : null}
                 </Field>
               </div>
             </FieldGroup>
@@ -201,10 +237,16 @@ export function LeaseWizard({
       {/* Section 3 — Recap + paiement */}
       <section className="flex flex-col gap-5 border-t border-border pt-10">
         <header>
-          <span className="font-mono text-[12px] font-semibold tracking-[0.12em] text-primary">
+          <span
+            aria-hidden
+            className="font-mono text-[12px] font-semibold tracking-[0.12em] text-primary"
+          >
             03 / 03
           </span>
           <h2 className="mt-2 font-serif text-[clamp(22px,2.4vw,30px)] font-normal leading-[1.15] tracking-[-0.02em] text-foreground">
+            <span className="sr-only">
+              {t('lease.wizard.progress', { current: 3, total: 3 })} —{' '}
+            </span>
             {t('lease.wizard.step3.title')}
           </h2>
           <p className="mt-1.5 text-[14px] leading-[1.55] text-foreground/65">
@@ -212,9 +254,17 @@ export function LeaseWizard({
           </p>
         </header>
 
-        {/* Live fee preview — magazine pull-quote style */}
+        {/* Live fee preview — magazine pull-quote style.
+            A11Y-M4 audit fix — aria-labelledby on the <dl> so screen
+            readers announce "Récapitulatif des frais" when entering. */}
         <div className="rounded-2xl border border-border bg-muted/30 p-6">
-          <dl className="flex flex-col gap-3">
+          <span id="lease-fee-recap-label" className="sr-only">
+            {t('lease.wizard.feeRecap.label')}
+          </span>
+          <dl
+            aria-labelledby="lease-fee-recap-label"
+            className="flex flex-col gap-3"
+          >
             <div className="flex items-baseline justify-between gap-4">
               <dt className="text-[14px] text-foreground/70">
                 {t('lease.fees.signature')}

@@ -1,6 +1,8 @@
 'use client'
 
-import { useActionState } from 'react'
+import { useActionState, useId } from 'react'
+import { Button } from '@/components/ui/button'
+import { useT } from '@/lib/i18n/client'
 import { unlinkOAuthAction } from '../actions/unlink-oauth'
 
 // Derive the state type from the action so the action file can keep its
@@ -16,19 +18,33 @@ export function UnlinkOAuthButton({
   provider: string
   canUnlink: boolean
 }) {
+  const t = useT()
   const [state, action, pending] = useActionState(unlinkOAuthAction, initial)
+  // A11Y-H4 audit fix — hint id is rendered as a visible `<p>` when the
+  // button is disabled, and the button's `aria-describedby` points at
+  // it so the reason is announced on focus (replacing the inaccessible
+  // `title` attribute that only worked on hover).
+  const hintId = useId()
+
+  const disabled = !canUnlink || pending
 
   return (
     <form action={action} className="flex flex-col items-end gap-1">
       <input type="hidden" name="provider" value={provider} />
-      <button
+      <Button
         type="submit"
-        disabled={!canUnlink || pending}
-        title={canUnlink ? undefined : 'Ajoute un mot de passe avant de délier ta dernière connexion'}
-        className="rounded-md border border-border px-4 py-1.5 text-sm font-medium hover:bg-muted disabled:cursor-not-allowed disabled:opacity-50"
+        variant="outline"
+        size="sm"
+        disabled={disabled}
+        aria-describedby={!canUnlink ? hintId : undefined}
       >
-        {pending ? '…' : 'Délier'}
-      </button>
+        {pending ? '…' : t('oauth.unlink')}
+      </Button>
+      {!canUnlink ? (
+        <p id={hintId} className="text-xs text-muted-foreground">
+          {t('oauth.unlinkHint.needPassword')}
+        </p>
+      ) : null}
       {state.message && !state.ok && (
         <p role="alert" className="text-xs text-destructive">
           {state.message}

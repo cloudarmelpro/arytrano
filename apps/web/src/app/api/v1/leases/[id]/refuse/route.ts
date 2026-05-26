@@ -1,6 +1,7 @@
 import { ok, withErrorHandling } from '@/lib/api/response'
 import { requireBearer } from '@/lib/api/bearer'
 import { errors } from '@/lib/api/errors'
+import { rateLimiters } from '@/lib/rate-limit'
 import { getLocale } from '@/lib/i18n/get-locale'
 import { getT } from '@/lib/i18n/translate'
 import { refuseLease } from '@/features/leases/services/refuse-lease'
@@ -23,6 +24,10 @@ export const POST = withErrorHandling(async (req: Request, ctx: Ctx) => {
   if (len > 8192) {
     throw errors.validation(t('lease.error.payloadTooLarge'))
   }
+
+  // SEC-M2 audit fix — bound stolen-bearer enumeration / runaway client.
+  const rl = await rateLimiters.leaseAction(payload.sub)
+  if (!rl.success) throw errors.rateLimited(t('lease.error.rateLimit'))
 
   const body = (await req.json().catch(() => ({}))) as { reason?: unknown }
   const reason =

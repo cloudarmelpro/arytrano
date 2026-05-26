@@ -9,8 +9,8 @@ import { Input } from '@/components/ui/input'
 import { Field, FieldLabel, FieldDescription, FieldError } from '@/components/ui/field'
 import { formatAriary } from '@/lib/format/currency'
 import type { Locale } from '@/lib/i18n/config'
-import { getT } from '@/lib/i18n/translate'
-import type { MessageKey } from '@/lib/i18n/messages'
+import { useT, type Translator } from '@/lib/i18n/client'
+import type { MessageKey } from '@/lib/i18n/messages/types'
 import type { QuartierRow } from '@/features/landing/server'
 import type { ScoredQuartier } from '../types'
 import { subscribeQuizEmailAction } from '../actions/submit-quiz'
@@ -28,7 +28,10 @@ export function QuizResults({
   submissionId: string | null
   onRestart: () => void
 }) {
-  const t = getT(locale)
+  // PERF-H1 audit fix — client-side translator via context (active locale
+  // already injected at the root layout). Was `getT(locale)` which pulled
+  // both dictionaries into the client bundle.
+  const t = useT()
 
   // Reorder full quartier rows in the scored sequence so we can show
   // names, photos, listing counts without a second DB lookup.
@@ -103,7 +106,7 @@ function TopMatchCard({
 }: {
   locale: Locale
   data: ScoredQuartier & { quartier: QuartierRow }
-  t: ReturnType<typeof getT>
+  t: Translator
 }) {
   const { quartier, reasonCodes } = data
   const name = locale === 'mg' ? quartier.nameMg : quartier.nameFr
@@ -200,7 +203,7 @@ function SecondaryCard({
 }: {
   locale: Locale
   data: ScoredQuartier & { quartier: QuartierRow }
-  t: ReturnType<typeof getT>
+  t: Translator
 }) {
   const { quartier, reasonCodes } = data
   const name = locale === 'mg' ? quartier.nameMg : quartier.nameFr
@@ -268,7 +271,7 @@ function ReasonChips({
   compact = false,
 }: {
   codes: string[]
-  t: ReturnType<typeof getT>
+  t: Translator
   compact?: boolean
 }) {
   return (
@@ -293,7 +296,7 @@ function ReasonChips({
 
 function labelForListingsCta(
   count: number,
-  t: ReturnType<typeof getT>,
+  t: Translator,
 ): string {
   if (count === 0) return t('quiz.results.viewListings.zero')
   if (count === 1) return t('quiz.results.viewListings.one')
@@ -305,7 +308,7 @@ function EmailCaptureCard({
   t,
 }: {
   submissionId: string
-  t: ReturnType<typeof getT>
+  t: Translator
 }) {
   const [email, setEmail] = useState('')
   const [status, setStatus] = useState<'idle' | 'success' | 'error'>('idle')

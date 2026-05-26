@@ -63,6 +63,12 @@ export function ResultsSearchStrip({ cities }: { cities: CityOption[] }) {
   const [quartierText, setQuartierText] = useState(initialQuartierLabel)
   const [typeText, setTypeText] = useState(initialTypeLabel)
 
+  // PERF-M3 audit note — `useMemo` from URL was considered but rejected:
+  // the wizard uses a "stage then submit" UX (visitor types in the
+  // Combobox, picks, then clicks Rechercher to commit). Deriving the
+  // slug state from URL would force every pick to commit immediately,
+  // breaking that flow. The 3 useEffect pairs below stay — they sync
+  // state when the URL changes EXTERNALLY (chip removal, browser back).
   // Re-sync on external URL changes (chip removed, browser back, reset).
   useEffect(() => {
     setCity(urlCity)
@@ -170,6 +176,11 @@ export function ResultsSearchStrip({ cities }: { cities: CityOption[] }) {
           <Combobox.Input
             placeholder={t('landing.hero.search.city.placeholder')}
             disabled={pending}
+            // A11Y-H6 audit fix — belt-and-suspenders aria-label. Base UI's
+            // Combobox.Input renders an <input> nested inside the wrapping
+            // <label> via Segment; if Base UI ever inserts a wrapper that
+            // breaks the for/id chain, this explicit name keeps it accessible.
+            aria-label={t('annonces.search.city.label')}
             className="w-full bg-transparent text-[15px] font-bold leading-[1.15] tracking-[-0.01em] text-foreground outline-none placeholder:font-medium placeholder:text-foreground/45 disabled:opacity-60"
           />
         </Segment>
@@ -208,6 +219,7 @@ export function ResultsSearchStrip({ cities }: { cities: CityOption[] }) {
           <Combobox.Input
             placeholder={t('landing.hero.search.quartier.placeholder')}
             disabled={pending || !city}
+            aria-label={t('annonces.search.quartier.label')}
             className="w-full bg-transparent text-[15px] font-bold leading-[1.15] tracking-[-0.01em] text-foreground outline-none placeholder:font-medium placeholder:text-foreground/45 disabled:opacity-60"
           />
         </Segment>
@@ -249,6 +261,7 @@ export function ResultsSearchStrip({ cities }: { cities: CityOption[] }) {
           <Combobox.Input
             placeholder={t('landing.hero.search.type.placeholder')}
             disabled={pending}
+            aria-label={t('annonces.search.type.label')}
             className="w-full bg-transparent text-[15px] font-bold leading-[1.15] tracking-[-0.01em] text-foreground outline-none placeholder:font-medium placeholder:text-foreground/45 disabled:opacity-60"
           />
         </Segment>

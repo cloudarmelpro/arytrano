@@ -34,7 +34,7 @@ export function HeaderPrimaryNav({ items }: { items: NavEntry[] }) {
               href={n.href}
               data-active={isActive}
               aria-current={isActive ? 'page' : undefined}
-              className={`relative -mb-px inline-flex shrink-0 items-center gap-1 sm:gap-2 whitespace-nowrap border-b-2 pl-0 pr-1 sm:pr-2.5 py-3.5 mr-0.5 sm:mr-2.5 last:mr-0 text-[12px] sm:text-[14px] tracking-[-0.005em] transition ${
+              className={`relative -mb-px inline-flex shrink-0 items-center justify-center min-w-[44px] sm:min-w-0 gap-1 sm:gap-2 whitespace-nowrap border-b-2 px-2 sm:pl-0 sm:pr-2.5 py-3.5 mr-0.5 sm:mr-2.5 last:mr-0 text-[12px] sm:text-[14px] tracking-[-0.005em] transition ${
                 isActive
                   ? 'border-white font-semibold text-white'
                   : 'border-transparent font-medium text-white/80 hover:text-white'

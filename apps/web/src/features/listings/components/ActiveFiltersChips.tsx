@@ -12,6 +12,13 @@ type Neighborhood = { slug: string; nameFr: string; nameMg: string }
 type Chip = {
   key: string
   label: React.ReactNode
+  /**
+   * Plain-text version of the chip label used by the aria-label for the
+   * remove button (A11Y-H3 audit fix). When `label` is a string, this
+   * is the same value; for JSX labels (e.g. the italic search-query chip)
+   * the caller passes the unstyled string explicitly.
+   */
+  ariaText: string
   remove: () => void
 }
 
@@ -79,6 +86,7 @@ export function ActiveFiltersChips({
     chips.push({
       key: 'q',
       label: <span className="italic">«&nbsp;{display}&nbsp;»</span>,
+      ariaText: display,
       remove: () => removeParams('q'),
     })
   }
@@ -92,9 +100,11 @@ export function ActiveFiltersChips({
     } as const
     const key = typeMap[type as keyof typeof typeMap]
     if (key) {
+      const label = t(key)
       chips.push({
         key: `type-${type}`,
-        label: t(key),
+        label,
+        ariaText: label,
         remove: () => removeParams('type'),
       })
     }
@@ -103,9 +113,11 @@ export function ActiveFiltersChips({
   if (neighborhoodSlug) {
     const n = neighborhoods.find((x) => x.slug === neighborhoodSlug)
     if (n) {
+      const label = locale === 'mg' ? n.nameMg : n.nameFr
       chips.push({
         key: `neighborhood-${neighborhoodSlug}`,
-        label: locale === 'mg' ? n.nameMg : n.nameFr,
+        label,
+        ariaText: label,
         remove: () => removeParams('neighborhood'),
       })
     }
@@ -123,6 +135,7 @@ export function ActiveFiltersChips({
     chips.push({
       key: 'price',
       label: priceLabel,
+      ariaText: priceLabel,
       remove: () => removeParams('priceMin', 'priceMax'),
     })
   }
@@ -130,9 +143,11 @@ export function ActiveFiltersChips({
   for (const value of amenities) {
     const a = AMENITY_CATALOG.find((c) => c.value === value)
     if (a) {
+      const label = t(a.labelKey)
       chips.push({
         key: `amenity-${value}`,
-        label: t(a.labelKey),
+        label,
+        ariaText: label,
         remove: () => removeAmenity(value),
       })
     }
@@ -155,7 +170,7 @@ export function ActiveFiltersChips({
           size="sm"
           onClick={c.remove}
           disabled={pending}
-          aria-label={t('filters.chips.remove')}
+          aria-label={t('filters.chips.removeNamed', { filter: c.ariaText })}
           className="group h-7 max-w-full gap-1.5 rounded-full px-3 text-[12.5px] font-medium hover:border-primary/40 hover:bg-primary/[0.04]"
         >
           <span className="truncate">{c.label}</span>

@@ -4,6 +4,7 @@ import { Toaster } from '@/components/ui/sonner'
 import { env } from '@/lib/env'
 import { LocaleProvider } from '@/lib/i18n/client'
 import { getLocale } from '@/lib/i18n/get-locale'
+import { getMessagesFor } from '@/lib/i18n/messages'
 import { safeJsonLd } from '@/lib/seo/safe-json-ld'
 import { SkipToContent } from '@/components/shared/SkipToContent'
 // Direct file import (not via the auth barrel) — the barrel also
@@ -76,6 +77,11 @@ export default async function RootLayout({
   children: React.ReactNode
 }>) {
   const locale = await getLocale()
+  // PERF-H1 audit fix — load the active-locale dictionary server-side
+  // and pass it as a prop to the Client Component LocaleProvider. The
+  // client bundle no longer imports both dictionaries; only the active
+  // one flows over the RSC payload.
+  const messages = getMessagesFor(locale)
   return (
     <html
       lang={locale}
@@ -83,7 +89,9 @@ export default async function RootLayout({
     >
       <body className="bg-background text-foreground min-h-full flex flex-col">
         <SkipToContent />
-        <LocaleProvider locale={locale}>{children}</LocaleProvider>
+        <LocaleProvider locale={locale} messages={messages}>
+          {children}
+        </LocaleProvider>
         <Toaster position="bottom-right" closeButton />
         {/* Cross-tab sign-in/out sync — refreshes RSC in other tabs so
             the header / sidebar / route guards pick up the new state

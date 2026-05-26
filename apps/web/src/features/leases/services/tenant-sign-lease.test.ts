@@ -33,6 +33,8 @@ const baseLease = {
   status: 'PENDING_TENANT',
   tenantId: 'tenant_1',
   listingId: 'listing_1',
+  // SEC-M5 — service now re-verifies linked Payment is CONFIRMED.
+  payment: { status: 'CONFIRMED' },
   owner: {
     id: 'owner_1',
     name: 'Hery R.',
@@ -73,6 +75,22 @@ describe('tenantSignLease', () => {
       kind: 'invalid_status',
       leaseId: 'lease_1',
       currentStatus: 'DRAFT',
+    })
+    expect(prisma.$transaction).not.toHaveBeenCalled()
+  })
+
+  it('refuses to sign when the linked Payment is not CONFIRMED (SEC-M5)', async () => {
+    vi.mocked(prisma.lease.findUnique).mockResolvedValue({
+      ...baseLease,
+      payment: { status: 'INITIATED' },
+    } as never)
+
+    const result = await tenantSignLease('lease_1', 'tenant_1')
+
+    expect(result).toEqual({
+      kind: 'invalid_status',
+      leaseId: 'lease_1',
+      currentStatus: 'payment=INITIATED',
     })
     expect(prisma.$transaction).not.toHaveBeenCalled()
   })

@@ -2,7 +2,7 @@ import { notFound, redirect } from 'next/navigation'
 import Link from 'next/link'
 import type { Metadata } from 'next'
 import { auth } from '@/features/auth'
-import { prisma } from '@/lib/db'
+import { getListingForLeaseWizard } from '@/features/listings/queries/get-listing-for-lease-wizard'
 import { LeaseWizard } from '@/features/leases/components/LeaseWizard'
 import { getLocale } from '@/lib/i18n/get-locale'
 import { getT } from '@/lib/i18n/translate'
@@ -23,19 +23,9 @@ export default async function NewLeasePage({
     redirect(`/sign-in?next=/dashboard/listings/${listingId}/lease/new`)
   }
 
+  // PERF-M1 + arch fix — query lives in features/listings/queries/, not inline here.
   const [listing, locale] = await Promise.all([
-    prisma.listing.findUnique({
-      where: { id: listingId },
-      select: {
-        id: true,
-        title: true,
-        ownerId: true,
-        status: true,
-        slug: true,
-        priceMonthlyMGA: true,
-        cautionMonths: true,
-      },
-    }),
+    getListingForLeaseWizard(listingId),
     getLocale(),
   ])
   if (!listing) notFound()

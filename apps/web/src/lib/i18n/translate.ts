@@ -1,5 +1,4 @@
-import type { Locale } from './config'
-import { type MessageKey, type Messages, getMessagesFor } from './messages'
+import type { MessageKey, Messages } from './messages/types'
 
 /**
  * Translation function: `t(key, params?)`.
@@ -11,6 +10,11 @@ import { type MessageKey, type Messages, getMessagesFor } from './messages'
  * Placeholders are simple `{name}` markers; no fancy ICU plural / gender — we
  * pre-compute the plural by selecting the right key (`.one` / `.other`) at the
  * call site. Keeps the runtime tiny and the translations explicit.
+ *
+ * PERF-H1 audit note — this module imports ONLY types from `messages/`,
+ * never the actual dictionaries. The runtime `getT(locale)` helper lives
+ * in `messages/index.ts` (server-only path) so the client bundle does
+ * not pull in fr-MG.ts + mg.ts via the translator import chain.
  */
 export type Translator = <K extends MessageKey>(
   key: K,
@@ -30,6 +34,4 @@ export function makeTranslator(messages: Messages): Translator {
   }
 }
 
-export function getT(locale: Locale): Translator {
-  return makeTranslator(getMessagesFor(locale))
-}
+export { getT } from './messages'

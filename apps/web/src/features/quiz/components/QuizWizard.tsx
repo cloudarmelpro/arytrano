@@ -7,8 +7,8 @@ import { RadioGroup } from '@base-ui/react/radio-group'
 import { Button } from '@/components/ui/button'
 import { FieldSet, FieldLegend, FieldDescription } from '@/components/ui/field'
 import type { Locale } from '@/lib/i18n/config'
-import { getT } from '@/lib/i18n/translate'
-import type { MessageKey } from '@/lib/i18n/messages'
+import { useT, type Translator } from '@/lib/i18n/client'
+import type { MessageKey } from '@/lib/i18n/messages/types'
 import type { QuartierRow } from '@/features/landing/server'
 import { scoreQuartiers } from '../services/score-quartiers'
 import { QUARTIER_PROFILES_BY_CITY } from '../data/quartier-profiles'
@@ -120,7 +120,11 @@ export function QuizWizard({
   locale: Locale
   quartiers: QuartierRow[]
 }) {
-  const t = getT(locale)
+  // PERF-H1 audit fix — use the client translator (reads from context,
+  // which is fed by the active-locale dictionary passed as a prop from
+  // the Server layout). Importing `getT` here pulled both locale
+  // dictionaries into the client bundle.
+  const t = useT()
   const [step, setStep] = useState(0)
   const [direction, setDirection] = useState<1 | -1>(1)
   // Pre-fill citySlug when Q0 is hidden (single scorable city). The
@@ -294,7 +298,7 @@ function ProgressBar({
 }: {
   step: number
   total: number
-  label: ReturnType<typeof getT>
+  label: Translator
 }) {
   const pct = (step / total) * 100
   const labelText = label('quiz.progress', { step, total })

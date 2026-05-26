@@ -1,4 +1,7 @@
 import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { getLocale } from '@/lib/i18n/get-locale'
+import { getT } from '@/lib/i18n/translate'
 import { linkProviderAction } from '../actions/link-oauth'
 import { UnlinkOAuthButton } from './UnlinkOAuthButton'
 import { OAUTH_ICONS } from './oauth-icons'
@@ -15,12 +18,15 @@ const PROVIDERS: Array<{ id: 'google' | 'facebook'; label: string }> = [
   { id: 'facebook', label: 'Facebook' },
 ]
 
-export function OAuthConnectionsSection({
+export async function OAuthConnectionsSection({
   googleEnabled,
   facebookEnabled,
   linked,
   canUnlink,
 }: OAuthConnectionsProps) {
+  // A11Y-M5 audit fix — translate the "Lié / Non lié" status labels
+  // and the "Lier" action label instead of hardcoded French.
+  const t = getT(await getLocale())
   return (
     <ul className="flex flex-col divide-y divide-border">
       {PROVIDERS.map((p) => {
@@ -44,19 +50,16 @@ export function OAuthConnectionsSection({
                 variant={isLinked ? 'secondary' : 'outline'}
                 className="text-[10px] uppercase tracking-wider"
               >
-                {isLinked ? 'Lié' : 'Non lié'}
+                {isLinked ? t('oauth.linked') : t('oauth.unlinked')}
               </Badge>
             </div>
             {isLinked ? (
               <UnlinkOAuthButton provider={p.id} canUnlink={canUnlink} />
             ) : (
               <form action={linkProviderAction.bind(null, p.id)}>
-                <button
-                  type="submit"
-                  className="rounded-md bg-primary px-4 py-1.5 text-sm font-medium text-primary-foreground hover:opacity-90"
-                >
-                  Lier
-                </button>
+                <Button type="submit" size="sm">
+                  {t('oauth.link')}
+                </Button>
               </form>
             )}
           </li>

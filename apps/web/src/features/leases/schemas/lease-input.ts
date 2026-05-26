@@ -23,12 +23,10 @@ export const initiateLeaseInputSchema = z.object({
     .toLowerCase()
     .max(254, 'tenantEmail too long'),
 
-  /** Monthly rent in Ariary (Int). */
-  monthlyRentMGA: z
-    .number()
-    .int()
-    .positive()
-    .max(50_000_000, 'monthlyRentMGA above sane cap'),
+  // SEC-H2 audit fix — `monthlyRentMGA` is NOT part of the input schema.
+  // It is derived server-side from `listing.priceMonthlyMGA` so an owner
+  // can't fabricate a contract value that diverges from the public
+  // listing. See `services/initiate-lease.ts`.
 
   /** First day of the lease. Must be today or in the future. */
   startDate: z.coerce.date().refine(
