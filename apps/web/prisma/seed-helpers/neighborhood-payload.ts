@@ -18,6 +18,7 @@ import { frMG } from '../../src/lib/i18n/messages/fr-MG'
 import { mg } from '../../src/lib/i18n/messages/mg'
 import { QUARTIER_DESCRIPTORS } from '../../src/features/landing/quartier-descriptors'
 import { QUARTIER_PROFILES_BY_CITY } from '../../src/features/quiz/data/quartier-profiles'
+import { DRAFT_EDITORIAL } from './editorial-drafts'
 
 export type EditorialPayload = {
   fr: {
@@ -40,32 +41,36 @@ export type EditorialPayload = {
 
 /**
  * Resolve the 6 editorial strings for a quartier slug, in both
- * locales, by looking up the MessageKeys in the i18n dictionaries.
- * Returns null when the slug has no descriptor entry yet (the 4 new
- * cities — Tana/Toamasina/Mahajanga/Toliara — fall through here in
- * Batch A).
+ * locales. Resolution order:
+ *  1. `QUARTIER_DESCRIPTORS` + i18n dictionaries (production content
+ *     for Fianarantsoa — written from on-the-ground interviews).
+ *  2. `DRAFT_EDITORIAL` (placeholder content for the 4 new cities —
+ *     should be refined post-launch via `/admin/geo`).
+ * Returns null when neither source has the slug.
  */
 export function buildEditorialFor(slug: string): EditorialPayload | null {
   const d = QUARTIER_DESCRIPTORS[slug]
-  if (!d) return null
-  return {
-    fr: {
-      tagline: frMG[d.tagline],
-      landmark: frMG[d.landmark],
-      ambiance: frMG[d.ambiance],
-      walk: frMG[d.walk],
-      transport: frMG[d.transport],
-      distance: frMG[d.distance],
-    },
-    mg: {
-      tagline: mg[d.tagline],
-      landmark: mg[d.landmark],
-      ambiance: mg[d.ambiance],
-      walk: mg[d.walk],
-      transport: mg[d.transport],
-      distance: mg[d.distance],
-    },
+  if (d) {
+    return {
+      fr: {
+        tagline: frMG[d.tagline],
+        landmark: frMG[d.landmark],
+        ambiance: frMG[d.ambiance],
+        walk: frMG[d.walk],
+        transport: frMG[d.transport],
+        distance: frMG[d.distance],
+      },
+      mg: {
+        tagline: mg[d.tagline],
+        landmark: mg[d.landmark],
+        ambiance: mg[d.ambiance],
+        walk: mg[d.walk],
+        transport: mg[d.transport],
+        distance: mg[d.distance],
+      },
+    }
   }
+  return DRAFT_EDITORIAL[slug] ?? null
 }
 
 /**
