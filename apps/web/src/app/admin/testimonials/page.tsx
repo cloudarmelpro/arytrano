@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { buttonVariants } from '@/components/ui/button'
 import { listAdminTestimonials } from '@/features/admin-testimonials/server'
 import type {
   StatusFilter,
@@ -58,7 +59,7 @@ export default async function AdminTestimonialsPage({
         </div>
         <Link
           href="/admin/testimonials/new"
-          className="inline-flex h-10 items-center rounded-md bg-primary px-5 text-sm font-medium text-primary-foreground transition hover:opacity-90"
+          className={buttonVariants({ size: 'lg' })}
         >
           {t('admin.testimonials.list.create')}
         </Link>

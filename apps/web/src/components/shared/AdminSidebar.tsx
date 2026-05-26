@@ -116,6 +116,16 @@ function IconCash() {
   )
 }
 
+function IconMap() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M3 6l6-3 6 3 6-3v15l-6 3-6-3-6 3V6z" />
+      <path d="M9 3v15" />
+      <path d="M15 6v15" />
+    </svg>
+  )
+}
+
 function IconBarChart() {
   return (
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -185,6 +195,16 @@ const buildSections = (openReports: number): Section[] => [
         href: '/admin/quiz-analytics',
         labelKey: 'admin.nav.quizAnalytics',
         icon: <IconBarChart />,
+      },
+    ],
+  },
+  {
+    labelKey: 'admin.section.content',
+    items: [
+      {
+        href: '/admin/geo',
+        labelKey: 'admin.nav.geo',
+        icon: <IconMap />,
       },
     ],
   },
