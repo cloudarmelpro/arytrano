@@ -1,7 +1,11 @@
 import 'dotenv/config'
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient, Prisma } from '@prisma/client'
 import { PrismaPg } from '@prisma/adapter-pg'
 import { CITY_SEEDS } from './seed-helpers/cities'
+import {
+  buildEditorialFor,
+  buildQuizProfileFor,
+} from './seed-helpers/neighborhood-payload'
 
 const connectionString = process.env.DATABASE_URL
 if (!connectionString) {
@@ -46,14 +50,33 @@ async function main() {
       },
     })
     for (const n of seed.neighborhoods) {
+      // E-T07 Batch A — hydrate the new JSONB columns from the TS
+      // source of truth. Editorial is null for the 4 new cities
+      // (no descriptors yet); quizProfile is populated for all 5
+      // launch cities (profiles added today).
+      const editorial = buildEditorialFor(n.slug)
+      const quizProfile = buildQuizProfileFor(seed.slug, n.slug)
+      // `Prisma.DbNull` is the sentinel that tells Prisma to write
+      // SQL NULL (vs `undefined` which would skip the column).
+      // `Prisma.JsonNull` would write the JSON literal `"null"`,
+      // which we don't want.
+      const editorialValue = editorial ?? Prisma.DbNull
+      const quizProfileValue = quizProfile ?? Prisma.DbNull
       await prisma.neighborhood.upsert({
         where: { cityId_slug: { cityId: city.id, slug: n.slug } },
-        create: { ...n, cityId: city.id },
+        create: {
+          ...n,
+          cityId: city.id,
+          editorial: editorialValue,
+          quizProfile: quizProfileValue,
+        },
         update: {
           nameFr: n.nameFr,
           nameMg: n.nameMg,
           lat: n.lat,
           lng: n.lng,
+          editorial: editorialValue,
+          quizProfile: quizProfileValue,
         },
       })
     }

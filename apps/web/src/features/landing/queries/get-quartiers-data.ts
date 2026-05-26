@@ -1,5 +1,11 @@
 import 'server-only'
 import { prisma } from '@/lib/db'
+import {
+  parseEditorial,
+  parseQuizProfile,
+  type NeighborhoodEditorial,
+  type QuartierQuizProfile,
+} from '@/features/geo'
 
 export type QuartierSampleListing = {
   id: string
@@ -27,6 +33,15 @@ export type QuartierRow = {
   publishedListings: number
   avgPriceMGA: number | null
   sampleListings: QuartierSampleListing[]
+  /**
+   * E-T07 Batch B1 — DB-driven copies of the formerly-TS-only data.
+   * `editorial` is null when the row hasn't been hydrated yet (the 4
+   * new cities); consumers fall back to the legacy TS modules until
+   * Batch B2 flips the source of truth. `quizProfile` is currently
+   * populated for all 5 launch cities (we seeded profiles today).
+   */
+  editorial: NeighborhoodEditorial | null
+  quizProfile: QuartierQuizProfile | null
 }
 
 export type QuartiersPageData = {
@@ -64,6 +79,8 @@ export async function getQuartiersData(
       nameMg: true,
       lat: true,
       lng: true,
+      editorial: true,
+      quizProfile: true,
       city: { select: { slug: true } },
     },
   })
@@ -151,6 +168,8 @@ export async function getQuartiersData(
         publishedListings: agg?.count ?? 0,
         avgPriceMGA: agg?.avg !== undefined && agg?.avg !== null ? Math.round(agg.avg) : null,
         sampleListings: samplesByNeighborhood.get(n.id) ?? [],
+        editorial: parseEditorial(n.editorial),
+        quizProfile: parseQuizProfile(n.quizProfile),
       }
     })
     .sort((a, b) => {

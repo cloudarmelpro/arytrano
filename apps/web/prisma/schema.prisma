@@ -276,6 +276,20 @@ model Neighborhood {
   lng       Decimal  @db.Decimal(9, 6)
   createdAt DateTime @default(now())
 
+  // E-T07 Batch A — editorial copy (tagline / landmark / ambiance / walk
+  // / transport / distance) keyed by locale. Hydrated from the seed
+  // helpers via migration 20260526210000. Consumers (landing,
+  // /villes/[slug]/quartiers/[slug]) still read from the TS module in
+  // Batch A; refactor to read from this column comes in Batch B.
+  // Shape: { fr: { tagline, landmark, ambiance, walk, transport, distance }, mg: {...} }
+  editorial Json?
+
+  // E-T07 Batch A — quiz scoring profile (priceTier / schoolScores /
+  // housingMix / vibe / mobilityScores / strengths). Same hydrate
+  // strategy. Zod-validated at write time once Batch C admin UI ships
+  // so an admin can't smuggle invalid values into the ranking algo.
+  quizProfile Json?
+
   city     City      @relation(fields: [cityId], references: [id], onDelete: Restrict)
   listings Listing[]
 

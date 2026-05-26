@@ -61,7 +61,14 @@ export function LandingNeighborhoods({
           {rows.slice(0, 8).map((n, i) => {
             const span = SPANS[i] ?? { col: 1, row: 1 }
             const palette = PALETTES[i % PALETTES.length] ?? PALETTES[0]!
+            // E-T07 Batch B2 — DB-driven tagline first, fall back to the
+            // legacy TS dictionary when `editorial` is null (the 4 new
+            // cities pre-admin-CRUD). Empty string when neither has it.
             const descriptor = QUARTIER_DESCRIPTORS[n.slug]
+            const dbLocale = locale === 'mg' ? n.editorial?.mg : n.editorial?.fr
+            const tagline =
+              dbLocale?.tagline ??
+              (descriptor ? t(descriptor.tagline) : '')
             const label = locale === 'mg' ? n.nameMg : n.nameFr
             return (
               <li
@@ -112,7 +119,7 @@ export function LandingNeighborhoods({
                       className={`mt-1.5 font-medium opacity-80 ${span.feature ? 'text-[14px]' : 'text-[12.5px]'
                         }`}
                     >
-                      {descriptor ? t(descriptor.tagline) : ''}
+                      {tagline}
                     </div>
                   </div>
                 </Link>

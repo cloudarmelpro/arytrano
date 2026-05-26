@@ -2178,7 +2178,7 @@ export const frMG = {
   'admin.testimonials.list.title': 'Témoignages',
   'admin.testimonials.list.lead':
     'Citations publiées sur la landing AryTrano. Ajoute, édite, publie ou retire selon les besoins marketing.',
-  'admin.testimonials.list.create': 'Nouveau témoignage',
+  'admin.testimonials.list.create': 'Nouveau',
   'admin.testimonials.list.empty':
     'Aucun témoignage encore — clique « Nouveau témoignage » pour commencer.',
   'admin.testimonials.list.next': 'Page suivante',

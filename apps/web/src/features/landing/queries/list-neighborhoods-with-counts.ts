@@ -1,6 +1,10 @@
 import 'server-only'
 import { unstable_cache } from 'next/cache'
 import { prisma } from '@/lib/db'
+import {
+  parseEditorial,
+  type NeighborhoodEditorial,
+} from '@/features/geo'
 
 export type NeighborhoodRow = {
   id: string
@@ -9,6 +13,14 @@ export type NeighborhoodRow = {
   nameMg: string
   citySlug: string
   publishedListings: number
+  /**
+   * E-T07 Batch B1 — DB-driven editorial copy. Null when the row's
+   * `editorial` JSONB column hasn't been hydrated (the 4 new cities
+   * pre-Batch C admin UI). Consumers should fall back to the legacy
+   * `QUARTIER_DESCRIPTORS` TS module until Batch B2 flips the source
+   * of truth entirely.
+   */
+  editorial: NeighborhoodEditorial | null
 }
 
 /**
@@ -30,6 +42,7 @@ export const listNeighborhoodsWithCounts = unstable_cache(
         slug: true,
         nameFr: true,
         nameMg: true,
+        editorial: true,
         city: { select: { slug: true } },
         _count: { select: { listings: { where: { status: 'PUBLISHED' } } } },
       },
@@ -43,6 +56,7 @@ export const listNeighborhoodsWithCounts = unstable_cache(
         nameMg: r.nameMg,
         citySlug: r.city.slug,
         publishedListings: r._count.listings,
+        editorial: parseEditorial(r.editorial),
       }))
       .sort((a, b) => {
         if (b.publishedListings !== a.publishedListings) {
@@ -51,6 +65,9 @@ export const listNeighborhoodsWithCounts = unstable_cache(
         return a.nameFr.localeCompare(b.nameFr)
       })
   },
-  ['neighborhoods-counts-v1'],
+  // v2 bump : NeighborhoodRow now carries `editorial`. Bumping the
+  // cache key invalidates the v1 cache so consumers don't see a stale
+  // row missing the new field after deploy.
+  ['neighborhoods-counts-v2'],
   { revalidate: 300, tags: ['neighborhoods-counts'] },
 )

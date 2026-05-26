@@ -56,15 +56,19 @@ export function QuartiersBlocks({
       <div className="mx-auto max-w-[1280px] px-6 lg:px-10">
         <div className="flex flex-col gap-12">
           {quartiers.map((q, i) => {
+            // E-T07 Batch B2 — render the block when EITHER source has
+            // copy : DB-hydrated `editorial` OR the legacy TS descriptor.
+            // Skip only when neither side has content (typical for a
+            // brand-new quartier seeded without any editorial yet).
             const descriptor = QUARTIER_DESCRIPTORS[q.slug]
-            if (!descriptor) return null
+            if (!descriptor && !q.editorial) return null
             return (
               <QuartierBlock
                 key={q.slug}
                 t={t}
                 locale={locale}
                 quartier={q}
-                descriptor={descriptor}
+                descriptor={descriptor ?? null}
                 tone={TONES_BY_INDEX[i % TONES_BY_INDEX.length] ?? 'warm'}
                 reverse={i % 2 === 1}
               />
@@ -87,12 +91,27 @@ function QuartierBlock({
   t: Translator
   locale: Locale
   quartier: QuartierRow
-  descriptor: QuartierFullDescriptor
+  /** Optional now — DB editorial supersedes when present. */
+  descriptor: QuartierFullDescriptor | null
   tone: Tone
   reverse: boolean
 }) {
   const name = locale === 'mg' ? quartier.nameMg : quartier.nameFr
   const heroPhoto = quartier.sampleListings[0]?.photo ?? null
+  // E-T07 Batch B2 — prefer DB-driven copy when the row has been
+  // hydrated; fall back to the legacy TS dictionary keys for rows
+  // still on the v0.5 pipeline (the 4 new cities pre-admin CRUD).
+  // Empty string if neither side has the field — caller already
+  // filters out rows where both descriptor + editorial are null.
+  const dbLocale =
+    locale === 'mg' ? quartier.editorial?.mg : quartier.editorial?.fr
+  const ambianceText =
+    dbLocale?.ambiance ?? (descriptor ? t(descriptor.ambiance) : '')
+  const distanceText =
+    dbLocale?.distance ?? (descriptor ? t(descriptor.distance) : '')
+  const walkText = dbLocale?.walk ?? (descriptor ? t(descriptor.walk) : '')
+  const transportText =
+    dbLocale?.transport ?? (descriptor ? t(descriptor.transport) : '')
   return (
     <article
       id={quartier.slug}
@@ -150,7 +169,7 @@ function QuartierBlock({
             </Link>
           </h2>
           <p className="mt-3.5 text-[16px] leading-[1.55] text-foreground/70">
-            {t(descriptor.ambiance)}
+            {ambianceText}
           </p>
         </div>
 
@@ -170,7 +189,7 @@ function QuartierBlock({
           />
           <DataCell
             label={t('quartiers.block.dataCell.distance')}
-            value={t(descriptor.distance)}
+            value={distanceText}
           />
           <DataCell
             label={t('quartiers.block.dataCell.listings')}
@@ -184,10 +203,10 @@ function QuartierBlock({
         </div>
 
         <div className="grid grid-cols-2 gap-6 max-sm:grid-cols-1 max-sm:gap-4">
-          <Poi label={t('quartiers.block.poi.walk')} body={t(descriptor.walk)} />
+          <Poi label={t('quartiers.block.poi.walk')} body={walkText} />
           <Poi
             label={t('quartiers.block.poi.transport')}
-            body={t(descriptor.transport)}
+            body={transportText}
           />
         </div>
 

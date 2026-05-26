@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useTransition } from 'react'
+import { useMemo, useState, useTransition } from 'react'
 import { motion, AnimatePresence, MotionConfig } from 'motion/react'
 import { Radio } from '@base-ui/react/radio'
 import { RadioGroup } from '@base-ui/react/radio-group'
@@ -10,8 +10,8 @@ import type { Locale } from '@/lib/i18n/config'
 import { useT, type Translator } from '@/lib/i18n/client'
 import type { MessageKey } from '@/lib/i18n/messages/types'
 import type { QuartierRow } from '@/features/landing/server'
+import type { QuartierQuizProfile } from '@/features/geo'
 import { scoreQuartiers } from '../services/score-quartiers'
-import { QUARTIER_PROFILES_BY_CITY } from '../data/quartier-profiles'
 import type { QuizAnswers, ScoredQuartier } from '../types'
 import { QuizResults } from './QuizResults'
 import { submitQuizAction } from '../actions/submit-quiz'
@@ -25,20 +25,14 @@ type StepDef = {
   options: Array<{ value: string; label: MessageKey }>
 }
 
-/** Cities the quiz can actually score against (i.e. those with profile
- * coverage in `QUARTIER_PROFILES_BY_CITY`). v1 = just Fianarantsoa.
- * Q0 (city) appears only when this list has > 1 entry. */
-const QUIZ_CITIES = Object.keys(QUARTIER_PROFILES_BY_CITY)
-
-const CITY_STEP: StepDef = {
-  key: 'citySlug',
-  title: 'quiz.q.city.title',
-  help: 'quiz.q.city.help',
-  options: QUIZ_CITIES.map((slug) => ({
-    value: slug,
-    label: `cities.${slug}.name` as MessageKey,
-  })),
-}
+/**
+ * E-T07 Batch B2 — quiz scoring profiles are now sourced from the
+ * `QuartierRow.quizProfile` JSONB column (hydrated server-side in
+ * `getQuartiersData`). The wizard receives `quartiers` as a prop and
+ * derives `profilesByCity` locally — no `QUARTIER_PROFILES_BY_CITY`
+ * import anymore. The Q0 city step appears whenever ≥ 2 cities have
+ * profile coverage in the row set.
+ */
 
 const BASE_STEPS: StepDef[] = [
   {
@@ -106,13 +100,6 @@ const BASE_STEPS: StepDef[] = [
   },
 ]
 
-/** Show Q0 only when there are multiple scorable cities — otherwise
- * pre-fill the citySlug silently and keep the wizard at 6 questions. */
-const SHOW_CITY_STEP = QUIZ_CITIES.length > 1
-const STEPS: StepDef[] = SHOW_CITY_STEP
-  ? [CITY_STEP, ...BASE_STEPS]
-  : BASE_STEPS
-
 export function QuizWizard({
   locale,
   quartiers,
@@ -125,12 +112,51 @@ export function QuizWizard({
   // the Server layout). Importing `getT` here pulled both locale
   // dictionaries into the client bundle.
   const t = useT()
+
+  // E-T07 Batch B2 — derive the city → quartier → profile map from
+  // the prop. Memoised so the steps list stays referentially stable
+  // across renders (avoids re-mounting the RadioGroup on each state
+  // change).
+  const profilesByCity = useMemo(() => {
+    const map: Record<string, Record<string, QuartierQuizProfile>> = {}
+    for (const q of quartiers) {
+      if (!q.quizProfile) continue
+      if (!map[q.citySlug]) map[q.citySlug] = {}
+      map[q.citySlug]![q.slug] = q.quizProfile
+    }
+    return map
+  }, [quartiers])
+
+  const quizCities = useMemo(
+    () => Object.keys(profilesByCity),
+    [profilesByCity],
+  )
+  const showCityStep = quizCities.length > 1
+
+  const cityStep: StepDef = useMemo(
+    () => ({
+      key: 'citySlug',
+      title: 'quiz.q.city.title',
+      help: 'quiz.q.city.help',
+      options: quizCities.map((slug) => ({
+        value: slug,
+        label: `cities.${slug}.name` as MessageKey,
+      })),
+    }),
+    [quizCities],
+  )
+
+  const STEPS: StepDef[] = useMemo(
+    () => (showCityStep ? [cityStep, ...BASE_STEPS] : BASE_STEPS),
+    [showCityStep, cityStep],
+  )
+
   const [step, setStep] = useState(0)
   const [direction, setDirection] = useState<1 | -1>(1)
   // Pre-fill citySlug when Q0 is hidden (single scorable city). The
   // wizard otherwise starts empty and the user picks via Q0.
   const [answers, setAnswers] = useState<Partial<QuizAnswers>>(
-    SHOW_CITY_STEP ? {} : { citySlug: QUIZ_CITIES[0] },
+    showCityStep ? {} : { citySlug: quizCities[0] },
   )
   const [phase, setPhase] = useState<'quiz' | 'results'>('quiz')
   const [results, setResults] = useState<ScoredQuartier[]>([])
@@ -182,7 +208,7 @@ export function QuizWizard({
     // Final step → score + submit + show results.
     // 4 quartiers: 1 top match in the hero card + 3 in "À considérer aussi".
     const finalAnswers = answers as QuizAnswers
-    const cityProfiles = QUARTIER_PROFILES_BY_CITY[finalAnswers.citySlug] ?? {}
+    const cityProfiles = profilesByCity[finalAnswers.citySlug] ?? {}
     const scored = scoreQuartiers(finalAnswers, cityProfiles, 4)
     setResults(scored)
     setPhase('results')
