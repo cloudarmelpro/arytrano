@@ -12,6 +12,8 @@ import {
   type PublicListingDetail,
   type RegisterRequest,
   type SavedSearchRow,
+  type LeaseRow,
+  type LeaseDetail,
   publicCitySchema,
   publicNeighborhoodSchema,
   publicListingCardSchema,
@@ -19,6 +21,8 @@ import {
   contactResponseSchema,
   authTokensSchema,
   savedSearchRowSchema,
+  leaseRowSchema,
+  leaseDetailSchema,
 } from '@arytrano/shared'
 import { z } from 'zod'
 import { API_BASE_URL } from '../config'
@@ -381,4 +385,55 @@ export async function unregisterExpoPushToken(): Promise<void> {
     z.object({ cleared: z.literal(true) }),
     { method: 'DELETE' },
   )
+}
+
+// ────────────────────────────────────────────────────────────────────
+// Leases (E-T22 mobile — tenant accept/refuse + owner watch)
+// ────────────────────────────────────────────────────────────────────
+
+/** List leases where the caller is owner OR tenant. */
+export async function listMyLeases(): Promise<LeaseRow[]> {
+  const r = await request('/api/v1/leases', z.array(leaseRowSchema))
+  return r.data
+}
+
+/** Single lease detail — includes counterpart emails (gated server-side). */
+export async function getLeaseById(id: string): Promise<LeaseDetail> {
+  const r = await request(
+    `/api/v1/leases/${encodeURIComponent(id)}`,
+    leaseDetailSchema,
+  )
+  return r.data
+}
+
+/** Tenant accepts the lease. Server transitions PENDING_TENANT → ACTIVE. */
+export async function signLease(id: string): Promise<{ leaseId: string }> {
+  const r = await request(
+    `/api/v1/leases/${encodeURIComponent(id)}/sign`,
+    z.object({ leaseId: z.string() }),
+    { method: 'POST' },
+  )
+  return r.data
+}
+
+/** Tenant refuses the lease. Optional reason flows into the audit log. */
+export async function refuseLease(
+  id: string,
+  reason?: string,
+): Promise<{ leaseId: string; paymentRefundQueued: boolean }> {
+  const r = await request(
+    `/api/v1/leases/${encodeURIComponent(id)}/refuse`,
+    z.object({
+      leaseId: z.string(),
+      paymentRefundQueued: z.boolean(),
+    }),
+    {
+      method: 'POST',
+      // Send an empty object instead of omitting the body — keeps the
+      // content-type header consistent with the rate-limit guard on
+      // the server side.
+      body: reason ? { reason } : {},
+    },
+  )
+  return r.data
 }

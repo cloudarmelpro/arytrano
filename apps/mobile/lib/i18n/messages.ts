@@ -84,6 +84,7 @@ export const messages = {
 
     'profile.title': 'Mon profil',
     'profile.row.savedSearches': 'Recherches sauvegardées',
+    'profile.row.leases': 'Mes baux',
     'profile.row.favorites': 'Mes favoris',
     'profile.row.settings': 'Paramètres du compte',
     'profile.logout': 'Se déconnecter',
@@ -163,6 +164,39 @@ export const messages = {
 
     'units.ariaryPerMonth': '{amount} ariary par mois',
     'units.perMonth': 'Ar / mois',
+
+    // Leases (E-T22 mobile)
+    'lease.list.title': 'Mes baux',
+    'lease.list.empty.title': 'Aucun bail pour l\'instant.',
+    'lease.list.empty.lead':
+      'Un propriétaire t\'inviteras ici quand un contrat sera prêt à signer.',
+    'lease.list.role.owner': 'Propriétaire',
+    'lease.list.role.tenant': 'Locataire',
+    'lease.list.row.openCta': 'Voir le bail',
+    'lease.status.DRAFT': 'Brouillon',
+    'lease.status.PENDING_TENANT': 'En attente de ta signature',
+    'lease.status.ACTIVE': 'Actif',
+    'lease.status.REFUSED': 'Refusé',
+    'lease.status.TERMINATED': 'Terminé',
+    'lease.status.DISPUTED': 'En litige',
+    'lease.detail.title': 'Détail du bail',
+    'lease.detail.parties.owner': 'Propriétaire',
+    'lease.detail.parties.tenant': 'Locataire',
+    'lease.detail.terms.startDate': 'Date de début',
+    'lease.detail.terms.duration': 'Durée',
+    'lease.detail.terms.months': '{count} mois',
+    'lease.detail.terms.monthlyRent': 'Loyer mensuel',
+    'lease.detail.terms.caution': 'Caution',
+    'lease.tenant.cta.accept': 'Accepter et signer',
+    'lease.tenant.cta.refuse': 'Refuser',
+    'lease.tenant.refuse.reason.label': 'Raison du refus (optionnel)',
+    'lease.tenant.refuse.reason.placeholder':
+      'Ex : conditions différentes',
+    'lease.tenant.refuse.confirm': 'Confirmer le refus',
+    'lease.tenant.outcome.signed': 'Bail accepté. Tu peux fermer l\'app.',
+    'lease.tenant.outcome.refused': 'Bail refusé.',
+    'lease.tenant.error.generic':
+      'Erreur — vérifie ta connexion et réessaie.',
   },
   mg: {
     'common.appName': 'AryTrano',
@@ -232,6 +266,7 @@ export const messages = {
 
     'profile.title': 'Mombamomba ahy',
     'profile.row.savedSearches': 'Fitadiavana voatahiry',
+    'profile.row.leases': 'Ireo bail-ko',
     'profile.row.favorites': 'Ny tiako',
     'profile.row.settings': 'Fandrindrana kaonty',
     'profile.logout': 'Hivoaka',
@@ -312,6 +347,40 @@ export const messages = {
 
     'units.ariaryPerMonth': '{amount} ariary isam-bolana',
     'units.perMonth': 'Ar / volana',
+
+    // Leases (E-T22 mobile)
+    'lease.list.title': 'Ireo bail-ko',
+    'lease.list.empty.title': 'Mbola tsy misy bail.',
+    'lease.list.empty.lead':
+      'Hampiantsoina ato ianao raha vao misy fifanarahana hosoniavina.',
+    'lease.list.role.owner': 'Tompon-trano',
+    'lease.list.role.tenant': 'Mpanofa',
+    'lease.list.row.openCta': 'Jereo ny bail',
+    'lease.status.DRAFT': 'Bilan-kevitra',
+    'lease.status.PENDING_TENANT': 'Miandry ny soniavinao',
+    'lease.status.ACTIVE': 'Mavitrika',
+    'lease.status.REFUSED': 'Nolavina',
+    'lease.status.TERMINATED': 'Vita',
+    'lease.status.DISPUTED': 'Misy disadisa',
+    'lease.detail.title': 'Antsipirian\'ny bail',
+    'lease.detail.parties.owner': 'Tompon-trano',
+    'lease.detail.parties.tenant': 'Mpanofa',
+    'lease.detail.terms.startDate': 'Daty fanombohana',
+    'lease.detail.terms.duration': 'Faharetana',
+    'lease.detail.terms.months': '{count} volana',
+    'lease.detail.terms.monthlyRent': 'Hofa isam-bolana',
+    'lease.detail.terms.caution': 'Antoka',
+    'lease.tenant.cta.accept': 'Manaiky sy hanao sonia',
+    'lease.tenant.cta.refuse': 'Mandà',
+    'lease.tenant.refuse.reason.label': 'Antony fandavana (azo halefa)',
+    'lease.tenant.refuse.reason.placeholder':
+      'Oh : tsy mitovy ny fepetra',
+    'lease.tenant.refuse.confirm': 'Hamafiso ny fandavana',
+    'lease.tenant.outcome.signed':
+      'Voaray ny bail. Azonao akatona ny app.',
+    'lease.tenant.outcome.refused': 'Nolavina ny bail.',
+    'lease.tenant.error.generic':
+      'Hadisoana — jereo ny tambajotranao dia andramo indray.',
   },
 } as const satisfies Record<Locale, Record<string, string>>
 

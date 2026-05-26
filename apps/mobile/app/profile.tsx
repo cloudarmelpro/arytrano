@@ -72,6 +72,13 @@ export default function Profile() {
             onPress={() => router.push('/saved-searches')}
           />
           <ProfileRow
+            label={t('profile.row.leases')}
+            // Cast — expo-router types are generated from the file system
+            // at dev/build start; the new /leases route is picked up
+            // automatically once the dev server is restarted.
+            onPress={() => router.push('/leases' as never)}
+          />
+          <ProfileRow
             label={t('profile.row.settings')}
             onPress={showComingSoon}
           />

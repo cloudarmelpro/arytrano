@@ -1,6 +1,7 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { logout as apiLogout, login as apiLogin, register as apiRegister } from '../api/client'
 import { getAccessToken } from './token-store'
+import { decodeAccessToken } from './jwt-decode'
 import {
   registerForPushNotifications,
   unregisterFromPushNotifications,
@@ -27,7 +28,15 @@ export function useAuth() {
     queryKey: AUTH_QUERY_KEY,
     queryFn: async () => {
       const token = await getAccessToken()
-      return { signedIn: token !== null }
+      if (!token) return { signedIn: false, user: null }
+      // Decode locally instead of an extra /users/me round-trip. We
+      // only expose what's in the JWT (sub, role) — screens that need
+      // name/email still hit /users/me explicitly.
+      const payload = decodeAccessToken(token)
+      return {
+        signedIn: true,
+        user: payload ? { id: payload.sub, role: payload.role } : null,
+      }
     },
     // Auth state changes rarely; no need to refetch on focus.
     staleTime: Infinity,
@@ -63,6 +72,7 @@ export function useAuth() {
 
   return {
     signedIn: query.data?.signedIn ?? false,
+    user: query.data?.user ?? null,
     isLoading: query.isLoading,
     login,
     register,

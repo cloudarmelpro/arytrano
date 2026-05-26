@@ -5,13 +5,17 @@ import {
   type PressableProps,
 } from 'react-native'
 
-type Variant = 'primary' | 'outline' | 'ghost'
+type Variant = 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger'
 type Size = 'sm' | 'md' | 'lg'
 
 const VARIANT_STYLES: Record<Variant, { container: string; text: string }> = {
   primary: {
     container: 'bg-primary active:opacity-90',
     text: 'text-primary-foreground',
+  },
+  secondary: {
+    container: 'border border-neutral-300 bg-white active:bg-neutral-50',
+    text: 'text-neutral-900',
   },
   outline: {
     container: 'border border-border bg-background active:bg-muted',
@@ -20,6 +24,10 @@ const VARIANT_STYLES: Record<Variant, { container: string; text: string }> = {
   ghost: {
     container: 'bg-transparent active:bg-muted',
     text: 'text-primary',
+  },
+  danger: {
+    container: 'bg-rose-600 active:opacity-90',
+    text: 'text-white',
   },
 }
 
