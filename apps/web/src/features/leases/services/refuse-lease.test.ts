@@ -15,8 +15,15 @@ vi.mock('@/lib/db', () => ({
 vi.mock('@/lib/email/send-transactional', () => ({
   sendTransactionalEmail: vi.fn().mockResolvedValue(undefined),
 }))
+vi.mock('@/lib/push/send-push', () => ({
+  sendPush: vi.fn().mockResolvedValue({ accepted: 0, rejected: 0, tickets: [] }),
+}))
+vi.mock('@/lib/push/receipts', () => ({
+  recordTickets: vi.fn().mockResolvedValue(undefined),
+}))
 
 import { refuseLease } from './refuse-lease'
+import { sendPush } from '@/lib/push/send-push'
 import { prisma } from '@/lib/db'
 
 beforeEach(() => {
@@ -39,6 +46,7 @@ const baseLease = {
     name: 'Hery R.',
     email: 'owner@example.mg',
     locale: 'FR_MG',
+    expoPushToken: null,
   },
   tenant: { name: 'Mialy R.', email: 'tenant@example.mg' },
   listing: { title: 'Studio Andrainjato' },
@@ -124,5 +132,30 @@ describe('refuseLease', () => {
       leaseId: 'lease_1',
       currentStatus: 'ACTIVE',
     })
+  })
+
+  it('fires owner push when expoPushToken is set (S2-25)', async () => {
+    vi.mocked(prisma.lease.findUnique).mockResolvedValue({
+      ...baseLease,
+      owner: {
+        ...baseLease.owner,
+        expoPushToken: 'ExponentPushToken[abc123]',
+      },
+    } as never)
+    vi.mocked(prisma.payment.findUnique).mockResolvedValue({
+      id: 'pay_1',
+      status: 'CONFIRMED',
+    } as never)
+
+    const result = await refuseLease('lease_1', 'tenant_1', 'on a trouvé autre')
+
+    expect(result.kind).toBe('ok')
+    expect(sendPush).toHaveBeenCalledOnce()
+    const args = vi.mocked(sendPush).mock.calls[0]?.[0]
+    expect(args![0]?.to).toBe('ExponentPushToken[abc123]')
+    // Reason MUST NOT travel through the push payload — PII + lock screen.
+    expect(args![0]?.body).not.toContain('on a trouvé autre')
+    expect(args![0]?.data?.kind).toBe('leaseTenantRefused')
+    expect(args![0]?.data?.leaseId).toBe('lease_1')
   })
 })

@@ -14,8 +14,15 @@ vi.mock('@/lib/db', () => ({
 vi.mock('@/lib/email/send-transactional', () => ({
   sendTransactionalEmail: vi.fn().mockResolvedValue(undefined),
 }))
+vi.mock('@/lib/push/send-push', () => ({
+  sendPush: vi.fn().mockResolvedValue({ accepted: 0, rejected: 0, tickets: [] }),
+}))
+vi.mock('@/lib/push/receipts', () => ({
+  recordTickets: vi.fn().mockResolvedValue(undefined),
+}))
 
 import { tenantSignLease } from './tenant-sign-lease'
+import { sendPush } from '@/lib/push/send-push'
 import { prisma } from '@/lib/db'
 
 beforeEach(() => {
@@ -40,6 +47,7 @@ const baseLease = {
     name: 'Hery R.',
     email: 'owner@example.mg',
     locale: 'FR_MG',
+    expoPushToken: null,
   },
   tenant: { name: 'Mialy R.', email: 'tenant@example.mg' },
   listing: { title: 'Studio Andrainjato' },
@@ -102,5 +110,30 @@ describe('tenantSignLease', () => {
 
     expect(result).toEqual({ kind: 'ok', leaseId: 'lease_1' })
     expect(prisma.$transaction).toHaveBeenCalledOnce()
+    // No push token → no push call
+    expect(sendPush).not.toHaveBeenCalled()
+  })
+
+  it('fires owner push when expoPushToken is set (S2-25)', async () => {
+    vi.mocked(prisma.lease.findUnique).mockResolvedValue({
+      ...baseLease,
+      owner: {
+        ...baseLease.owner,
+        expoPushToken: 'ExponentPushToken[abc123]',
+      },
+    } as never)
+
+    const result = await tenantSignLease('lease_1', 'tenant_1')
+
+    expect(result.kind).toBe('ok')
+    expect(sendPush).toHaveBeenCalledOnce()
+    const args = vi.mocked(sendPush).mock.calls[0]?.[0]
+    expect(args).toBeDefined()
+    expect(args![0]?.to).toBe('ExponentPushToken[abc123]')
+    // S2-25 + M2 audit posture — no listing title on the lock screen.
+    expect(args![0]?.body).not.toContain('Studio Andrainjato')
+    // Data payload routes the mobile app to the lease detail.
+    expect(args![0]?.data?.kind).toBe('leaseTenantSigned')
+    expect(args![0]?.data?.leaseId).toBe('lease_1')
   })
 })

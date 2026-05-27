@@ -7,6 +7,8 @@ import { sanitizeEmailHeaderValue } from '@/lib/email/sanitize-header'
 import { stripC0ControlChars } from '@/lib/format/strip-c0'
 import { buildLeaseTenantRefusedEmail } from '@/lib/email/templates/lease-tenant-refused'
 import { fromPrismaLocale } from '@/lib/i18n/config'
+import { sendPush } from '@/lib/push/send-push'
+import { recordTickets } from '@/lib/push/receipts'
 
 /**
  * Tenant refuses the lease. Moves the Lease from PENDING_TENANT to
@@ -39,7 +41,14 @@ export async function refuseLease(
       tenantId: true,
       paymentId: true,
       owner: {
-        select: { id: true, name: true, email: true, locale: true },
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          locale: true,
+          // S2-25 — owner mobile push (null when only using web).
+          expoPushToken: true,
+        },
       },
       tenant: { select: { name: true, email: true } },
       listing: { select: { title: true } },
@@ -131,6 +140,36 @@ export async function refuseLease(
     html: email.html,
     text: email.text,
   })
+
+  // S2-25 — fire-and-forget owner push. Same security posture as the
+  // accept path : generic body, leaseId in data for deep-link routing.
+  // Reason is NOT included in the push (PII + lock-screen exposure) —
+  // owner reads it inside the app on the lease detail screen.
+  if (lease.owner.expoPushToken) {
+    const ownerLocale = fromPrismaLocale(lease.owner.locale)
+    const pushTitle =
+      ownerLocale === 'mg' ? 'Nolavina ny bail' : 'Bail refusé'
+    const pushBody =
+      ownerLocale === 'mg'
+        ? "Nanda ny bail ny mpanofa. Sokafy ny app hijerena."
+        : "Le locataire a refusé. Ouvre l'app pour voir les détails."
+    void sendPush([
+      {
+        to: lease.owner.expoPushToken,
+        title: pushTitle,
+        body: pushBody,
+        sound: 'default',
+        data: { kind: 'leaseTenantRefused', leaseId: lease.id },
+      },
+    ]).then((result) =>
+      recordTickets(
+        result.tickets.map((t) => ({
+          userId: lease.owner.id,
+          ticketId: t.ticketId,
+        })),
+      ),
+    )
+  }
 
   return { kind: 'ok', leaseId: lease.id, paymentRefundQueued }
 }
