@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server'
 import * as Sentry from '@sentry/nextjs'
 import { goalPayProvider, recordWebhookEvent } from '@/features/payments/server'
 import { applyLeasePaymentSideEffect } from '@/features/leases'
+import { extractRequestInfo } from '@/lib/auth/request-info'
+import { rateLimiters } from '@/lib/rate-limit'
 
 // Webhooks must run on the Node.js runtime — we rely on `node:crypto`
 // (HMAC-SHA256 with timing-safe compare) and Prisma. The Edge runtime
@@ -47,6 +49,20 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
+  // Audit H1 fix — rate-limit BEFORE any work, including HMAC verify.
+  // The webhook handler is exposed at 3 URLs (canonical + 2 aliases)
+  // and an attacker can spam all 3 with bogus bodies. Without a limit
+  // each request still runs `request.text()` + HMAC compute + Sentry
+  // capture. Fail-CLOSED on null IP so a stripped X-Forwarded-For
+  // can't bypass the cap.
+  const { ipHash } = extractRequestInfo(request.headers)
+  const rl = await rateLimiters.webhookIngress(ipHash)
+  if (!rl.success) {
+    // 429 with no body — don't hint that this is a rate-limit response
+    // (an attacker enumerating endpoints can already see the status).
+    return NextResponse.json({ error: 'too_many' }, { status: 429 })
+  }
+
   // SEC-M1 audit fix — bound the buffer BEFORE running HMAC over it.
   // Without this an attacker can POST hundreds of MB of garbage and
   // burn Node memory + CPU before the signature check rejects them.
@@ -73,6 +89,17 @@ export async function POST(request: Request) {
   const signature = request.headers.get('x-gpay-signature')
 
   if (!goalPayProvider.verifyWebhookSignature(rawBody, signature)) {
+    // Audit fix — alert on EVERY invalid signature. This is either an
+    // attack (someone POSTing forged webhooks) or a rotated secret
+    // mismatch between dashboard and env. Both need admin attention.
+    // No PII in the tags : only the presence/absence of a sig header.
+    Sentry.captureMessage('webhook signature invalid', {
+      level: 'warning',
+      tags: {
+        kind: 'invalid_signature',
+        hasHeader: signature ? 'true' : 'false',
+      },
+    })
     // Don't leak why it failed (missing header vs mismatch) — both
     // surface as 401 to avoid hinting at the verification mechanism.
     return NextResponse.json(

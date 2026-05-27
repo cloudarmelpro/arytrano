@@ -167,6 +167,19 @@ const cronAccessLimiter = makeLimiter('cron-access', {
   window: '1 h',
 })
 
+// GoalPay webhook ingress (audit H1) — 100/min per IP. HMAC verify
+// short-circuits invalid signatures, but each rejected POST still
+// runs `request.text()` + HMAC compute + Sentry capture. An attacker
+// spamming the 3 webhook URLs (canonical + `/webhook-gpay` alias +
+// `/api/goalpay/webhook/test` test alias) could burn CPU and noise
+// up the Sentry alert channel. 100/min is generous for legit
+// GoalPay (one webhook per Payment status change × ~4 events =
+// typically <10/min even under load) while bounding abuse.
+const webhookIngressLimiter = makeLimiter('webhook-ingress', {
+  requests: 100,
+  window: '1 m',
+})
+
 type RateLimitResult = { success: boolean; remaining?: number; reset?: number }
 
 async function check(
@@ -265,4 +278,8 @@ export const rateLimiters = {
   /** Cron secret probe — 30/h per IP. Fail-CLOSED on null IP. */
   cronAccess: (ipHash: string | null) =>
     check(cronAccessLimiter, ipHash ?? 'noip:cron-access'),
+
+  /** GoalPay webhook ingress — 100/min per IP. Fail-CLOSED on null IP. */
+  webhookIngress: (ipHash: string | null) =>
+    check(webhookIngressLimiter, ipHash ?? 'noip:webhook-ingress'),
 }

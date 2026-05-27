@@ -65,14 +65,25 @@ export interface GoalPayInitiateResponse {
   orderReference: string
 }
 
-/** Strip the access field before logging — never let the merchant
- *  key flow into stdout/Sentry breadcrumbs. */
+/** Sanitize the payload before logging — strip the merchant access
+ *  key (never leave server boundary in logs) and tighten the user-supplied
+ *  fields that a malicious lister could weaponize as PII or noise.
+ *
+ *  Audit M2 fix : `description` flows in as `"Bail AryTrano — {listing.title}"`
+ *  where `listing.title` is owner-supplied free text. A bad-actor lister
+ *  could put their phone number / address in the title and have it land
+ *  in Sentry breadcrumbs. Truncate aggressively. `metadata` labels carry
+ *  pricing detail — drop the array, keep only the row count. */
 function sanitizeBodyForLogs(body: GoalPayInitiateBody) {
   return {
-    ...body,
+    description: body.description.slice(0, 60),
     access: body.access
       ? `${body.access.slice(0, 6)}…(redacted, ${body.access.length} chars)`
       : '(empty)',
+    reference: body.reference,
+    amount: body.amount,
+    currency: body.currency,
+    metadataItems: body.metadata.length,
   }
 }
 
