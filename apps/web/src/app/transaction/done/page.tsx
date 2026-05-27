@@ -1,7 +1,6 @@
 import type { Metadata } from 'next'
-import { auth } from '@/features/auth'
-import { findLeaseByPaymentReference } from '@/features/payments'
-import { TransactionResult } from '@/features/payments/components/TransactionResult'
+import { resolveLeaseHrefForReturn } from '@/features/payments/server'
+import { TransactionResult } from '@/features/payments'
 
 export const metadata: Metadata = {
   title: 'Paiement confirmé · AryTrano',
@@ -29,7 +28,7 @@ type SearchParams = Promise<{
  *
  * We never mutate state based on the URL : anyone with the redirect
  * link could replay it. The webhook's HMAC verification is the only
- * trusted source.
+ * trusted source. Ownership gating happens inside resolveLeaseHrefForReturn.
  */
 export default async function TransactionDonePage({
   searchParams,
@@ -37,21 +36,8 @@ export default async function TransactionDonePage({
   searchParams: SearchParams
 }) {
   const sp = await searchParams
-  const session = await auth()
   const reference = typeof sp.reference === 'string' ? sp.reference : null
-
-  // Look up the lease so the CTA points at the right detail page.
-  // We don't trust the URL ; auth check + ownership match guards
-  // the leaseId disclosure.
-  let leaseHref: string | null = null
-  let showLeaseLink = false
-  if (reference && session?.user?.id) {
-    const r = await findLeaseByPaymentReference(reference)
-    if (r && r.ownerUserId === session.user.id) {
-      leaseHref = `/dashboard/leases/${r.leaseId}`
-      showLeaseLink = true
-    }
-  }
+  const { leaseHref, showLeaseLink } = await resolveLeaseHrefForReturn(reference)
 
   return (
     <TransactionResult

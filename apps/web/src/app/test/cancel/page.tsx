@@ -1,7 +1,6 @@
 import type { Metadata } from 'next'
-import { auth } from '@/features/auth'
-import { findLeaseByPaymentReference } from '@/features/payments'
-import { TransactionResult } from '@/features/payments/components/TransactionResult'
+import { resolveLeaseHrefForReturn } from '@/features/payments/server'
+import { TransactionResult } from '@/features/payments'
 
 export const metadata: Metadata = {
   title: 'Paiement test annulé · AryTrano',
@@ -20,18 +19,8 @@ export default async function TestCancelPage({
   searchParams: SearchParams
 }) {
   const sp = await searchParams
-  const session = await auth()
   const reference = typeof sp.reference === 'string' ? sp.reference : null
-
-  let leaseHref: string | null = null
-  let showLeaseLink = false
-  if (reference && session?.user?.id) {
-    const r = await findLeaseByPaymentReference(reference)
-    if (r && r.ownerUserId === session.user.id) {
-      leaseHref = `/dashboard/leases/${r.leaseId}`
-      showLeaseLink = true
-    }
-  }
+  const { leaseHref, showLeaseLink } = await resolveLeaseHrefForReturn(reference)
 
   return (
     <TransactionResult

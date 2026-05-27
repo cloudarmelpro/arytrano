@@ -1,7 +1,6 @@
 import type { Metadata } from 'next'
-import { auth } from '@/features/auth'
-import { findLeaseByPaymentReference } from '@/features/payments'
-import { TransactionResult } from '@/features/payments/components/TransactionResult'
+import { resolveLeaseHrefForReturn } from '@/features/payments/server'
+import { TransactionResult } from '@/features/payments'
 
 export const metadata: Metadata = {
   title: 'Paiement test confirmé · AryTrano',
@@ -23,7 +22,7 @@ type SearchParams = Promise<{
  *
  * The dashboard test config in GoalPay lets us point at localhost
  * for redirects (browser follows them, no DNS issue). For the
- * webhook, use ngrok — see runbooks/payments-goalpay.md §4.
+ * webhook, use ngrok — see runbooks/payments-goalpay.md §2.bis.
  */
 export default async function TestSuccessPage({
   searchParams,
@@ -31,18 +30,8 @@ export default async function TestSuccessPage({
   searchParams: SearchParams
 }) {
   const sp = await searchParams
-  const session = await auth()
   const reference = typeof sp.reference === 'string' ? sp.reference : null
-
-  let leaseHref: string | null = null
-  let showLeaseLink = false
-  if (reference && session?.user?.id) {
-    const r = await findLeaseByPaymentReference(reference)
-    if (r && r.ownerUserId === session.user.id) {
-      leaseHref = `/dashboard/leases/${r.leaseId}`
-      showLeaseLink = true
-    }
-  }
+  const { leaseHref, showLeaseLink } = await resolveLeaseHrefForReturn(reference)
 
   return (
     <TransactionResult

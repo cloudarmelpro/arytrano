@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import * as Sentry from '@sentry/nextjs'
-import { goalPayProvider, recordWebhookEvent } from '@/features/payments'
+import { goalPayProvider, recordWebhookEvent } from '@/features/payments/server'
 import { applyLeasePaymentSideEffect } from '@/features/leases'
 
 // Webhooks must run on the Node.js runtime — we rely on `node:crypto`

@@ -4,7 +4,7 @@ import * as Sentry from '@sentry/nextjs'
 import { env } from '@/lib/env'
 import { extractRequestInfo } from '@/lib/auth/request-info'
 import { rateLimiters } from '@/lib/rate-limit'
-import { reconcileStuckPayments } from '@/features/payments'
+import { reconcileStuckPayments } from '@/features/payments/server'
 
 /**
  * Cron — Payment reconciliation (E-T20 minimal v1).

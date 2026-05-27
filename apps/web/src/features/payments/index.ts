@@ -1,17 +1,19 @@
-// Public surface of the payments feature. Cross-feature consumers
-// (the GoalPay webhook route, the leases feature, the cron route)
-// import from here, never from internal paths. ARCHITECTURE.md rule #1.
+/**
+ * Client-safe public surface of the payments feature.
+ *
+ * Anything exported from here is allowed to be imported from a Client
+ * Component (`'use client'`) — no `server-only`, no Prisma, no fetch
+ * to GoalPay, no env access. Server-only modules live in `./server.ts`.
+ *
+ * Memory rule `feedback_feature_index_client_safe` — re-exporting a
+ * `'server-only'` module here poisons every client consumer's bundle
+ * with a build-time error, even if only a type-safe symbol is used.
+ */
 
-export { goalPayProvider } from './goalpay/provider'
-export { GoalPayClientError } from './goalpay/client'
-export {
-  recordWebhookEvent,
-  type RecordWebhookOutcome,
-} from './services/record-webhook-event'
-export { reconcileStuckPayments } from './services/reconcile-stuck-payments'
 export { goalPayWebhookPayloadSchema } from './schemas/webhook'
 export type { GoalPayWebhookPayload } from './schemas/webhook'
+
 export {
-  findLeaseByPaymentReference,
-  type LeaseForTransactionReturn,
-} from './queries/find-lease-by-payment-reference'
+  TransactionResult,
+  type TransactionStatus,
+} from './components/TransactionResult'

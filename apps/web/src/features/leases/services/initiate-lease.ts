@@ -1,6 +1,6 @@
 import 'server-only'
 import { prisma } from '@/lib/db'
-import { goalPayProvider } from '@/features/payments'
+import { goalPayProvider } from '@/features/payments/server'
 import {
   initiateLeaseInputSchema,
   type InitiateLeaseInput,
