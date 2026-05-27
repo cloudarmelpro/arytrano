@@ -144,8 +144,8 @@ function Column({
   fieldErrors?: Record<string, string[]>
 }) {
   return (
-    <section className="flex flex-col gap-4 rounded-2xl border border-border bg-background p-5">
-      <header className="flex items-center justify-between">
+    <section className="flex flex-col gap-4">
+      <header className="flex items-center justify-between border-b border-border pb-3">
         <h2 className="text-base font-semibold text-foreground">{label}</h2>
         <span className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground">
           {locale}
