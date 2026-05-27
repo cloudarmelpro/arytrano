@@ -3579,6 +3579,167 @@ Objectif : un livre de contrôle exhaustif à dérouler avant d'ouvrir publiquem
 
 ---
 
+## 📦 Session 2026-05-26 → 2026-05-27 — recap + suite
+
+**18 commits livrés sur `main`** (de `5a7190c` à `20c3c25`). État `main` = **`20c3c25`**, branch up to date.
+
+### Livré dans cette session
+
+| Catégorie | Commits | Périmètre |
+|---|---|---|
+| **E-T15 GoalPay infra** | `376742a` | PaymentProvider + webhook HMAC + reconcile cron + audit fixes Wave 1 |
+| **Audits Wave 2+3** | `23aa25f` | 22 fixes security/a11y/perf (HIGH+MEDIUM+LOW) |
+| **Admin revenue v0.5** | `fa4df61` | `/admin/revenue` + FTS pg_trgm GIN + PWA offline fallback |
+| **Saved-search + map** | `ee3306a` | Email fallback (push+email), `/annonces?view=map` toggle |
+| **Mobile E-T22 lease** | `5814e15` | Tenant accept/refuse flow (Expo) + shared Zod schemas |
+| **E-T07 Batch A+B** | `1052eb3` + `7ff0804` | Multi-ville schema + 29 brouillons éditoriaux + consumers DB-first |
+| **E-T07 Batch C** | `1590fe9` + `5c5adba` + `75b0934` | Admin /admin/geo CRUD éditorial + create city/quartier + lighter layout |
+| **E-T07 Batch C2** | `9118d8a` + `98429b1` | quizProfile admin form + shadcn Select |
+| **Polish UI** | `c6b08bc` + `2460d4a` | Select item highlight + cursor-pointer |
+| **Confirm destructive** | `bb642f3` | Dialog wrap sur "Effacer" éditorial + profile |
+| **Migration check script** | `a3b1e60` | `npm run check:migrations` |
+| **GoalPay credentials rename** | `20c3c25` | ACCESS_TOKEN → ACCESS_KEY, BASE_URL → PAYMENT_GOALPAY_URL (full URL) |
+
+**Tests** : 189/189 vert sur tous les commits. Typecheck clean. Turbopack build clean (modulo env vars manquants en build prod — voir Launch checklist).
+
+### GoalPay merchant — credentials reçues le 2026-05-27
+
+L'utilisateur a confirmé l'activation du compte marchand. Variables prod attendues :
+- `GOALPAY_ACCESS_KEY=TGP_*`
+- `GOALPAY_WEBHOOK_SECRET=SK_*`
+- `PAYMENT_GOALPAY_URL=https://api.goalpay.pro/api/payement/service`
+
+Code adapté à ces noms dans `20c3c25`. Reste à : (1) coller les vraies valeurs en `.env`, (2) test e2e avec 100 Ar minimal après deploy prod (cf runbook `public/docs/runbooks/payments-goalpay.md §3`).
+
+---
+
+### 📋 Reste à faire — priorisé pour la session suivante
+
+Convention : chaque ticket utilise le numéro suivant disponible. **Statut bloqueur explicité** quand applicable.
+
+#### 🔴 P0 — bloqueurs lancement Fianarantsoa (non-code)
+
+Ces items NE sont PAS du code que je peux écrire. Ils sont sur l'utilisateur ou un prestataire :
+
+##### S2-1 · Provision Contabo VPS S + DNS arytrano.mg + SSL
+**Bloqueur** : aucun ; juste à exécuter
+**Description** : suivre `public/docs/runbooks/contabo-deployment.md` §1–6. Caddy gère le SSL auto via Let's Encrypt si le DNS pointe d'abord vers l'IP Contabo.
+**Sortie attendue** : `https://arytrano.mg` répond 200 avec un certificat valide.
+**Effort** : ~2h.
+
+##### S2-2 · Comptes externes (R2, Stadia, Sentry, UptimeRobot)
+**Bloqueur** : aucun
+**Description** : 4 signups indépendants. Chacun donne des credentials à mettre en `.env` prod :
+- Cloudflare R2 (backup storage rclone)
+- Stadia Maps (`NEXT_PUBLIC_STADIA_API_KEY`, déjà câblé)
+- Sentry (DSN + auth token)
+- UptimeRobot (monitor sur `/api/health`)
+**Sortie attendue** : 4 sets de credentials collés en `.env` prod + redéployé.
+**Effort** : ~1h30 total.
+
+##### S2-3 · GoalPay test e2e en prod avec 100 Ar
+**Bloqueur** : S2-1 (besoin de `arytrano.mg/api/webhooks/goalpay` accessible publiquement pour que GoalPay puisse POSTer)
+**Description** : suivre `public/docs/runbooks/payments-goalpay.md §3`. Owner test → wizard lease → paie 100 Ar via le checkout GoalPay → webhook arrive → lease passe DRAFT → PENDING_TENANT → tenant signe → ACTIVE.
+**Sortie attendue** : 1 Lease ACTIVE + 1 Payment CONFIRMED + 1 PaymentEvent audit row.
+**Effort** : ~30min après que l'infra soit up.
+
+##### S2-4 · CGU + politique de confidentialité + mentions légales (juriste MG)
+**Bloqueur** : juriste
+**Description** : `/legal/terms`, `/legal/privacy`, `/legal/mentions`, `/legal/cookies` sont actuellement des placeholders. Faire rédiger par un juriste Madagascar (Code du Bail + RGPD-like local). Une fois reçus, copier-coller dans `messages/fr-MG.ts` + `mg.ts` ; les routes existent déjà.
+**Effort code** : ~1h après livraison juriste (juste copy-paste). Effort juriste : indéterminé.
+
+##### S2-5 · Recrutement 50 premiers proprios Fianarantsoa + 5–10 testimonials
+**Bloqueur** : terrain
+**Description** : c'est l'effort marketing principal. Le ticket `T-035` (testimonials DB-driven) attend déjà du contenu — admin peut le saisir via `/admin/testimonials` (existant).
+
+---
+
+#### 🟠 P1 — Code post-launch, dès qu'on a du trafic
+
+##### S2-6 · Vérification audits 2026-05-27 (security + architecture)
+**Bloqueur** : aucun
+**Description** : les agents `security-reviewer` + `general-purpose` ont audité les 14 commits depuis `23aa25f`. **Findings à reporter ici une fois les agents revenus**. Triager HIGH → bloquant launch, MEDIUM → post-launch, LOW → v0.5+.
+**Référence** : section "Findings audits 2026-05-27" ci-dessous.
+
+##### S2-7 · Garde l'éditorial admin contre re-seed écrasement
+**Bloqueur** : aucun
+**Description** : actuellement `seed.ts` UPDATE `editorial` + `quizProfile` à chaque `db seed`. Si un admin raffine via `/admin/geo` puis quelqu'un re-seed (par exemple après un `db:reset`), le contenu raffiné est perdu. Le commentaire dans `editorial-drafts.ts` documente le risque.
+**Fix proposé** : dans `seed.ts`, lire le row existant avant l'upsert. Si `editorial !== null` ET `editorial.fr.tagline !== draftPayload.fr.tagline`, **skip** l'écriture (le row a été édité, ne pas écraser). Idem pour `quizProfile`.
+**Effort** : ~1h.
+
+##### S2-8 · Backfill loginEvent device pour les sessions OAuth anciennes
+**Bloqueur** : décision UX
+**Description** : ~4 rows `LoginEvent` Google OAuth s'affichent "Appareil inconnu" dans `/dashboard/settings#login-events` parce qu'ils datent d'avant le fix `events.signIn` (commit `376742a`). Décider : (a) laisser flagger comme "pré-fix, device non enregistré", (b) backfill avec un placeholder « Connexion ancienne », (c) supprimer ces rows.
+**Effort** : 30min selon option.
+
+##### S2-9 · Wave 2 a11y MEDIUMs restants (M2 refuse-reason validation)
+**Bloqueur** : aucun
+**Description** : audit a11y avait identifié `LeaseTenantActions.tsx` refuse-reason `<Input>` sans `required`/`minLength` + sans `aria-invalid`. Form submit même avec raison vide. Memo : reason est explicitement optionnel côté business (le commentaire dans schema dit "optionnel"), mais l'a11y veut au moins le `aria-required="false"` pour clarifier. Très mineur.
+**Effort** : 15min.
+
+##### S2-10 · Mobile lease initiate flow (owner-side)
+**Bloqueur** : aucun
+**Description** : actuellement seul le tenant peut interagir avec un lease depuis l'app mobile (accept/refuse). L'initiate-lease wizard reste web-only — un owner doit ouvrir le site pour créer un bail. Ajouter le flow mobile :
+- Screen `/app/leases/new/[listingId].tsx` (form simplifiée : tenantEmail + startDate + durationMonths ; rent + cautionMonths viennent du listing)
+- Réutiliser `initiateLease` API endpoint
+- Push vers checkout WebView GoalPay
+**Effort** : ~1 jour. **Justifié seulement si les premiers proprios confirment qu'ils veulent ça mobile-first.**
+
+##### S2-11 · Email backfill option dans admin/quiz-analytics
+**Bloqueur** : aucun
+**Description** : `/admin/quiz-analytics` montre le taux email opt-in mais pas la liste des emails. Si on veut envoyer un email blast aux étudiants qui ont fait le quiz, on doit aller dans DB. Ajouter un export CSV des emails consentants (avec marquage RGPD).
+**Effort** : ~3h.
+
+---
+
+#### 🟡 P2 — v1 et au-delà, non-bloquants
+
+##### S2-12 · E-T24 cohort analytics squelette
+**Description** : queries de funnel (signup → publish OR contact → review) prêtes à dégrainer. Pas d'UI lourde tant qu'on n'a pas de trafic. Référence : section `E-T24` ligne ~3416 ci-dessus.
+**Effort** : ~2 jours pour le squelette, + 1 jour pour l'UI quand on a des cohortes.
+
+##### S2-13 · E-T13 PWA "last-viewed listings" via IndexedDB
+**Description** : actuellement le SW a un fallback `/offline` mais ne stocke pas les dernières annonces vues. Pour Madagascar 3G instable, c'est un vrai plus. **Attention** : conflit avec la règle "listing-detail jamais runtime-cached" pour éviter de servir une annonce modérée hors-ligne — il faudrait un mécanisme TTL court + vérification moderation status au reconnect.
+**Effort** : ~2 jours avec les guards.
+
+##### S2-14 · E-T21 OpenAPI 3.1 spec finalisée + Postman collection
+**Description** : `/api/v1/openapi.json` existe mais peut être incomplet. Vérifier que les 39 endpoints sont tous documentés via `zod-to-openapi`. Générer aussi la Postman collection (`public/docs/postman-collection.json`).
+**Effort** : ~1 jour de validation + génération.
+
+##### S2-15 · Reflow `/dashboard/leases` au-delà de 50 leases
+**Description** : `listUserLeases` retourne max 50 sans pagination. Owner avec 60+ leases ne voit pas les plus anciens. Ajouter cursor pagination (cf PERF-M4 audit).
+**Effort** : ~2h.
+
+##### S2-16 · Centraliser la voix éditoriale → guide style pour /admin/geo
+**Description** : les 29 brouillons éditoriaux dans `editorial-drafts.ts` ne suivent pas exactement la même voix que les 8 Fianar (lesquels viennent d'interviews terrain). Quand on raffine via `/admin/geo`, on doit avoir un mini-guide. Créer `public/docs/runbooks/editorial-style-guide.md` (1 page) qui rappelle :
+- Ton : direct, opinionné, comme un grand frère qui connaît le quartier
+- Anti-pattern : marketing creux, "magnifique quartier convivial pour tous"
+- Tagline : ≤ 12 mots, doit donner envie de cliquer
+- Ambiance : 2–3 phrases, contraste semaine/weekend si pertinent
+- Walk : noms d'établissements précis (lycée X, marché Y, pas "écoles")
+- Transport : lignes taxi-be spécifiques quand possible
+- Distance : "X min Z" pas "près de", "à proximité"
+**Effort** : ~1h pour le doc.
+
+##### S2-17 · Mobile app — store listing + screenshots
+**Description** : E-T22 mobile fonctionne mais n'est pas dans les stores. Préparer :
+- 4–6 screenshots iPhone 15 / Pixel 8 (landing → listing detail → favoris → lease detail)
+- Description FR + MG store
+- Icon 1024×1024 (déjà placeholder dans `apps/mobile/assets/`)
+- Privacy nutrition labels Apple + data safety Google
+**Bloqueur** : compte Apple Developer (99 USD/an) + Google Play (25 USD once)
+**Effort** : ~1 jour de préparation + délais review stores (3–7j Apple, 1j Google).
+
+---
+
+### 🔬 Findings audits 2026-05-27 — à compléter
+
+> **Bloqué** : les 2 agents (`security-reviewer` + `general-purpose` architecture) tournent en background pendant que je rédige ces tickets. Findings concrets à coller ici dès qu'ils ressortent. Voir aussi le rapport conversationnel envoyé en final.
+
+**Méta** : scope = 14 commits entre `23aa25f` et `bb642f3`. Skip de doublons avec audits passés (Wave 1+2+3 déjà clean).
+
+---
+
 ## 🔁 Audit followups (post 2026-05-20 batch)
 
 - **AUD-001** — Migrer `QuizSubmission.locale` + `WhatsAppAlert.locale` de `String` à enum `Locale` (FR_MG / MG). À faire **avant que les tables aient du volume**. Voir `TODO(audit P2)` dans `prisma/schema.prisma`. Nécessite : (1) migration SQL qui ALTER COLUMN avec USING-cast, (2) MAJ des 2 actions pour écrire `'FR_MG'` / `'MG'` au lieu de `'fr-MG'` / `'mg'`.
