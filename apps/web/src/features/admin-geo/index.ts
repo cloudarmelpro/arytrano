@@ -21,3 +21,7 @@ export {
   createNeighborhoodAction,
   type CreateNeighborhoodActionState,
 } from './actions/create-neighborhood'
+export {
+  updateNeighborhoodQuizProfileAction,
+  type UpdateQuizProfileActionState,
+} from './actions/update-quiz-profile'
