@@ -1,6 +1,6 @@
 'use client'
 
-import { useActionState, useState } from 'react'
+import { useActionState, useRef, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import {
   Field,
@@ -15,6 +15,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { ConfirmDestructive } from '@/components/shared/ConfirmDestructive'
 import {
   updateNeighborhoodQuizProfileAction,
   type UpdateQuizProfileActionState,
@@ -83,9 +84,20 @@ export function QuizProfileForm({
     initial,
   )
   const [intent, setIntent] = useState<'save' | 'clear'>('save')
+  const formRef = useRef<HTMLFormElement>(null)
+
+  function confirmClear() {
+    setIntent('clear')
+    const intentInput =
+      formRef.current?.querySelector<HTMLInputElement>(
+        'input[name="intent"]',
+      )
+    if (intentInput) intentInput.value = 'clear'
+    formRef.current?.requestSubmit()
+  }
 
   return (
-    <form action={action} className="flex flex-col gap-6">
+    <form ref={formRef} action={action} className="flex flex-col gap-6">
       <input type="hidden" name="citySlug" value={citySlug} />
       <input type="hidden" name="neighborhoodSlug" value={neighborhoodSlug} />
       <input type="hidden" name="intent" value={intent} />
@@ -220,14 +232,16 @@ export function QuizProfileForm({
         ) : null}
 
         <div className="flex flex-wrap items-center justify-end gap-2 border-t border-border pt-6">
-          <Button
-            type="submit"
-            variant="ghost"
-            onClick={() => setIntent('clear')}
-            aria-busy={pending && intent === 'clear'}
-          >
-            Effacer le profil
-          </Button>
+          <ConfirmDestructive
+            triggerLabel="Effacer le profil"
+            triggerVariant="ghost"
+            dialogTitle="Effacer le profil quiz ?"
+            dialogBody="Ce quartier ne remontera plus dans les recommandations du quiz tant qu'un nouveau profil n'est pas saisi. Les pages publiques (annonces / quartiers) continuent de fonctionner normalement."
+            confirmLabel="Oui, effacer"
+            pending={pending && intent === 'clear'}
+            pendingLabel="Effacement…"
+            onConfirm={confirmClear}
+          />
           <Button
             type="submit"
             onClick={() => setIntent('save')}

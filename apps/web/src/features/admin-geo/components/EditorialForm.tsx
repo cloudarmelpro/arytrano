@@ -1,6 +1,6 @@
 'use client'
 
-import { useActionState, useState } from 'react'
+import { useActionState, useRef, useState } from 'react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -11,6 +11,7 @@ import {
   FieldGroup,
   FieldLabel,
 } from '@/components/ui/field'
+import { ConfirmDestructive } from '@/components/shared/ConfirmDestructive'
 import {
   updateNeighborhoodEditorialAction,
   type UpdateEditorialActionState,
@@ -61,9 +62,28 @@ export function EditorialForm({
     initial,
   )
   const [intent, setIntent] = useState<'save' | 'clear'>('save')
+  const formRef = useRef<HTMLFormElement>(null)
+
+  function confirmClear() {
+    // Flip the intent hidden input then submit programmatically.
+    // setState alone wouldn't update the DOM in time before the next
+    // event loop tick, so we mutate the hidden input directly and
+    // call requestSubmit which respects the form's validation hooks.
+    setIntent('clear')
+    const intentInput =
+      formRef.current?.querySelector<HTMLInputElement>(
+        'input[name="intent"]',
+      )
+    if (intentInput) intentInput.value = 'clear'
+    formRef.current?.requestSubmit()
+  }
 
   return (
-    <form action={action} className="flex flex-col gap-6">
+    <form
+      ref={formRef}
+      action={action}
+      className="flex flex-col gap-6"
+    >
       <input type="hidden" name="citySlug" value={citySlug} />
       <input type="hidden" name="neighborhoodSlug" value={neighborhoodSlug} />
       <input type="hidden" name="intent" value={intent} />
@@ -110,14 +130,16 @@ export function EditorialForm({
             ← Retour à la liste
           </Link>
           <div className="flex items-center gap-2">
-            <Button
-              type="submit"
-              variant="ghost"
-              onClick={() => setIntent('clear')}
-              aria-busy={pending && intent === 'clear'}
-            >
-              Effacer (revenir au fallback)
-            </Button>
+            <ConfirmDestructive
+              triggerLabel="Effacer (revenir au fallback)"
+              triggerVariant="ghost"
+              dialogTitle="Effacer l'éditorial ?"
+              dialogBody="Le contenu éditorial de ce quartier sera supprimé. Les pages publiques retomberont sur le contenu par défaut (dictionnaire i18n historique, ou rien pour les villes sans fallback). Action réversible — il suffit de re-sauvegarder via ce formulaire."
+              confirmLabel="Oui, effacer"
+              pending={pending && intent === 'clear'}
+              pendingLabel="Effacement…"
+              onConfirm={confirmClear}
+            />
             <Button
               type="submit"
               onClick={() => setIntent('save')}
