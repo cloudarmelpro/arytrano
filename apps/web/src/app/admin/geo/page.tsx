@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { buttonVariants } from '@/components/ui/button'
 import { listGeoAdmin } from '@/features/admin-geo'
 
 export const metadata: Metadata = {
@@ -16,10 +17,15 @@ export const metadata: Metadata = {
  * the database with quizProfile populated but `editorial` null, so
  * those rows surface as "À éditer" here.
  *
- * Edit happens on the detail page (`./cities/[slug]/neighborhoods/[slug]`).
- * Create / delete of City + Neighborhood rows is intentionally NOT
- * exposed in Batch C — adding a brand-new city is still rare enough
- * to warrant a seed-file change + code review.
+ * Create flows (Ajouter une ville / Ajouter un quartier) live next to
+ * each section header. Edit happens on the detail page
+ * (`./cities/[slug]/neighborhoods/[slug]`). No delete in v1 — listing
+ * references make removal dangerous, gated to a manual SQL operation
+ * with a runbook entry.
+ *
+ * Layout note — city sections are separated by a hairline border
+ * below their heading + spacing, not by a card frame. The frame felt
+ * heavy when stacked across 5 cities.
  */
 export default async function AdminGeoPage() {
   const cities = await listGeoAdmin()
@@ -34,45 +40,59 @@ export default async function AdminGeoPage() {
 
   return (
     <div className="flex flex-col gap-10">
-      <header className="flex flex-col gap-2">
-        <h1 className="text-3xl font-semibold leading-tight text-foreground sm:text-4xl">
-          Géographie
-        </h1>
-        <p className="max-w-2xl text-sm text-muted-foreground">
-          Édite le contenu éditorial des quartiers — tagline, ambiance,
-          repères piétons, transports. Les profils de quiz et la création
-          de nouvelles villes restent gérés via le seed (E-T07 Batch A).
-        </p>
-        <p className="mt-2 text-[13px] font-medium text-foreground/70">
-          {cities.length} ville{cities.length > 1 ? 's' : ''} ·{' '}
-          {totalNeighborhoods} quartiers ·{' '}
-          {editorialMissing > 0 ? (
-            <span className="text-amber-700">
-              {editorialMissing} sans éditorial
-            </span>
-          ) : (
-            <span className="text-emerald-700">éditorial complet</span>
-          )}
-        </p>
+      <header className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between sm:gap-6">
+        <div className="flex flex-col gap-2">
+          <h1 className="text-3xl font-semibold leading-tight text-foreground sm:text-4xl">
+            Géographie
+          </h1>
+          <p className="max-w-2xl text-sm text-muted-foreground">
+            Édite le contenu éditorial des quartiers — tagline, ambiance,
+            repères piétons, transports. Les profils de quiz restent
+            gérés via le seed (E-T07 Batch A).
+          </p>
+          <p className="mt-2 text-[13px] font-medium text-foreground/70">
+            {cities.length} ville{cities.length > 1 ? 's' : ''} ·{' '}
+            {totalNeighborhoods} quartiers ·{' '}
+            {editorialMissing > 0 ? (
+              <span className="text-amber-700">
+                {editorialMissing} sans éditorial
+              </span>
+            ) : (
+              <span className="text-emerald-700">éditorial complet</span>
+            )}
+          </p>
+        </div>
+        <Link
+          href="/admin/geo/cities/new"
+          className={buttonVariants({ size: 'lg' })}
+        >
+          + Ajouter une ville
+        </Link>
       </header>
 
-      <div className="flex flex-col gap-8">
+      <div className="flex flex-col gap-10">
         {cities.map((city) => (
-          <section
-            key={city.id}
-            className="flex flex-col gap-4 rounded-2xl border border-border bg-background p-6"
-          >
-            <div className="flex items-baseline justify-between gap-4">
-              <h2 className="text-xl font-semibold text-foreground">
-                {city.nameFr}
-              </h2>
-              <span className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground">
-                /{city.slug}
-              </span>
+          <section key={city.id} className="flex flex-col gap-4">
+            <div className="flex items-baseline justify-between gap-4 border-b border-border pb-3">
+              <div className="flex items-baseline gap-3">
+                <h2 className="text-xl font-semibold text-foreground">
+                  {city.nameFr}
+                </h2>
+                <span className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground">
+                  /{city.slug}
+                </span>
+              </div>
+              <Link
+                href={`/admin/geo/cities/${city.slug}/neighborhoods/new`}
+                className={buttonVariants({ variant: 'outline', size: 'sm' })}
+              >
+                + Quartier
+              </Link>
             </div>
             {city.neighborhoods.length === 0 ? (
               <p className="text-sm text-muted-foreground">
-                Aucun quartier seedé pour cette ville.
+                Aucun quartier dans cette ville. Ajoute le premier via le
+                bouton ci-dessus.
               </p>
             ) : (
               <div className="overflow-x-auto rounded-xl border border-border">
