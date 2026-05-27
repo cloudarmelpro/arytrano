@@ -11,15 +11,11 @@
 
 | Variable | Type | Description |
 |---|---|---|
-| `GOALPAY_ACCESS_TOKEN` | string `TGP_*` | Token marchand (récupéré dans le dashboard GoalPay). **Server-only**, jamais envoyé au navigateur. |
-| `GOALPAY_WEBHOOK_SECRET` | string aléatoire | Secret partagé HMAC-SHA256 (configuré dans le dashboard GoalPay pour signer les webhooks). |
-| `GOALPAY_BASE_URL` | URL (default `https://api.goalpay.pro`) | Base API. Pas de sandbox documenté — toujours prod. |
+| `GOALPAY_ACCESS_KEY` | string `TGP_*` | Clé marchand envoyée par le support GoalPay après onboarding. **Server-only**, jamais envoyée au navigateur. |
+| `GOALPAY_WEBHOOK_SECRET` | string `SK_*` | Secret partagé HMAC-SHA256 fourni par GoalPay (configuré côté merchant dashboard pour signer les webhooks). |
+| `PAYMENT_GOALPAY_URL` | URL complète (default `https://api.goalpay.pro/api/payement/service`) | Endpoint complet de l'initiate-payment. Pas de sandbox documenté — toujours prod. |
 
-**Génération du `WEBHOOK_SECRET`** :
-```bash
-openssl rand -hex 32
-# 64 chars hex — copier dans .env ET dans le dashboard GoalPay
-```
+**Note** : `GOALPAY_WEBHOOK_SECRET` est fourni par GoalPay support — on ne le génère pas nous-même. Coller la valeur reçue dans `.env`.
 
 ---
 
@@ -164,7 +160,7 @@ Avant le premier paiement réel :
 
 - [ ] Compte GoalPay marchand signé + token `TGP_*` reçu
 - [ ] Webhook secret généré (`openssl rand -hex 32`)
-- [ ] Variables env présentes dans le serveur prod : `GOALPAY_ACCESS_TOKEN`, `GOALPAY_WEBHOOK_SECRET`, `GOALPAY_BASE_URL`
+- [ ] Variables env présentes dans le serveur prod : `GOALPAY_ACCESS_KEY`, `GOALPAY_WEBHOOK_SECRET`, `PAYMENT_GOALPAY_URL`
 - [ ] URL webhook configurée dans le dashboard GoalPay : `https://<domaine>/api/webhooks/goalpay`
 - [ ] Webhook secret côté dashboard matche `GOALPAY_WEBHOOK_SECRET`
 - [ ] Migration Prisma appliquée en prod

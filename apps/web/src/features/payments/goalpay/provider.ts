@@ -15,13 +15,13 @@ import { goalPayWebhookPayloadSchema } from '../schemas/webhook'
  * adapter — no business logic, no DB writes. Higher-level services
  * (initiate-payment, record-webhook-event) consume this.
  *
- * Token + secret are resolved from `env` at call-time. If a future
- * provider needs per-merchant tokens we'll refactor to a factory.
+ * Key + secret are resolved from `env` at call-time. If a future
+ * provider needs per-merchant keys we'll refactor to a factory.
  */
 export const goalPayProvider: PaymentProvider = {
   async initiate(input: InitiatePaymentInput): Promise<InitiatePaymentResult> {
-    if (!env.GOALPAY_ACCESS_TOKEN) {
-      throw new Error('GOALPAY_ACCESS_TOKEN not configured')
+    if (!env.GOALPAY_ACCESS_KEY) {
+      throw new Error('GOALPAY_ACCESS_KEY not configured')
     }
     // Defensive: GoalPay rejects non-integer amounts. We trust the Zod
     // schema at the service boundary but re-assert here so a misuse of
@@ -33,7 +33,7 @@ export const goalPayProvider: PaymentProvider = {
 
     const result = await callInitiatePayment({
       description: input.description,
-      access: env.GOALPAY_ACCESS_TOKEN,
+      access: env.GOALPAY_ACCESS_KEY,
       reference: input.reference,
       amount: input.amountMGA,
       currency: 'Ar',

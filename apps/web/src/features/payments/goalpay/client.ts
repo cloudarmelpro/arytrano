@@ -7,9 +7,11 @@ import { env } from '@/lib/env'
  *
  * Surface (verified 2026-05-25 on https://goalpay.pro/docs/api/integrations) :
  *
- *   POST {GOALPAY_BASE_URL}/api/payement/service
+ *   POST {PAYMENT_GOALPAY_URL}
  *
- * Auth is via a body field (`access`), NOT a header. The token starts
+ * Default URL : https://api.goalpay.pro/api/payement/service
+ *
+ * Auth is via a body field (`access`), NOT a header. The key starts
  * with `TGP_` and is server-only — never expose to the browser.
  *
  * No retry on 4xx (validation errors are deterministic). On 5xx we
@@ -65,7 +67,10 @@ export interface GoalPayInitiateResponse {
 export async function callInitiatePayment(
   body: GoalPayInitiateBody,
 ): Promise<GoalPayInitiateResponse> {
-  const url = `${env.GOALPAY_BASE_URL}/api/payement/service`
+  // Full URL comes from env now (PAYMENT_GOALPAY_URL) — the path is
+  // baked into the env value so renaming the endpoint is a single-var
+  // change rather than touching code.
+  const url = env.PAYMENT_GOALPAY_URL
 
   const controller = new AbortController()
   const timer = setTimeout(() => controller.abort(), TIMEOUT_MS)
