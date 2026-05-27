@@ -1,5 +1,6 @@
 import 'server-only'
 import { z } from 'zod'
+import * as Sentry from '@sentry/nextjs'
 import { env } from '@/lib/env'
 
 /**
@@ -64,6 +65,17 @@ export interface GoalPayInitiateResponse {
   orderReference: string
 }
 
+/** Strip the access field before logging — never let the merchant
+ *  key flow into stdout/Sentry breadcrumbs. */
+function sanitizeBodyForLogs(body: GoalPayInitiateBody) {
+  return {
+    ...body,
+    access: body.access
+      ? `${body.access.slice(0, 6)}…(redacted, ${body.access.length} chars)`
+      : '(empty)',
+  }
+}
+
 export async function callInitiatePayment(
   body: GoalPayInitiateBody,
 ): Promise<GoalPayInitiateResponse> {
@@ -74,6 +86,13 @@ export async function callInitiatePayment(
 
   const controller = new AbortController()
   const timer = setTimeout(() => controller.abort(), TIMEOUT_MS)
+
+  // Dev-only echo so a 500 from GoalPay can be diagnosed by reading
+  // the local terminal — what we actually sent. Access key is
+  // redacted. NEVER enabled in production (PII + key leak risk).
+  if (process.env.NODE_ENV !== 'production') {
+    console.warn('[goalpay] POST', url, sanitizeBodyForLogs(body))
+  }
 
   let res: Response
   try {
@@ -86,6 +105,10 @@ export async function callInitiatePayment(
   } catch (err) {
     clearTimeout(timer)
     const reason = err instanceof Error ? err.message : 'unknown'
+    Sentry.captureException(err, {
+      tags: { provider: 'goalpay', stage: 'fetch' },
+      extra: { url, reason },
+    })
     throw new GoalPayClientError(
       `GoalPay request failed: ${reason}`,
       0,
@@ -97,9 +120,28 @@ export async function callInitiatePayment(
   const text = await res.text()
 
   if (!res.ok) {
-    // Excerpt only — keep body out of full logs (may contain merchant
-    // metadata). The status code + first ~200 chars is enough to
-    // diagnose without leaking PII into telemetry.
+    // Dev terminal echo + Sentry breadcrumb. The body excerpt may
+    // contain a French error message from GoalPay (no PII — we don't
+    // send payer phone in the initiate request) ; safe to attach.
+    if (process.env.NODE_ENV !== 'production') {
+      console.error(
+        '[goalpay] non-2xx',
+        res.status,
+        text.slice(0, 500),
+      )
+    }
+    Sentry.captureMessage('GoalPay initiate returned non-2xx', {
+      level: res.status >= 500 ? 'error' : 'warning',
+      tags: {
+        provider: 'goalpay',
+        stage: 'initiate-response',
+        status: String(res.status),
+      },
+      extra: {
+        bodyExcerpt: text.slice(0, 500),
+        sentBody: sanitizeBodyForLogs(body),
+      },
+    })
     throw new GoalPayClientError(
       `GoalPay returned ${res.status}`,
       res.status,
