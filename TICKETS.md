@@ -3832,7 +3832,9 @@ Ces items NE sont PAS du code que je peux écrire. Ils sont sur l'utilisateur ou
 
 #### 🟡 MOYENNE reportées (13 — ticket parapluie S2-22)
 
-##### S2-22 · Misc audit MEDIUMs round 2 (paiement, sécu, a11y, archi)
+##### S2-22 · Misc audit MEDIUMs round 2 (paiement, sécu, a11y, archi) — ✅ partial (2026-05-27)
+**Statut** : 7 sur 13 fixés dans commit `1c75bcd`. Reste 6 (P-M1 doc-only, P-M2 transient retry, S-M2 listing-title creation validation, AR-M2/AR-M3 QuizProfileForm primitives, A-M1 CTA aria-label avec listing.title) reportés à S2-22.5 (besoin design ou refactor plus large).
+**Fixés** : P-M3 amount=0 reject, P-M4 test webhook 404 prod, S-M1 cuid security doc, A-M2 LeaseWizard sections aria-labelledby, A-M3 startDate FieldDescription, PF-M1 todayIso memo, AR-M1 ARCHITECTURE.md server.ts pattern.
 **Description** : 13 findings de sévérité MOYENNE répartis sur 4 domaines. Liste exhaustive :
 
 **Paiement (4)** :
@@ -3897,21 +3899,19 @@ Sans cette feature : un tenant qui ne répond pas → lease bloqué `PENDING_TEN
 
 ### S2-23 → S2-25 — Nouveaux tickets follow-up
 
-##### S2-23 · `pending-tenant-expire` cron auto-REFUSE
-**Bloqueur** : aucun
-**Description** : aujourd'hui un lease `PENDING_TENANT` ne s'auto-annule jamais. L'owner peut désormais cancel manuellement (Lot précédent), mais un cron qui auto-REFUSE après N jours (ex 14j) protégerait les listings inactifs (owner a oublié). Mirror du pattern `reconcile-stuck-payments`. Inclure un email avant expiration (J-3 par exemple) pour donner au tenant une dernière chance.
-**Fichier** : nouveau `features/leases/services/expire-pending-leases.ts` + route `app/api/cron/expire-pending-leases/route.ts`
-**Effort** : ~2-3h.
+##### S2-23 · `pending-tenant-expire` cron auto-REFUSE — ✅ done (2026-05-27)
+**Description** : auto-REFUSE des leases stuck `PENDING_TENANT` > 14 jours. Commit `2787c2b...` (à compléter post-push). Service `expirePendingLeases` mirror du pattern reconcile-stuck-payments avec race-safe updateMany. 2 emails par expired lease (tenant + owner) deferred via after(). Cap 200 rows/run.
+**Statut** : ✅ done — cron route `/api/cron/expire-pending-leases` à wirer côté infra (systemd timer ou Vercel cron, daily 04h UTC). L'email warning J-3 documenté mais NON shippé (reporté à S2-23bis si volume justifie).
+**Tests** : 7 cas (zero stale, refund queued, no payment, non-CONFIRMED, race-lost, single failure resilient, staleAfterDays override).
 
 ##### S2-24 · `ACTIVE → TERMINATED` cron end-of-lease
 **Bloqueur** : aucun (mais peu urgent — aucun lease n'arrivera à end-date en v0)
 **Description** : les leases ACTIVE arrivent à end-date (= `startDate + durationMonths`). Aucun mécanisme actuel ne les transitionne à TERMINATED. Cron daily : `SELECT WHERE status='ACTIVE' AND startDate + durationMonths × 30j < NOW()` → update TERMINATED + email aux 2 parties.
 **Effort** : ~2h.
 
-##### S2-25 · Push notification owner sur tenant.accept/refuse (mobile)
-**Bloqueur** : aucun
-**Description** : owner reçoit email à l'accept/refuse mais pas de push mobile. Pour les owners qui utilisent l'app, push notif via E-T22 infra serait plus immédiat. Service `lease.tenant.signed` + `lease.tenant.refused` events → trigger push via Expo Push API (déjà câblé dans `lib/push/`).
-**Effort** : ~3h.
+##### S2-25 · Push notification owner sur tenant.accept/refuse (mobile) — ✅ done (2026-05-27)
+**Description** : Commit `67f8823`. `tenantSignLease` + `refuseLease` ajoutent un push owner fire-and-forget après l'email. Pattern mirror notify-owner-contact : body générique (pas de listingTitle ni reason sur lock screen — audit M2), data payload avec `kind` + `leaseId` pour deep-link mobile. Skip si `User.expoPushToken` null (web-only owners).
+**Tests** : 209/209 (2 new — push fires avec token, no push sans token).
 
 ---
 
