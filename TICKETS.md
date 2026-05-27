@@ -3637,11 +3637,10 @@ Ces items NE sont PAS du code que je peux écrire. Ils sont sur l'utilisateur ou
 **Sortie attendue** : 4 sets de credentials collés en `.env` prod + redéployé.
 **Effort** : ~1h30 total.
 
-##### S2-3 · GoalPay test e2e en prod avec 100 Ar
-**Bloqueur** : S2-1 (besoin de `arytrano.mg/api/webhooks/goalpay` accessible publiquement pour que GoalPay puisse POSTer)
+##### S2-3 · GoalPay test e2e en prod avec 100 Ar — ✅ done (2026-05-27)
 **Description** : suivre `public/docs/runbooks/payments-goalpay.md §3`. Owner test → wizard lease → paie 100 Ar via le checkout GoalPay → webhook arrive → lease passe DRAFT → PENDING_TENANT → tenant signe → ACTIVE.
 **Sortie attendue** : 1 Lease ACTIVE + 1 Payment CONFIRMED + 1 PaymentEvent audit row.
-**Effort** : ~30min après que l'infra soit up.
+**Statut** : ✅ done — flow validé bout-en-bout après les 4 lots de cleanup post-audit (commits `2e7c6de` → `7aa5aed`). Aucun refacto n'a cassé le pipeline prod : wizard → checkout GoalPay → paiement Mobile Money → webhook HMAC → state machine DB → redirect page. E-T15 GoalPay infra est officiellement validé.
 
 ##### S2-4 · CGU + politique de confidentialité + mentions légales (juriste MG)
 **Bloqueur** : juriste

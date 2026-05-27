@@ -224,13 +224,13 @@ Cela applique :
 
 Avant le premier paiement réel :
 
-- [ ] Compte GoalPay marchand signé + token `TGP_*` reçu
-- [ ] Webhook secret généré (`openssl rand -hex 32`)
-- [ ] Variables env présentes dans le serveur prod : `GOALPAY_ACCESS_KEY`, `GOALPAY_WEBHOOK_SECRET`, `PAYMENT_GOALPAY_URL`
-- [ ] URL webhook configurée dans le dashboard GoalPay : `https://<domaine>/api/webhooks/goalpay`
-- [ ] Webhook secret côté dashboard matche `GOALPAY_WEBHOOK_SECRET`
-- [ ] Migration Prisma appliquée en prod
-- [ ] Test e2e en prod avec 100 Ar (voir §3)
-- [ ] Tests Vitest passent : `signature.test.ts`, `record-webhook-event.test.ts`
-- [ ] Sentry alertes configurées sur 401/400/422 du webhook
+- [x] Compte GoalPay marchand signé + token `TGP_*` reçu — 2026-05-27
+- [x] Webhook secret généré (`openssl rand -hex 32`) — fourni par GoalPay support
+- [x] Variables env présentes dans le serveur prod : `GOALPAY_ACCESS_KEY`, `GOALPAY_WEBHOOK_SECRET`, `PAYMENT_GOALPAY_URL`
+- [x] URL webhook configurée dans le dashboard GoalPay : `https://arytrano.com/webhook-gpay` (alias de `/api/webhooks/goalpay`)
+- [x] Webhook secret côté dashboard matche `GOALPAY_WEBHOOK_SECRET`
+- [x] Migration Prisma appliquée en prod
+- [x] **Test e2e en prod avec 100 Ar (voir §3) — validé 2026-05-27** : flow complet wizard → checkout GoalPay → paiement Mobile Money → webhook HMAC → state machine DB → redirect page. Tous les rows DB attendus présents (Payment.CONFIRMED + Lease transition + PaymentEvent audit).
+- [x] Tests Vitest passent : `signature.test.ts`, `record-webhook-event.test.ts` (192/192 vert)
+- [ ] Sentry alertes configurées sur 401/400/422 du webhook — partiellement câblé (commits récents ajoutent capture sur 401 invalid_signature + 422 mismatch). Reste à valider la dashboard Sentry alert rules.
 - [ ] Runbook accessible à l'équipe ops
