@@ -60,6 +60,23 @@ const TONE_CLASSES = {
   destructive: 'border-destructive/30 bg-destructive/5 text-destructive',
 } as const
 
+// A11y audit C1 fix — `fail` is a negative outcome and gets `role=alert`
+// (assertive announcement). `done` + `canceled` are informational and use
+// `role=status` (polite, doesn't interrupt). `aria-live` mirrors the same
+// politeness so the result is announced even if the page was reached via
+// client-side navigation (e.g. a future SPA-style transition from the
+// wizard) where the document title alone wouldn't re-fire.
+const REGION_ROLE: Record<TransactionStatus, 'status' | 'alert'> = {
+  done: 'status',
+  canceled: 'status',
+  fail: 'alert',
+}
+const REGION_POLITENESS: Record<TransactionStatus, 'polite' | 'assertive'> = {
+  done: 'polite',
+  canceled: 'polite',
+  fail: 'assertive',
+}
+
 export function TransactionResult({
   status,
   leaseHref,
@@ -73,7 +90,11 @@ export function TransactionResult({
 }) {
   const copy = COPY[status]
   return (
-    <main className="mx-auto flex min-h-[70vh] max-w-[640px] flex-col items-center justify-center gap-6 px-6 py-16 text-center">
+    <main
+      role={REGION_ROLE[status]}
+      aria-live={REGION_POLITENESS[status]}
+      className="mx-auto flex min-h-[70vh] max-w-[640px] flex-col items-center justify-center gap-6 px-6 py-16 text-center"
+    >
       <div
         className={`grid h-20 w-20 place-items-center rounded-full border-2 ${TONE_CLASSES[copy.tone]}`}
       >

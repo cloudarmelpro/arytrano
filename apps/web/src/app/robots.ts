@@ -23,6 +23,16 @@ export default function robots(): MetadataRoute.Robots {
     '/api/cron/',
     '/admin/',
     '/u/',
+    // SEO audit C1 fix — GoalPay redirect targets carry a `?reference=`
+    // query string. Even with per-page `robots: { index: false }`,
+    // Googlebot can crawl URLs it finds via external backlinks (e.g.
+    // the GoalPay dashboard's listing of merchant return URLs) and
+    // expose them in Search Console with the reference visible.
+    '/transaction/',
+    '/test/',
+    // Webhook S2S endpoint — never indexable, but a hard `Disallow`
+    // also short-circuits crawlers from probing the stack fingerprint.
+    '/webhook-gpay',
   ]
   const disallow = [...privatePaths, ...privatePaths.map((p) => `/mg${p}`)]
 

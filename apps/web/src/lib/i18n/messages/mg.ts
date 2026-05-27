@@ -53,6 +53,7 @@ export const mg: Record<MessageKey, string> = {
   'lease.fees.commission': 'Commission antoka (8%)',
   'lease.fees.total': 'Tontaliny aloa izao',
   'lease.cta.payAndSign': 'Aloa ary manao sonia',
+  'lease.cta.loading': 'Manomana ny fandoavam-bola…',
   'lease.cta.microcopy':
     'Halefa any amin\'ny GoalPay ianao. Ny bail dia mavitrika aorian\'ny faneken\'ny mpanofa.',
 

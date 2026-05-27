@@ -102,8 +102,12 @@ export function LeaseWizard({
                 autoComplete="email"
                 aria-invalid={(fieldErrors.tenantEmail?.length ?? 0) > 0}
                 aria-describedby={
+                  // A11y audit H1 fix — when an error appears, keep
+                  // the help text association too. Dropping the help
+                  // ID on error means SR users lose context about
+                  // what the field expects right when they need it.
                   fieldErrors.tenantEmail?.length
-                    ? 'lease-tenantEmail-error'
+                    ? 'lease-tenantEmail-help lease-tenantEmail-error'
                     : 'lease-tenantEmail-help'
                 }
               />
@@ -214,8 +218,10 @@ export function LeaseWizard({
                     defaultValue={12}
                     aria-invalid={(fieldErrors.durationMonths?.length ?? 0) > 0}
                     aria-describedby={
+                      // A11y audit H1 fix — keep help + error linked
+                      // together when an error fires.
                       fieldErrors.durationMonths?.length
-                        ? 'lease-duration-error'
+                        ? 'lease-duration-help lease-duration-error'
                         : 'lease-duration-help'
                     }
                   />
@@ -302,6 +308,13 @@ export function LeaseWizard({
         ) : null}
 
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
+          {/* A11y audit H3 fix — `aria-busy` on a <form> is not well
+              supported across screen readers. A visually hidden polite
+              live-region near the submit button gives a reliable
+              announcement when the wizard is awaiting GoalPay redirect. */}
+          <span aria-live="polite" className="sr-only">
+            {pending ? t('lease.cta.loading') : ''}
+          </span>
           <Button
             type="submit"
             disabled={pending}

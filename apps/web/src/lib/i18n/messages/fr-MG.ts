@@ -47,6 +47,7 @@ export const frMG = {
   'lease.fees.commission': 'Commission caution (8%)',
   'lease.fees.total': 'Total à payer maintenant',
   'lease.cta.payAndSign': 'Payer et signer',
+  'lease.cta.loading': 'Initialisation du paiement…',
   'lease.cta.microcopy':
     'Tu seras redirigé vers GoalPay. Le bail s’active après l’acceptation du locataire.',
 
