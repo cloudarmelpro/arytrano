@@ -17,6 +17,7 @@ export type TransactionalEventType =
   | 'lease-invite-tenant'
   | 'lease-tenant-signed'
   | 'lease-tenant-refused'
+  | 'lease-owner-canceled'
   | 'saved-search-match'
 
 /**

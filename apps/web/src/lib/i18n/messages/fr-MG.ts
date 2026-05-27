@@ -89,6 +89,17 @@ export const frMG = {
   'lease.tenant.outcome.refused': 'Bail refusé. Mise à jour de la page…',
   'lease.owner.waiting':
     '{name} doit accepter ce bail pour qu’il devienne actif. Tu seras notifié à la signature.',
+  'lease.owner.cancel.cta': 'Annuler ce bail',
+  'lease.owner.cancel.warning':
+    'L’annulation libère l’annonce. Le frais de signature est non-refundable de principe — notre équipe examinera ton cas et te recontactera si un geste commercial s’applique.',
+  'lease.owner.cancel.reason.label': 'Raison de l’annulation (optionnel)',
+  'lease.owner.cancel.reason.placeholder':
+    'Ex : locataire injoignable, j’ai trouvé un autre candidat…',
+  'lease.owner.cancel.reason.help':
+    'Visible par l’admin AryTrano uniquement, jamais par le locataire.',
+  'lease.owner.cancel.confirm': 'Confirmer l’annulation',
+  'lease.owner.cancel.outcome':
+    'Bail annulé. L’annonce redevient disponible. Mise à jour de la page…',
 
   // Lease status badge labels
   'lease.status.DRAFT': 'Brouillon',
@@ -116,10 +127,13 @@ export const frMG = {
     'Un bail est déjà en cours sur cette annonce (statut : {status}).',
   'lease.error.leaseNotFound': 'Bail introuvable.',
   'lease.error.notTenant': 'Tu n’es pas le locataire désigné sur ce bail.',
+  'lease.error.notOwner': 'Tu n’es pas le propriétaire désigné sur ce bail.',
   'lease.error.cannotSign':
     'Ce bail ne peut plus être signé (statut : {status}).',
   'lease.error.cannotRefuse':
     'Ce bail ne peut plus être refusé (statut : {status}).',
+  'lease.error.cannotCancel':
+    'Ce bail ne peut plus être annulé (statut : {status}).',
   'lease.error.payloadTooLarge': 'Charge utile trop volumineuse.',
   'sidebar.myLeases': 'Mes baux',
   'sidebar.section.tenant': 'Locataire',

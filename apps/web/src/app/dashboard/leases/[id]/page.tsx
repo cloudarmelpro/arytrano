@@ -5,6 +5,7 @@ import { auth } from '@/features/auth'
 import { getLeaseById } from '@/features/leases/queries/get-lease-by-id'
 import { LeaseStatusBadge } from '@/features/leases/components/LeaseStatusBadge'
 import { LeaseTenantActions } from '@/features/leases/components/LeaseTenantActions'
+import { LeaseOwnerCancel } from '@/features/leases/components/LeaseOwnerCancel'
 import { getLocale } from '@/lib/i18n/get-locale'
 import { getT } from '@/lib/i18n/translate'
 import { formatAriary } from '@/lib/format/currency'
@@ -167,7 +168,7 @@ export default async function LeaseDetailPage({
         </section>
       ) : null}
 
-      {/* Owner waiting state */}
+      {/* Owner waiting state + cancel option */}
       {isOwner && lease.status === 'PENDING_TENANT' ? (
         <section className="mt-10 rounded-2xl border border-border bg-muted/30 p-6">
           <p className="text-[14.5px] leading-[1.55] text-foreground/70">
@@ -175,6 +176,9 @@ export default async function LeaseDetailPage({
               name: lease.tenant.name ?? lease.tenant.email,
             })}
           </p>
+          <div className="mt-5 border-t border-border pt-5">
+            <LeaseOwnerCancel leaseId={lease.id} />
+          </div>
         </section>
       ) : null}
     </div>

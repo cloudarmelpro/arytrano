@@ -92,6 +92,17 @@ export const mg: Record<MessageKey, string> = {
   'lease.tenant.outcome.refused': 'Nolavina ny fifanarahana. Manavao ny pejy…',
   'lease.owner.waiting':
     'Tsy maintsy manaiky ny bail i {name} mba ho lasa mavitrika. Hampandrenesina anao isika rehefa vita sonia.',
+  'lease.owner.cancel.cta': 'Hanafoana ity bail ity',
+  'lease.owner.cancel.warning':
+    'Ny fanafoanana dia mamotsotra ny filazana. Ny saran\'ny sonia dia tsy averina amin\'ny ankapobeny — ny ekipanay handinika ny tranganao ary hifandray aminao raha misy fihetsika fanasoavana.',
+  'lease.owner.cancel.reason.label': 'Antony nanafoanana (tsy voatery)',
+  'lease.owner.cancel.reason.placeholder':
+    'Ohatra : tsy hita ny mpanofa, nahita olon-kafa aho…',
+  'lease.owner.cancel.reason.help':
+    'Hita amin\'ny admin AryTrano ihany, tsy mihitsy amin\'ny mpanofa.',
+  'lease.owner.cancel.confirm': 'Hamafiso ny fanafoanana',
+  'lease.owner.cancel.outcome':
+    'Voafoana ny bail. Mamerina amin\'ny laoniny ny filazana. Manavao ny pejy…',
 
   'lease.status.DRAFT': 'Drafy',
   'lease.status.PENDING_TENANT': 'Miandry ny mpanofa',
@@ -119,10 +130,14 @@ export const mg: Record<MessageKey, string> = {
     'Efa misy bail mandeha amin\'ity filazana ity (toetra : {status}).',
   'lease.error.leaseNotFound': 'Tsy hita ny bail.',
   'lease.error.notTenant': 'Tsy ianao no mpanofa voatondro amin\'ity bail ity.',
+  'lease.error.notOwner':
+    'Tsy ianao no tompon-trano voatondro amin\'ity bail ity.',
   'lease.error.cannotSign':
     'Tsy azo ataony sonia intsony ity bail ity (toetra : {status}).',
   'lease.error.cannotRefuse':
     'Tsy azo lavina intsony ity bail ity (toetra : {status}).',
+  'lease.error.cannotCancel':
+    'Tsy azo foanana intsony ity bail ity (toetra : {status}).',
   'lease.error.payloadTooLarge': 'Lehibe loatra ny data nalefa.',
   'sidebar.myLeases': 'Ireo bail-ko',
   'sidebar.section.tenant': 'Mpanofa',
