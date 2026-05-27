@@ -1,7 +1,7 @@
 'use server'
 
 import { revalidatePath, updateTag } from 'next/cache'
-import { requireAdmin } from '@/features/admin/services/require-admin'
+import { requireAdmin } from '@/features/admin/server'
 import {
   updateNeighborhoodQuizProfile,
   type UpdateOutcome,
@@ -39,7 +39,17 @@ export async function updateNeighborhoodQuizProfileAction(
 
   const citySlug = String(formData.get('citySlug') ?? '')
   const neighborhoodSlug = String(formData.get('neighborhoodSlug') ?? '')
-  const intent = String(formData.get('intent') ?? 'save')
+
+  // SEC audit M3 (2026-05-27) — strict intent.
+  const rawIntent = String(formData.get('intent') ?? 'save')
+  if (rawIntent !== 'save' && rawIntent !== 'clear') {
+    return {
+      ok: false,
+      message: 'Action invalide.',
+      fields: { intent: ['valeur attendue : save | clear'] },
+    }
+  }
+  const intent: 'save' | 'clear' = rawIntent
 
   const quizProfile =
     intent === 'clear'

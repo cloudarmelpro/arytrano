@@ -16,7 +16,7 @@ import {
   ListingsViewToggle,
 } from '@/features/listings'
 import { SaveSearchButton } from '@/features/search'
-import { listCitiesWithNeighborhoods } from '@/features/geo'
+import { listCitiesWithNeighborhoods } from '@/features/geo/server'
 import { listCitiesWithCounts } from '@/features/landing/server'
 import { getFavoritedListingIds } from '@/features/favorites/server'
 import { auth } from '@/features/auth'

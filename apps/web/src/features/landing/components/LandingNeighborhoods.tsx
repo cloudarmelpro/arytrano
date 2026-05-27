@@ -77,7 +77,11 @@ export function LandingNeighborhoods({
                 className="max-sm:!col-span-1 max-sm:!row-span-1"
               >
                 <Link
-                  href={`/annonces?neighborhood=${n.slug}`}
+                  // L1 audit fix — scope by city : neighborhood slugs
+                  // are unique per-city (composite @@unique). A bare
+                  // ?neighborhood=anjoma surfaces results from any
+                  // city with an `anjoma` quartier (Fianar + Toamasina).
+                  href={`/annonces?city=${n.citySlug}&neighborhood=${n.slug}`}
                   style={{
                     background: `repeating-linear-gradient(135deg, ${palette.bg} 0 14px, color-mix(in oklch, ${palette.bg} 92%, white) 14px 28px)`,
                     color: palette.fg,

@@ -1,7 +1,7 @@
 'use server'
 
 import { revalidatePath, updateTag } from 'next/cache'
-import { requireAdmin } from '@/features/admin/services/require-admin'
+import { requireAdmin } from '@/features/admin/server'
 import {
   updateNeighborhoodEditorial,
   type UpdateOutcome,
@@ -33,9 +33,19 @@ export async function updateNeighborhoodEditorialAction(
   const citySlug = String(formData.get('citySlug') ?? '')
   const neighborhoodSlug = String(formData.get('neighborhoodSlug') ?? '')
 
-  // Empty intent = clear (sends null payload). Otherwise build the
-  // structured object from the form fields.
-  const intent = String(formData.get('intent') ?? 'save')
+  // SEC audit M3 (2026-05-27) — strict intent. Any value that isn't
+  // exactly 'save' or 'clear' is rejected so a future refactor adding
+  // a new intent (e.g. 'preview') can't silently fall through to save.
+  const rawIntent = String(formData.get('intent') ?? 'save')
+  if (rawIntent !== 'save' && rawIntent !== 'clear') {
+    return {
+      ok: false,
+      message: 'Action invalide.',
+      fields: { intent: ['valeur attendue : save | clear'] },
+    }
+  }
+  const intent: 'save' | 'clear' = rawIntent
+
   const editorial =
     intent === 'clear'
       ? null

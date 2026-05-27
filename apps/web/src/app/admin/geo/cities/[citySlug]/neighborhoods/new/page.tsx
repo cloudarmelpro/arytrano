@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { prisma } from '@/lib/db'
+import { getCityForAdmin } from '@/features/admin-geo'
 import { CreateNeighborhoodForm } from '@/features/admin-geo/components/CreateNeighborhoodForm'
 
 export const metadata: Metadata = {
@@ -18,11 +18,9 @@ export default async function NewNeighborhoodPage({
 }) {
   const { citySlug } = await params
   // Verify the parent city exists so the form doesn't post into a
-  // dead route. Cheap one-row lookup.
-  const city = await prisma.city.findUnique({
-    where: { slug: citySlug },
-    select: { slug: true, nameFr: true },
-  })
+  // dead route. Query lives in `features/admin-geo/queries/` per
+  // ARCHITECTURE.md rule #2 (routes stay thin, no Prisma in `app/`).
+  const city = await getCityForAdmin(citySlug)
   if (!city) notFound()
 
   return (

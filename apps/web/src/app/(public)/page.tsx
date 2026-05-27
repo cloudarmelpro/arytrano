@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { auth } from '@/features/auth'
-import { listCitiesWithNeighborhoods } from '@/features/geo'
+import { listCitiesWithNeighborhoods } from '@/features/geo/server'
 import {
   LandingHero,
   LandingTrustStrip,

@@ -20,10 +20,13 @@ export default async function AdminRevenuePage() {
   ])
   const t = getT(locale)
 
-  const dateFormatter = new Intl.DateTimeFormat(
-    locale === 'mg' ? 'fr-FR' : 'fr-FR',
-    { dateStyle: 'short', timeStyle: 'short' },
-  )
+  // Madagascar Malagasy doesn't have its own CLDR date-format locale,
+  // so we use fr-FR for both — closest match for the dd/mm/yyyy format
+  // visitors are used to.
+  const dateFormatter = new Intl.DateTimeFormat('fr-FR', {
+    dateStyle: 'short',
+    timeStyle: 'short',
+  })
 
   const monthDelta =
     stats.lastMonthMGA > 0

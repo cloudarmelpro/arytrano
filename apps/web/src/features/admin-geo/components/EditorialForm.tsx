@@ -4,6 +4,7 @@ import { useActionState, useRef, useState } from 'react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
 import {
   Field,
   FieldDescription,
@@ -205,7 +206,7 @@ function FieldRow({
     <Field>
       <FieldLabel htmlFor={id}>{field.label}</FieldLabel>
       {field.multiline ? (
-        <textarea
+        <Textarea
           id={id}
           name={name}
           defaultValue={defaultValue}
@@ -213,7 +214,6 @@ function FieldRow({
           rows={3}
           aria-invalid={Boolean(errors?.length)}
           aria-describedby={errorId}
-          className="min-h-[88px] rounded-md border border-border bg-background px-3 py-2 text-[14px] outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:opacity-60"
         />
       ) : (
         <Input

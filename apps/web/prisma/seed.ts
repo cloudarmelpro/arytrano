@@ -56,27 +56,45 @@ async function main() {
       // launch cities (profiles added today).
       const editorial = buildEditorialFor(n.slug)
       const quizProfile = buildQuizProfileFor(seed.slug, n.slug)
-      // `Prisma.DbNull` is the sentinel that tells Prisma to write
-      // SQL NULL (vs `undefined` which would skip the column).
-      // `Prisma.JsonNull` would write the JSON literal `"null"`,
-      // which we don't want.
-      const editorialValue = editorial ?? Prisma.DbNull
-      const quizProfileValue = quizProfile ?? Prisma.DbNull
+
+      // Re-seed safety (audit 2026-05-27 finding M1) : if a row
+      // already exists with a non-null editorial / quizProfile, it
+      // means an admin has refined the content via `/admin/geo`.
+      // Skip overwriting those columns on re-seed so the refined
+      // version survives. First-time seed (existing == null on both)
+      // still writes the draft so brand-new DBs come up populated.
+      const existing = await prisma.neighborhood.findUnique({
+        where: { cityId_slug: { cityId: city.id, slug: n.slug } },
+        select: { id: true, editorial: true, quizProfile: true },
+      })
+      // `Prisma.DbNull` writes SQL NULL ; `undefined` skips the
+      // column entirely (keeps whatever's already there).
+      const editorialUpdate = existing?.editorial
+        ? undefined
+        : (editorial ?? Prisma.DbNull)
+      const quizProfileUpdate = existing?.quizProfile
+        ? undefined
+        : (quizProfile ?? Prisma.DbNull)
+      const editorialCreate = editorial ?? Prisma.DbNull
+      const quizProfileCreate = quizProfile ?? Prisma.DbNull
+
       await prisma.neighborhood.upsert({
         where: { cityId_slug: { cityId: city.id, slug: n.slug } },
         create: {
           ...n,
           cityId: city.id,
-          editorial: editorialValue,
-          quizProfile: quizProfileValue,
+          editorial: editorialCreate,
+          quizProfile: quizProfileCreate,
         },
         update: {
           nameFr: n.nameFr,
           nameMg: n.nameMg,
           lat: n.lat,
           lng: n.lng,
-          editorial: editorialValue,
-          quizProfile: quizProfileValue,
+          ...(editorialUpdate !== undefined && { editorial: editorialUpdate }),
+          ...(quizProfileUpdate !== undefined && {
+            quizProfile: quizProfileUpdate,
+          }),
         },
       })
     }

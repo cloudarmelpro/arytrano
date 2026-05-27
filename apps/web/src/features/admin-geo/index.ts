@@ -10,6 +10,10 @@ export {
   type GeoAdminNeighborhoodDetail,
 } from './queries/get-neighborhood-admin'
 export {
+  getCityForAdmin,
+  type CityForAdmin,
+} from './queries/get-city-for-admin'
+export {
   updateNeighborhoodEditorialAction,
   type UpdateEditorialActionState,
 } from './actions/update-editorial'

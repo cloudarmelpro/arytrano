@@ -2,7 +2,6 @@ import 'server-only'
 import { Prisma } from '@prisma/client'
 import { prisma } from '@/lib/db'
 import { neighborhoodEditorialSchema } from '@/features/geo'
-import { errors } from '@/lib/api/errors'
 
 /**
  * Update the editorial JSON on a Neighborhood row.
@@ -70,23 +69,3 @@ export async function updateNeighborhoodEditorial(
   return { kind: 'ok', neighborhoodId: row.id }
 }
 
-/** Helper exposed to the admin Server Action so consumers don't need
- *  to import `errors` themselves. Throws on `not_found` /
- *  `validation_failed` — these surface as 404 / 422 via withErrorHandling.
- */
-export async function updateNeighborhoodEditorialOrThrow(
-  input: UpdateNeighborhoodEditorialInput,
-): Promise<string> {
-  const r = await updateNeighborhoodEditorial(input)
-  switch (r.kind) {
-    case 'ok':
-      return r.neighborhoodId
-    case 'not_found':
-      throw errors.notFound('Quartier introuvable')
-    case 'validation_failed':
-      throw errors.validation(
-        'Champs invalides',
-        Object.fromEntries(r.issues.map((i) => [i.path, [i.message]])),
-      )
-  }
-}

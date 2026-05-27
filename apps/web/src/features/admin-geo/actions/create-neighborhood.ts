@@ -2,7 +2,7 @@
 
 import { revalidatePath, updateTag } from 'next/cache'
 import { redirect } from 'next/navigation'
-import { requireAdmin } from '@/features/admin/services/require-admin'
+import { requireAdmin } from '@/features/admin/server'
 import { createNeighborhood } from '../services/create-neighborhood'
 
 export type CreateNeighborhoodActionState = {

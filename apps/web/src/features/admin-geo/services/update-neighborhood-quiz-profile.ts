@@ -2,7 +2,6 @@ import 'server-only'
 import { Prisma } from '@prisma/client'
 import { prisma } from '@/lib/db'
 import { quartierQuizProfileSchema } from '@/features/geo'
-import { errors } from '@/lib/api/errors'
 
 /**
  * Update the quizProfile JSON on a Neighborhood row.
@@ -68,21 +67,3 @@ export async function updateNeighborhoodQuizProfile(
   return { kind: 'ok', neighborhoodId: row.id }
 }
 
-/** Helper that throws — for REST handlers / actions that prefer the
- *  errors helper to a switch. Same shape as updateNeighborhoodEditorialOrThrow. */
-export async function updateNeighborhoodQuizProfileOrThrow(
-  input: UpdateQuizProfileInput,
-): Promise<string> {
-  const r = await updateNeighborhoodQuizProfile(input)
-  switch (r.kind) {
-    case 'ok':
-      return r.neighborhoodId
-    case 'not_found':
-      throw errors.notFound('Quartier introuvable')
-    case 'validation_failed':
-      throw errors.validation(
-        'Champs invalides',
-        Object.fromEntries(r.issues.map((i) => [i.path, [i.message]])),
-      )
-  }
-}
