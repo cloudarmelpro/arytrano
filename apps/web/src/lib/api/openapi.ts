@@ -841,10 +841,10 @@ export function generateOpenApiSpec() {
       version: '1.0.0',
       description:
         'Public REST API for the AryTrano student-housing platform. Powers the React Native mobile app and any third-party integrations.\n\nAuth : `Authorization: Bearer <JWT>` issued by `POST /api/v1/auth/login` or `/register`. Refresh via `/auth/refresh`.\n\nPagination : cursor-based (`?cursor=<id>`), never offset. Response shape : `{ data, meta? }` on success, `{ error: { code, message, fields? } }` on failure.',
-      contact: { name: 'AryTrano', url: 'https://arytrano.mg' },
+      contact: { name: 'AryTrano', url: 'https://arytrano.com' },
     },
     servers: [
-      { url: 'https://arytrano.mg', description: 'Production' },
+      { url: 'https://arytrano.com', description: 'Production' },
       { url: 'http://localhost:3000', description: 'Local dev' },
     ],
     tags: [

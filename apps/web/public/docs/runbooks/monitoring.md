@@ -19,7 +19,7 @@
    SENTRY_TRACES_SAMPLE_RATE=0.1
    ```
 4. Re-déployer : `docker compose -f docker-compose.prod.yml up -d`
-5. Vérifier dans Sentry qu'un event de test arrive : `curl https://arytrano.mg/api/sentry-test`
+5. Vérifier dans Sentry qu'un event de test arrive : `curl https://arytrano.com/api/sentry-test`
 
 ---
 
@@ -113,7 +113,7 @@ export async function GET() {
 
 Curl :
 ```bash
-curl https://arytrano.mg/api/sentry-test
+curl https://arytrano.com/api/sentry-test
 ```
 
 Devrait apparaître dans Sentry > Issues sous 60s.
@@ -181,7 +181,7 @@ un outil externe gratuit qui ping `/api/health` :
 | **BetterStack Heartbeat** | 10 monitors, ping every 30s |
 | **Cron-job.org** | Unlimited, gentle |
 
-Setup recommandé : UptimeRobot, 1 monitor sur `https://arytrano.mg/api/health`,
+Setup recommandé : UptimeRobot, 1 monitor sur `https://arytrano.com/api/health`,
 expected response contient `"ok":true`, alert email + Slack si fail 2x consécutifs.
 
 Le endpoint `/api/health` retourne aussi `lastBackupAgeHours` — configurer

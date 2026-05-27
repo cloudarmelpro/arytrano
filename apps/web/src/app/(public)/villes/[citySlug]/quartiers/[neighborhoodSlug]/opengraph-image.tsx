@@ -129,7 +129,7 @@ export default async function NeighborhoodOpenGraphImage({
             color: 'rgba(255,255,255,0.7)',
           }}
         >
-          <span>arytrano.mg</span>
+          <span>arytrano.com</span>
           <span>{cityName} · Madagascar</span>
         </div>
       </div>

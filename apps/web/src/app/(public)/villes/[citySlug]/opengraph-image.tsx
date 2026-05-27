@@ -138,7 +138,7 @@ export default async function CityOpenGraphImage({
             color: 'rgba(255,255,255,0.7)',
           }}
         >
-          <span>arytrano.mg</span>
+          <span>arytrano.com</span>
           <span>Madagascar</span>
         </div>
       </div>

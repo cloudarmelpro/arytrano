@@ -31,7 +31,7 @@ psql "$DATABASE_URL" -c 'SELECT COUNT(*) FROM "User";'
 systemctl start arytrano
 
 # 7. Check /api/health
-curl https://arytrano.mg/api/health
+curl https://arytrano.com/api/health
 ```
 
 ---
@@ -137,7 +137,7 @@ Wait for the app to log `ready - started server on 0.0.0.0:3000` (or similar).
 ### 7. Verify via the public healthcheck
 
 ```bash
-curl https://arytrano.mg/api/health
+curl https://arytrano.com/api/health
 ```
 
 Expected response:

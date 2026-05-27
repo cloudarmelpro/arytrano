@@ -98,18 +98,18 @@ docker compose version
 
 ## 3. DNS
 
-Point `arytrano.mg` and `www.arytrano.mg` (A records) to your Contabo IP at your domain registrar.
+Point `arytrano.com` and `www.arytrano.com` (A records) to your Contabo IP at your domain registrar.
 
-Add a CNAME `mg.arytrano.mg` → `arytrano.mg` if you want a separate subdomain for the Malagasy language fallback (optional).
+Add a CNAME `mg.arytrano.com` → `arytrano.com` if you want a separate subdomain for the Malagasy language fallback (optional).
 
-Wait ~10 min for DNS propagation (`dig arytrano.mg` to verify).
+Wait ~10 min for DNS propagation (`dig arytrano.com` to verify).
 
 ---
 
 ## 4. App directory layout
 
 ```bash
-ssh deploy@arytrano.mg
+ssh deploy@arytrano.com
 sudo mkdir -p /opt/arytrano
 sudo chown deploy:deploy /opt/arytrano
 cd /opt/arytrano
@@ -126,7 +126,7 @@ sudo nano /etc/arytrano/app.env  # fill in real prod values
 
 Required env vars in `/etc/arytrano/app.env` :
 - `DATABASE_URL=postgresql://arytrano:STRONG_PWD@postgres:5432/arytrano`
-- `AUTH_URL=https://arytrano.mg`
+- `AUTH_URL=https://arytrano.com`
 - `AUTH_SECRET=` (`openssl rand -base64 32`)
 - `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`
 - `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN`
@@ -193,7 +193,7 @@ networks:
 ## 6. Caddyfile
 
 ```caddy
-arytrano.mg, www.arytrano.mg {
+arytrano.com, www.arytrano.com {
   encode gzip zstd
   reverse_proxy app:3000
 
@@ -211,8 +211,8 @@ arytrano.mg, www.arytrano.mg {
 }
 
 # Redirect www → apex
-www.arytrano.mg {
-  redir https://arytrano.mg{uri} permanent
+www.arytrano.com {
+  redir https://arytrano.com{uri} permanent
 }
 ```
 
@@ -237,7 +237,7 @@ Watch logs :
 docker compose -f docker-compose.prod.yml logs -f app
 ```
 
-Verify : `curl https://arytrano.mg/api/health` returns `{"ok":true,"db":"up"}`.
+Verify : `curl https://arytrano.com/api/health` returns `{"ok":true,"db":"up"}`.
 
 ---
 
@@ -375,8 +375,8 @@ instead (200k tile views/mo free, ~$20/mo above).
 1. https://client.stadiamaps.com/signup → free plan
 2. Create a property `arytrano-web`
 3. **Authentication > Authorized Domains** :
-   - `arytrano.mg`
-   - `www.arytrano.mg`
+   - `arytrano.com`
+   - `www.arytrano.com`
    - `localhost:3000` (dev — optional, restrict to a separate key in prod)
 4. **Authentication > API Keys** → create one for production
 5. Copy the key (~30 char alnum)
@@ -455,7 +455,7 @@ After=network-online.target
 [Service]
 Type=oneshot
 EnvironmentFile=/etc/arytrano/app.env
-ExecStart=/usr/bin/curl -fsS -H "Authorization: Bearer ${CRON_SECRET}" https://arytrano.mg/api/cron/prompt-review
+ExecStart=/usr/bin/curl -fsS -H "Authorization: Bearer ${CRON_SECRET}" https://arytrano.com/api/cron/prompt-review
 User=root
 ```
 
@@ -483,7 +483,7 @@ sudo systemctl list-timers | grep arytrano-cron
 ### 10b.3 Test manually
 
 ```bash
-curl -H "Authorization: Bearer $CRON_SECRET" https://arytrano.mg/api/cron/prompt-review
+curl -H "Authorization: Bearer $CRON_SECRET" https://arytrano.com/api/cron/prompt-review
 # { "ok": true, "candidates": N, "emailed": N, "failed": 0 }
 ```
 
@@ -498,7 +498,7 @@ After=network-online.target
 [Service]
 Type=oneshot
 EnvironmentFile=/etc/arytrano/app.env
-ExecStart=/usr/bin/curl -fsS -H "Authorization: Bearer ${CRON_SECRET}" https://arytrano.mg/api/cron/listing-expiration
+ExecStart=/usr/bin/curl -fsS -H "Authorization: Bearer ${CRON_SECRET}" https://arytrano.com/api/cron/listing-expiration
 User=root
 ```
 
@@ -521,7 +521,7 @@ Enable + verify :
 ```bash
 sudo systemctl daemon-reload
 sudo systemctl enable --now arytrano-cron-listing-expiration.timer
-curl -H "Authorization: Bearer $CRON_SECRET" https://arytrano.mg/api/cron/listing-expiration
+curl -H "Authorization: Bearer $CRON_SECRET" https://arytrano.com/api/cron/listing-expiration
 # { "ok": true, "warned": N, "expired": N, "failed": 0 }
 ```
 
@@ -542,7 +542,7 @@ After=network-online.target
 [Service]
 Type=oneshot
 EnvironmentFile=/etc/arytrano/app.env
-ExecStart=/usr/bin/curl -fsS -H "Authorization: Bearer ${CRON_SECRET}" https://arytrano.mg/api/cron/push-receipts
+ExecStart=/usr/bin/curl -fsS -H "Authorization: Bearer ${CRON_SECRET}" https://arytrano.com/api/cron/push-receipts
 User=root
 ```
 
@@ -571,7 +571,7 @@ sudo systemctl list-timers | grep arytrano-cron-push-receipts
 # Next run should show up within 30 min.
 
 # Manual test :
-curl -H "Authorization: Bearer $CRON_SECRET" https://arytrano.mg/api/cron/push-receipts
+curl -H "Authorization: Bearer $CRON_SECRET" https://arytrano.com/api/cron/push-receipts
 # { "ok": true, "polled": N, "delivered": N, "deviceNotRegistered": N,
 #   "otherErrors": 0, "staleDeleted": 0 }
 ```
@@ -601,7 +601,7 @@ E-T17 subscription renewal.
 ## 11. Deploy a new version
 
 ```bash
-ssh deploy@arytrano.mg
+ssh deploy@arytrano.com
 cd /opt/arytrano
 git pull
 docker compose -f docker-compose.prod.yml pull   # or build
@@ -641,7 +641,7 @@ If a migration broke things : restore from backup (see `restore-db.md`).
 |---------|--------------|
 | Contabo VPS S | €5.89 |
 | Cloudflare R2 (~5GB stored, no egress) | $0.08 |
-| Domain arytrano.mg | ~€10/year ≈ €0.83/mo |
+| Domain arytrano.com | ~€10/year ≈ €0.83/mo |
 | Cloudinary (free tier 25GB) | $0 |
 | Upstash Redis (free tier 10k commands/day) | $0 |
 | Sentry (free tier 5k errors/mo) | $0 |

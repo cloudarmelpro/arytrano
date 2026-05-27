@@ -19,15 +19,43 @@
 
 ---
 
-## 2. Configurer le webhook côté GoalPay
+## 2. Configurer le webhook + redirects côté GoalPay
 
-Dans le dashboard marchand GoalPay :
+Dans le dashboard marchand GoalPay → onglet « Configuration » :
 
-1. **Webhook URL** : `https://arytrano.mg/api/webhooks/goalpay`
-2. **Webhook secret** : coller la valeur générée à l'étape 1
-3. **Events souscrits** : `payment.success`, `payment.failed`, `payment.canceled`, `payment.expired` (les 4)
+**Domaine du site** : `https://arytrano.com`
 
-Vérifier que le secret côté dashboard **matche exactement** celui dans `GOALPAY_WEBHOOK_SECRET` — un mismatch fait que toutes les callbacks renvoient `401 invalid_signature` et le statut Payment reste bloqué en `INITIATED`.
+**Webhook URL** : 2 URLs acceptées (la 2e est un alias court pour compat
+avec la config initiale GoalPay) :
+- ✅ canonique : `https://arytrano.com/api/webhooks/goalpay`
+- ✅ alias court : `https://arytrano.com/webhook-gpay`
+
+Les deux pointent vers le même handler (HMAC verify + idempotent DB
+record). N'importe laquelle marche ; nouvelle intégration → préférer
+la canonique.
+
+**Webhook secret** : coller la valeur `SK_*` fournie par GoalPay support
+dans `.env` (variable `GOALPAY_WEBHOOK_SECRET`). Vérifier que la valeur
+côté dashboard **matche exactement** celle de l'env — un mismatch fait
+que toutes les callbacks renvoient `401 invalid_signature` et le statut
+Payment reste bloqué en `INITIATED`.
+
+**URLs de redirection après paiement** :
+- Paiement réussi : `https://arytrano.com/transaction/done`
+- Paiement annulé : `https://arytrano.com/transaction/canceled`
+- Paiement échoué : `https://arytrano.com/transaction/fail`
+
+Les 3 pages sont des Server Components qui :
+1. Lisent `?reference=lease_XXX` de l'URL
+2. Lookup le Payment + lease propriétaire-checké
+3. Affichent un état UI + CTA vers `/dashboard/leases/[id]`
+
+**Elles ne mutent JAMAIS l'état** — c'est le webhook qui pilote la state
+machine. Le lien de redirect est replayable par n'importe qui ; on ne
+peut donc pas lui faire confiance.
+
+**Events webhook souscrits** : `payment.success`, `payment.failed`,
+`payment.canceled`, `payment.expired` (les 4).
 
 ---
 

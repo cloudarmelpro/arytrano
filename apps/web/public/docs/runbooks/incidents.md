@@ -28,7 +28,7 @@ L'incident peut venir de :
 
 → Première chose : **vérifier `/api/health`** :
 ```bash
-curl https://arytrano.mg/api/health
+curl https://arytrano.com/api/health
 ```
 
 Si retourne 503 → DB injoignable → **SEV-1**.
@@ -40,7 +40,7 @@ Si retourne 503 → DB injoignable → **SEV-1**.
 ### 2.1 SSH dans le VPS
 
 ```bash
-ssh deploy@arytrano.mg
+ssh deploy@arytrano.com
 ```
 
 ### 2.2 Status des services Docker
@@ -83,7 +83,7 @@ git checkout <commit-précédent>
 docker compose -f docker-compose.prod.yml up -d app
 
 # Vérifier
-curl https://arytrano.mg/api/health
+curl https://arytrano.com/api/health
 ```
 
 Communiquer dans Slack `#ops` : « Rollback to commit X en cours, ETA 5 min ».
@@ -216,7 +216,7 @@ ss -tn state established '( sport = :443 or sport = :80 )' | head -20
 docker compose -f docker-compose.prod.yml logs --since 1m caddy | wc -l
 
 # Tester une URL depuis le VPS lui-même
-curl -i -H 'User-Agent: ops-test' https://arytrano.mg/api/health
+curl -i -H 'User-Agent: ops-test' https://arytrano.com/api/health
 ```
 
 ---

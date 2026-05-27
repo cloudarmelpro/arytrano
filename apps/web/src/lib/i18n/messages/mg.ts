@@ -28,7 +28,7 @@ export const mg: Record<MessageKey, string> = {
   'lease.wizard.feeRecap.label': 'Famintinana ny saran-tsoratra',
   'lease.wizard.step1.title': 'Ny mpanofa',
   'lease.wizard.step1.help':
-    'Ataovy ny email-n\'ny kaonty AryTrano-n\'ny mpanofa — raha tsy mbola manana izy, asaivo mamorona kaonty ao amin\'ny arytrano.mg aloha.',
+    'Ataovy ny email-n\'ny kaonty AryTrano-n\'ny mpanofa — raha tsy mbola manana izy, asaivo mamorona kaonty ao amin\'ny arytrano.com aloha.',
   'lease.wizard.step2.title': 'Ny fepetra',
   'lease.wizard.step2.help':
     'Hofa isam-bolana, antoka, daty fanombohana ary faharetana. Ny antoka dia ho an\'ny tompon-trano — AryTrano tsy mitazona.',
@@ -111,7 +111,7 @@ export const mg: Record<MessageKey, string> = {
   'lease.error.listingNotRentable':
     'Tsy mety ho amin\'ny sonia ity filazana ity (toetra : {status}).',
   'lease.error.tenantNotFound':
-    'Tsy misy kaonty AryTrano amin\'io email io. Asaivo mamorona kaonty ao amin\'ny arytrano.mg ny mpanofa, dia miverena eto.',
+    'Tsy misy kaonty AryTrano amin\'io email io. Asaivo mamorona kaonty ao amin\'ny arytrano.com ny mpanofa, dia miverena eto.',
   'lease.error.tenantIsOwner':
     'Tsy afaka manao sonia bail amin\'ny tenanao ianao.',
   'lease.error.existingLease':
@@ -134,7 +134,7 @@ export const mg: Record<MessageKey, string> = {
   'legal.eyebrow': 'Filazana ara-dalàna',
   'legal.lastUpdated': 'Fanavaozana farany: {date}',
   'legal.draftNotice':
-    'Dika voalohany (v0.5). Hojeren’ny mpanolotsaina ara-dalàna ity antontan-taratasy ity alohan’ny fanatontosana. Raha misy fanontaniana, alefaso amin’ny contact@arytrano.mg.',
+    'Dika voalohany (v0.5). Hojeren’ny mpanolotsaina ara-dalàna ity antontan-taratasy ity alohan’ny fanatontosana. Raha misy fanontaniana, alefaso amin’ny contact@arytrano.com.',
 
   // /legal/terms — CGU (Malagasy translations are placeholders, FR is the authoritative text per Madagascar law)
   'legal.terms.title': 'Fepetra ankapobeny',
@@ -170,7 +170,7 @@ export const mg: Record<MessageKey, string> = {
     'Kaonty mpianatra: raha mbola mavitrika + 12 volana. Kaonty tompon-trano voamarina: raha mbola misy filazana + 5 taona aorian’izay (adidy ara-kaonty malagasy). Taratasy fanondroana chiffré: 6 volana aorian’ny fanamarinana.',
   'legal.privacy.s4.h': '4. Ny zonao',
   'legal.privacy.s4.body':
-    'Araka ny lalàna malagasy 2014-038 momba ny fiarovana ny vaovao manokana, afaka mampihatra ny zo hidirana, hanitsy, hamafa ary hanaova portability ianao. Soraty contact@arytrano.mg miaraka amin’ny porofo maha-olona.',
+    'Araka ny lalàna malagasy 2014-038 momba ny fiarovana ny vaovao manokana, afaka mampihatra ny zo hidirana, hanitsy, hamafa ary hanaova portability ianao. Soraty contact@arytrano.com miaraka amin’ny porofo maha-olona.',
   'legal.privacy.s5.h': '5. Filaminana',
   'legal.privacy.s5.body':
     'TLS 1.3 amin’ny fifandraisana rehetra. Teny miafina hashed (Argon2id). Taratasy fanondroana chiffré + rotation lakile. Ny fidirana voafetra amin’ny ekipa fanamarinana (4 olona farafahabetsany).',
@@ -203,7 +203,7 @@ export const mg: Record<MessageKey, string> = {
     'AryTrano SARL (eo am-pisoratana). Foibe: Fianarantsoa, Madagasikara. Solontena ara-dalàna: ho fenoina alohan’ny famoahana.',
   'legal.mentions.s2.h': 'Fifandraisana',
   'legal.mentions.s2.body':
-    'Mailaka: contact@arytrano.mg. WhatsApp: +261 — ho fenoina. Ho an’ny fanontaniana momba ny vaovao: privacy@arytrano.mg.',
+    'Mailaka: contact@arytrano.com. WhatsApp: +261 — ho fenoina. Ho an’ny fanontaniana momba ny vaovao: privacy@arytrano.com.',
   'legal.mentions.s3.h': 'Hosting',
   'legal.mentions.s3.body':
     'Voapetraka ao amin’ny Vercel Inc. (USA). 340 S Lemon Ave #4133, Walnut, CA 91789, USA. GDPR via Standard Contractual Clauses.',
@@ -263,7 +263,7 @@ export const mg: Record<MessageKey, string> = {
     'Tsy misy olana — tsy hisy hafatra alefa amin\'io laharana io. Raha tianao ny mandray filazana indray, mamerena amin\'ny formulaire ao ambany pejy.',
   'unsubscribe.invalid.title': 'Tsy mety na lany andro ny rohy.',
   'unsubscribe.invalid.body':
-    'Tsy fantatra ny rohy nokitihinao. Raha mbola mahazo hafatra ianao, fifandraisana amin\'ny contact@arytrano.mg.',
+    'Tsy fantatra ny rohy nokitihinao. Raha mbola mahazo hafatra ianao, fifandraisana amin\'ny contact@arytrano.com.',
   'unsubscribe.backHome': 'Hiverina amin\'ny AryTrano',
 
   'footerV3.tagline':
@@ -1075,7 +1075,7 @@ export const mg: Record<MessageKey, string> = {
   'proprietaires.hero.stat3.n': '100 %',
   'proprietaires.hero.stat3.label': 'Ny hofa dia ho anao',
 
-  'proprietaires.preview.url': 'arytrano.mg/annonces/...',
+  'proprietaires.preview.url': 'arytrano.com/annonces/...',
   'proprietaires.preview.step': 'Dingana 3/4',
   'proprietaires.preview.title': 'Faritao ny trano',
   'proprietaires.preview.verified': 'Voamarina',

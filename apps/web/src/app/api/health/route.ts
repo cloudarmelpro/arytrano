@@ -8,7 +8,7 @@ import { env } from '@/lib/env'
  *
  * Used by:
  *   - External uptime monitoring (UptimeRobot, BetterStack) pinging
- *     `https://arytrano.mg/api/health` every 1-5 min
+ *     `https://arytrano.com/api/health` every 1-5 min
  *   - Caddy/nginx healthcheck blocks
  *   - Manual incident debugging (`curl /api/health`)
  *

@@ -22,7 +22,7 @@ export const frMG = {
   'lease.wizard.feeRecap.label': 'Récapitulatif des frais',
   'lease.wizard.step1.title': 'Le locataire',
   'lease.wizard.step1.help':
-    'Indique l’email du compte AryTrano du locataire — s’il n’en a pas, demande-lui de s’inscrire d’abord sur arytrano.mg.',
+    'Indique l’email du compte AryTrano du locataire — s’il n’en a pas, demande-lui de s’inscrire d’abord sur arytrano.com.',
   'lease.wizard.step2.title': 'Les conditions',
   'lease.wizard.step2.help':
     'Loyer mensuel, caution, date de début et durée. La caution reste due au propriétaire — AryTrano ne la garde pas.',
@@ -109,7 +109,7 @@ export const frMG = {
   'lease.error.listingNotRentable':
     'Cette annonce n’est pas disponible à la signature (statut : {status}).',
   'lease.error.tenantNotFound':
-    'Aucun compte AryTrano avec cet email. Demande à ton locataire de créer un compte sur arytrano.mg, puis reviens ici.',
+    'Aucun compte AryTrano avec cet email. Demande à ton locataire de créer un compte sur arytrano.com, puis reviens ici.',
   'lease.error.tenantIsOwner': 'Tu ne peux pas signer un bail avec toi-même.',
   'lease.error.existingLease':
     'Un bail est déjà en cours sur cette annonce (statut : {status}).',
@@ -131,7 +131,7 @@ export const frMG = {
   'legal.eyebrow': 'Mentions légales',
   'legal.lastUpdated': 'Dernière mise à jour : {date}',
   'legal.draftNotice':
-    'Version provisoire (v0.5). Ce document sera révisé par un conseil juridique avant le lancement officiel. Pour toute question, écris-nous à contact@arytrano.mg.',
+    'Version provisoire (v0.5). Ce document sera révisé par un conseil juridique avant le lancement officiel. Pour toute question, écris-nous à contact@arytrano.com.',
 
   // /legal/terms — CGU
   'legal.terms.title': 'Conditions générales d’utilisation',
@@ -167,7 +167,7 @@ export const frMG = {
     'Compte étudiant : tant que le compte reste actif + 12 mois après la dernière connexion. Compte propriétaire vérifié : tant que des annonces sont actives + 5 ans après la dernière annonce supprimée (obligation comptable malagasy). Pièces d’identité chiffrées : 6 mois après la fin de la vérification.',
   'legal.privacy.s4.h': '4. Tes droits',
   'legal.privacy.s4.body':
-    'Conformément à la loi malagasy n°2014-038 relative à la protection des données personnelles, tu peux exercer à tout moment tes droits d’accès, de rectification, d’effacement et de portabilité. Écris à contact@arytrano.mg avec une preuve d’identité.',
+    'Conformément à la loi malagasy n°2014-038 relative à la protection des données personnelles, tu peux exercer à tout moment tes droits d’accès, de rectification, d’effacement et de portabilité. Écris à contact@arytrano.com avec une preuve d’identité.',
   'legal.privacy.s5.h': '5. Sécurité',
   'legal.privacy.s5.body':
     'TLS 1.3 sur toutes les connexions. Mots de passe hachés (Argon2id). Pièces d’identité chiffrées au repos avec rotation des clés. Accès aux données restreint à l’équipe de vérification (4 personnes max). Aucune fuite à signaler à ce jour.',
@@ -200,7 +200,7 @@ export const frMG = {
     'AryTrano SARL (en cours d’immatriculation). Siège social : Fianarantsoa, Madagascar. Représentant légal : à compléter avant lancement officiel.',
   'legal.mentions.s2.h': 'Contact',
   'legal.mentions.s2.body':
-    'Email : contact@arytrano.mg. WhatsApp : +261 — à compléter. Pour les questions de protection des données : privacy@arytrano.mg.',
+    'Email : contact@arytrano.com. WhatsApp : +261 — à compléter. Pour les questions de protection des données : privacy@arytrano.com.',
   'legal.mentions.s3.h': 'Hébergement',
   'legal.mentions.s3.body':
     'Le site est hébergé par Vercel Inc. (USA). 340 S Lemon Ave #4133, Walnut, CA 91789, USA. Conformité GDPR via Standard Contractual Clauses.',
@@ -260,7 +260,7 @@ export const frMG = {
     'Pas de soucis — aucun message ne partira vers ce numéro. Si tu veux à nouveau recevoir les annonces, repasse par le formulaire en bas du site.',
   'unsubscribe.invalid.title': 'Lien invalide ou expiré.',
   'unsubscribe.invalid.body':
-    'Le lien de désabonnement que tu as cliqué n\'est pas reconnu. Si tu reçois encore des messages, contacte-nous à contact@arytrano.mg.',
+    'Le lien de désabonnement que tu as cliqué n\'est pas reconnu. Si tu reçois encore des messages, contacte-nous à contact@arytrano.com.',
   'unsubscribe.backHome': 'Retour à AryTrano',
 
   'footerV3.tagline':
@@ -1063,7 +1063,7 @@ export const frMG = {
   'proprietaires.hero.stat3.n': '100 %',
   'proprietaires.hero.stat3.label': 'Du loyer reste à toi',
 
-  'proprietaires.preview.url': 'arytrano.mg/annonces/...',
+  'proprietaires.preview.url': 'arytrano.com/annonces/...',
   'proprietaires.preview.step': 'Étape 3 sur 4',
   'proprietaires.preview.title': 'Décris ton logement',
   'proprietaires.preview.verified': 'Vérifiée',

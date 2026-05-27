@@ -11,3 +11,7 @@ export {
 export { reconcileStuckPayments } from './services/reconcile-stuck-payments'
 export { goalPayWebhookPayloadSchema } from './schemas/webhook'
 export type { GoalPayWebhookPayload } from './schemas/webhook'
+export {
+  findLeaseByPaymentReference,
+  type LeaseForTransactionReturn,
+} from './queries/find-lease-by-payment-reference'
