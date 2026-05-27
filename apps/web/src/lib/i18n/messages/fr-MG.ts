@@ -39,6 +39,8 @@ export const frMG = {
   'lease.fields.caution.help':
     'Montant de la caution. Mets 0 si tu n’en prends pas. Une commission de 8% s’applique sur ce montant.',
   'lease.fields.startDate': 'Date de début',
+  'lease.fields.startDate.help':
+    'À partir d’aujourd’hui ; format JJ/MM/AAAA.',
   'lease.fields.durationMonths': 'Durée (mois)',
   'lease.fields.durationMonths.help': 'Maximum 60 mois (5 ans).',
   'lease.caution.derived.none': 'Aucune caution sur cette annonce',

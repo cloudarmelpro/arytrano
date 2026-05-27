@@ -20,4 +20,29 @@
  */
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
-export { GET, POST } from '@/app/api/webhooks/goalpay/route'
+
+// Audit P-M4 fix — gate the test alias behind NODE_ENV. In prod the
+// canonical /api/webhooks/goalpay handles real GoalPay traffic; the
+// `/test` alias must not be reachable as it would invite attackers
+// to probe (HMAC still rejects forged bodies but each probe burns
+// CPU + Sentry slot). The 404 returned to a prod caller looks
+// indistinguishable from "endpoint doesn't exist".
+import { NextResponse } from 'next/server'
+import {
+  GET as canonicalGet,
+  POST as canonicalPost,
+} from '@/app/api/webhooks/goalpay/route'
+
+export async function GET(request: Request) {
+  if (process.env.NODE_ENV === 'production') {
+    return NextResponse.json({ error: 'not_found' }, { status: 404 })
+  }
+  return canonicalGet()
+}
+
+export async function POST(request: Request) {
+  if (process.env.NODE_ENV === 'production') {
+    return NextResponse.json({ error: 'not_found' }, { status: 404 })
+  }
+  return canonicalPost(request)
+}

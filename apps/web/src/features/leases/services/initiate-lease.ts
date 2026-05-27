@@ -219,6 +219,14 @@ export async function initiateLease(
  * to avoid collisions across concurrent inits. cuid is already used
  * for primary keys via Prisma; we generate ours here to avoid pulling
  * `@paralleldrive/cuid2` into the client bundle.
+ *
+ * SECURITY note (audit S-M1) — this value MUST stay unguessable :
+ * it flows out as the GoalPay `reference` AND resurfaces in the
+ * `/transaction/{done,canceled,fail}?reference=` redirect URLs. The
+ * owner-only ownership check on the redirect pages prevents leak
+ * even if guessed, but a future refactor that ever shortened this
+ * to a nano-id "for readability" would weaken that defense. Keep at
+ * 96 bits of `crypto.getRandomValues` minimum.
  */
 function cryptoRandomCuid(): string {
   const bytes = new Uint8Array(12)

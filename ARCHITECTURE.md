@@ -212,6 +212,14 @@ POST /api/v1/listings (src/app/api/v1/listings/route.ts)
   must never ship to the client (DB, secrets, payment adapter, services).
 - **Public surface**: `features/<name>/index.ts` is the only file allowed
   to be imported from outside the feature.
+- **Server-only public surface**: when a feature ships server-only modules
+  (Prisma queries, payment adapters, side-effecting services), they go
+  in a sibling `features/<name>/server.ts` barrel with `import 'server-only'`
+  at the top. Client Components that import from `features/<name>` (the
+  default barrel) MUST stay safe — they would otherwise poison the bundle
+  with a server-only build failure even on a type-only re-export. Today
+  this pattern is applied to `features/geo`, `features/admin`, and
+  `features/payments`.
 
 ---
 

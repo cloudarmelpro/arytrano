@@ -92,6 +92,19 @@ export async function recordWebhookEvent(
     }
   }
 
+  // Audit P-M3 fix — `payment.success` with amount=0 is suspect. Zod
+  // schema accepts `nonnegative` so 0 passes validation, but no
+  // legitimate Mobile Money success goes through at 0. Likely a
+  // provider bug OR an upstream listing with priceMonthlyMGA=0 that
+  // got past validation. Surface as mismatch so the admin investigates.
+  if (event.event === 'payment.success' && event.amountMGA === 0) {
+    return {
+      kind: 'mismatch',
+      paymentId: existing.id,
+      reason: 'amount',
+    }
+  }
+
   // If we already recorded a providerTxId on an earlier webhook for the
   // same reference, it must match. (GoalPay won't normally send two
   // different order_references for the same reference, but worth

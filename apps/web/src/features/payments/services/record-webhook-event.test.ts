@@ -176,6 +176,31 @@ describe('recordWebhookEvent', () => {
     })
   })
 
+  it('rejects payment.success with amount=0 as mismatch (audit P-M3)', async () => {
+    // Zod schema accepts `nonnegative` so 0 passes validation. But no
+    // legitimate Mobile Money success goes through at 0 — must be a
+    // provider bug or upstream amountMGA=0 leak. Service must flag it.
+    vi.mocked(prisma.payment.findUnique).mockResolvedValue({
+      id: 'pay_zero',
+      status: 'INITIATED',
+      amountMGA: 0,
+      providerTxId: null,
+      purpose: 'LEASE_SUCCESS_FEE',
+    } as never)
+
+    const outcome = await recordWebhookEvent({
+      ...baseEvent,
+      amountMGA: 0,
+    })
+
+    expect(outcome).toEqual({
+      kind: 'mismatch',
+      paymentId: 'pay_zero',
+      reason: 'amount',
+    })
+    expect(prisma.$transaction).not.toHaveBeenCalled()
+  })
+
   it('maps payment.canceled → CANCELED and payment.expired → EXPIRED', async () => {
     for (const [event, expected] of [
       ['payment.canceled', 'CANCELED'],

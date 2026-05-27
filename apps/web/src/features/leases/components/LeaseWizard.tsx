@@ -1,5 +1,6 @@
 'use client'
 
+import { useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -49,6 +50,12 @@ export function LeaseWizard({
   const cautionMGA = monthlyRentMGA * cautionMonths
   const previewFees = calculateLeaseFees({ cautionMGA })
 
+  // Audit PF-M1 fix — memoize today's ISO date so we don't recompute
+  // `new Date()` on every render. The `min` attribute on the date input
+  // only needs to be set at mount; React Compiler will likely DCE this
+  // but explicit memo signals intent and stays correct under SSR.
+  const todayMin = useMemo(() => todayIso(), [])
+
   function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
     const formData = new FormData(e.currentTarget)
@@ -69,7 +76,10 @@ export function LeaseWizard({
       <input type="hidden" name="listingId" value={listingId} />
 
       {/* Section 1 — Locataire */}
-      <section className="flex flex-col gap-5">
+      <section
+        aria-labelledby="lease-wizard-section-1-heading"
+        className="flex flex-col gap-5"
+      >
         <header>
           <span
             aria-hidden
@@ -77,7 +87,10 @@ export function LeaseWizard({
           >
             01 / 03
           </span>
-          <h2 className="mt-2 font-serif text-[clamp(22px,2.4vw,30px)] font-normal leading-[1.15] tracking-[-0.02em] text-foreground">
+          <h2
+            id="lease-wizard-section-1-heading"
+            className="mt-2 font-serif text-[clamp(22px,2.4vw,30px)] font-normal leading-[1.15] tracking-[-0.02em] text-foreground"
+          >
             <span className="sr-only">
               {t('lease.wizard.progress', { current: 1, total: 3 })} —{' '}
             </span>
@@ -125,7 +138,10 @@ export function LeaseWizard({
       </section>
 
       {/* Section 2 — Conditions */}
-      <section className="flex flex-col gap-5 border-t border-border pt-10">
+      <section
+        aria-labelledby="lease-wizard-section-2-heading"
+        className="flex flex-col gap-5 border-t border-border pt-10"
+      >
         <header>
           <span
             aria-hidden
@@ -133,7 +149,10 @@ export function LeaseWizard({
           >
             02 / 03
           </span>
-          <h2 className="mt-2 font-serif text-[clamp(22px,2.4vw,30px)] font-normal leading-[1.15] tracking-[-0.02em] text-foreground">
+          <h2
+            id="lease-wizard-section-2-heading"
+            className="mt-2 font-serif text-[clamp(22px,2.4vw,30px)] font-normal leading-[1.15] tracking-[-0.02em] text-foreground"
+          >
             <span className="sr-only">
               {t('lease.wizard.progress', { current: 2, total: 3 })} —{' '}
             </span>
@@ -188,14 +207,19 @@ export function LeaseWizard({
                     name="startDate"
                     type="date"
                     required
-                    min={todayIso()}
+                    min={todayMin}
                     aria-invalid={(fieldErrors.startDate?.length ?? 0) > 0}
                     aria-describedby={
+                      // A11y audit A-M3 fix — always link the help text;
+                      // append the error ID when an error is showing.
                       fieldErrors.startDate?.length
-                        ? 'lease-startDate-error'
-                        : undefined
+                        ? 'lease-startDate-help lease-startDate-error'
+                        : 'lease-startDate-help'
                     }
                   />
+                  <FieldDescription id="lease-startDate-help">
+                    {t('lease.fields.startDate.help')}
+                  </FieldDescription>
                   {fieldErrors.startDate?.length ? (
                     <FieldError id="lease-startDate-error">
                       {fieldErrors.startDate.join(' · ')}
@@ -241,7 +265,10 @@ export function LeaseWizard({
       </section>
 
       {/* Section 3 — Recap + paiement */}
-      <section className="flex flex-col gap-5 border-t border-border pt-10">
+      <section
+        aria-labelledby="lease-wizard-section-3-heading"
+        className="flex flex-col gap-5 border-t border-border pt-10"
+      >
         <header>
           <span
             aria-hidden
@@ -249,7 +276,10 @@ export function LeaseWizard({
           >
             03 / 03
           </span>
-          <h2 className="mt-2 font-serif text-[clamp(22px,2.4vw,30px)] font-normal leading-[1.15] tracking-[-0.02em] text-foreground">
+          <h2
+            id="lease-wizard-section-3-heading"
+            className="mt-2 font-serif text-[clamp(22px,2.4vw,30px)] font-normal leading-[1.15] tracking-[-0.02em] text-foreground"
+          >
             <span className="sr-only">
               {t('lease.wizard.progress', { current: 3, total: 3 })} —{' '}
             </span>

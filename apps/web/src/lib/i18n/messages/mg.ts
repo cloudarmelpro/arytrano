@@ -45,6 +45,8 @@ export const mg: Record<MessageKey, string> = {
   'lease.fields.caution.help':
     'Tatitra antoka. Ataovy 0 raha tsy maka antoka ianao. Misy commission 8% amin\'ity vola ity.',
   'lease.fields.startDate': 'Daty fanombohana',
+  'lease.fields.startDate.help':
+    'Manomboka anio ; endrika JJ/MM/AAAA.',
   'lease.fields.durationMonths': 'Faharetana (volana)',
   'lease.fields.durationMonths.help': 'Hatramin\'ny 60 volana (5 taona).',
   'lease.caution.derived.none': 'Tsy misy antoka amin\'ity filazana ity',
