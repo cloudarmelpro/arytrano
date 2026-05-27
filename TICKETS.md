@@ -3732,11 +3732,146 @@ Ces items NE sont PAS du code que je peux écrire. Ils sont sur l'utilisateur ou
 
 ---
 
-### 🔬 Findings audits 2026-05-27 — à compléter
-
-> **Bloqué** : les 2 agents (`security-reviewer` + `general-purpose` architecture) tournent en background pendant que je rédige ces tickets. Findings concrets à coller ici dès qu'ils ressortent. Voir aussi le rapport conversationnel envoyé en final.
+### 🔬 Findings audits 2026-05-27
 
 **Méta** : scope = 14 commits entre `23aa25f` et `bb642f3`. Skip de doublons avec audits passés (Wave 1+2+3 déjà clean).
+
+#### Security agent — 0 Critical, 0 High, 5 Medium, 5 Low
+
+| Sev | Code | Fichier | Résumé | Statut |
+|---|---|---|---|---|
+| M1 | seed-clobber | `prisma/seed.ts:73-79` | re-seed efface silencieusement les édits admin via `/admin/geo` | ✅ **fixé** dans le commit suivant (guard `findUnique` → skip si non-null) |
+| M2 | slug-immutability | `services/create-{city,neighborhood}.ts` | promesse seulement dans le doc, pas au niveau DB | ⏳ documenté ; faire si un update-city ship un jour |
+| M3 | intent-fallthrough | `actions/update-{editorial,quiz-profile}.ts` | `intent` accepte strings arbitraires, fallback silencieux sur `save` | ✅ **fixé** (validation stricte `save \| clear`) |
+| M4 | revalidatePath-unsafe | `actions/update-editorial.ts`, `update-quiz-profile.ts` | `revalidatePath` consume slugs raw FormData sans regex re-check | ⏳ admin-only, low impact ; à faire en next session |
+| M5 | apostrophes-mixed | `seed-helpers/editorial-drafts.ts` | ASCII `\'` vs typographic `'` — fragilité encodage | ⏳ S2-cosmetic, post-launch |
+| L1 | dispute-snapshot | `admin-revenue/get-revenue-stats.ts:122-128` | 9 queries en `Promise.all`, denom dispute peut osciller ±1 row | ⏳ wrap dans single groupBy |
+| L2 | signedThisMonth | `admin-revenue/get-revenue-stats.ts:106-111` | leases sign-then-dispute disparaissent du KPI | ⏳ revisit quand DISPUTED devient courant |
+| L3 | jwt-role-UI-only | `mobile/lib/auth/use-auth.ts` | role exposé sans signature verify — UI-only, attaquant = device owner | ⏳ rename `localRoleHint` pour clarifier |
+| L4 | cuid-leak | `admin-geo/queries/get-neighborhood-admin.ts:54-63` | renvoie `id` cuid dans output admin (déjà gated par layout) | ⏳ documenter `AdminOnly` |
+| L5 | redirect-throw-pattern | `actions/create-{city,neighborhood}.ts` | switch repose sur `redirect()` qui throw — pas de `return` explicite | ⏳ ajouter `return` defensif |
+
+**Notes positives confirmées** :
+- `requireAdmin()` partout sur les 4 admin-geo actions
+- Zod-at-the-boundary sur les 4 services
+- Pas de poisoning bundle client via `features/geo/index.ts` (HIGH fix — voir ci-dessous)
+- Mobile lease : server toujours autoritaire, UI gate cosmétique
+- Saved-search email : sanitize headers + escapeHtml + searchName jamais leaké
+
+#### Architecture agent — 3 High, 6 Medium, 5 Low, 2 Nit
+
+| Sev | Code | Fichier | Résumé | Statut |
+|---|---|---|---|---|
+| **H1** | geo-barrel-server-only | `features/geo/index.ts:3` | re-exporte `listCitiesWithNeighborhoods` qui a `'server-only'` — viole memory rule | ✅ **fixé** — split en `features/geo/server.ts` |
+| **H2** | prisma-in-route | `app/admin/geo/cities/[citySlug]/neighborhoods/new/page.tsx:22` | `prisma.city.findUnique` direct dans le route file — viole arch rule #2 | ✅ **fixé** — `getCityForAdmin()` extrait dans `queries/` |
+| **H3** | raw-textarea | `EditorialForm.tsx:208-217` | `<textarea>` hand-rolled au lieu du shadcn `<Textarea>` | ✅ **fixé** |
+| M1 | deep-import-requireAdmin | `admin-geo/actions/*.ts:4-5` (×4) | import via `services/require-admin` au lieu de `@/features/admin/server` barrel | ✅ **fixé** sur les 4 fichiers |
+| M2 | label-not-associated | `QuizProfileForm.tsx:311-332` `SubSelect` | `<label>` micro-label sans `htmlFor` matching le SelectTrigger | ⏳ S2-cosmetic — wire htmlFor + id |
+| M3 | raw-checkbox | `QuizProfileForm.tsx:347-357` `CheckboxGroup` | `<input type="checkbox">` au lieu du shadcn `<Checkbox>` | ⏳ extract `<ChipCheckbox>` component ou compose avec shadcn |
+| M4 | jwt-exp-not-checked | `mobile/lib/auth/use-auth.ts:35-39` | expired token reporte `signedIn:true` jusqu'au prochain 401 | ✅ **fixé** — check `payload.exp * 1000 < Date.now()` |
+| M5 | no-unit-tests | `admin-geo/services/*.ts`, `admin-revenue/queries/get-revenue-stats.ts` | services neufs sans tests Vitest | ⏳ S2-9 dédié — au moins Zod paths + slug collision + dispute denom-zero |
+| M6 | seed-clobber | (= sec M1) | duplicate de sec M1 | ✅ **fixé** |
+| L1 | neighborhood-bare-slug | `LandingNeighborhoods.tsx:80` | `?neighborhood=` sans `?city=` → collisions cross-city | ✅ **fixé** — scoped avec `?city=${citySlug}&neighborhood=${slug}` |
+| L2 | dead-orThrow | `admin-geo/services/update-*-OrThrow` | helpers déclarés mais jamais consommés (pas de REST endpoint) | ✅ **fixé** — supprimés |
+| L3 | dead-ternary | `admin/revenue/page.tsx:23-26` | `locale === 'mg' ? 'fr-FR' : 'fr-FR'` — branches identiques | ✅ **fixé** — collapse |
+| L4 | hook-duplication | `EditorialForm` + `QuizProfileForm` share formRef+intent pattern | ~30 lignes dupliquées | ⏳ extract `useIntentSubmit` SI un 3e form ship |
+| L5 | i18n-inconsistent-admin | admin-geo strings hardcoded FR, admin-revenue via `t()` | inconsistance pattern | ⏳ S2 décision : tout admin = FR hardcoded OU tout via `t()` |
+| Nit | formatAriary-dup | web `lib/format/currency.ts` + mobile inline (×2) | duplication pure fn | ⏳ move to `packages/shared/src/format/currency.ts` |
+| Nit | expo-as-never | `mobile/app/leases.tsx:141` | `router.push as never` workaround | ⏳ Expo SDK 54 a une meilleure pattern |
+
+**Score** : 8 findings fixés en live dans cette session (3 HIGH + 5 MEDIUM/LOW directs). 9 restants documentés pour next session avec priorité claire.
+
+---
+
+### 📦 Session 2026-05-27 (cont.) — 4 lots cleanup post-audit GoalPay
+
+**4 commits livrés** sur `main` (de `2e7c6de` à `7aa5aed`). État `main` = **`7aa5aed`**.
+
+| Lot | Commit | Périmètre | Findings résolus |
+|---|---|---|---|
+| **1 — Refacto archi** | `2e7c6de` | Split `features/payments/{index,server}.ts` + extract `resolveLeaseHrefForReturn` query (auth+lookup en parallèle) → 6 pages transaction/test passent de ~50 à ~10 lignes | Archi C1, H1, H2 · Perf M1, M2 |
+| **2 — Correctness paiement** | `604c767` | Status filter dans reconcile updateMany · secret < 16 chars rejeté · TOCTOU via conditional updateMany dans tx · currency `Ar\|MGA` tolérance | Paiement C1, C2, H2, H3 |
+| **3 — Défense en profondeur** | `981d4d6` | Rate-limit webhook 100/min/IP fail-CLOSED · sanitize `description` dans Sentry logs · alert Sentry sur 401 signature | Sécu H1, M2 + monitoring 401 |
+| **4 — SEO + A11y** | `7aa5aed` | `robots.ts` disallows `/transaction/`, `/test/`, `/webhook-gpay` · `role=alert\|status` + `aria-live` sur TransactionResult · `aria-describedby` garde help+error · sr-only live region pour pending wizard · clé i18n `lease.cta.loading` (fr+mg) | SEO C1, A11y C1, H1, H3 |
+
+**Tests** : 192/192 vert (3 nouveaux — empty/short secret, race-lost TOCTOU). Typecheck clean.
+
+---
+
+### 🔬 Findings audits 2026-05-27 (round 2) — 6 agents post-GoalPay-wiring
+
+**Méta** : audits déclenchés après le wiring test mode. 6 angles parallèles (sécu, SEO, paiement, archi, a11y, perf). Scope = commits depuis `20c3c25`.
+
+**Résolus en live (16/45)** : 5 CRITIQUE + 8 HAUTE + 3 MOYENNE. Détails dans le tableau ci-dessus par lot.
+
+**Reportés (29/45)** — nouveaux tickets S2-18 → S2-22 ci-dessous.
+
+#### 🟠 HAUTE reportées (4 — tickets S2-18 à S2-21)
+
+##### S2-18 · Side-effect lease hors transaction webhook (Paiement H1)
+**Bloqueur** : décision conception (atomicité vs rollback email)
+**Description** : `applyLeasePaymentSideEffect` s'exécute APRÈS commit du Payment dans le webhook handler. Si le process crash entre les deux → Payment `CONFIRMED` + Lease `DRAFT` (état incohérent, GoalPay ne retentera pas car notre 200 a été envoyé). Options : (a) déplacer la side-effect DANS la transaction Prisma (risque rollback si email throw, à arbitrer), (b) ajouter un job de réconciliation `leases` qui rejoue les side-effects pour `Payment.CONFIRMED + Lease.DRAFT`. Option **(b)** est plus défensive.
+**Fichier** : `src/app/api/webhooks/goalpay/route.ts:100-102` + `src/features/leases/services/apply-lease-payment-side-effect.ts`
+**Effort** : ~3h (option b + test). **Justifié seulement après que le flow GoalPay prod soit testé end-to-end et qu'on observe un cas de DB/email failure.**
+
+##### S2-19 · Migrer `/webhook-gpay` et `/api/goalpay/webhook/test` sous convention (Archi H3)
+**Bloqueur** : coordination GoalPay support (changer URL dans leur dashboard)
+**Description** : ces 2 aliases violent la convention `/api/webhooks/<provider>/` (Rule 8). Plan : (1) email GoalPay support pour mettre à jour le webhook URL prod vers `https://arytrano.com/api/webhooks/goalpay`, (2) bouger localement `/api/goalpay/webhook/test` → `/api/webhooks/goalpay/test`, (3) garder l'alias `/webhook-gpay` 6 mois pour compat + retirer.
+**Effort** : ~30min code + email à GoalPay.
+
+##### S2-20 · Differential HTTP status codes côté webhook (Sécu H2)
+**Bloqueur** : aucun
+**Description** : 400 (body invalide) / 401 (sig invalide) / 413 (too large) / 422 (mismatch) leak des info de stack. Un attaquant peut distinguer "endpoint live" de "endpoint dégradé" par fingerprinting. Mitigation : collapse tous les rejects publics sur **401 `{ error: "rejected" }`**, garder les statuts riches uniquement dans Sentry tags. À arbitrer avec la spec GoalPay retry policy avant de toucher (s'ils ont besoin de différencier pour décider de retry).
+**Fichier** : `src/app/api/webhooks/goalpay/route.ts:56-58, 78-92, 88-91`
+**Effort** : ~1h + test.
+
+##### S2-21 · `description` + `og:*` sur pages transaction (SEO H)
+**Bloqueur** : aucun
+**Description** : les 6 pages `/transaction/*` et `/test/*` n'ont pas de `description` ni `openGraph` dans leurs `Metadata`. Impact SEO faible (noindex appliqué + maintenant disallow dans robots.ts), MAIS un user qui partage l'URL sur WhatsApp/Telegram (usages courants à Madagascar) verra un preview vide. Ajouter une description neutre + OG image par défaut depuis le layout.
+**Fichiers** : 6 pages transaction/test
+**Effort** : ~30min.
+
+#### 🟡 MOYENNE reportées (13 — ticket parapluie S2-22)
+
+##### S2-22 · Misc audit MEDIUMs round 2 (paiement, sécu, a11y, archi)
+**Description** : 13 findings de sévérité MOYENNE répartis sur 4 domaines. Liste exhaustive :
+
+**Paiement (4)** :
+- **P-M1** : `Sentry.captureMessage('webhook event for unknown reference')` envoie `event.reference` dans Sentry. Identifiant interne pas critique, mais à documenter comme acceptable. Fichier : `record-webhook-event.ts:76-80`.
+- **P-M2** : `unknown_reference` retourne 200 → GoalPay arrête de retry. Si webhook arrive avant que `Payment` soit committé (race init / DB lente), on perd l'event. Fix : retourner 503 (transient) si event arrive < 60s après tentative init. Fichier : `route.ts:118-119`.
+- **P-M3** : pas de validation `amount === 0` sur `payment.success` (Zod accepte `nonnegative`). Un Payment initié avec `amountMGA=0` (bug en amont) passerait. Fix : reject mismatch. Fichier : `record-webhook-event.ts:87`.
+- **P-M4** : `/api/goalpay/webhook/test` exposée en prod aussi. Gate `if (process.env.NODE_ENV === 'production') return 404`. Fichier : alias route.ts.
+
+**Sécurité (1)** :
+- **S-M1** : `cryptoRandomCuid` non-crypto-rated nominal (entropie OK à 96 bits). Acceptable, mais documenter explicitement "must be unguessable" dans le commentaire pour qu'un futur dev ne passe pas à un nano-id court. Fichier : `initiate-lease.ts:223-227`.
+
+**A11y (3)** :
+- **A-M1** : `<section>` du LeaseWizard sans `aria-labelledby` (3 sections → liste landmarks SR confuse). Fichier : `LeaseWizard.tsx:72, 124, 238`.
+- **A-M2** : `startDate` sans `FieldDescription` (pas de hint de format JJ/MM/AAAA). Fichier : `LeaseWizard.tsx:186`.
+- **A-M3** : CTAs "Voir le bail" / "Retour à l'accueil" sans `aria-label` contextualisé (listing.title). Nécessite passer `listingTitle` à TransactionResult. Fichier : `TransactionResult.tsx:92-105`.
+
+**Archi (3)** :
+- **AR-M1** : documenter `<feature>/server.ts` comme 2e surface publique dans ARCHITECTURE.md (pattern maintenant utilisé sur `geo`, `admin`, `payments`).
+- **AR-M2** : `M2 QuizProfileForm` `<label>` micro-label sans `htmlFor` matching SelectTrigger (déjà reporté en round 1, encore pending).
+- **AR-M3** : `M3 QuizProfileForm` `<input type="checkbox">` au lieu de shadcn `<Checkbox>` (round 1).
+
+**Perf (1)** :
+- **PF-M1** : `todayIso()` recalculée à chaque rendu LeaseWizard. Impact négligeable. Mémoïser ou déplacer hors composant. Fichier : `LeaseWizard.tsx:330`.
+
+**Sécurité M2 doc** (mentioned in round 1 et non couvert par lot 3) :
+- **S-M2** : sanitize `listing.title` user-input à la création/édition listing (au-delà du log) pour réduire la surface d'injection PII dans tous les contextes downstream (emails, push, push, payment description).
+
+**Effort total** : ~4h cumulés. Aucun n'est bloqueur lancement Fianarantsoa.
+
+---
+
+### 📊 État global findings (cumulatif depuis 2026-05-20)
+
+- **Round 1 (commit `23aa25f`)** : Wave 1+2+3 — 22 fixes appliqués
+- **Round 1bis (mid-session 2026-05-27)** : 8 findings sur 17 (admin-geo + mobile audit) — 3 HIGH + 5 MEDIUM/LOW
+- **Round 2 (post-GoalPay wiring)** : 16 findings sur 45 résolus en live — 5 CRITIQUE + 8 HAUTE + 3 MEDIUM. **29 reportés** sur tickets S2-18 → S2-22.
+
+**Statut global avant launch Fianarantsoa** : aucun CRITIQUE en suspens, 4 HAUTE acceptables avec mitigations documentées (S2-18 défensif post-launch, S2-19 coordination provider, S2-20 cosmétique sécu, S2-21 cosmétique SEO).
 
 ---
 
