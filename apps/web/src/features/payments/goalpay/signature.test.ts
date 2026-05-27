@@ -57,6 +57,19 @@ describe('verifyGoalPaySignature', () => {
     expect(verifyGoalPaySignature(body, 'aabbcc', SECRET)).toBe(false)
   })
 
+  it('returns false when the secret is empty (audit C2 — fail-closed on misconfigured env)', () => {
+    const body = '{"event":"payment.success"}'
+    const sig = signBody(body, '')
+    expect(verifyGoalPaySignature(body, sig, '')).toBe(false)
+  })
+
+  it('returns false when the secret is shorter than 16 chars (audit C2 — defense-in-depth)', () => {
+    const body = '{"event":"payment.success"}'
+    const shortSecret = 'short'
+    const sig = signBody(body, shortSecret)
+    expect(verifyGoalPaySignature(body, sig, shortSecret)).toBe(false)
+  })
+
   it('uses timing-safe comparison (truthy on identical bytes via Buffer)', () => {
     // Sanity: the function does NOT use === on hex strings (which would
     // be timing-vulnerable). We can't directly observe timing in a unit

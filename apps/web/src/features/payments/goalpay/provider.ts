@@ -69,7 +69,10 @@ export const goalPayProvider: PaymentProvider = {
       orderReference: validated.data.order_reference,
       reference: validated.data.reference,
       amountMGA: validated.data.amount,
-      currency: validated.data.currency,
+      // Audit H3 fix — normalize ISO `"MGA"` and GoalPay's `"Ar"` to a
+      // single value, so downstream services (amount validators, audit
+      // log, lease activation) don't need branching on provider quirks.
+      currency: 'Ar',
       description: validated.data.description,
       error: validated.data.error,
     }

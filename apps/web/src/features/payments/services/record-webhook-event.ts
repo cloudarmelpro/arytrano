@@ -134,24 +134,53 @@ export async function recordWebhookEvent(
   }
 
   // First-time terminal transition.
-  await prisma.$transaction([
-    prisma.payment.update({
-      where: { id: existing.id },
+  //
+  // Audit H2 fix — use a CONDITIONAL `updateMany` inside the transaction
+  // so the existence-of-non-terminal check is atomic with the flip.
+  // Without this, two concurrent webhooks for the same Payment could
+  // both pass the stale `findUnique` check above (lines 61-70) and both
+  // commit an `applied` outcome, doubling downstream side-effects
+  // (email tenant invite, lease activation). The `where.status` filter
+  // means a row already flipped by a concurrent handler is silently
+  // skipped, and `updated.count` tells us whether we won the race.
+  const txResult = await prisma.$transaction(async (tx) => {
+    const updated = await tx.payment.updateMany({
+      where: {
+        id: existing.id,
+        status: { in: ['INITIATED', 'PENDING'] },
+      },
       data: {
         status: targetStatus,
         webhookReceivedAt: now,
         providerTxId: event.orderReference,
         ...(targetStatus === 'CONFIRMED' ? { completedAt: now } : {}),
       },
-    }),
-    prisma.paymentEvent.create({
+    })
+    // Always audit, even when we lost the race — the event arrived
+    // and belongs in the immutable trail. The audit row's `status`
+    // records what the event WOULD have transitioned to, not the
+    // post-flip Payment.status (which `updateMany.count === 0` proves
+    // was already terminal by another writer).
+    await tx.paymentEvent.create({
       data: {
         paymentId: existing.id,
         status: targetStatus,
         rawPayload: safePayload,
       },
-    }),
-  ])
+    })
+    return updated.count
+  })
+
+  if (txResult === 0) {
+    // Race lost — a concurrent webhook handler flipped the row first.
+    // Return noop so the route handler does NOT re-dispatch downstream
+    // side-effects (they already ran on the winning call).
+    return {
+      kind: 'noop',
+      paymentId: existing.id,
+      existingStatus: existing.status,
+    }
+  }
 
   return {
     kind: 'applied',

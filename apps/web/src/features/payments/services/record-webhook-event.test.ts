@@ -9,6 +9,7 @@ vi.mock('@/lib/db', () => ({
     payment: {
       findUnique: vi.fn(),
       update: vi.fn(),
+      updateMany: vi.fn(),
     },
     paymentEvent: {
       create: vi.fn(),
@@ -32,10 +33,19 @@ const baseEvent: WebhookEvent = {
 
 beforeEach(() => {
   vi.clearAllMocks()
-  // Default mock for $transaction: just run the array of promises.
+  // Support both shapes : array (legacy batch form, used by other
+  // services) and async callback (interactive form, used here for the
+  // race-safe conditional update). Default `updateMany.count = 1` so
+  // the happy path is "we won the race".
+  vi.mocked(prisma.payment.updateMany).mockResolvedValue({ count: 1 } as never)
   vi.mocked(prisma.$transaction).mockImplementation(
-    async (ops: unknown) => {
-      if (Array.isArray(ops)) return Promise.all(ops)
+    async (opsOrCb: unknown) => {
+      if (Array.isArray(opsOrCb)) return Promise.all(opsOrCb)
+      if (typeof opsOrCb === 'function') {
+        // Pass the prisma mock itself as the `tx` argument — the inner
+        // calls go through the same vi.fn() mocks set up above.
+        return (opsOrCb as (tx: unknown) => unknown)(prisma)
+      }
       throw new Error('Unexpected $transaction shape in test')
     },
   )
@@ -110,6 +120,37 @@ describe('recordWebhookEvent', () => {
       purpose: 'LEASE_SUCCESS_FEE',
     })
     expect(prisma.$transaction).toHaveBeenCalledOnce()
+    // Audit H2 fix — must use updateMany (with status filter) not
+    // update, so concurrent webhooks don't both commit the transition.
+    expect(prisma.payment.updateMany).toHaveBeenCalledOnce()
+    expect(prisma.payment.update).not.toHaveBeenCalled()
+  })
+
+  it('returns noop when a concurrent webhook flipped the row first (race-lost)', async () => {
+    // The findUnique sees a stale INITIATED, but by the time we hit
+    // updateMany the row was already moved to a terminal status by a
+    // concurrent handler — the conditional WHERE matches 0 rows.
+    vi.mocked(prisma.payment.findUnique).mockResolvedValue({
+      id: 'pay_race',
+      status: 'INITIATED',
+      amountMGA: 15000,
+      providerTxId: null,
+      purpose: 'LEASE_SUCCESS_FEE',
+    } as never)
+    vi.mocked(prisma.payment.updateMany).mockResolvedValueOnce({
+      count: 0,
+    } as never)
+
+    const outcome = await recordWebhookEvent(baseEvent)
+
+    expect(outcome).toEqual({
+      kind: 'noop',
+      paymentId: 'pay_race',
+      existingStatus: 'INITIATED',
+    })
+    // Audit row STILL written — we want the event in the trail even
+    // when it didn't drive a transition.
+    expect(prisma.paymentEvent.create).toHaveBeenCalledOnce()
   })
 
   it('maps payment.failed → FAILED', async () => {

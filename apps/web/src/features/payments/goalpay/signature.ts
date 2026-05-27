@@ -24,6 +24,13 @@ export function verifyGoalPaySignature(
 ): boolean {
   if (!signatureHeader) return false
 
+  // Audit C2 fix — defense-in-depth secret length floor. A blank or
+  // very short secret (e.g. `.env` corruption, `GOALPAY_WEBHOOK_SECRET=""`)
+  // would otherwise produce a deterministic HMAC that an attacker can
+  // forge offline. `provider.ts` already rejects an unset env value, but
+  // an empty string passes that check — refuse it here too.
+  if (!secret || secret.length < 16) return false
+
   // Compute the expected HMAC over the raw body.
   const expected = createHmac('sha256', secret).update(rawBody).digest('hex')
 

@@ -70,8 +70,18 @@ export async function reconcileStuckPayments(opts?: {
   let markedExpired = 0
   try {
     const [updateResult] = await prisma.$transaction([
+      // Audit C1 fix — re-filter on status inside the update. Between
+      // `findMany` and this `updateMany`, a legitimate `payment.success`
+      // webhook could have flipped a row to CONFIRMED. Without the
+      // status filter, we'd overwrite it with EXPIRED and stall the
+      // lease activation forever. With the filter, racey rows are
+      // simply skipped — `updateResult.count` reflects only the rows
+      // that were still INITIATED/PENDING at write time.
       prisma.payment.updateMany({
-        where: { id: { in: ids } },
+        where: {
+          id: { in: ids },
+          status: { in: ['INITIATED', 'PENDING'] },
+        },
         data: { status: 'EXPIRED', webhookReceivedAt: now },
       }),
       prisma.paymentEvent.createMany({ data: auditRows }),
