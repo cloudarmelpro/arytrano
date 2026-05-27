@@ -66,14 +66,14 @@ export default async function AdminGeoPage() {
           href="/admin/geo/cities/new"
           className={buttonVariants({ size: 'lg' })}
         >
-          + Ajouter une ville
+          Ajouter une ville
         </Link>
       </header>
 
       <div className="flex flex-col gap-10">
         {cities.map((city) => (
           <section key={city.id} className="flex flex-col gap-4">
-            <div className="flex items-baseline justify-between gap-4 border-b border-border pb-3">
+            <div className="flex items-baseline justify-between gap-4">
               <div className="flex items-baseline gap-3">
                 <h2 className="text-xl font-semibold text-foreground">
                   {city.nameFr}
@@ -95,7 +95,7 @@ export default async function AdminGeoPage() {
                 bouton ci-dessus.
               </p>
             ) : (
-              <div className="overflow-x-auto rounded-xl border border-border">
+              <div className="overflow-x-auto rounded-md border border-border">
                 <table className="w-full text-sm">
                   <thead className="border-b border-border bg-muted/30 text-left text-[11px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
                     <tr>

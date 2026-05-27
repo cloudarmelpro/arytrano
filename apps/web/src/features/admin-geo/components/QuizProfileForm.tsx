@@ -6,9 +6,15 @@ import {
   Field,
   FieldDescription,
   FieldError,
-  FieldGroup,
   FieldLabel,
 } from '@/components/ui/field'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import {
   updateNeighborhoodQuizProfileAction,
   type UpdateQuizProfileActionState,
@@ -29,6 +35,13 @@ const VIBES = [
   { value: 'mixed', label: 'Mixte' },
 ] as const
 
+const SCORE_ITEMS = [
+  { value: '0', label: '0 — absent' },
+  { value: '1', label: '1 — un peu' },
+  { value: '2', label: '2 — correct' },
+  { value: '3', label: '3 — excellent' },
+] as const
+
 const HOUSING = [
   { value: 'ROOM', label: 'Chambre' },
   { value: 'STUDIO', label: 'Studio' },
@@ -42,19 +55,19 @@ const STRENGTHS = [
   { value: 'social', label: 'Vie sociale' },
 ] as const
 
-const SCORE_OPTIONS = [0, 1, 2, 3]
-
 /**
- * Quiz profile editor.
+ * Quiz profile editor — uses shadcn `<Select>` (which wraps Base UI
+ * `Select`) for the single-value fields so the dropdown opens BELOW
+ * the trigger, mirroring the landing hero search bar UX. Multi-select
+ * fields stay as chip-style checkboxes (Base UI Select is single-only;
+ * a multi Combobox would be heavier without UX gain at this scale).
  *
- * Every input is bounded — scores are 0-3 number selects, enum fields
- * are radios, multi-selects are checkboxes (at least 1 required). The
- * server still re-Zod-parses (defense in depth), but the UI prevents
- * out-of-range submissions in the first place.
+ * Memory note (`feedback_base_ui_select`) — `Select.Root` needs the
+ * `items` prop so the trigger renders the matching label instead of
+ * the raw value (e.g. `low` instead of `Bas (< 250k Ar)`).
  *
- * Two intents :
- *   save  → write the JSON payload to Neighborhood.quizProfile
- *   clear → set quizProfile = NULL (row drops out of Q0 city list)
+ * The server still re-Zod-parses via `quartierQuizProfileSchema`
+ * (defense in depth). The UI just makes invalid values unreachable.
  */
 export function QuizProfileForm({
   citySlug,
@@ -79,43 +92,46 @@ export function QuizProfileForm({
 
       <fieldset disabled={pending} className="contents">
         <div className="grid gap-6 lg:grid-cols-2">
-          {/* Price tier */}
           <Field>
-            <FieldLabel>Tranche de prix</FieldLabel>
-            <RadioRow
+            <FieldLabel htmlFor="qp-priceTier">Tranche de prix</FieldLabel>
+            <EnumSelect
+              id="qp-priceTier"
               name="priceTier"
-              options={PRICE_TIERS}
+              items={PRICE_TIERS}
               defaultValue={initialProfile?.priceTier ?? 'mid'}
+              placeholder="Choisis une tranche"
             />
             <ErrorLine errs={state.fields?.priceTier} />
           </Field>
 
-          {/* Vibe */}
           <Field>
-            <FieldLabel>Ambiance</FieldLabel>
-            <RadioRow
+            <FieldLabel htmlFor="qp-vibe">Ambiance</FieldLabel>
+            <EnumSelect
+              id="qp-vibe"
               name="vibe"
-              options={VIBES}
+              items={VIBES}
               defaultValue={initialProfile?.vibe ?? 'mixed'}
+              placeholder="Choisis une ambiance"
             />
             <ErrorLine errs={state.fields?.vibe} />
           </Field>
 
-          {/* School scores */}
           <Field>
-            <FieldLabel>Score « écoles » (0-3)</FieldLabel>
+            <FieldLabel>Score « écoles »</FieldLabel>
             <div className="grid grid-cols-2 gap-3">
-              <ScoreSelect
-                name="schoolScores.university"
+              <SubSelect
                 label="Université"
-                defaultValue={
-                  initialProfile?.schoolScores.university ?? 0
-                }
+                name="schoolScores.university"
+                items={SCORE_ITEMS}
+                defaultValue={String(
+                  initialProfile?.schoolScores.university ?? 0,
+                )}
               />
-              <ScoreSelect
-                name="schoolScores.lycee"
+              <SubSelect
                 label="Lycées"
-                defaultValue={initialProfile?.schoolScores.lycee ?? 0}
+                name="schoolScores.lycee"
+                items={SCORE_ITEMS}
+                defaultValue={String(initialProfile?.schoolScores.lycee ?? 0)}
               />
             </div>
             <FieldDescription>
@@ -125,35 +141,40 @@ export function QuizProfileForm({
             <ErrorLine errs={state.fields?.['schoolScores.lycee']} />
           </Field>
 
-          {/* Mobility scores */}
           <Field>
-            <FieldLabel>Score « mobilité » (0-3)</FieldLabel>
+            <FieldLabel>Score « mobilité »</FieldLabel>
             <div className="grid grid-cols-3 gap-3">
-              <ScoreSelect
-                name="mobilityScores.walk"
+              <SubSelect
                 label="À pied"
-                defaultValue={initialProfile?.mobilityScores.walk ?? 0}
+                name="mobilityScores.walk"
+                items={SCORE_ITEMS}
+                defaultValue={String(
+                  initialProfile?.mobilityScores.walk ?? 0,
+                )}
               />
-              <ScoreSelect
-                name="mobilityScores.taxibe"
+              <SubSelect
                 label="Taxi-be"
-                defaultValue={
-                  initialProfile?.mobilityScores.taxibe ?? 0
-                }
+                name="mobilityScores.taxibe"
+                items={SCORE_ITEMS}
+                defaultValue={String(
+                  initialProfile?.mobilityScores.taxibe ?? 0,
+                )}
               />
-              <ScoreSelect
-                name="mobilityScores.car"
+              <SubSelect
                 label="Voiture"
-                defaultValue={initialProfile?.mobilityScores.car ?? 0}
+                name="mobilityScores.car"
+                items={SCORE_ITEMS}
+                defaultValue={String(initialProfile?.mobilityScores.car ?? 0)}
               />
             </div>
-            <FieldDescription>Viabilité du mode de transport depuis le quartier.</FieldDescription>
+            <FieldDescription>
+              Viabilité du mode de transport depuis le quartier.
+            </FieldDescription>
             <ErrorLine errs={state.fields?.['mobilityScores.walk']} />
             <ErrorLine errs={state.fields?.['mobilityScores.taxibe']} />
             <ErrorLine errs={state.fields?.['mobilityScores.car']} />
           </Field>
 
-          {/* Housing mix */}
           <Field>
             <FieldLabel>Types de logements disponibles</FieldLabel>
             <CheckboxGroup
@@ -165,7 +186,6 @@ export function QuizProfileForm({
             <ErrorLine errs={state.fields?.housingMix} />
           </Field>
 
-          {/* Strengths */}
           <Field>
             <FieldLabel>Points forts (bonus Q6)</FieldLabel>
             <CheckboxGroup
@@ -221,61 +241,79 @@ export function QuizProfileForm({
   )
 }
 
-function RadioRow<T extends string>({
+type SelectItemDef = { value: string; label: string }
+
+/**
+ * Wraps shadcn `<Select>` for the full-row enum fields (priceTier,
+ * vibe). The popup opens `side="bottom"`, matching the landing hero
+ * search bar where the suggestion list drops below the input.
+ *
+ * `items` prop on `Select` (Root) is mandatory per memory
+ * `feedback_base_ui_select` — without it, the trigger renders the raw
+ * value (e.g. `low`) instead of the user-facing label.
+ */
+function EnumSelect({
+  id,
   name,
-  options,
+  items,
   defaultValue,
+  placeholder,
 }: {
+  id?: string
   name: string
-  options: readonly { value: T; label: string }[]
-  defaultValue: T
+  items: readonly SelectItemDef[]
+  defaultValue: string
+  placeholder: string
 }) {
   return (
-    <div className="flex flex-wrap gap-2" role="radiogroup">
-      {options.map((o) => (
-        <label
-          key={o.value}
-          className="inline-flex cursor-pointer items-center gap-2 rounded-md border border-border bg-background px-3 py-1.5 text-[13px] has-[:checked]:border-primary has-[:checked]:bg-primary/[0.08] has-[:checked]:text-primary"
-        >
-          <input
-            type="radio"
-            name={name}
-            value={o.value}
-            defaultChecked={defaultValue === o.value}
-            className="sr-only"
-          />
-          {o.label}
-        </label>
-      ))}
-    </div>
+    <Select name={name} items={[...items]} defaultValue={defaultValue}>
+      <SelectTrigger id={id} className="w-full">
+        <SelectValue placeholder={placeholder} />
+      </SelectTrigger>
+      <SelectContent side="bottom" sideOffset={6} alignItemWithTrigger={false}>
+        {items.map((o) => (
+          <SelectItem key={o.value} value={o.value}>
+            {o.label}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
   )
 }
 
-function ScoreSelect({
-  name,
+/** Score sub-select with its own micro-label (for the grid layouts). */
+function SubSelect({
   label,
+  name,
+  items,
   defaultValue,
 }: {
-  name: string
   label: string
-  defaultValue: number
+  name: string
+  items: readonly SelectItemDef[]
+  defaultValue: string
 }) {
   return (
     <label className="flex flex-col gap-1">
       <span className="text-[11.5px] font-medium uppercase tracking-wider text-muted-foreground">
         {label}
       </span>
-      <select
-        name={name}
-        defaultValue={String(defaultValue)}
-        className="h-9 rounded-md border border-border bg-background px-2 text-[14px] outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
-      >
-        {SCORE_OPTIONS.map((s) => (
-          <option key={s} value={s}>
-            {s}
-          </option>
-        ))}
-      </select>
+      <Select name={name} items={[...items]} defaultValue={defaultValue}>
+        <SelectTrigger className="w-full">
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent
+          side="bottom"
+          sideOffset={6}
+          alignItemWithTrigger={false}
+        >
+          {items.map((o) => (
+            <SelectItem key={o.value} value={o.value}>
+              {o.label}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
     </label>
   )
 }
