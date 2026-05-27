@@ -3874,6 +3874,47 @@ Ces items NE sont PAS du code que je peux écrire. Ils sont sur l'utilisateur ou
 
 ---
 
+### 📦 Session 2026-05-27 (cont. 2) — Lease lifecycle : owner cancel PENDING_TENANT
+
+**1 commit livré** : `cbd13ce`. État `main` = **`cbd13ce`**.
+
+#### Owner cancel PENDING_TENANT — gap critique fermé
+Sans cette feature : un tenant qui ne répond pas → lease bloqué `PENDING_TENANT` à vie, listing masqué via partial unique index, owner peut pas relancer.
+
+**Service** : `ownerCancelPendingLease(leaseId, ownerId, reason)` :
+- `Lease.PENDING_TENANT → REFUSED` (libère le listing)
+- `Payment.CONFIRMED → REFUND_PENDING` (admin examine au cas par cas)
+- `PaymentEvent` audit avec `reason: 'owner_canceled_pending'`
+- Email tenant via `lease-owner-canceled` template (FR + MG)
+
+**Action / UI** : Server Action `ownerCancelLeaseAction` + composant client `LeaseOwnerCancel` (inline form + a11y live region) intégré dans `/dashboard/leases/[id]` quand `isOwner && status === 'PENDING_TENANT'`.
+
+**Tests** : 199/199 vert (7 nouveaux dans `owner-cancel-pending-lease.test.ts`). Typecheck clean.
+
+**Politique refund** : `REFUND_PENDING` queued mais l'admin décide manuellement (cf runbook `payments-goalpay.md §5`) — le frais de signature est techniquement non-refundable, geste commercial au cas par cas.
+
+---
+
+### S2-23 → S2-25 — Nouveaux tickets follow-up
+
+##### S2-23 · `pending-tenant-expire` cron auto-REFUSE
+**Bloqueur** : aucun
+**Description** : aujourd'hui un lease `PENDING_TENANT` ne s'auto-annule jamais. L'owner peut désormais cancel manuellement (Lot précédent), mais un cron qui auto-REFUSE après N jours (ex 14j) protégerait les listings inactifs (owner a oublié). Mirror du pattern `reconcile-stuck-payments`. Inclure un email avant expiration (J-3 par exemple) pour donner au tenant une dernière chance.
+**Fichier** : nouveau `features/leases/services/expire-pending-leases.ts` + route `app/api/cron/expire-pending-leases/route.ts`
+**Effort** : ~2-3h.
+
+##### S2-24 · `ACTIVE → TERMINATED` cron end-of-lease
+**Bloqueur** : aucun (mais peu urgent — aucun lease n'arrivera à end-date en v0)
+**Description** : les leases ACTIVE arrivent à end-date (= `startDate + durationMonths`). Aucun mécanisme actuel ne les transitionne à TERMINATED. Cron daily : `SELECT WHERE status='ACTIVE' AND startDate + durationMonths × 30j < NOW()` → update TERMINATED + email aux 2 parties.
+**Effort** : ~2h.
+
+##### S2-25 · Push notification owner sur tenant.accept/refuse (mobile)
+**Bloqueur** : aucun
+**Description** : owner reçoit email à l'accept/refuse mais pas de push mobile. Pour les owners qui utilisent l'app, push notif via E-T22 infra serait plus immédiat. Service `lease.tenant.signed` + `lease.tenant.refused` events → trigger push via Expo Push API (déjà câblé dans `lib/push/`).
+**Effort** : ~3h.
+
+---
+
 ## 🔁 Audit followups (post 2026-05-20 batch)
 
 - **AUD-001** — Migrer `QuizSubmission.locale` + `WhatsAppAlert.locale` de `String` à enum `Locale` (FR_MG / MG). À faire **avant que les tables aient du volume**. Voir `TODO(audit P2)` dans `prisma/schema.prisma`. Nécessite : (1) migration SQL qui ALTER COLUMN avec USING-cast, (2) MAJ des 2 actions pour écrire `'FR_MG'` / `'MG'` au lieu de `'fr-MG'` / `'mg'`.
