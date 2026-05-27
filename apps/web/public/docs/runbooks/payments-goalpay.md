@@ -59,6 +59,44 @@ peut donc pas lui faire confiance.
 
 ---
 
+## 2.bis Mode TEST sur localhost (vérifié 2026-05-27)
+
+GoalPay a un mode test après tout — accessible via l'onglet « Token de
+test » du dashboard. Aucune transaction réelle, parfait pour vérifier
+les redirects + webhooks avant le test prod 100 Ar.
+
+**Dashboard → onglet TEST → coller** :
+
+| Champ | Valeur localhost | Notes |
+|---|---|---|
+| Paiement réussi | `http://localhost:3000/test/success` | Le browser suit la redirection → localhost direct |
+| Paiement annulé | `http://localhost:3000/test/cancel` | idem |
+| Paiement échoué | `http://localhost:3000/test/fail` | idem |
+| Webhook | `https://<ton-ngrok>.ngrok-free.app/api/goalpay/webhook/test` | GoalPay POSTe depuis SON serveur → besoin d'ngrok |
+
+**.env local** : coller la TEST key (`TGPT_*`) reçue dans le dashboard
+test → `GOALPAY_ACCESS_KEY` + le webhook secret test → `GOALPAY_WEBHOOK_SECRET`.
+Restart `npm run dev` (Next.js charge .env au boot).
+
+**Setup ngrok** (une seule fois) :
+```bash
+# Installer (Windows : winget install ngrok.ngrok ; macOS : brew install ngrok)
+ngrok config add-authtoken <ton-token-depuis-ngrok.com/dashboard>
+
+# Lancer le tunnel sur localhost:3000
+ngrok http 3000
+
+# Copier l'URL https affichée (ex: https://abc123.ngrok-free.app)
+# Coller dans le dashboard GoalPay test : <url>/api/goalpay/webhook/test
+```
+
+**Routes test côté code** (créées dans le commit GoalPay test wiring) :
+- `/test/{success,cancel,fail}` — miroir de `/transaction/*` prod
+- `/api/goalpay/webhook/test` — alias du handler canonique
+  `/api/webhooks/goalpay` (même HMAC verify, même idempotence)
+
+---
+
 ## 3. Tester en prod (pas de sandbox)
 
 GoalPay n'a pas de sandbox documenté. Le test se fait en prod avec un montant minimal.
