@@ -85,6 +85,33 @@ export const mg: Record<MessageKey, string> = {
   'lease.detail.parties.owner': 'Tompon-trano',
   'lease.detail.parties.tenant': 'Mpanofa',
   'lease.detail.signedAt': 'Vita sonia',
+  'lease.detail.reference': 'Ref {ref}',
+  'lease.detail.you': 'ianao',
+  'lease.detail.financial.title': 'Famintinana ara-bola',
+  'lease.detail.financial.platformFee': 'Saran\'ny AryTrano (20% amin\'ny hofa)',
+  'lease.detail.financial.platformFee.tenantPays':
+    'Ity vola ity dia aloanao any amin\'ny AryTrano amin\'ny fotoana faneken\'ny bail. Ny hofa sy ny antoka dia atolotrao mivantana amin\'ny tompon-trano.',
+  'lease.detail.financial.platformFee.ownerInfo':
+    'Ity vola ity dia haloan\'ny mpanofa any amin\'ny AryTrano. Tsy mandoa ianao.',
+  'lease.detail.financial.timing': 'Faharetana {months} volana · Manomboka {date}',
+  'lease.detail.signedOn': 'Vita sonia ny {date}',
+  'lease.detail.pendingAction': 'Miandry hetsika',
+  'lease.detail.statusNext.PENDING_TENANT.tenant':
+    'Manaiky sy mandoa ny saran\'ny AryTrano mba hamavitrika ny bail.',
+  'lease.detail.statusNext.PENDING_TENANT.owner':
+    'Miandry ny faneken\'ny mpanofa sy ny fandoavana ny saran\'ny AryTrano izahay.',
+  'lease.detail.statusNext.ACTIVE': 'Bail mavitrika. Soa raha ho ela.',
+  'lease.detail.statusNext.REFUSED.owner':
+    'Tsy tafita ny bail. Afaka manomboka fanasana hafa avy amin\'ny filazanao ianao.',
+  'lease.detail.statusNext.REFUSED.tenant':
+    'Tsy tafita ity bail ity. Tohizo ny fitadiavana amin\'ny AryTrano.',
+  'lease.detail.statusNext.TERMINATED': 'Vita amin\'ny fomba mahazatra ny bail.',
+  'lease.detail.statusNext.DISPUTED': 'Misy ady misokatra amin\'ity bail ity.',
+  'lease.detail.statusNext.DRAFT': 'Drafy — mbola tsy nalefa tamin\'ny mpanofa.',
+  'lease.detail.active.cta.tenant': 'Tohizo ny fitadiavako',
+  'lease.detail.active.cta.owner': 'Hijery ny filazanay',
+  'lease.detail.refused.cta.tenant': 'Hijery filazana hafa',
+  'lease.detail.refused.cta.owner': 'Hijery ny filazanay',
 
   'lease.tenant.title': 'Asain\'ny tompon-trano hianao hanao sonia',
   'lease.tenant.help':

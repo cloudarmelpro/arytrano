@@ -81,6 +81,33 @@ export const frMG = {
   'lease.detail.parties.owner': 'Propriétaire',
   'lease.detail.parties.tenant': 'Locataire',
   'lease.detail.signedAt': 'A signé',
+  'lease.detail.reference': 'Réf {ref}',
+  'lease.detail.you': 'toi',
+  'lease.detail.financial.title': 'Récapitulatif financier',
+  'lease.detail.financial.platformFee': 'Frais AryTrano (20% du loyer)',
+  'lease.detail.financial.platformFee.tenantPays':
+    'Tu paies ce montant à AryTrano à l’acceptation. Le loyer + la caution sont versés directement au propriétaire (hors AryTrano).',
+  'lease.detail.financial.platformFee.ownerInfo':
+    'Le locataire paiera ce montant à AryTrano à l’acceptation. Toi tu ne paies rien.',
+  'lease.detail.financial.timing': 'Durée {months} mois · Début {date}',
+  'lease.detail.signedOn': 'Signé le {date}',
+  'lease.detail.pendingAction': 'En attente d’action',
+  'lease.detail.statusNext.PENDING_TENANT.tenant':
+    'Accepte et paie les frais AryTrano pour activer le bail.',
+  'lease.detail.statusNext.PENDING_TENANT.owner':
+    'On attend que ton locataire accepte et règle les frais AryTrano.',
+  'lease.detail.statusNext.ACTIVE': 'Bail actif. Bonne installation.',
+  'lease.detail.statusNext.REFUSED.owner':
+    'Le bail n’a pas abouti. Tu peux relancer une autre invitation depuis ton annonce.',
+  'lease.detail.statusNext.REFUSED.tenant':
+    'Ce bail n’a pas abouti. Continue ta recherche sur AryTrano.',
+  'lease.detail.statusNext.TERMINATED': 'Le bail s’est terminé naturellement.',
+  'lease.detail.statusNext.DISPUTED': 'Un litige est ouvert sur ce bail.',
+  'lease.detail.statusNext.DRAFT': 'Brouillon — pas encore envoyé au locataire.',
+  'lease.detail.active.cta.tenant': 'Continuer ma recherche',
+  'lease.detail.active.cta.owner': 'Voir mes annonces',
+  'lease.detail.refused.cta.tenant': 'Voir d’autres annonces',
+  'lease.detail.refused.cta.owner': 'Voir mes annonces',
 
   // Tenant action area on the detail page
   'lease.tenant.title': 'Un propriétaire t’invite à signer',
