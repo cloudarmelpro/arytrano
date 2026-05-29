@@ -3,7 +3,6 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import type { UserRole } from '@prisma/client'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { useT } from '@/lib/i18n/client'
 import type { MessageKey } from '@/lib/i18n/messages'
 // Import the action DIRECTLY (not via `@/features/auth` index) — the
@@ -24,12 +23,6 @@ type Section = {
   /** Render this section only for these roles. `null` = everyone. */
   roles: null | UserRole[]
   items: Item[]
-}
-
-export type AccountSidebarUser = {
-  name: string | null
-  email: string
-  image: string | null
 }
 
 function IconHome() {
@@ -164,25 +157,6 @@ function IconFileSignature() {
   )
 }
 
-function IconCog() {
-  return (
-    <svg
-      width="14"
-      height="14"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.8"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      <circle cx="12" cy="12" r="3" />
-      <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
-    </svg>
-  )
-}
-
 /**
  * Top-level section roots (e.g. `/dashboard`) match only on exact pathname
  * — otherwise their prefix swallows every sub-route and the overview link
@@ -249,13 +223,7 @@ const SECTIONS: Section[] = [
   },
 ]
 
-export function AccountSidebar({
-  role,
-  user,
-}: {
-  role: UserRole
-  user: AccountSidebarUser
-}) {
+export function AccountSidebar({ role }: { role: UserRole }) {
   const pathname = usePathname()
   const t = useT()
 
@@ -263,35 +231,8 @@ export function AccountSidebar({
     (s) => s.roles === null || s.roles.includes(role),
   )
 
-  const firstName = user.name?.trim().split(/\s+/)[0] ?? null
-  const initial =
-    user.name?.[0]?.toUpperCase() ?? user.email[0]?.toUpperCase() ?? 'A'
-
   return (
     <aside className="md:w-60">
-      {/* User-info card — matches the inside-page sidebar header from the design ref. */}
-      <div className="mb-6 flex items-center gap-3 rounded-md px-2 py-2">
-        <Avatar className="h-10 w-10 ring-1 ring-border">
-          {user.image && <AvatarImage src={user.image} alt={user.name ?? user.email} />}
-          <AvatarFallback className="text-sm font-semibold text-primary">
-            {initial}
-          </AvatarFallback>
-        </Avatar>
-        <div className="min-w-0 flex-1">
-          <p className="truncate text-sm font-semibold text-foreground">
-            {firstName ?? user.email.split('@')[0]}
-          </p>
-          <p className="truncate text-xs text-muted-foreground">{user.email}</p>
-        </div>
-        <Link
-          href="/dashboard/profile"
-          aria-label={t('sidebar.profile')}
-          className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-muted-foreground transition hover:bg-muted hover:text-foreground"
-        >
-          <IconCog />
-        </Link>
-      </div>
-
       <nav aria-label={t('sidebar.myAccount')} className="flex flex-col gap-6">
         {visibleSections.map((section) => (
           <div key={section.labelKey} className="flex flex-col gap-2">
