@@ -37,10 +37,7 @@ export const POST = withErrorHandling(async (req: Request) => {
     case 'ok':
       return ok({
         leaseId: result.leaseId,
-        paymentId: result.paymentId,
-        checkoutUrl: result.checkoutUrl,
-        expiresInMinutes: result.expiresInMinutes,
-        fees: result.fees,
+        platformFeeMGA: result.platformFeeMGA,
       })
     case 'listing_not_found':
       throw errors.notFound(t('lease.error.listingNotFound'))

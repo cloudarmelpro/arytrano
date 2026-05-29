@@ -10,42 +10,53 @@ import {
   FieldLabel,
 } from '@/components/ui/field'
 import { useT } from '@/lib/i18n/client'
-import {
-  tenantSignLeaseAction,
-  tenantRefuseLeaseAction,
-} from '../actions/sign-lease'
+import { formatAriary } from '@/lib/format/currency'
+import { tenantPayLeaseAction } from '../actions/pay-lease'
+import { tenantRefuseLeaseAction } from '../actions/sign-lease'
 import { useLeaseAction } from './use-lease-action'
 
 /**
- * Tenant-side action buttons for a PENDING_TENANT lease.
+ * Tenant-side action buttons for a PENDING_TENANT lease (revised E-T26).
  *
- * Two paths:
- *   - Accept    → Server Action tenantSignLeaseAction → Lease ACTIVE
- *   - Refuse    → opens inline reason textarea → tenantRefuseLeaseAction
+ * Two paths :
+ *   - Accept + pay → Server Action `tenantPayLeaseAction` → redirects
+ *     to GoalPay checkout for the platform fee (= 20% × monthly rent).
+ *     After payment success the webhook flips the lease to ACTIVE.
+ *   - Refuse → opens inline reason textarea → `tenantRefuseLeaseAction`
  *
- * Both Server Actions revalidate the lease detail + list pages.
+ * The Pay CTA shows the exact amount the tenant will be charged so
+ * there is no surprise at the GoalPay checkout screen.
  *
- * A11Y-H1 audit fix — the `aria-live="polite"` status region announces
- * the outcome to screen readers BEFORE `router.refresh()` re-renders
- * the page. Without this, a tenant clicking "Accepter" or "Refuser"
- * gets no programmatic confirmation that the action succeeded.
+ * Memory rules : `feedback_shadcn_primitives_only`, `feedback_loading_states`,
+ * `feedback_server_action_authn_guard`.
  */
-export function LeaseTenantActions({ leaseId }: { leaseId: string }) {
+export function LeaseTenantActions({
+  leaseId,
+  platformFeeMGA,
+}: {
+  leaseId: string
+  /** Snapshot of what the tenant pays — shown on the Accept CTA. */
+  platformFeeMGA: number
+}) {
   const t = useT()
   const router = useRouter()
   const { pending, serverError, run } = useLeaseAction()
   const [refuseOpen, setRefuseOpen] = useState(false)
   const [reason, setReason] = useState('')
-  const [outcome, setOutcome] = useState<'signed' | 'refused' | null>(null)
+  const [outcome, setOutcome] = useState<'refused' | null>(null)
 
-  function accept() {
+  function acceptAndPay() {
     setOutcome(null)
     const fd = new FormData()
     fd.set('leaseId', leaseId)
+    // Pay action does the GoalPay redirect server-side via redirect()
+    // which throws. The Server Action result only surfaces an error
+    // state — success never returns to the client.
     run(
-      () => tenantSignLeaseAction({ ok: false }, fd),
+      () => tenantPayLeaseAction({ ok: false }, fd),
       () => {
-        setOutcome('signed')
+        // No-op on the "ok" return — only fires on already_paid case
+        // (race between Accept clicks vs webhook). Refresh the page.
         router.refresh()
       },
     )
@@ -75,11 +86,13 @@ export function LeaseTenantActions({ leaseId }: { leaseId: string }) {
           <Button
             type="button"
             size="lg"
-            onClick={accept}
+            onClick={acceptAndPay}
             disabled={pending}
             className="gap-2 px-6"
           >
-            {t('lease.tenant.cta.accept')}
+            {t('lease.tenant.cta.acceptAndPay', {
+              amount: formatAriary(platformFeeMGA),
+            })}
           </Button>
           <Button
             type="button"
@@ -130,14 +143,8 @@ export function LeaseTenantActions({ leaseId }: { leaseId: string }) {
         </form>
       )}
 
-      {/* Outcome announcement — aria-live="polite" so accept/refuse
-          success is read out before router.refresh() rewinds the DOM. */}
       <div role="status" aria-live="polite" className="sr-only">
-        {outcome === 'signed'
-          ? t('lease.tenant.outcome.signed')
-          : outcome === 'refused'
-            ? t('lease.tenant.outcome.refused')
-            : ''}
+        {outcome === 'refused' ? t('lease.tenant.outcome.refused') : ''}
       </div>
 
       {serverError ? (

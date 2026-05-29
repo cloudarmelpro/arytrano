@@ -56,8 +56,13 @@ export const mg: Record<MessageKey, string> = {
   'lease.fees.total': 'Tontaliny aloa izao',
   'lease.cta.payAndSign': 'Aloa ary manao sonia',
   'lease.cta.loading': 'Manomana ny fandoavam-bola…',
+  'lease.cta.create': 'Hamorona bail',
+  'lease.cta.creating': 'Mamorona ny bail…',
   'lease.cta.microcopy':
-    'Halefa any amin\'ny GoalPay ianao. Ny bail dia mavitrika aorian\'ny faneken\'ny mpanofa.',
+    'Tsy mandoa na inona na inona ianao. Ny mpanofa no mandoa 20%-n\'ny hofan-trano ho an\'ny AryTrano rehefa manaiky.',
+  'lease.fees.platform.label': 'Aloan\'ny mpanofa ho an\'ny AryTrano',
+  'lease.fees.platform.help':
+    'Saran\'ny AryTrano : 20%-n\'ny hofan-trano isam-bolana, aloan\'ny mpanofa amin\'ny fotoana fanaovan-tsonia. Tsy mandoa ianao.',
 
   'lease.list.eyebrow': 'Ireo bail-ko',
   'lease.list.title': 'Ny bail-nao ao amin\'ny AryTrano',
@@ -85,6 +90,7 @@ export const mg: Record<MessageKey, string> = {
   'lease.tenant.help':
     'Jereo ny fepetra etsy ambony. Raha tsara daholo, ekeo ny bail mba ho lasa mavitrika.',
   'lease.tenant.cta.accept': 'Ekena ary atao sonia',
+  'lease.tenant.cta.acceptAndPay': 'Ekena ary aloa {amount}',
   'lease.tenant.cta.refuse': 'Lavina',
   'lease.tenant.refuse.reason.label': 'Antony nandavana (tsy voatery)',
   'lease.tenant.refuse.reason.placeholder':
@@ -140,6 +146,10 @@ export const mg: Record<MessageKey, string> = {
     'Tsy azo lavina intsony ity bail ity (toetra : {status}).',
   'lease.error.cannotCancel':
     'Tsy azo foanana intsony ity bail ity (toetra : {status}).',
+  'lease.error.cannotPay':
+    'Tsy azo aloana intsony ity bail ity (toetra : {status}).',
+  'lease.error.alreadyPaid':
+    'Efa eo am-pananganana ity bail ity. Andraso segondra vitsy dia avoaro indray ny pejy.',
   'lease.error.payloadTooLarge': 'Lehibe loatra ny data nalefa.',
   'sidebar.myLeases': 'Ireo bail-ko',
   'sidebar.section.tenant': 'Mpanofa',

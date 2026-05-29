@@ -13,9 +13,10 @@ export type InitiateLeaseActionState = {
   ok: boolean
   message?: string
   fields?: Record<string, string[]>
-  /** Returned on success — used by the client to redirect to GoalPay checkout. */
-  checkoutUrl?: string
+  /** Returned on success — used by the client to redirect to the lease detail page. */
   leaseId?: string
+  /** Snapshot of what the tenant will pay (for the wizard success page). */
+  platformFeeMGA?: number
 }
 
 export async function initiateLeaseAction(
@@ -71,13 +72,13 @@ export async function initiateLeaseAction(
 
   switch (result.kind) {
     case 'ok':
-      // Don't redirect server-side — the client needs the checkoutUrl
-      // to navigate to GoalPay's hosted checkout. We return it and let
-      // the form submit handler do `window.location.href = url`.
+      // Revised E-T26 (2026-05-27) — owner pays nothing. The wizard
+      // returns the leaseId so the client navigates to the lease
+      // detail page where the owner can monitor tenant acceptance.
       return {
         ok: true,
-        checkoutUrl: result.checkoutUrl,
         leaseId: result.leaseId,
+        platformFeeMGA: result.platformFeeMGA,
       }
     case 'listing_not_found':
       return { ok: false, message: t('lease.error.listingNotFound') }

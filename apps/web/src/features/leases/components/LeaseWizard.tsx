@@ -14,7 +14,7 @@ import {
 import { Icon } from '@/components/shared/Icon'
 import { useT } from '@/lib/i18n/client'
 import { formatAriary } from '@/lib/format/currency'
-import { calculateLeaseFees } from '../calculate-fees'
+import { calculatePlatformFee } from '../calculate-fees'
 import { initiateLeaseAction } from '../actions/initiate-lease'
 import { useLeaseAction } from './use-lease-action'
 
@@ -48,7 +48,10 @@ export function LeaseWizard({
   // here. This keeps the public listing display and the lease totals
   // perfectly aligned (no surprise upcharge at signing).
   const cautionMGA = monthlyRentMGA * cautionMonths
-  const previewFees = calculateLeaseFees({ cautionMGA })
+  // Revised E-T26 (2026-05-27) — the owner pays nothing. The preview
+  // shows what the TENANT will be charged at lease acceptance, as a
+  // transparency / educational block for the owner.
+  const previewFees = calculatePlatformFee({ monthlyRentMGA })
 
   // Audit PF-M1 fix — memoize today's ISO date so we don't recompute
   // `new Date()` on every render. The `min` attribute on the date input
@@ -62,9 +65,10 @@ export function LeaseWizard({
     run(
       () => initiateLeaseAction({ ok: false }, formData),
       (result) => {
-        if (result.checkoutUrl) {
-          window.location.href = result.checkoutUrl
-        } else if (result.leaseId) {
+        // Revised E-T26 — no GoalPay redirect from the owner side.
+        // Lease is created in PENDING_TENANT and the tenant pays from
+        // the lease detail page.
+        if (result.leaseId) {
           router.push(`/dashboard/leases/${result.leaseId}`)
         }
       },
@@ -290,9 +294,9 @@ export function LeaseWizard({
           </p>
         </header>
 
-        {/* Live fee preview — magazine pull-quote style.
-            A11Y-M4 audit fix — aria-labelledby on the <dl> so screen
-            readers announce "Récapitulatif des frais" when entering. */}
+        {/* Revised E-T26 fee preview — what the TENANT will pay at
+            acceptance. The owner pays NOTHING; this block exists for
+            transparency so the owner knows what their tenant sees. */}
         <div className="rounded-2xl border border-border bg-muted/30 p-6">
           <span id="lease-fee-recap-label" className="sr-only">
             {t('lease.wizard.feeRecap.label')}
@@ -303,28 +307,15 @@ export function LeaseWizard({
           >
             <div className="flex items-baseline justify-between gap-4">
               <dt className="text-[14px] text-foreground/70">
-                {t('lease.fees.signature')}
-              </dt>
-              <dd className="font-mono text-[15px] font-semibold tabular-nums text-foreground">
-                {formatAriary(previewFees.signatureFeeMGA)}
-              </dd>
-            </div>
-            <div className="flex items-baseline justify-between gap-4">
-              <dt className="text-[14px] text-foreground/70">
-                {t('lease.fees.commission')}
-              </dt>
-              <dd className="font-mono text-[15px] font-semibold tabular-nums text-foreground">
-                {formatAriary(previewFees.cautionCommissionMGA)}
-              </dd>
-            </div>
-            <div className="mt-1 flex items-baseline justify-between gap-4 border-t border-border pt-3">
-              <dt className="text-[15px] font-bold text-foreground">
-                {t('lease.fees.total')}
+                {t('lease.fees.platform.label')}
               </dt>
               <dd className="font-serif text-[clamp(24px,2.6vw,32px)] font-normal tabular-nums leading-none text-primary">
-                {formatAriary(previewFees.totalMGA)}
+                {formatAriary(previewFees.platformFeeMGA)}
               </dd>
             </div>
+            <p className="text-[12.5px] leading-[1.5] text-foreground/55">
+              {t('lease.fees.platform.help')}
+            </p>
           </dl>
         </div>
 
@@ -338,12 +329,11 @@ export function LeaseWizard({
         ) : null}
 
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
-          {/* A11y audit H3 fix — `aria-busy` on a <form> is not well
-              supported across screen readers. A visually hidden polite
-              live-region near the submit button gives a reliable
-              announcement when the wizard is awaiting GoalPay redirect. */}
+          {/* A11y audit H3 fix — polite live-region near the submit
+              button for SR users. Revised E-T26 — wording is now
+              "creating the lease" not "initialising payment". */}
           <span aria-live="polite" className="sr-only">
-            {pending ? t('lease.cta.loading') : ''}
+            {pending ? t('lease.cta.creating') : ''}
           </span>
           <Button
             type="submit"
@@ -359,7 +349,7 @@ export function LeaseWizard({
             ) : (
               <Icon name="arrow-right" size={16} />
             )}
-            {t('lease.cta.payAndSign')}
+            {t('lease.cta.create')}
           </Button>
           <p className="text-[12.5px] font-medium text-foreground/55">
             {t('lease.cta.microcopy')}

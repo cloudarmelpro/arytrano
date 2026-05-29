@@ -1,47 +1,45 @@
-import {
-  LEASE_SIGNATURE_FEE_MGA,
-  CAUTION_COMMISSION_RATE,
-  CAUTION_COMMISSION_CAP_MGA,
-} from './config'
+import { PLATFORM_FEE_RATE, PLATFORM_FEE_CAP_MGA } from './config'
 
 /**
- * Pure fee calculator — no DB, no IO. Used by both the wizard recap UI
- * and the `initiate-lease` service so the visible total matches the
- * actual charge to the rounding bit.
+ * Pure platform-fee calculator — no DB, no IO. Used by :
+ *   - The owner wizard (`LeaseWizard.tsx`) to preview what the tenant
+ *     will pay BEFORE the lease is created — owner sees this as a
+ *     transparency / explainer block.
+ *   - The tenant action component (`LeaseTenantActions.tsx`) to show
+ *     the exact amount on the "Accepter et payer" CTA.
+ *   - The `initiate-lease` service to snapshot `platformFeeMGA` on
+ *     the Lease row at creation time.
+ *   - The `tenant-initiate-payment` service to send the right amount
+ *     to GoalPay at the tenant-acceptance step.
  *
- * Returns Int Ariary (memory `project_mga_no_subunit`). Caution
- * commission is `floor(caution × rate)` to avoid charging more than
- * the visible figure when the visitor sees a rounded percentage.
+ * Returns Int Ariary (memory `project_mga_no_subunit`). The fee is
+ * `floor(monthlyRent × rate)` to avoid charging more than the visible
+ * rounded percentage. If a CAP is configured and exceeded, the cap
+ * wins.
  *
  * Always re-validate inputs at the service boundary — this function
  * trusts what it receives and does no Zod parsing.
  */
-export interface LeaseFees {
-  /** Flat signature fee (currently 15 000 Ar). */
-  signatureFeeMGA: number
-  /** Commission on the caution (floored). */
-  cautionCommissionMGA: number
-  /** Sum: signatureFee + cautionCommission. */
-  totalMGA: number
+export interface PlatformFee {
+  /** Platform fee charged to the TENANT at lease acceptance. */
+  platformFeeMGA: number
 }
 
-export function calculateLeaseFees(input: {
-  cautionMGA: number
-}): LeaseFees {
-  if (!Number.isInteger(input.cautionMGA) || input.cautionMGA < 0) {
-    throw new RangeError(`Invalid cautionMGA: ${input.cautionMGA}`)
+export function calculatePlatformFee(input: {
+  monthlyRentMGA: number
+}): PlatformFee {
+  if (!Number.isInteger(input.monthlyRentMGA) || input.monthlyRentMGA < 0) {
+    throw new RangeError(
+      `Invalid monthlyRentMGA: ${input.monthlyRentMGA}`,
+    )
   }
 
-  const signatureFeeMGA = LEASE_SIGNATURE_FEE_MGA
-  let cautionCommissionMGA = Math.floor(
-    input.cautionMGA * CAUTION_COMMISSION_RATE,
-  )
+  let platformFeeMGA = Math.floor(input.monthlyRentMGA * PLATFORM_FEE_RATE)
   if (
-    CAUTION_COMMISSION_CAP_MGA !== null &&
-    cautionCommissionMGA > CAUTION_COMMISSION_CAP_MGA
+    PLATFORM_FEE_CAP_MGA !== null &&
+    platformFeeMGA > PLATFORM_FEE_CAP_MGA
   ) {
-    cautionCommissionMGA = CAUTION_COMMISSION_CAP_MGA
+    platformFeeMGA = PLATFORM_FEE_CAP_MGA
   }
-  const totalMGA = signatureFeeMGA + cautionCommissionMGA
-  return { signatureFeeMGA, cautionCommissionMGA, totalMGA }
+  return { platformFeeMGA }
 }

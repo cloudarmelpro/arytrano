@@ -1,37 +1,36 @@
 /**
- * E-T26 — Lease success-fee configuration.
+ * E-T26 (revised 2026-05-27) — Lease platform-fee configuration.
  *
  * SEC-L6 audit note — CLIENT-SAFE MODULE. Imported by `LeaseWizard.tsx`
- * (a Client Component) for the live fee recap. Do NOT put secrets,
- * provider keys, or any server-only constants in this file — they
- * would ship to the client bundle. Server-only fee logic belongs in
- * `services/` next to the Prisma calls that consume it.
+ * (a Client Component) for the live fee preview AND by `LeaseTenantActions.tsx`
+ * (also Client) for the tenant-side "pay 20% to accept" CTA. Do NOT
+ * put secrets or server-only constants here — they would ship to the
+ * client bundle. Server-only fee logic belongs in `services/` next
+ * to the Prisma calls that consume it.
  *
- * These are PUBLIC business constants (visible on the /proprietaires
- * pricing page). Stored as code, not env, so a deploy misconfiguration
- * can't quietly debit a different amount than what the marketing page
- * promises.
+ * Business model (post-2026-05-27 switch) :
+ *   - The TENANT pays AryTrano a one-time platform fee at lease acceptance.
+ *   - The fee = 20% of the monthly rent (PLATFORM_FEE_RATE × monthlyRentMGA, floored).
+ *   - The OWNER pays AryTrano NOTHING. Rent + caution flow offline
+ *     between tenant and owner (Mobile Money outside the platform).
  *
- * If the fee structure changes (e.g. promo period), edit here AND the
- * `/proprietaires` page i18n keys together. Historical Lease rows keep
- * their original `signatureFeeMGA` / `cautionCommissionMGA` (snapshot
- * at signing time) so audit + reconciliation are unaffected.
+ * If the rate ever changes (promo, premium tier, regional split), edit
+ * here AND the `/proprietaires` + `/comment-ca-marche` i18n pages
+ * together. Historical Lease rows keep their original `platformFeeMGA`
+ * (snapshot at signing time) so audit + reconciliation are unaffected.
  */
-
-/** Flat per-lease signature fee, in Ariary (Int — no subunit). */
-export const LEASE_SIGNATURE_FEE_MGA = 15_000
 
 /**
- * Commission on the caution, expressed as a fraction (0.08 = 8 %).
- * Applied to `cautionMGA` and floored to the nearest Ariary integer.
- * Set to `0` if you want to test signature-fee-only flows.
+ * Platform fee rate as a fraction of the monthly rent (0.20 = 20%).
+ * Applied at lease acceptance, charged to the tenant via GoalPay.
+ * Floored to the nearest Ariary integer.
  */
-export const CAUTION_COMMISSION_RATE = 0.08
+export const PLATFORM_FEE_RATE = 0.2
 
 /**
- * Cap on the caution commission (Ariary). Protects against eye-watering
- * fees on luxury rentals — Booking-style soft ceiling. Set to `null` to
- * disable the cap entirely. The marketing page math (~55k Ar example)
- * assumes no cap kicks in for typical Madagascar rentals.
+ * Optional cap on the platform fee, in Ariary. Set to `null` to
+ * disable. Useful if luxury rentals would produce a fee that scares
+ * tenants away — Booking-style soft ceiling. Default null until we
+ * see real data.
  */
-export const CAUTION_COMMISSION_CAP_MGA: number | null = null
+export const PLATFORM_FEE_CAP_MGA: number | null = null

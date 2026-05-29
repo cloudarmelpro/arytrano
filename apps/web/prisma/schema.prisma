@@ -726,18 +726,20 @@ model Lease {
   cautionMGA           Int          @default(0)
   startDate            DateTime
   durationMonths       Int
-  // Computed at creation from CONSTANTS:
-  //   signatureFeeMGA      = LEASE_SIGNATURE_FEE_MGA (default 15 000)
-  //   cautionCommissionMGA = floor(cautionMGA × CAUTION_COMMISSION_RATE)
-  // Stored on the row so historical leases reflect the fee structure
-  // at the time of signing (audit trail). Don't recompute from current
-  // constants — fees may change over time.
-  signatureFeeMGA      Int
-  cautionCommissionMGA Int
+  // E-T26 (revised 2026-05-27) — platform fee charged to the TENANT
+  // at lease acceptance, NOT the owner. Default rate is 20% of the
+  // monthly rent (= PLATFORM_FEE_RATE × monthlyRentMGA, floored).
+  // Snapshotted on the row so a future rate change leaves audit trails
+  // intact. Owner pays nothing to AryTrano — the rent + caution flow
+  // directly between tenant and owner offline.
+  platformFeeMGA       Int          @default(0)
   paymentId            String?      @unique
-  status               LeaseStatus  @default(DRAFT)
-  ownerSignedAt        DateTime?    // set when payment CONFIRMED
-  tenantSignedAt       DateTime?    // set when tenant accepts
+  status               LeaseStatus  @default(PENDING_TENANT)
+  // ownerSignedAt now set at lease CREATION (owner commit = create
+  // the lease wizard; no payment step on owner side). tenantSignedAt
+  // set when the tenant pays + transition to ACTIVE.
+  ownerSignedAt        DateTime?
+  tenantSignedAt       DateTime?
   terminatedAt         DateTime?
   createdAt            DateTime     @default(now())
   updatedAt            DateTime     @updatedAt
@@ -754,11 +756,15 @@ model Lease {
 }
 
 enum LeaseStatus {
-  DRAFT             // owner draft, no payment yet
-  PENDING_TENANT    // owner signed + paid; tenant must accept
-  ACTIVE            // both parties signed
-  REFUSED           // tenant refused → refund flow
-  TERMINATED        // lease ended (TERMINATED at end of durationMonths)
+  // DRAFT is vestigial in the new tenant-pays model — owner creates
+  // a lease directly into PENDING_TENANT. Kept in the enum for
+  // backward compatibility with historical rows and future flows
+  // (admin tooling that might park a lease in DRAFT pre-tenant invite).
+  DRAFT
+  PENDING_TENANT    // owner created the lease; tenant must accept + pay
+  ACTIVE            // tenant accepted, paid the platform fee, lease live
+  REFUSED           // tenant refused OR owner canceled before tenant paid
+  TERMINATED        // lease ended (at end of durationMonths)
   DISPUTED          // E-T27 arbitrage open
 }
 

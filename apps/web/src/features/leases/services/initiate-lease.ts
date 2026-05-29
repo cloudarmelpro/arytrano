@@ -1,43 +1,38 @@
 import 'server-only'
 import { prisma } from '@/lib/db'
-import { goalPayProvider } from '@/features/payments/server'
 import {
   initiateLeaseInputSchema,
   type InitiateLeaseInput,
 } from '../schemas/lease-input'
-import { calculateLeaseFees } from '../calculate-fees'
+import { calculatePlatformFee } from '../calculate-fees'
 
 /**
- * Owner-initiated lease + signature payment.
+ * Owner-initiated lease creation (revised E-T26, 2026-05-27).
+ *
+ * NEW MODEL : the owner pays NOTHING to AryTrano. The tenant pays the
+ * platform fee (= 20% × monthlyRent, snapshotted) when they ACCEPT
+ * the lease via the dashboard. Rent + caution still flow OFFLINE
+ * between tenant and owner.
  *
  * Flow :
  *   1. Validate input (Zod)
  *   2. Verify the listing belongs to the caller and is rentable
  *   3. Find the tenant User by email (must already have an AryTrano account)
  *   4. Reject if the listing already has an active or pending lease
- *   5. Calculate fees (snapshot in the row)
- *   6. Create Payment + Lease (DRAFT) in a single transaction
- *   7. Call GoalPay to get a checkout URL
- *   8. Update Payment with providerTxId + expiresAt
- *   9. Return checkoutUrl + leaseId to the caller (Server Action / REST handler)
+ *   5. Snapshot the platform fee (% × monthly rent) on the Lease row
+ *   6. Create Lease in `PENDING_TENANT` straight away — `ownerSignedAt`
+ *      = now, since "creating the lease" is the owner's commitment.
+ *   7. Return the leaseId — the wizard redirects to the detail page.
  *
- * The Lease stays in DRAFT until the webhook arrives. The webhook
- * handler (record-webhook-event hook in E-T26 ④) moves it to
- * PENDING_TENANT on payment.success, and notifies the tenant.
- *
- * Side-effects beyond DB writes (email tenant invite, push notif) are
- * deferred to the webhook step — at initiation time the payment is
- * not confirmed yet, so we don't notify anyone.
+ * No GoalPay call here anymore. The Payment row is created only when
+ * the tenant clicks "Accepter et payer" (see tenant-initiate-payment).
  */
 
 export type InitiateLeaseResult =
   | {
       kind: 'ok'
       leaseId: string
-      paymentId: string
-      checkoutUrl: string
-      expiresInMinutes: number
-      fees: { signatureFeeMGA: number; cautionCommissionMGA: number; totalMGA: number }
+      platformFeeMGA: number
     }
   | { kind: 'listing_not_found' }
   | { kind: 'listing_not_owned' }
@@ -64,17 +59,15 @@ export async function initiateLease(
   }
   const input: InitiateLeaseInput = parsed.data
 
-  // 2) Verify listing ownership + rentable status. We also read
-  //    `priceMonthlyMGA` and `cautionMonths` here so the caution amount
-  //    is DERIVED server-side (single source of truth on the listing,
-  //    never re-input from the lease wizard — owner can't fudge it).
+  // 2) Verify listing ownership + rentable status. Read priceMonthlyMGA
+  //    + cautionMonths here so the cautionMGA and platformFeeMGA are
+  //    DERIVED server-side (single source of truth on the listing).
   const listing = await prisma.listing.findUnique({
     where: { id: input.listingId },
     select: {
       id: true,
       ownerId: true,
       status: true,
-      title: true,
       priceMonthlyMGA: true,
       cautionMonths: true,
     },
@@ -98,8 +91,6 @@ export async function initiateLease(
   }
 
   // 4) Reject if the listing already has an active or pending lease.
-  //    DRAFT leases (owner started wizard but never paid) are NOT
-  //    blocking — they'll naturally expire (no cron yet, follow-up).
   const blockingLease = await prisma.lease.findFirst({
     where: {
       listingId: listing.id,
@@ -115,121 +106,35 @@ export async function initiateLease(
     }
   }
 
-  // 5) Derive caution from listing (NEVER from wizard input — single
-  //    source of truth = the listing). Snapshot the value on the Lease
-  //    row so historical leases survive future listing edits.
+  // 5) Snapshot the fee derived from the listing's current monthly rent.
   const cautionMGA = listing.priceMonthlyMGA * listing.cautionMonths
-  const fees = calculateLeaseFees({ cautionMGA })
-
-  // 6) Generate the idempotency key (also our merchant `reference`
-  //    sent to GoalPay). Using a stable cuid here lets us safely
-  //    retry the create-Lease step if the user double-clicks.
-  const idempotencyKey = `lease_${cryptoRandomCuid()}`
-
-  // 7) Create Payment + Lease in a transaction.
-  //    Payment.expiresAt is left null here; we set it after the
-  //    GoalPay call returns the real `expires_in_minutes`.
-  const created = await prisma.$transaction(async (tx) => {
-    const payment = await tx.payment.create({
-      data: {
-        userId: ownerId,
-        listingId: listing.id,
-        idempotencyKey,
-        provider: 'GOALPAY',
-        amountMGA: fees.totalMGA,
-        purpose: 'LEASE_SUCCESS_FEE',
-        status: 'INITIATED',
-      },
-      select: { id: true },
-    })
-    const lease = await tx.lease.create({
-      data: {
-        listingId: listing.id,
-        ownerId,
-        tenantId: tenant.id,
-        // SEC-H2 audit fix — `monthlyRentMGA` is sourced from the
-        // listing, NEVER from form input. An owner cannot write a
-        // contract value that diverges from the published listing price.
-        monthlyRentMGA: listing.priceMonthlyMGA,
-        cautionMGA,
-        startDate: input.startDate,
-        durationMonths: input.durationMonths,
-        signatureFeeMGA: fees.signatureFeeMGA,
-        cautionCommissionMGA: fees.cautionCommissionMGA,
-        paymentId: payment.id,
-        status: 'DRAFT',
-      },
-      select: { id: true },
-    })
-    return { paymentId: payment.id, leaseId: lease.id }
+  const { platformFeeMGA } = calculatePlatformFee({
+    monthlyRentMGA: listing.priceMonthlyMGA,
   })
 
-  // 8) Call GoalPay. If this fails AFTER the DB transaction succeeded,
-  //    we have a Payment in INITIATED with no providerTxId — that's
-  //    expected and the reconciliation cron (E-T20) will mark it
-  //    stuck/expired after 12h.
-  const goalPayResponse = await goalPayProvider.initiate({
-    reference: idempotencyKey,
-    amountMGA: fees.totalMGA,
-    description: `Bail AryTrano — ${listing.title}`,
-    metadata: [
-      {
-        label: 'Frais de signature AryTrano',
-        unit_price: fees.signatureFeeMGA,
-        quantity: 1,
-      },
-      ...(fees.cautionCommissionMGA > 0
-        ? [
-            {
-              label: `Commission caution (8% × ${cautionMGA.toLocaleString('fr-FR')} Ar)`,
-              unit_price: fees.cautionCommissionMGA,
-              quantity: 1,
-            },
-          ]
-        : []),
-    ],
-  })
-
-  // 9) Persist provider-side info
+  // 6) Create the Lease in PENDING_TENANT straight away — owner
+  //    commits by creating, no payment step required.
   const now = new Date()
-  const expiresAt = new Date(
-    now.getTime() + goalPayResponse.expiresInMinutes * 60_000,
-  )
-  await prisma.payment.update({
-    where: { id: created.paymentId },
+  const lease = await prisma.lease.create({
     data: {
-      providerTxId: goalPayResponse.providerTxId,
-      expiresAt,
+      listingId: listing.id,
+      ownerId,
+      tenantId: tenant.id,
+      // SEC-H2 audit fix — monthlyRentMGA + cautionMGA sourced server-side.
+      monthlyRentMGA: listing.priceMonthlyMGA,
+      cautionMGA,
+      startDate: input.startDate,
+      durationMonths: input.durationMonths,
+      platformFeeMGA,
+      status: 'PENDING_TENANT',
+      ownerSignedAt: now,
     },
+    select: { id: true },
   })
 
   return {
     kind: 'ok',
-    leaseId: created.leaseId,
-    paymentId: created.paymentId,
-    checkoutUrl: goalPayResponse.checkoutUrl,
-    expiresInMinutes: goalPayResponse.expiresInMinutes,
-    fees,
+    leaseId: lease.id,
+    platformFeeMGA,
   }
-}
-
-/**
- * Lightweight cuid-like random id for the idempotencyKey. Not a real
- * cuid (no monotonicity, no machine fingerprint) — just enough entropy
- * to avoid collisions across concurrent inits. cuid is already used
- * for primary keys via Prisma; we generate ours here to avoid pulling
- * `@paralleldrive/cuid2` into the client bundle.
- *
- * SECURITY note (audit S-M1) — this value MUST stay unguessable :
- * it flows out as the GoalPay `reference` AND resurfaces in the
- * `/transaction/{done,canceled,fail}?reference=` redirect URLs. The
- * owner-only ownership check on the redirect pages prevents leak
- * even if guessed, but a future refactor that ever shortened this
- * to a nano-id "for readability" would weaken that defense. Keep at
- * 96 bits of `crypto.getRandomValues` minimum.
- */
-function cryptoRandomCuid(): string {
-  const bytes = new Uint8Array(12)
-  crypto.getRandomValues(bytes)
-  return Array.from(bytes, (b) => b.toString(16).padStart(2, '0')).join('')
 }

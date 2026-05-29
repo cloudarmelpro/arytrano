@@ -50,8 +50,13 @@ export const frMG = {
   'lease.fees.total': 'Total à payer maintenant',
   'lease.cta.payAndSign': 'Payer et signer',
   'lease.cta.loading': 'Initialisation du paiement…',
+  'lease.cta.create': 'Créer le bail',
+  'lease.cta.creating': 'Création du bail…',
   'lease.cta.microcopy':
-    'Tu seras redirigé vers GoalPay. Le bail s’active après l’acceptation du locataire.',
+    'Tu ne paies rien. Le locataire paie 20% du loyer à AryTrano au moment où il accepte.',
+  'lease.fees.platform.label': 'Le locataire paiera à AryTrano',
+  'lease.fees.platform.help':
+    'Frais AryTrano : 20% du loyer mensuel, dûs par le locataire à la signature. Toi tu ne paies rien.',
 
   // Lease list (/dashboard/leases)
   'lease.list.eyebrow': 'Mes baux',
@@ -82,6 +87,7 @@ export const frMG = {
   'lease.tenant.help':
     'Vérifie les conditions ci-dessus. Si tout est correct, accepte le bail pour le rendre actif.',
   'lease.tenant.cta.accept': 'Accepter et signer',
+  'lease.tenant.cta.acceptAndPay': 'Accepter et payer {amount}',
   'lease.tenant.cta.refuse': 'Refuser',
   'lease.tenant.refuse.reason.label': 'Raison du refus (optionnel)',
   'lease.tenant.refuse.reason.placeholder':
@@ -136,6 +142,10 @@ export const frMG = {
     'Ce bail ne peut plus être refusé (statut : {status}).',
   'lease.error.cannotCancel':
     'Ce bail ne peut plus être annulé (statut : {status}).',
+  'lease.error.cannotPay':
+    'Ce bail ne peut plus être payé (statut : {status}).',
+  'lease.error.alreadyPaid':
+    'Ce bail est déjà en cours d’activation. Patiente quelques secondes puis recharge la page.',
   'lease.error.payloadTooLarge': 'Charge utile trop volumineuse.',
   'sidebar.myLeases': 'Mes baux',
   'sidebar.section.tenant': 'Locataire',

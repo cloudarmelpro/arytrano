@@ -163,7 +163,10 @@ export default async function LeaseDetailPage({
             {t('lease.tenant.help')}
           </p>
           <div className="mt-5">
-            <LeaseTenantActions leaseId={lease.id} />
+            <LeaseTenantActions
+              leaseId={lease.id}
+              platformFeeMGA={lease.platformFeeMGA}
+            />
           </div>
         </section>
       ) : null}

@@ -5,52 +5,44 @@ import * as Sentry from '@sentry/nextjs'
 import { prisma } from '@/lib/db'
 import type { PaymentStatus } from '@prisma/client'
 import { env } from '@/lib/env'
-import { formatAriary } from '@/lib/format/currency'
 import { sendTransactionalEmail } from '@/lib/email/send-transactional'
 import { sanitizeEmailHeaderValue } from '@/lib/email/sanitize-header'
-import { buildLeaseInviteTenantEmail } from '@/lib/email/templates/lease-invite-tenant'
+import { buildLeaseTenantSignedEmail } from '@/lib/email/templates/lease-tenant-signed'
 import { fromPrismaLocale } from '@/lib/i18n/config'
-import type { Locale as PrismaLocaleEnum } from '@prisma/client'
+import { sendPush } from '@/lib/push/send-push'
+import { recordTickets } from '@/lib/push/receipts'
 
 /**
  * Apply the Lease-side state transition that follows a Payment status
- * change. Called by the webhook route after `recordWebhookEvent` has
- * persisted the Payment update — keeps cross-feature concerns out of
- * the payments service.
+ * change. Called by the GoalPay webhook route after `recordWebhookEvent`
+ * has persisted the Payment update.
  *
- * Transitions handled :
- *   Payment CONFIRMED   + Lease DRAFT  →  Lease PENDING_TENANT (+ ownerSignedAt = now)
- *   Payment FAILED      + Lease DRAFT  →  noop (owner can re-initiate)
- *   Payment CANCELED    + Lease DRAFT  →  noop
- *   Payment EXPIRED     + Lease DRAFT  →  noop
- *   Anything else                      →  noop
+ * Revised E-T26 (2026-05-27) — tenant-pays model :
  *
- * Idempotent : if the Lease is already PENDING_TENANT (replay), we
- * return `already_pending` without rewriting `ownerSignedAt`.
+ *   Payment CONFIRMED + Lease PENDING_TENANT → Lease ACTIVE
+ *     (tenantSignedAt = now ; Listing.status = RENTED)
  *
- * Side effects beyond the DB write (tenant email invite, push notif)
- * are intentionally NOT in this service — they belong to a follow-up
- * "notify-tenant" service so this one stays unit-testable without
- * mocking the email pipeline.
+ *   Anything else → noop.
+ *
+ * The OWNER is notified (email + push) when the tenant payment lands,
+ * matching the prior `tenant-sign-lease` semantics.
+ *
+ * Race safety : another lease on the same listing may have raced to
+ * ACTIVE (partial unique index `Lease_listing_active_unique`). If the
+ * Lease.update throws P2002, mark this lease REFUSED + queue refund.
  */
 
 export type LeaseSideEffectOutcome =
   | { kind: 'no_lease_linked'; paymentId: string }
   | { kind: 'noop'; paymentId: string; reason: string }
-  | { kind: 'lease_now_pending_tenant'; leaseId: string }
-  | { kind: 'already_pending'; leaseId: string }
-  /** H1 audit fix — race lost: another lease on the same listing
-   *  reached PENDING_TENANT first. We marked this one REFUSED and
-   *  queued its Payment for manual refund. */
+  | { kind: 'lease_now_active'; leaseId: string }
+  | { kind: 'already_active'; leaseId: string }
   | { kind: 'race_lost_marked_refused'; leaseId: string }
 
 export async function applyLeasePaymentSideEffect(
   paymentId: string,
   newStatus: PaymentStatus,
 ): Promise<LeaseSideEffectOutcome> {
-  // Only ACT on the success path. Other terminal payment statuses leave
-  // the Lease in DRAFT — the owner can re-initiate, creating a fresh
-  // Payment + Lease pair.
   if (newStatus !== 'CONFIRMED') {
     return { kind: 'noop', paymentId, reason: `status=${newStatus}` }
   }
@@ -60,31 +52,38 @@ export async function applyLeasePaymentSideEffect(
     select: {
       id: true,
       status: true,
+      listingId: true,
       monthlyRentMGA: true,
       cautionMGA: true,
-      owner: { select: { name: true, email: true } },
-      tenant: {
-        select: { id: true, name: true, email: true, locale: true },
+      platformFeeMGA: true,
+      owner: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          locale: true,
+          expoPushToken: true,
+        },
       },
+      tenant: { select: { name: true, email: true } },
       listing: { select: { title: true } },
     },
   })
 
   if (!lease) {
-    // Payment may have been for a different purpose (legacy PREMIUM_LISTING,
-    // FEATURED_PLACEMENT) — those don't link to a Lease. Not an error.
+    // Payment may have been for a different purpose (legacy
+    // PREMIUM_LISTING, FEATURED_PLACEMENT) — not an error.
     return { kind: 'no_lease_linked', paymentId }
   }
 
-  if (lease.status === 'PENDING_TENANT') {
-    // Replay / duplicate webhook. The Payment service is already
-    // idempotent on its end; we're idempotent on ours too.
-    return { kind: 'already_pending', leaseId: lease.id }
+  if (lease.status === 'ACTIVE') {
+    // Replay / duplicate webhook. Idempotent.
+    return { kind: 'already_active', leaseId: lease.id }
   }
 
-  if (lease.status !== 'DRAFT') {
-    // Out-of-sequence state (ACTIVE / REFUSED / etc.) — should not
-    // happen in normal flow, but don't clobber a more advanced state.
+  if (lease.status !== 'PENDING_TENANT') {
+    // Out-of-sequence (DRAFT vestigial, REFUSED/TERMINATED) — don't
+    // clobber a more advanced state. Surface for forensics.
     return {
       kind: 'noop',
       paymentId,
@@ -92,23 +91,30 @@ export async function applyLeasePaymentSideEffect(
     }
   }
 
-  // H1 audit fix — Postgres partial unique index `Lease_listing_active_unique`
-  // forbids two PENDING_TENANT/ACTIVE/DISPUTED leases on the same
-  // listing. If we lose the race against a concurrent webhook, mark
-  // this lease REFUSED + queue the linked Payment for manual refund.
+  const now = new Date()
+
   try {
-    await prisma.lease.update({
-      where: { id: lease.id },
-      data: {
-        status: 'PENDING_TENANT',
-        ownerSignedAt: new Date(),
-      },
-    })
+    await prisma.$transaction([
+      prisma.lease.update({
+        where: { id: lease.id },
+        data: {
+          status: 'ACTIVE',
+          tenantSignedAt: now,
+        },
+      }),
+      prisma.listing.update({
+        where: { id: lease.listingId },
+        data: { status: 'RENTED' },
+      }),
+    ])
   } catch (err) {
     if (
       err instanceof Prisma.PrismaClientKnownRequestError &&
       err.code === 'P2002'
     ) {
+      // Race-lost on the partial unique index — another lease on the
+      // same listing reached ACTIVE first. Mark this one REFUSED +
+      // queue the tenant's payment for manual refund.
       await prisma.$transaction([
         prisma.lease.update({
           where: { id: lease.id },
@@ -125,7 +131,7 @@ export async function applyLeasePaymentSideEffect(
             rawPayload: {
               reason: 'race_lost_concurrent_lease',
               leaseId: lease.id,
-              note: 'Another lease on the same listing reached PENDING_TENANT first; refund queued.',
+              note: 'Another lease on the same listing reached ACTIVE first; tenant refund queued.',
             },
           },
         }),
@@ -135,94 +141,81 @@ export async function applyLeasePaymentSideEffect(
     throw err
   }
 
-  // PERF-H2 audit fix — defer the SMTP round-trip via `after()` from
-  // `next/server` so the webhook response is flushed to GoalPay BEFORE
-  // we wait on the email provider. Without this, a slow SMTP push
-  // (200ms-2s typical) holds the webhook 200 open, triggers GoalPay's
-  // retry timer, and the retried delivery would send a second invite
-  // email (sendTransactional's rate-limit catches storms but not
-  // legitimate retries within the bucket).
-  //
-  // `after()` schedules the work to run after the response is flushed
-  // (only valid inside a request scope — the webhook route is the only
-  // caller in production). In tests or other non-request contexts it
-  // throws; we fall back to fire-and-forget so the service stays usable
-  // outside Next's request lifecycle. Errors are reported to Sentry so
-  // a stuck email doesn't surface as a 500 on the webhook path.
-  const emailInput = {
-    leaseId: lease.id,
-    tenant: lease.tenant,
-    ownerName: lease.owner.name ?? lease.owner.email,
-    listingTitle: lease.listing.title,
-    monthlyRentMGA: lease.monthlyRentMGA,
-    cautionMGA: lease.cautionMGA,
-  }
-  const deferEmail = async () => {
+  // Defer notifications behind the webhook response so GoalPay receives
+  // its 200 immediately even on slow SMTP / push providers.
+  const leaseUrl = `${env.AUTH_URL.replace(/\/$/, '')}/dashboard/leases/${lease.id}`
+  const ownerName = sanitizeEmailHeaderValue(
+    lease.owner.name ?? lease.owner.email,
+  )
+  const tenantName = sanitizeEmailHeaderValue(
+    lease.tenant.name ?? 'locataire',
+  )
+
+  const deferNotifications = async () => {
+    // Email
     try {
-      await notifyTenantInvite(emailInput)
+      const email = buildLeaseTenantSignedEmail(
+        fromPrismaLocale(lease.owner.locale),
+        {
+          recipientName: ownerName,
+          tenantName,
+          listingTitle: sanitizeEmailHeaderValue(lease.listing.title),
+          leaseUrl,
+        },
+      )
+      await sendTransactionalEmail({
+        recipientId: lease.owner.id,
+        recipientEmail: lease.owner.email,
+        eventType: 'lease-tenant-signed',
+        subject: email.subject,
+        html: email.html,
+        text: email.text,
+      })
     } catch (err) {
       Sentry.captureException(err, {
-        tags: { kind: 'lease-invite-tenant-after' },
+        tags: { kind: 'lease-active-owner-email-after' },
         extra: { leaseId: lease.id },
       })
     }
+
+    // Push
+    if (lease.owner.expoPushToken) {
+      try {
+        const ownerLocale = fromPrismaLocale(lease.owner.locale)
+        const pushTitle =
+          ownerLocale === 'mg' ? 'Voasonia ny bail' : 'Ton bail est signé'
+        const pushBody =
+          ownerLocale === 'mg'
+            ? "Naloan'ny mpanofa ny saran'ny sonia. Sokafy ny app hijerena."
+            : "Le locataire a payé. Ouvre l'app pour voir les détails."
+        const result = await sendPush([
+          {
+            to: lease.owner.expoPushToken,
+            title: pushTitle,
+            body: pushBody,
+            sound: 'default',
+            data: { kind: 'leaseTenantSigned', leaseId: lease.id },
+          },
+        ])
+        await recordTickets(
+          result.tickets.map((t) => ({
+            userId: lease.owner.id,
+            ticketId: t.ticketId,
+          })),
+        )
+      } catch (err) {
+        Sentry.captureException(err, {
+          tags: { kind: 'lease-active-owner-push-after' },
+          extra: { leaseId: lease.id },
+        })
+      }
+    }
   }
   try {
-    after(deferEmail)
+    after(deferNotifications)
   } catch {
-    // Out-of-request-scope (tests, future non-HTTP callers). Run inline
-    // as fire-and-forget; we explicitly drop the floating promise.
-    void deferEmail()
+    void deferNotifications()
   }
 
-  return { kind: 'lease_now_pending_tenant', leaseId: lease.id }
-}
-
-/**
- * Build + send the tenant invite email. Sanitizes name fields against
- * CRLF injection (memory `feedback_email_header_injection`) before
- * they flow into the Subject header.
- */
-async function notifyTenantInvite(input: {
-  leaseId: string
-  tenant: {
-    id: string
-    name: string | null
-    email: string
-    locale: PrismaLocaleEnum
-  }
-  ownerName: string
-  listingTitle: string
-  monthlyRentMGA: number
-  cautionMGA: number
-}): Promise<void> {
-  // Memory `feedback_debug_logs_no_pii` adjacent: never leak the email
-  // local-part to the recipient. When `name` is null, fall back to a
-  // neutral label rather than `email.split('@')[0]`.
-  const tenantName = sanitizeEmailHeaderValue(
-    input.tenant.name ?? 'locataire',
-  )
-  const ownerName = sanitizeEmailHeaderValue(input.ownerName)
-  const listingTitle = sanitizeEmailHeaderValue(input.listingTitle)
-
-  const leaseUrl = `${env.AUTH_URL.replace(/\/$/, '')}/dashboard/leases/${input.leaseId}`
-
-  const email = buildLeaseInviteTenantEmail(fromPrismaLocale(input.tenant.locale), {
-    recipientName: tenantName,
-    ownerName,
-    listingTitle,
-    monthlyRentFormatted: formatAriary(input.monthlyRentMGA),
-    cautionFormatted:
-      input.cautionMGA > 0 ? formatAriary(input.cautionMGA) : '0 Ar',
-    leaseUrl,
-  })
-
-  await sendTransactionalEmail({
-    recipientId: input.tenant.id,
-    recipientEmail: input.tenant.email,
-    eventType: 'lease-invite-tenant',
-    subject: email.subject,
-    html: email.html,
-    text: email.text,
-  })
+  return { kind: 'lease_now_active', leaseId: lease.id }
 }
