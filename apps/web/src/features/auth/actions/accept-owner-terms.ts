@@ -46,10 +46,11 @@ export async function acceptOwnerTermsAction(
   const result = await acceptOwnerTerms(session.user.id)
   switch (result.kind) {
     case 'ok':
-      // The Prisma update bumped tokenVersion, invalidating the JWT
-      // mid-flight. Auth.js's session callback reads the fresh
-      // ownerTermsAcceptedAt on the next request — the dashboard
-      // gate will let the user through.
+      // The service updates ownerTermsAcceptedAt only — no
+      // tokenVersion bump. The dashboard layout's per-request
+      // Prisma read picks up the fresh timestamp on the next
+      // render, so the gate lets the user through naturally
+      // without invalidating the JWT.
       redirect('/dashboard')
     case 'not_found':
       return { ok: false, message: t('lease.error.notAuthenticated') }

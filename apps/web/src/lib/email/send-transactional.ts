@@ -20,6 +20,8 @@ export type TransactionalEventType =
   | 'lease-owner-canceled'
   | 'lease-pending-expired-tenant'
   | 'lease-pending-expired-owner'
+  | 'lease-terminated-owner'
+  | 'lease-terminated-tenant'
   | 'saved-search-match'
 
 /**
