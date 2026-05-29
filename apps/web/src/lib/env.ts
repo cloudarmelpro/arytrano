@@ -144,6 +144,26 @@ const EnvSchema = z.object({
   // `outdoors`, `osm_bright`, `stamen_terrain`.
   NEXT_PUBLIC_STADIA_STYLE: z.string().default('alidade_smooth'),
 
+  // --- AryTrano concierge hotline (T-018 concierge mode) ----
+  // Single contact endpoint shown on EVERY listing instead of the
+  // owner's direct phone — AryTrano team handles the relay manually
+  // for security (no spam at the owner) and qualification.
+  //
+  // E.164 DIGITS ONLY, no leading `+`. MG country code 261 + 9 digits.
+  // Example : 261341234567 (= +261 34 12 345 67).
+  //
+  // Both vars are NEXT_PUBLIC_* because the listing detail page
+  // renders them client-side after the reveal click. Storing in env
+  // (vs hardcoding) lets the team rotate or split per region later.
+  NEXT_PUBLIC_ARYTRANO_WHATSAPP: z
+    .string()
+    .regex(/^261\d{9}$/, 'NEXT_PUBLIC_ARYTRANO_WHATSAPP must be E.164 digits-only (261 + 9 digits)')
+    .default('261341234567'),
+  NEXT_PUBLIC_ARYTRANO_PHONE: z
+    .string()
+    .regex(/^261\d{9}$/, 'NEXT_PUBLIC_ARYTRANO_PHONE must be E.164 digits-only (261 + 9 digits)')
+    .default('261341234567'),
+
   // --- Cron secret (T-050 + T-049 + E-T20) -----------------
   // Shared secret expected as `Authorization: Bearer <secret>` on
   // /api/cron/* endpoints. Without it, prod crons would be publicly

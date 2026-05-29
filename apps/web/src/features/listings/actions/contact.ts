@@ -12,6 +12,8 @@ type RevealContactState = {
   ok: boolean
   message?: string
   phoneE164?: string
+  /** Pre-filled WhatsApp message text (URL-encoded by the client into ?text=). */
+  whatsappPrefilledText?: string
   channel?: 'WHATSAPP' | 'PHONE'
   ownerDisplayName?: string
 }
@@ -56,6 +58,7 @@ export async function revealContactAction(
     return {
       ok: true,
       phoneE164: result.phoneE164,
+      whatsappPrefilledText: result.whatsappPrefilledText,
       channel: result.channel,
       ownerDisplayName: result.ownerDisplayName,
     }

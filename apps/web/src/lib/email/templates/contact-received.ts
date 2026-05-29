@@ -13,17 +13,16 @@ export type ContactReceivedData = {
 }
 
 /**
- * "Nouveau contact" email (T-047). Fired by `record-contact-click`
- * after a ContactEvent insert when the listing owner has not opted
- * out via the User.contactNotificationsEnabled toggle.
+ * "Nouveau contact" email (T-047, revised for concierge model 2026-05-27).
+ * Fired by `record-contact-click` after a ContactEvent insert.
+ *
+ * Tone : reassuring — the owner doesn't have to do anything. AryTrano
+ * received the inquiry on their behalf and will relay it through the
+ * normal team workflow. Owner consults their dashboard stats if they
+ * want to see the volume.
  *
  * Anti-spam : rate-limited 10/h per (userId, eventType) by the
- * transactional send wrapper. A student spamming the contact button
- * doesn't translate to 50 emails — at most 10 within an hour.
- *
- * Privacy : we DO NOT include the student's name or any identifier.
- * The reveal flow is anonymous by design — the owner only sees the
- * student's number once they ARE contacted via WhatsApp.
+ * transactional send wrapper.
  */
 export function buildContactReceivedEmail(
   locale: Locale,
@@ -36,13 +35,13 @@ export function buildContactReceivedEmail(
     const channelMg =
       data.channel === 'WHATSAPP' ? 'WhatsApp' : 'antso telefaonina'
     return {
-      subject: `Nahazo fifandraisana vaovao ho an'ny ${data.listingTitle}`,
+      subject: `Nahazo fanontaniana ho an'ny ${data.listingTitle}`,
       html: emailHtmlLayout({
         salutation: `Salama ${safeName},`,
         body:
-          `Misy mpianatra vao avao naneho fahalianana amin'ny <strong>${safeTitle}</strong> tamin'ny alalan'ny ${channelMg}.<br/><br/>` +
-          `Andramo miandrandra ny hafatra ao amin'ny WhatsApp-nao, na jereo ny stats-anao mba hahafantarana ny ankamaroan'ny fifandraisana ny annonce-nao.<br/><br/>` +
-          `Tsy mila valianao io mailaka io.`,
+          `Misy olona naneho fahalianana amin'ny <strong>${safeTitle}</strong> tamin'ny alalan'ny ${channelMg}.<br/><br/>` +
+          `Ny ekipan'AryTrano no nahazo ny fanontaniana — izahay no manao fifandraisana aminao raha mety. Tsy mila manao na inona na inona ianao izao.<br/><br/>` +
+          `Jereo ny stats-anao mba hahafantarana ny ankamaroan'ny fifandraisana ny filazana-nao.`,
         primaryCta: {
           label: 'Hijery ny stats',
           href: data.statsUrl,
@@ -51,7 +50,7 @@ export function buildContactReceivedEmail(
       text: emailTextLayout({
         salutation: `Salama ${data.recipientName},`,
         body:
-          `Fifandraisana vaovao amin'ny ${data.listingTitle} (${channelMg}).\n\n` +
+          `Fanontaniana vaovao amin'ny ${data.listingTitle} (${channelMg}). Ny ekipan'AryTrano no nahazo azy ary hifandray aminao raha mety.\n\n` +
           `Stats : ${data.statsUrl}`,
         cta: data.statsUrl,
       }),
@@ -61,13 +60,13 @@ export function buildContactReceivedEmail(
   const channelFr =
     data.channel === 'WHATSAPP' ? 'WhatsApp' : 'appel téléphonique'
   return {
-    subject: `Nouveau contact pour ${data.listingTitle}`,
+    subject: `Nouvelle demande pour ${data.listingTitle}`,
     html: emailHtmlLayout({
       salutation: `Bonjour ${safeName},`,
       body:
-        `Un étudiant vient de marquer son intérêt pour <strong>${safeTitle}</strong> via ${channelFr}.<br/><br/>` +
-        `Surveille ton WhatsApp pour le message, ou consulte tes statistiques pour suivre l'activité de ton annonce.<br/><br/>` +
-        `Cet email ne demande pas de réponse.`,
+        `Quelqu'un vient de marquer son intérêt pour <strong>${safeTitle}</strong> via ${channelFr}.<br/><br/>` +
+        `L'équipe AryTrano a reçu la demande — on revient vers toi si le contact aboutit. Tu n'as rien à faire pour l'instant.<br/><br/>` +
+        `Consulte tes statistiques pour suivre l'activité de ton annonce.`,
       primaryCta: {
         label: 'Voir les stats',
         href: data.statsUrl,
@@ -76,7 +75,7 @@ export function buildContactReceivedEmail(
     text: emailTextLayout({
       salutation: `Bonjour ${data.recipientName},`,
       body:
-        `Nouveau contact sur ${data.listingTitle} (${channelFr}).\n\n` +
+        `Nouvelle demande sur ${data.listingTitle} (${channelFr}). L'équipe AryTrano a reçu le message et revient vers toi si le contact aboutit.\n\n` +
         `Stats : ${data.statsUrl}`,
       cta: data.statsUrl,
     }),

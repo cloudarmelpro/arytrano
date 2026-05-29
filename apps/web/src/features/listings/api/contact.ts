@@ -49,6 +49,7 @@ export const POST = withErrorHandling(
     return ok({
       channel: result.channel,
       phoneE164: result.phoneE164,
+      whatsappPrefilledText: result.whatsappPrefilledText,
       ownerDisplayName: result.ownerDisplayName,
     })
   },

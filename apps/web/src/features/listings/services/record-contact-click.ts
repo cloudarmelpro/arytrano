@@ -1,6 +1,7 @@
 import 'server-only'
 import { prisma } from '@/lib/db'
 import { errors } from '@/lib/api/errors'
+import { env } from '@/lib/env'
 import { hashUa } from '@/lib/auth/request-info'
 import { rateLimiters } from '@/lib/rate-limit'
 import type { ContactChannel } from '../schemas/contact'
@@ -8,19 +9,34 @@ import { notifyOwnerContact } from './notify-owner-contact'
 
 export type RecordContactClickResult = {
   channel: ContactChannel
-  /** E.164 digits-only phone (no `+`), suitable for wa.me/<x> or tel:<x>. */
+  /**
+   * AryTrano concierge hotline in E.164 digits-only. Same number is
+   * returned for both WHATSAPP and PHONE channels — AryTrano is the
+   * sole intermediary; the owner's number is never exposed.
+   */
   phoneE164: string
+  /**
+   * Pre-filled WhatsApp message the visitor's client opens with. Helps
+   * the AryTrano team see which listing the inquiry is about. Always
+   * returned; the client only uses it on the WhatsApp channel.
+   */
+  whatsappPrefilledText: string
   ownerDisplayName: string
 }
 
 /**
- * Records a contact click against a PUBLISHED listing and returns the owner
- * phone so the client can open `wa.me/<x>` or `tel:<x>`. The phone is never
- * exposed in the public listing payload — only revealed once a contact event
- * has been logged.
+ * Records a contact click against a PUBLISHED listing and returns the
+ * AryTrano CONCIERGE hotline (not the owner's number) so the visitor
+ * opens `wa.me/<arytrano>?text=…` or `tel:<arytrano>`.
  *
- * Anti-scraping defences (defense-in-depth):
- *  1. Every call is recorded in `ContactEvent` (owner sees the volume)
+ * AryTrano sits between visitor and owner : the owner's phone is never
+ * exposed in the public payload nor returned by this service. The team
+ * receives the inquiry via the pre-filled WhatsApp message (which names
+ * the listing) and relays to the owner offline.
+ *
+ * Anti-scraping defences (defense-in-depth, still relevant even when
+ * the returned number is shared) :
+ *  1. Every call is recorded in `ContactEvent` so owner sees the volume
  *  2. 30/h per (IP, listing) rate-limit — caps single-IP harvesting
  *  3. `ipHash` lets us flag abusive IPs without storing raw IP
  */
@@ -49,6 +65,10 @@ export async function recordContactClick(input: {
     select: {
       id: true,
       title: true,
+      slug: true,
+      // Owner.phone is still selected so the gating + future
+      // owner-side reveal in the dashboard still works, but it is
+      // NEVER returned from this service.
       owner: {
         select: {
           id: true,
@@ -67,13 +87,32 @@ export async function recordContactClick(input: {
     throw errors.notFound('Annonce introuvable')
   }
   if (!listing.owner.phone) {
+    // We still gate on the owner having a phone : AryTrano needs a
+    // way to forward the inquiry offline. Hide the contact UI when
+    // the owner hasn't provided one.
     throw errors.conflict('Le propriétaire n\'a pas renseigné son numéro')
   }
 
-  const phoneE164 = normalizePhoneE164(listing.owner.phone)
+  // Choose the AryTrano hotline for the requested channel. Today they
+  // are the same number, but the schema supports splitting later
+  // (e.g. dedicated WhatsApp Business vs voice).
+  const phoneE164 =
+    input.channel === 'WHATSAPP'
+      ? env.NEXT_PUBLIC_ARYTRANO_WHATSAPP
+      : env.NEXT_PUBLIC_ARYTRANO_PHONE
+
   if (!phoneE164) {
-    throw errors.conflict('Numéro du propriétaire invalide')
+    // Should not happen since the Zod schema enforces format + default,
+    // but defensive — never return an empty number to the client.
+    throw errors.conflict('Hotline AryTrano non configurée')
   }
+
+  // Pre-filled WhatsApp message (concierge model). Names the listing
+  // by title + slug so the AryTrano agent immediately knows context.
+  const whatsappPrefilledText = buildWhatsAppPrefilledText({
+    listingTitle: listing.title,
+    listingSlug: listing.slug,
+  })
 
   // Hash the UA to keep parity with LoginEvent — never store raw UA strings.
   const uaHash = input.userAgent ? hashUa(input.userAgent) : null
@@ -114,36 +153,29 @@ export async function recordContactClick(input: {
   return {
     channel: input.channel,
     phoneE164,
+    whatsappPrefilledText,
     ownerDisplayName,
   }
 }
 
 /**
- * Normalize a phone input to E.164 digits-only (no leading `+`). Madagascar
- * country code is 261. Accepts these common shapes from user input:
- *   "+261 34 12 345 67"  → "261341234567"
- *   "0341234567"          → "261341234567"
- *   "261341234567"        → "261341234567"
- *   "341234567"           → "261341234567"
- *
- * Returns null unless the result is EXACTLY `261` + 9 digits (12 total).
- * Strict MG-only — we don't want to silently fail on `wa.me/<non-MG-number>`.
- * Owners with non-MG numbers should leave the field blank.
+ * Build the WhatsApp pre-filled message body. Plain text (wa.me URL
+ * percent-encodes downstream). Keep it short — long lines wrap awkwardly
+ * in WhatsApp on small screens. We name the listing by title and slug
+ * so the team can locate it instantly even if the URL gets stripped by
+ * an aggressive link cleaner.
  */
-function normalizePhoneE164(input: string): string | null {
-  const digits = input.replace(/\D/g, '')
-  if (!digits) return null
-
-  let normalized = digits
-  if (normalized.startsWith('0')) {
-    // Local Malagasy format (0XX XX XXX XX) — strip leading 0, prepend 261
-    normalized = '261' + normalized.slice(1)
-  } else if (!normalized.startsWith('261')) {
-    // Bare local number (9 digits) — prepend country code
-    normalized = '261' + normalized
-  }
-
-  // MG mobile = exactly `261` + 9 digits = 12 total
-  if (normalized.length !== 12 || !normalized.startsWith('261')) return null
-  return normalized
+function buildWhatsAppPrefilledText(input: {
+  listingTitle: string
+  listingSlug: string
+}): string {
+  return (
+    `Bonjour AryTrano, je suis intéressé(e) par l'annonce "${input.listingTitle}" ` +
+    `(réf ${input.listingSlug}) sur arytrano.com. Merci !`
+  )
 }
+
+// `normalizePhoneE164` was removed when the concierge model landed —
+// AryTrano's hotline comes pre-validated via env.ts. If a future
+// owner-dashboard reveal flow needs it back, port from git history or
+// move it into `features/listings/utils/normalize-phone-e164.ts`.

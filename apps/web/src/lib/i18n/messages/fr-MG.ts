@@ -565,14 +565,17 @@ export const frMG = {
   'detail.photoCounter': '{current} / {total}',
   'detail.photoCount.alt': 'Voir la photo {n} en grand',
 
-  // Contact
-  'contact.whatsapp': 'WhatsApp',
-  'contact.call': 'Appeler',
-  'contact.aria.whatsapp': 'Contacter le propriétaire par WhatsApp',
-  'contact.aria.call': 'Appeler le propriétaire',
+  // Contact — concierge model (T-018, switched 2026-05-27)
+  // The contact goes through AryTrano, not the owner directly. Visitor
+  // talks to our team, who relays the inquiry to the owner offline.
+  'contact.whatsapp': 'WhatsApp AryTrano',
+  'contact.call': 'Appeler AryTrano',
+  'contact.aria.whatsapp': 'Contacter AryTrano par WhatsApp pour cette annonce',
+  'contact.aria.call': 'Appeler AryTrano pour cette annonce',
   'contact.hint':
-    "Le numéro reste masqué jusqu'au clic. Ton clic est enregistré pour le propriétaire — pas d'adresse IP brute stockée.",
-  'contact.noPhone': "Le propriétaire n'a pas encore renseigné son numéro.",
+    "Tu contactes notre équipe — on fait le lien avec le propriétaire. Pas de spam pour personne, et ton message arrive directement à AryTrano avec la référence de l'annonce.",
+  'contact.noPhone':
+    "Cette annonce n'est pas encore contactable. On reviendra vers toi dès qu'on aura confirmé les coordonnées.",
   'contact.error.generic': 'Impossible de récupérer le contact pour le moment.',
 
   // Photo gallery

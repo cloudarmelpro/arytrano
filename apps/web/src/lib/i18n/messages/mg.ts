@@ -568,14 +568,16 @@ export const mg: Record<MessageKey, string> = {
   'detail.photoCounter': '{current} / {total}',
   'detail.photoCount.alt': 'Jereo amin\'ny lehibe ny sary {n}',
 
-  // Contact
-  'contact.whatsapp': 'WhatsApp',
-  'contact.call': 'Antsoa',
-  'contact.aria.whatsapp': 'Mifandraisa amin\'ny tompon-trano amin\'ny WhatsApp',
-  'contact.aria.call': 'Antsoa ny tompon-trano',
+  // Contact — concierge model (T-018, switched 2026-05-27)
+  'contact.whatsapp': 'WhatsApp AryTrano',
+  'contact.call': 'Antsoa AryTrano',
+  'contact.aria.whatsapp':
+    'Mifandraisa amin\'ny AryTrano amin\'ny WhatsApp ho an\'ity filazana ity',
+  'contact.aria.call': 'Antsoa ny AryTrano ho an\'ity filazana ity',
   'contact.hint':
-    'Tsy hita ny laharana raha tsy hatramin\'ny rehefa kitihana. Voasoratra ho an\'ny tompon-trano ny kitihana — tsy mitahiry adiresy IP raw izahay.',
-  'contact.noPhone': 'Mbola tsy nametraka laharany ny tompon-trano.',
+    'Miresaka amin\'ny ekipanay ianao — izahay no manao fifandraisana amin\'ny tompon-trano. Tsy misy spam ho an\'iza, ary tonga any aminay mivantana ny hafatra miaraka amin\'ny referansa.',
+  'contact.noPhone':
+    'Mbola tsy azo ifandraisana ity filazana ity. Miverina aminao izahay rehefa voafaritra ny laharana.',
   'contact.error.generic': 'Tsy afaka mahazo ny laharana izao.',
 
   // Photo gallery

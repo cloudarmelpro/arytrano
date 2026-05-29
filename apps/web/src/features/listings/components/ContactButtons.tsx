@@ -48,9 +48,15 @@ export function ContactButtons({
         setActiveChannel(null)
         return
       }
+      // Concierge model — the phoneE164 returned is AryTrano's hotline.
+      // For WhatsApp we append a `?text=` pre-fill so the team agent
+      // sees which listing the visitor is asking about. `encodeURIComponent`
+      // handles accented characters in the listing title cleanly.
       const url =
         channel === 'WHATSAPP'
-          ? `https://wa.me/${result.phoneE164}`
+          ? `https://wa.me/${result.phoneE164}?text=${encodeURIComponent(
+              result.whatsappPrefilledText ?? '',
+            )}`
           : `tel:+${result.phoneE164}`
       // open in new tab for WhatsApp (browser → web/app), same tab for tel:
       if (channel === 'WHATSAPP') {

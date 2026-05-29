@@ -81,11 +81,14 @@ export async function notifyOwnerContact(
     // a specific listing. The mobile app reads `data.listingId` and
     // opens the right detail screen so the owner sees the title
     // INSIDE the app, not on the lock screen.
-    const pushTitle = localeKey === 'mg' ? 'Antso vaovao' : 'Nouveau contact'
+    const pushTitle =
+      localeKey === 'mg'
+        ? 'Fanontaniana ho an\'ny filazana-nao'
+        : 'Demande pour ton annonce'
     const pushBody =
       localeKey === 'mg'
-        ? "Misy olona te-hifandray aminao momba ny filazanao. Sokafy ny app hijerena."
-        : "Quelqu'un veut te contacter à propos de ton annonce. Ouvre l'app pour voir."
+        ? "Ny ekipan'AryTrano dia nahazo fanontaniana momba ny filazanao. Tsy mila manao na inona na inona ianao izao."
+        : "L'équipe AryTrano a reçu une demande pour ton annonce. Rien à faire de ton côté."
     void sendPush([
       {
         to: input.ownerPushToken,
