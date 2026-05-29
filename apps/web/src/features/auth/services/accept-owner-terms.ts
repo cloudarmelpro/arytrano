@@ -4,10 +4,14 @@ import { OWNER_TERMS_VERSION } from '../constants'
 
 /**
  * Marks an OWNER account as having accepted the current Owner Terms
- * (T-049). Bumps `tokenVersion` so the existing JWT/session is
- * invalidated and the next request re-issues with the up-to-date
- * gate state, otherwise the dashboard gate would keep redirecting
- * until the user manually signed out/in.
+ * (T-049).
+ *
+ * No tokenVersion bump : the dashboard layout reads `ownerTermsAcceptedAt`
+ * via a per-request Prisma query, so the next /dashboard render after
+ * the action's redirect picks up the fresh timestamp without touching
+ * the JWT. A tokenVersion bump here would invalidate the session
+ * mid-flight and bounce the user back to /sign-in — the exact opposite
+ * of what we want.
  *
  * Idempotent : a second call for an already-accepted user just
  * refreshes the timestamp + version. Cheap (one Prisma update).
@@ -40,11 +44,6 @@ export async function acceptOwnerTerms(
     data: {
       ownerTermsAcceptedAt: acceptedAt,
       ownerTermsVersion: OWNER_TERMS_VERSION,
-      // tokenVersion bump : invalidates the JWT so the per-request
-      // validation in auth.ts re-reads the fresh `ownerTermsAcceptedAt`.
-      // Without this the dashboard gate keeps redirecting on the same
-      // tab until the user signs out.
-      tokenVersion: { increment: 1 },
     },
   })
 
