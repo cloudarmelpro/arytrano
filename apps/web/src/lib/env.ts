@@ -158,11 +158,11 @@ const EnvSchema = z.object({
   NEXT_PUBLIC_ARYTRANO_WHATSAPP: z
     .string()
     .regex(/^261\d{9}$/, 'NEXT_PUBLIC_ARYTRANO_WHATSAPP must be E.164 digits-only (261 + 9 digits)')
-    .default('261341234567'),
+    .default('261334537686'),
   NEXT_PUBLIC_ARYTRANO_PHONE: z
     .string()
     .regex(/^261\d{9}$/, 'NEXT_PUBLIC_ARYTRANO_PHONE must be E.164 digits-only (261 + 9 digits)')
-    .default('261341234567'),
+    .default('261334537686'),
 
   // --- Cron secret (T-050 + T-049 + E-T20) -----------------
   // Shared secret expected as `Authorization: Bearer <secret>` on
