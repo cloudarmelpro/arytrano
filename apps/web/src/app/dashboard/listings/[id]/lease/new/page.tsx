@@ -36,7 +36,7 @@ export default async function NewLeasePage({
   const t = getT(locale)
 
   return (
-    <div className="mx-auto max-w-[760px] px-6 py-12 lg:px-10 lg:py-16">
+    <div className="mx-auto max-w-[760px] px-6 lg:px-10">
       <nav
         aria-label="Breadcrumb"
         className="mb-6 flex items-center gap-2 text-[12px] font-medium text-muted-foreground"

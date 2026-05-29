@@ -24,7 +24,7 @@ export default async function LeasesListPage() {
   const t = getT(locale)
 
   return (
-    <div className="mx-auto max-w-[1080px] px-6 py-12 lg:px-10 lg:py-16">
+    <div className="mx-auto max-w-[1080px] px-6 lg:px-10">
       <header className="mb-10">
         <span aria-hidden className="block h-px w-12 bg-primary" />
         <span className="mt-5 inline-block text-[12px] font-semibold uppercase tracking-[0.14em] text-primary">

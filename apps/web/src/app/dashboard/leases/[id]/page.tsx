@@ -52,7 +52,7 @@ export default async function LeaseDetailPage({
   const refShort = lease.id.slice(-6)
 
   return (
-    <div className="mx-auto max-w-[920px] px-6 py-12 lg:px-10 lg:py-16">
+    <div className="mx-auto max-w-[920px] px-6 lg:px-10">
       <nav
         aria-label="Breadcrumb"
         className="mb-8 flex items-center gap-2 text-[12.5px] font-medium text-foreground/55"
