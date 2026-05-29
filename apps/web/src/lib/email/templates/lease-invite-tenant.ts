@@ -14,17 +14,20 @@ export type LeaseInviteTenantData = {
   monthlyRentFormatted: string
   /** Caution formatted in Ariary (use "0 Ar" if no caution). */
   cautionFormatted: string
+  /** Platform fee the TENANT pays to AryTrano at acceptance, formatted in Ariary. */
+  platformFeeFormatted: string
   /** Full URL to the lease detail page where the tenant accepts/refuses. */
   leaseUrl: string
 }
 
 /**
  * "Un propriétaire t'invite à signer un bail" email — sent when the
- * Lease transitions DRAFT → PENDING_TENANT (i.e. owner paid the
- * signature fee via GoalPay).
+ * owner creates a Lease (revised E-T26, 2026-05-27 — owner pays nothing,
+ * tenant pays the platform fee at acceptance).
  *
  * The tenant clicks the CTA, lands on /dashboard/leases/[id], and can
- * Accept (Lease → ACTIVE) or Refuse (Lease → REFUSED + refund queued).
+ * "Accepter et payer X Ar" (Lease → ACTIVE after GoalPay success) or
+ * Refuse (Lease → REFUSED, no money charged).
  */
 export function buildLeaseInviteTenantEmail(
   locale: Locale,
@@ -35,6 +38,7 @@ export function buildLeaseInviteTenantEmail(
   const safeTitle = escapeHtml(data.listingTitle)
   const safeRent = escapeHtml(data.monthlyRentFormatted)
   const safeCaution = escapeHtml(data.cautionFormatted)
+  const safeFee = escapeHtml(data.platformFeeFormatted)
 
   if (locale === 'mg') {
     return {
@@ -42,15 +46,16 @@ export function buildLeaseInviteTenantEmail(
       html: emailHtmlLayout({
         salutation: `Salama ${safeName},`,
         body:
-          `<p><strong>${safeOwner}</strong> dia nanao sonia bail ho an'ny <strong>${safeTitle}</strong> ary manasa anao hanao sonia toy izany koa.</p>` +
+          `<p><strong>${safeOwner}</strong> dia te-hanofa <strong>${safeTitle}</strong> aminao ary manasa anao hanao sonia bail amin'ny AryTrano.</p>` +
           `<p style="margin-top:12px;"><strong>Hofa isam-bolana :</strong> ${safeRent}<br/>` +
-          `<strong>Antoka :</strong> ${safeCaution}</p>` +
-          `<p style="margin-top:12px;">Jereo ny fepetra rehetra eo amin'ny tabilao-nao. Afaka manaiky na mandà ianao.</p>`,
+          `<strong>Antoka :</strong> ${safeCaution}<br/>` +
+          `<strong>Saran'ny AryTrano (aloanao) :</strong> ${safeFee}</p>` +
+          `<p style="margin-top:12px;">Mba hanaovana sonia ny bail, aloa ny saran'ny AryTrano (20%-n'ny hofan-trano). Ny hofa sy ny antoka dia atolotrao mivantana amin'ny tompon-trano (tsy amin'ny AryTrano).</p>`,
         primaryCta: { label: 'Hijery ny bail', href: data.leaseUrl },
       }),
       text: emailTextLayout({
         salutation: `Salama ${data.recipientName},`,
-        body: `${data.ownerName} dia manasa anao hanao sonia bail ho an'ny "${data.listingTitle}". Hofa: ${data.monthlyRentFormatted}. Antoka: ${data.cautionFormatted}.`,
+        body: `${data.ownerName} dia manasa anao hanao sonia bail ho an'ny "${data.listingTitle}". Hofa: ${data.monthlyRentFormatted}. Antoka: ${data.cautionFormatted}. Saran'ny AryTrano: ${data.platformFeeFormatted}.`,
         cta: data.leaseUrl,
       }),
     }
@@ -61,15 +66,16 @@ export function buildLeaseInviteTenantEmail(
     html: emailHtmlLayout({
       salutation: `Bonjour ${safeName},`,
       body:
-        `<p><strong>${safeOwner}</strong> a signé un bail pour <strong>${safeTitle}</strong> et t'invite à signer à ton tour.</p>` +
+        `<p><strong>${safeOwner}</strong> te propose <strong>${safeTitle}</strong> et t'invite à signer un bail sur AryTrano.</p>` +
         `<p style="margin-top:12px;"><strong>Loyer mensuel :</strong> ${safeRent}<br/>` +
-        `<strong>Caution :</strong> ${safeCaution}</p>` +
-        `<p style="margin-top:12px;">Vérifie les conditions sur ton tableau de bord. Tu peux accepter ou refuser le bail.</p>`,
+        `<strong>Caution :</strong> ${safeCaution}<br/>` +
+        `<strong>Frais AryTrano (à ta charge) :</strong> ${safeFee}</p>` +
+        `<p style="margin-top:12px;">Pour signer le bail, tu paies les frais AryTrano (20% du loyer mensuel) à l'acceptation. Le loyer + la caution sont versés directement au propriétaire (hors AryTrano).</p>`,
       primaryCta: { label: 'Voir le bail', href: data.leaseUrl },
     }),
     text: emailTextLayout({
       salutation: `Bonjour ${data.recipientName},`,
-      body: `${data.ownerName} t'invite à signer un bail pour "${data.listingTitle}". Loyer : ${data.monthlyRentFormatted}. Caution : ${data.cautionFormatted}.`,
+      body: `${data.ownerName} t'invite à signer un bail pour "${data.listingTitle}". Loyer : ${data.monthlyRentFormatted}. Caution : ${data.cautionFormatted}. Frais AryTrano : ${data.platformFeeFormatted}.`,
       cta: data.leaseUrl,
     }),
   }

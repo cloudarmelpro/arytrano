@@ -1,5 +1,13 @@
 import 'server-only'
+import { after } from 'next/server'
+import * as Sentry from '@sentry/nextjs'
 import { prisma } from '@/lib/db'
+import { env } from '@/lib/env'
+import { sendTransactionalEmail } from '@/lib/email/send-transactional'
+import { sanitizeEmailHeaderValue } from '@/lib/email/sanitize-header'
+import { buildLeaseInviteTenantEmail } from '@/lib/email/templates/lease-invite-tenant'
+import { fromPrismaLocale } from '@/lib/i18n/config'
+import { formatAriary } from '@/lib/format/currency'
 import {
   initiateLeaseInputSchema,
   type InitiateLeaseInput,
@@ -78,10 +86,11 @@ export async function initiateLease(
     return { kind: 'listing_not_rentable', currentStatus: listing.status }
   }
 
-  // 3) Find tenant by email — must exist
+  // 3) Find tenant by email — must exist. We also pull the locale + name
+  //    here so the invite email is rendered without a second roundtrip.
   const tenant = await prisma.user.findUnique({
     where: { email: input.tenantEmail },
-    select: { id: true, status: true },
+    select: { id: true, status: true, name: true, locale: true },
   })
   if (!tenant || tenant.status !== 'ACTIVE') {
     return { kind: 'tenant_not_found', tenantEmail: input.tenantEmail }
@@ -89,6 +98,16 @@ export async function initiateLease(
   if (tenant.id === ownerId) {
     return { kind: 'tenant_is_owner' }
   }
+
+  // Also pull listing title + owner name for the invite email.
+  const ownerForEmail = await prisma.user.findUnique({
+    where: { id: ownerId },
+    select: { name: true, email: true },
+  })
+  const listingForEmail = await prisma.listing.findUnique({
+    where: { id: listing.id },
+    select: { title: true },
+  })
 
   // 4) Reject if the listing already has an active or pending lease.
   const blockingLease = await prisma.lease.findFirst({
@@ -131,6 +150,53 @@ export async function initiateLease(
     },
     select: { id: true },
   })
+
+  // 7) Notify the tenant via email. Deferred via `after()` so the wizard
+  //    redirect happens immediately and the SMTP round-trip doesn't
+  //    block the owner's response.
+  if (ownerForEmail && listingForEmail) {
+    const leaseUrl = `${env.AUTH_URL.replace(/\/$/, '')}/dashboard/leases/${lease.id}`
+    const recipientName = sanitizeEmailHeaderValue(tenant.name ?? 'locataire')
+    const ownerName = sanitizeEmailHeaderValue(
+      ownerForEmail.name ?? ownerForEmail.email,
+    )
+    const listingTitle = sanitizeEmailHeaderValue(listingForEmail.title)
+    const deferEmail = async () => {
+      try {
+        const built = buildLeaseInviteTenantEmail(
+          fromPrismaLocale(tenant.locale),
+          {
+            recipientName,
+            ownerName,
+            listingTitle,
+            monthlyRentFormatted: formatAriary(listing.priceMonthlyMGA),
+            cautionFormatted:
+              cautionMGA > 0 ? formatAriary(cautionMGA) : '0 Ar',
+            platformFeeFormatted: formatAriary(platformFeeMGA),
+            leaseUrl,
+          },
+        )
+        await sendTransactionalEmail({
+          recipientId: tenant.id,
+          recipientEmail: input.tenantEmail,
+          eventType: 'lease-invite-tenant',
+          subject: built.subject,
+          html: built.html,
+          text: built.text,
+        })
+      } catch (err) {
+        Sentry.captureException(err, {
+          tags: { kind: 'lease-invite-tenant-after' },
+          extra: { leaseId: lease.id },
+        })
+      }
+    }
+    try {
+      after(deferEmail)
+    } catch {
+      void deferEmail()
+    }
+  }
 
   return {
     kind: 'ok',
