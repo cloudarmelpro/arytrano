@@ -174,7 +174,7 @@ export default async function LeaseDetailPage({
 
       {/* Tenant pay action — only when the viewer is the tenant + still pending */}
       {isTenant && lease.status === 'PENDING_TENANT' ? (
-        <section className="mt-12 rounded-2xl border-2 border-primary/20 bg-primary/[0.04] p-7 lg:p-9">
+        <section className="mt-12 rounded-2xl border border-primary/20 bg-primary/[0.04] p-7 lg:p-9">
           <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-primary">
             {t('lease.detail.pendingAction')}
           </span>
