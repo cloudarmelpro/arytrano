@@ -3782,6 +3782,66 @@ Ces items NE sont PAS du code que je peux écrire. Ils sont sur l'utilisateur ou
 
 ---
 
+### 📦 Session 2026-05-29 — Lifecycle defensive crons + T-049 + concierge + audit r3
+
+**Commits livrés sur `main`** : `51a9fa1` → `74ec90c` (~20 commits depuis le matin).
+
+#### Tickets terminés cette session
+
+| Ticket | Description | Commits clés |
+|---|---|---|
+| ✅ **S2-23** | `pending-tenant-expire` cron — auto-REFUSE leases > 14j en PENDING_TENANT + 2 emails | `51a9fa1` |
+| ✅ **S2-25** | Push notif owner sur tenant.accept/refuse via Expo | `67f8823` |
+| ✅ **S2-22 (partial)** | 7 audit MEDIUMs round 2 (P-M3 amount=0, P-M4 gate test webhook prod, S-M1 cuid doc, A-M2 sections aria-labelledby, A-M3 startDate hint, PF-M1 todayIso memo, AR-M1 ARCHITECTURE.md note) | `1c75bcd` |
+| ✅ **E-T26 revised** | Business model switch : tenant pays 20% × loyer (au lieu d'owner 15k + 8% caution). Migration + tous les services + UI + emails refactorés | `fa6c58d` + `4d481aa` |
+| ✅ **T-018 revised** | Concierge contact — AryTrano hotline remplace numéro owner direct + WhatsApp pré-rempli avec ref listing | `2322917` + `d5874df` |
+| ✅ **T-049 Owner Terms gate** | CGU dédiée propriétaire + onboarding bloquant + clause **10% paiement unique** pour locations hors plateforme + gate dans dashboard layout + services | `ac44dc2` + `b0dcc2d` + `cbd9568` |
+| ✅ **S2-24** | `terminate-completed-leases` cron — ACTIVE → TERMINATED à end-date + flip Listing back to PUBLISHED | (commit after) |
+| ✅ **S2-18** | `reconcile-stuck-lease-activations` cron — rattrape les Payment.CONFIRMED dont side-effect lease n'a jamais run | (commit after) |
+
+#### Tickets ouverts (S2-* restants)
+
+| Ticket | Description | Effort | Bloqueur |
+|---|---|---|---|
+| 🔴 **S2-1** | Contabo VPS + DNS + SSL | ~2h | aucun (non-code) |
+| 🔴 **S2-2** | Comptes externes (R2, Stadia, Sentry, UptimeRobot) | ~1h30 | aucun (non-code) |
+| 🔴 **S2-4** | CGU + privacy juriste MG | indét | juriste |
+| 🔴 **S2-5** | Recrutement 50 propros + testimonials | indét | terrain |
+| 🟠 **S2-8** | Backfill loginEvent device OAuth anciens | ~30min | décision UX |
+| 🟠 **S2-9** | Wave 2 a11y M2 refuse-reason | ~15min | aucun |
+| 🟠 **S2-10** | Mobile owner lease init flow (Expo) | ~1j | aucun, mais discutable v0 |
+| 🟠 **S2-11** | Email backfill admin/quiz-analytics | ~3h | aucun |
+| 🟠 **S2-19** | Migrer `/webhook-gpay` + `/api/goalpay/webhook/test` sous convention | ~30min + GoalPay coord | provider |
+| 🟠 **S2-20** | Differential HTTP status webhook | ~1h | aucun |
+| 🟠 **S2-21** | description + og:* pages transaction | ~30min | aucun |
+| 🟡 **S2-22 (restants)** | 6 MEDIUMs design-heavier (P-M1 doc, P-M2 transient, S-M2 listing-title validation, AR-M2/M3 QuizProfileForm primitives, A-M1 CTA aria-label) | ~4h | aucun |
+
+#### 🔬 Findings audits 2026-05-29 (round 3) — pré-launch
+
+Scope : changements depuis `c8e1b98` (E-T26 tenant-pays + concierge + T-049). 2 agents parallèles (security + architecture).
+
+**Security agent** : 2 CRITICAL + 1 HIGH + 3 MEDIUM + 2 LOW
+- 🔴 **C1** : Owner Terms gate bypassable via REST API (mobile bearer) → **✅ fixé** (`74ec90c`) — helper `ownerTermsAcceptedFor()` pushed dans createListing + initiateLease + ownerCancelPendingLease
+- 🔴 **C2** : Double-payment race tenant-initiate-payment (2 onglets / double-click) → **✅ fixé** (`74ec90c`) — conditional `updateMany` dans `$transaction` filtre sur paymentId précédent ; race-lost retourne `in_progress`
+- 🟠 **H1** : Open-redirect via GoalPay checkout_url (pas d'host allowlist) → **✅ fixé** (`74ec90c`) — `TRUSTED_CHECKOUT_HOSTS` allowlist dans Zod schema
+- 🟠 **H2** : Stale comment `accept-owner-terms` action → **✅ fixé** (LOW-1 de archi, commit `S2-24+LOW-1`)
+- 🟡 **M1** : Orphan INITIATED payments accumulés (cap auto via cron reconcile-payments, mais on peut markEXPIRED les anciens avant create) — **reporté** S2-26
+- 🟡 **M2** : `record-contact-click` rate-limit dépendant Upstash config — vérif manuelle au moment du wire prod
+- 🟡 **M3** : WhatsApp pre-fill leak slug to hotline logs — déjà mitigé via admin moderation listing titles
+- 🟢 **L1** : `notifyOwnerContact` swallows email + push failures sans Sentry breadcrumb → ajouter `captureMessage` warning (mineur)
+- 🟢 **L2** : `cryptoRandomCuid` 96 bits — RAS
+
+**Architecture agent** : CLEAN sur les 8 rules + memory rules. 2 LOW (stale comment fixed, et `OWNER_TERMS_ONBOARDING_PATH` deep-import from app/ — précédent existant, OK).
+
+**Verdict global** : 2 CRITICAL + 1 HIGH fixés en live. Reste 1 MEDIUM (S2-26 markEXPIRED prior INITIATED payments) + 1 LOW (Sentry breadcrumb notifyOwnerContact) à programmer post-launch.
+
+#### Nouveau ticket S2-26 — orphan INITIATED payments cleanup
+**Bloqueur** : aucun
+**Description** : avant `prisma.payment.create` dans `tenant-initiate-payment.ts`, marquer les Payments INITIATED précédents du même tenant pour ce lease comme `EXPIRED` (status update + audit event reason=`superseded`). Sinon l'accumulation pollue les analytics et le work-set de `reconcile-stuck-payments`.
+**Effort** : ~1h.
+
+---
+
 ### 📦 Session 2026-05-27 (cont. 3) — E-T26 business model switch
 
 **2 commits livrés** : `fa6c58d` (refactor monolithique) + `4d481aa` (email wiring). État `main` = **`4d481aa`** (avant ce commit docs).
