@@ -53,9 +53,12 @@ export default async function LeaseDetailPage({
 
   return (
     <div className="mx-auto max-w-[920px] px-6 lg:px-10">
+      {/* Breadcrumb — small, hugging the column top so the column
+          ranks visually with the sidebar's first section label.
+          Tight `mb-3` keeps the eyebrow/H1 close behind. */}
       <nav
         aria-label="Breadcrumb"
-        className="mb-8 flex items-center gap-2 text-[12.5px] font-medium text-foreground/55"
+        className="mb-3 flex items-center gap-2 text-[11.5px] font-medium text-foreground/55"
       >
         <Link
           href="/dashboard/leases"
@@ -69,17 +72,19 @@ export default async function LeaseDetailPage({
         </span>
       </nav>
 
-      {/* Hero — listing title + status next step */}
+      {/* Hero — listing title + status next step.
+          Removed the standalone 1px decoration bar : the breadcrumb
+          already anchors the column visually, so the bar was just
+          adding vertical noise. */}
       <header className="mb-12">
-        <span aria-hidden className="block h-px w-12 bg-primary" />
-        <div className="mt-5 flex flex-wrap items-baseline gap-x-3 gap-y-1.5 text-[12px] font-semibold uppercase tracking-[0.14em] text-primary">
+        <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1.5 text-[12px] font-semibold uppercase tracking-[0.14em] text-primary">
           <span>{t('lease.detail.eyebrow')}</span>
           <span aria-hidden className="text-foreground/30">·</span>
           <span className="font-mono normal-case tracking-[0.06em] text-foreground/55">
             {t('lease.detail.reference', { ref: refShort })}
           </span>
         </div>
-        <h1 className="mt-3.5 font-serif text-[clamp(28px,3.4vw,44px)] font-normal leading-[1.05] tracking-[-0.025em] text-foreground text-balance">
+        <h1 className="mt-3 font-serif text-[clamp(28px,3.4vw,44px)] font-normal leading-[1.05] tracking-[-0.025em] text-foreground text-balance">
           {lease.listing.title}
         </h1>
         <div className="mt-5 flex flex-wrap items-center gap-3">
