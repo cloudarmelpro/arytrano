@@ -208,6 +208,62 @@ export const frMG = {
   'legal.terms.s6.body':
     'Ces CGU peuvent évoluer. Tu seras notifié(e) par email au moins 30 jours avant l’entrée en vigueur de toute modification substantielle. La poursuite de l’usage de la plateforme vaut acceptation.',
 
+  // /legal/terms-owner — CGU Propriétaire (T-049, 2026-05-29)
+  // Texte juridiquement contraignant ; les traductions MG restent indicatives.
+  'legal.termsOwner.title': 'Conditions d’utilisation — Propriétaires',
+  'legal.termsOwner.preambule.h': 'Préambule',
+  'legal.termsOwner.preambule':
+    'AryTrano (« la Plateforme ») met en relation des propriétaires souhaitant louer un bien immobilier et des locataires (étudiants, familles) à la recherche d’un logement. En créant un compte propriétaire sur la Plateforme, tu acceptes sans réserve les présentes Conditions Générales d’Utilisation.',
+  'legal.termsOwner.s1.h': '1. Acceptation des CGU',
+  'legal.termsOwner.s1.body':
+    'L’inscription en tant que propriétaire — par formulaire ou via un service tiers (Google, Facebook) — vaut acceptation pleine et entière des présentes Conditions. Tu ne peux pas publier d’annonce ni initier un bail sans avoir préalablement accepté ces CGU.',
+  'legal.termsOwner.s2.h': '2. Engagements du propriétaire',
+  'legal.termsOwner.s2.body':
+    'En tant que propriétaire, tu t’engages à :\n• Publier des annonces sincères, exactes et actualisées\n• Fournir des photos réelles du bien proposé\n• Indiquer un loyer et une caution conformes à la réalité du marché\n• Maintenir tes coordonnées (téléphone, email) à jour pour qu’AryTrano puisse te relayer les demandes\n• Répondre aux sollicitations du locataire dans un délai raisonnable une fois la mise en relation effectuée',
+  'legal.termsOwner.s3.h': '3. Modèle de mise en relation',
+  'legal.termsOwner.s3.body':
+    'AryTrano agit en tant qu’intermédiaire : les coordonnées des visiteurs intéressés sont reçues par notre équipe, qui te les transmet après qualification. AryTrano se réserve le droit de filtrer les locataires (sérieux, capacité de paiement présumée) avant transmission.',
+  'legal.termsOwner.s4.h': '4. Frais de service AryTrano',
+  'legal.termsOwner.s4.body':
+    'À la signature du bail, le LOCATAIRE règle à AryTrano une commission égale à 20 % du loyer mensuel. Le loyer mensuel et la caution sont versés directement au propriétaire, en dehors de la Plateforme. Le propriétaire ne paie aucun frais à AryTrano dans le cadre de ce modèle.',
+  'legal.termsOwner.s5.h':
+    '5. Obligation de transparence — Locations hors plateforme',
+  'legal.termsOwner.s5.body':
+    'CLAUSE ESSENTIELLE.\n\nLorsqu’un bien est publié sur AryTrano et que le propriétaire conclut un bail avec un locataire trouvé en dehors de la Plateforme (par bouche-à-oreille, par un autre site, ou directement), il s’engage à :\n\na) Notifier AryTrano sous 48 heures après signature du bail externe, depuis son espace propriétaire ou via le WhatsApp AryTrano (+261 33 45 37 686) ;\nb) Dépublier l’annonce sur AryTrano dans le même délai.\n\nÀ défaut, le propriétaire s’engage à verser à AryTrano une indemnité forfaitaire égale à 10 % du loyer mensuel convenu avec le locataire externe, pour chaque mois de location effective. Cette indemnité est due dès lors qu’AryTrano apporte la preuve raisonnable de la conclusion d’un bail externe non déclaré, et que l’annonce était active sur la Plateforme au moment de la conclusion du bail externe. Le règlement intervient sous 30 jours à compter de la notification formelle par AryTrano.\n\nPourquoi cette clause ? Pour préserver l’équité entre les propriétaires qui respectent leurs engagements et ceux qui utiliseraient la visibilité d’AryTrano sans contrepartie.',
+  'legal.termsOwner.s6.h': '6. Suspension et résiliation',
+  'legal.termsOwner.s6.body':
+    'AryTrano peut suspendre ou supprimer le compte d’un propriétaire en cas de non-respect des présentes CGU (notamment l’article 5), d’annonces trompeuses, de comportement discriminatoire, ou de toute pratique contraire au droit malgache. Le propriétaire peut résilier son compte à tout moment depuis /dashboard/settings. Les baux en cours restent valables jusqu’à leur terme.',
+  'legal.termsOwner.s7.h': '7. Limitation de responsabilité',
+  'legal.termsOwner.s7.body':
+    'AryTrano fournit un service de mise en relation. AryTrano n’est pas partie au contrat de bail entre propriétaire et locataire et ne saurait être tenue responsable des dégradations causées par le locataire, des impayés de loyer, ou des litiges entre les parties au bail.',
+  'legal.termsOwner.s8.h': '8. Modifications des CGU',
+  'legal.termsOwner.s8.body':
+    'AryTrano peut modifier les présentes CGU à tout moment. Les propriétaires sont notifiés par email avec un préavis de 15 jours. À défaut d’opposition, l’utilisation continue de la Plateforme vaut acceptation des nouvelles conditions.',
+  'legal.termsOwner.s9.h': '9. Loi applicable',
+  'legal.termsOwner.s9.body':
+    'Les présentes CGU sont régies par le droit malgache. En cas de litige, les parties s’efforcent de trouver une solution amiable avant tout recours juridictionnel. À défaut, les tribunaux de Fianarantsoa sont seuls compétents.',
+
+  // /onboarding/owner/terms — gate (T-049)
+  'onboarding.owner.terms.eyebrow': 'Bienvenue · CGU Propriétaire',
+  'onboarding.owner.terms.title': 'Avant d’aller plus loin',
+  'onboarding.owner.terms.title.named': 'Bienvenue {name}',
+  'onboarding.owner.terms.lead':
+    'Nos Conditions d’utilisation Propriétaire encadrent la publication des annonces, la mise en relation avec les locataires, et notre modèle de revenu (le locataire paie 20 % du loyer à AryTrano à la signature, toi tu ne paies rien). Une clause mérite ton attention immédiate :',
+  'onboarding.owner.terms.highlight.eyebrow': 'Clause clé',
+  'onboarding.owner.terms.highlight.title':
+    'Si tu loues hors AryTrano sans nous prévenir, 10 % du loyer mensuel',
+  'onboarding.owner.terms.highlight.body':
+    'Si un bien publié sur AryTrano est loué à un locataire trouvé en dehors de la plateforme et que tu ne nous le signales pas sous 48h (depuis ton espace ou via WhatsApp AryTrano), tu nous devras 10 % du loyer mensuel pour chaque mois de location effective. C’est pour préserver l’équité entre les propriétaires honnêtes et les autres.',
+  'onboarding.owner.terms.fullTextLink': 'Lire les CGU complètes →',
+  'onboarding.owner.terms.checkbox':
+    'J’ai lu et j’accepte les Conditions d’utilisation Propriétaire d’AryTrano, y compris la clause de transparence (article 5).',
+  'onboarding.owner.terms.cta': 'Accepter et continuer',
+  'onboarding.owner.terms.cta.loading': 'Enregistrement…',
+  'onboarding.owner.terms.error.checkRequired':
+    'Coche la case pour accepter les CGU avant de continuer.',
+  'onboarding.owner.terms.error.notOwner':
+    'Cette page est réservée aux comptes propriétaire.',
+
   // /legal/privacy
   'legal.privacy.title': 'Politique de confidentialité',
   'legal.privacy.s1.h': '1. Données collectées',

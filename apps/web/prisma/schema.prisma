@@ -43,6 +43,16 @@ model User {
   totpSecret      String?
   totpEnabledAt   DateTime?
 
+  // Owner CGU acceptance (T-049, 2026-05-29) — set when an OWNER
+  // account accepts the dedicated Owner Terms via /onboarding/owner/terms.
+  // Null for STUDENTs (they accept the generic /legal/terms inline at
+  // sign-up). Used by the dashboard layout gate to block owner activity
+  // (publishing, lease creation) until acceptance.
+  // `version` lets us re-prompt on future legally meaningful changes
+  // without resetting the timestamp.
+  ownerTermsAcceptedAt DateTime?
+  ownerTermsVersion    String?
+
   // T-047 — owners get an email on every contact click by default.
   // Toggle off via /dashboard/settings if they prefer to check the
   // dashboard only. Students never trigger this (they don't own

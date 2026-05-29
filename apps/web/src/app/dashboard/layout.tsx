@@ -5,6 +5,8 @@ import { Header } from '@/components/shared/Header'
 import { Footer } from '@/components/shared/Footer'
 import { AccountSidebar } from '@/components/shared/AccountSidebar'
 import { auth, DashboardReasonToast } from '@/features/auth'
+import { OWNER_TERMS_ONBOARDING_PATH } from '@/features/auth/constants'
+import { prisma } from '@/lib/db'
 
 export const metadata: Metadata = {
   robots: { index: false, follow: false },
@@ -18,6 +20,24 @@ export default async function DashboardLayout({ children }: { children: ReactNod
   // mismatch, account banned, deleted). Carry a friendly reason so
   // /sign-in can explain what happened.
   if (!session?.user) redirect('/sign-in?reason=session-expired')
+
+  // T-049 Owner Terms gate — block OWNER accounts (and admins acting
+  // as owners) from entering the dashboard before they have accepted
+  // the dedicated Owner Terms. Students never hit this. One extra
+  // Prisma read per dashboard render — minimal vs the per-request
+  // auth checks already in place; tightens compliance.
+  if (
+    session.user.role === 'OWNER' ||
+    session.user.role === 'ADMIN'
+  ) {
+    const u = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: { ownerTermsAcceptedAt: true },
+    })
+    if (!u?.ownerTermsAcceptedAt) {
+      redirect(OWNER_TERMS_ONBOARDING_PATH)
+    }
+  }
 
   return (
     <>

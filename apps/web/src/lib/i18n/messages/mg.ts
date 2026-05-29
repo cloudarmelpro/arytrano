@@ -212,6 +212,61 @@ export const mg: Record<MessageKey, string> = {
   'legal.terms.s6.body':
     'Mety hiova ireo fepetra ireo. Hampandrenesina amin’ny mailaka ianao 30 andro alohan’ny fanovana lehibe. Ny fitohizan’ny fampiasana ny sehatra dia midika ho fanekena.',
 
+  // /legal/terms-owner — CGU Tompon-trano (FR no manan-kery ara-dalàna)
+  'legal.termsOwner.title': 'Fepetra fampiasana — Tompon-trano',
+  'legal.termsOwner.preambule.h': 'Sasin-teny',
+  'legal.termsOwner.preambule':
+    'Ny AryTrano (« Sehatra ») dia mampifandray tompon-trano sy mpanofa (mpianatra, fianakaviana) mitady trano. Rehefa mamorona kaonty tompon-trano amin’ny Sehatra ianao, dia manaiky tsy misy hatak’andro ireto Fepetra Fampiasana ireto.',
+  'legal.termsOwner.s1.h': '1. Fanekena ny CGU',
+  'legal.termsOwner.s1.body':
+    'Ny fisoratana anarana ho tompon-trano — na amin’ny alalan’ny formulaire na amin’ny serivisy hafa (Google, Facebook) — dia midika ho fanekena feno ireto Fepetra ireto. Tsy afaka mamoaka filazana na manomboka bail ianao raha tsy efa nanaiky azy ireo.',
+  'legal.termsOwner.s2.h': '2. Adidin’ny tompon-trano',
+  'legal.termsOwner.s2.body':
+    'Amin’ny maha tompon-trano anao, dia manaiky ianao :\n• Hamoaka filazana marina sy mazava\n• Hanome sary tena izy ny trano\n• Hampahafantatra ny saran’ny hofa sy ny antoka araka ny zava-misy\n• Hampifanaraka ny laharanao (telefaonina, mailaka) mba hahafahan’ny AryTrano mampita ny fangatahana\n• Hamaly haingana ny mpanofa rehefa vita ny fampifandraisana',
+  'legal.termsOwner.s3.h': '3. Modelin’ny fampifandraisana',
+  'legal.termsOwner.s3.body':
+    'Ny AryTrano dia mpanelanelana : ny laharan’ireo olona te-hifandray dia raisin’ny ekipanay, izay hampita azy aminao aorian’ny fanamarinana. Manana zo hifantina ny mpanofa ny AryTrano alohan’ny fampitàna ny laharanao.',
+  'legal.termsOwner.s4.h': '4. Saran’ny serivisy AryTrano',
+  'legal.termsOwner.s4.body':
+    'Amin’ny fotoana fanaovan-tsonia ny bail, ny MPANOFA no mandoa amin’ny AryTrano 20 %-n’ny hofan-trano isam-bolana. Ny hofa sy ny antoka dia atolotra mivantana amin’ny tompon-trano, eo ivelan’ny Sehatra. Tsy mandoa na inona na inona amin’ny AryTrano ianao amin’ity modely ity.',
+  'legal.termsOwner.s5.h':
+    '5. Adidy fanazavana — Fanofana ivelan’ny Sehatra',
+  'legal.termsOwner.s5.body':
+    'FEPETRA LEHIBE.\n\nRehefa misy trano voapanantra amin’ny AryTrano ary manao bail amin’ny mpanofa hitanao ivelan’ny Sehatra ianao, dia manaiky :\n\na) Hampandre ny AryTrano ao anatin’ny 48 ora aorian’ny faneken-tsonia, avy amin’ny dashboard-nao na amin’ny WhatsApp AryTrano (+261 33 45 37 686) ;\nb) Hanala ny filazana amin’ny AryTrano amin’ny fe-potoana mitovy.\n\nRaha tsy izany dia mandoa ny AryTrano 10 %-n’ny hofan-trano isam-bolana noferanao tamin’ny mpanofa ivelany, isaky ny volana fanofana. Voadidy ny fandoavana raha mahazo porofo amin’ny faneken-tsonia tsy nambara ny AryTrano, ary ny filazana dia mbola navoaka tamin’ny fotoana nanaovan-tsonia ny bail ivelany. Ny fandoavana dia atao 30 andro aorian’ny fampandrenesana ofisialy avy amin’ny AryTrano.\n\nNa inona izany fepetra izany? Mba hiarovana ny rariny eo amin’ireo tompon-trano manaja ny fepetra sy ireo izay mampiasa ny vahaolana avy amin’ny AryTrano nefa tsy mandoa.',
+  'legal.termsOwner.s6.h': '6. Fampiatoana sy fanafoanana',
+  'legal.termsOwner.s6.body':
+    'Afaka manakana na mamafa ny kaonty tompon-trano ny AryTrano raha tsy araka ireto CGU ireto (indrindra ny andininy 5), filazana misy diso, fitondrantena maharatsy, na zavatra mifanohitra amin’ny lalàna malagasy. Afaka manafoana ny kaontinao amin’ny fotoana rehetra ianao avy ao /dashboard/settings. Ny bail mbola mandeha dia manan-kery hatramin’ny fiafarany.',
+  'legal.termsOwner.s7.h': '7. Famerana ny andraikitra',
+  'legal.termsOwner.s7.body':
+    'Ny AryTrano dia manolotra serivisy fampifandraisana. Tsy mpiantsehatra amin’ny fifanarahana eo amin’ny tompon-trano sy ny mpanofa izy, ary tsy tomponandraikitra amin’ny fanimbazimbana, ny tsy fandoavana hofa, na ny adin’ireo mpiantoka amin’ny bail.',
+  'legal.termsOwner.s8.h': '8. Fanovana ireto CGU ireto',
+  'legal.termsOwner.s8.body':
+    'Afaka manova ireto CGU ireto ny AryTrano amin’ny fotoana rehetra. Hampandrenesina amin’ny mailaka ny tompon-trano 15 andro alohan’ny fanovana. Raha tsy misy fanoherana dia heverina ho fanekena ny fitohizan’ny fampiasana ny Sehatra.',
+  'legal.termsOwner.s9.h': '9. Lalàna mihatra',
+  'legal.termsOwner.s9.body':
+    'Ireto CGU ireto dia mifehy ny lalàna malagasy. Raha misy disadisa dia miezaka mitady vahaolana am-pilaminana ny roa tonta. Raha tsy mety izany dia ny fitsarana Fianarantsoa ihany no mahefa.',
+
+  // /onboarding/owner/terms — gate (T-049)
+  'onboarding.owner.terms.eyebrow': 'Tongasoa · CGU Tompon-trano',
+  'onboarding.owner.terms.title': 'Alohan’ny hanohizana',
+  'onboarding.owner.terms.title.named': 'Tongasoa {name}',
+  'onboarding.owner.terms.lead':
+    'Ny Fepetra Fampiasana Tompon-trano dia mifehy ny famoahana filazana, ny fampifandraisana amin’ny mpanofa, ary ny modely vola (ny mpanofa no mandoa 20 % amin’ny AryTrano, fa tsy ianao). Misy fepetra iray tokony hahataitra anao :',
+  'onboarding.owner.terms.highlight.eyebrow': 'Fepetra lehibe',
+  'onboarding.owner.terms.highlight.title':
+    'Raha manofa ivelan’ny AryTrano nefa tsy mampandre, 10 % amin’ny hofa',
+  'onboarding.owner.terms.highlight.body':
+    'Raha misy trano voapanantra amin’ny AryTrano nefa nofananao tamin’ny mpanofa hitanao ivelany, ary tsy nampandre anay ianao tao anatin’ny 48 ora (avy amin’ny dashboard-nao na amin’ny WhatsApp AryTrano), dia haloanao 10 %-n’ny hofan-trano isaky ny volana fanofana. Izany dia mba hiarovana ny rariny eo amin’ireo tompon-trano marina sy ireo hafa.',
+  'onboarding.owner.terms.fullTextLink': 'Hamaky ny CGU feno →',
+  'onboarding.owner.terms.checkbox':
+    'Efa namaky sy manaiky ireo Fepetra Fampiasana Tompon-trano AryTrano, miaraka amin’ny andininy 5 momba ny fanazavana.',
+  'onboarding.owner.terms.cta': 'Manaiky ary hanohy',
+  'onboarding.owner.terms.cta.loading': 'Mitahiry…',
+  'onboarding.owner.terms.error.checkRequired':
+    'Asio marika ny boaty mba hanaiky ny CGU alohan’ny hanohizana.',
+  'onboarding.owner.terms.error.notOwner':
+    'Ho an’ny kaonty tompon-trano ihany ity pejy ity.',
+
   // /legal/privacy
   'legal.privacy.title': 'Politikan’ny tsiambaratelo',
   'legal.privacy.s1.h': '1. Vaovao angonina',

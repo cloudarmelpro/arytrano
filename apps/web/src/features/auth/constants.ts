@@ -10,3 +10,17 @@
  * read by `events.createUser` in `auth.ts`.
  */
 export const SIGNUP_ROLE_COOKIE_NAME = 'arytrano_signup_role'
+
+/**
+ * Current version identifier of the Owner Terms. Stored on
+ * `User.ownerTermsVersion` so we can re-prompt when this string changes
+ * (e.g. a meaningful clause edit) without resetting the timestamp for
+ * users who already accepted an older version.
+ *
+ * Bump the date on every legally meaningful edit of the Owner Terms.
+ */
+export const OWNER_TERMS_VERSION = '2026-05-29'
+
+/** Onboarding route path — referenced by the dashboard gate and the
+ *  sign-up flows. Single source of truth. */
+export const OWNER_TERMS_ONBOARDING_PATH = '/onboarding/owner/terms'
