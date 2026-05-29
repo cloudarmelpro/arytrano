@@ -8,6 +8,7 @@ import { sanitizeEmailHeaderValue } from '@/lib/email/sanitize-header'
 import { buildLeaseInviteTenantEmail } from '@/lib/email/templates/lease-invite-tenant'
 import { fromPrismaLocale } from '@/lib/i18n/config'
 import { formatAriary } from '@/lib/format/currency'
+import { ownerTermsAcceptedFor } from '@/features/auth/services/require-owner-terms-accepted'
 import {
   initiateLeaseInputSchema,
   type InitiateLeaseInput,
@@ -42,6 +43,7 @@ export type InitiateLeaseResult =
       leaseId: string
       platformFeeMGA: number
     }
+  | { kind: 'owner_terms_not_accepted' }
   | { kind: 'listing_not_found' }
   | { kind: 'listing_not_owned' }
   | { kind: 'listing_not_rentable'; currentStatus: string }
@@ -54,6 +56,15 @@ export async function initiateLease(
   ownerId: string,
   rawInput: unknown,
 ): Promise<InitiateLeaseResult> {
+  // 0) Owner Terms gate — defense in depth. The dashboard layout
+  //    redirects unaccepted owners to /onboarding/owner/terms, but
+  //    a mobile client hitting POST /api/v1/leases with a bearer
+  //    token would otherwise skip the gate entirely. Audit C1.
+  const accepted = await ownerTermsAcceptedFor(ownerId)
+  if (!accepted) {
+    return { kind: 'owner_terms_not_accepted' }
+  }
+
   // 1) Validate input
   const parsed = initiateLeaseInputSchema.safeParse(rawInput)
   if (!parsed.success) {

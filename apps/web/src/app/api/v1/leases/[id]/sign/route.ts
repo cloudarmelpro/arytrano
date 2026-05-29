@@ -44,6 +44,10 @@ export const POST = withErrorHandling(async (req: Request, ctx: Ctx) => {
       })
     case 'already_paid':
       throw errors.conflict(t('lease.error.alreadyPaid'))
+    case 'in_progress':
+      // C2 audit fix — same UX as already_paid : tell the mobile
+      // client to wait + refresh, not spawn another session.
+      throw errors.conflict(t('lease.error.alreadyPaid'))
     case 'lease_not_found':
       throw errors.notFound(t('lease.error.leaseNotFound'))
     case 'not_tenant':

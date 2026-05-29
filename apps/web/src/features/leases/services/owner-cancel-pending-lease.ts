@@ -1,5 +1,6 @@
 import 'server-only'
 import type { Prisma } from '@prisma/client'
+import { ownerTermsAcceptedFor } from '@/features/auth/services/require-owner-terms-accepted'
 import { after } from 'next/server'
 import * as Sentry from '@sentry/nextjs'
 import { prisma } from '@/lib/db'
@@ -37,6 +38,7 @@ import { fromPrismaLocale } from '@/lib/i18n/config'
 
 export type OwnerCancelOutcome =
   | { kind: 'ok'; leaseId: string; paymentRefundQueued: boolean }
+  | { kind: 'owner_terms_not_accepted'; leaseId: string }
   | { kind: 'not_found'; leaseId: string }
   | { kind: 'not_owner'; leaseId: string }
   | { kind: 'invalid_status'; leaseId: string; currentStatus: string }
@@ -46,6 +48,12 @@ export async function ownerCancelPendingLease(
   ownerId: string,
   reason: string,
 ): Promise<OwnerCancelOutcome> {
+  // T-049 Owner Terms gate — audit C1.
+  const accepted = await ownerTermsAcceptedFor(ownerId)
+  if (!accepted) {
+    return { kind: 'owner_terms_not_accepted', leaseId }
+  }
+
   const lease = await prisma.lease.findUnique({
     where: { id: leaseId },
     select: {

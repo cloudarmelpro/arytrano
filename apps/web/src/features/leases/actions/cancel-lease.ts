@@ -70,6 +70,11 @@ export async function ownerCancelLeaseAction(
       return { ok: false, message: t('lease.error.leaseNotFound') }
     case 'not_owner':
       return { ok: false, message: t('lease.error.notOwner') }
+    case 'owner_terms_not_accepted':
+      return {
+        ok: false,
+        message: t('onboarding.owner.terms.error.checkRequired'),
+      }
     case 'invalid_status':
       return {
         ok: false,

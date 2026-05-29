@@ -39,6 +39,10 @@ export const POST = withErrorHandling(async (req: Request) => {
         leaseId: result.leaseId,
         platformFeeMGA: result.platformFeeMGA,
       })
+    case 'owner_terms_not_accepted':
+      // C1 audit fix — mobile owner without accepted CGU cannot
+      // bypass the gate via the REST API.
+      throw errors.conflict(t('onboarding.owner.terms.error.checkRequired'))
     case 'listing_not_found':
       throw errors.notFound(t('lease.error.listingNotFound'))
     case 'listing_not_owned':

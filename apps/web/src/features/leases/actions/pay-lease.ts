@@ -62,6 +62,12 @@ export async function tenantPayLeaseAction(
       // the in-progress state instead of double-charging.
       revalidatePath(`/dashboard/leases/${leaseId}`)
       return { ok: false, message: t('lease.error.alreadyPaid') }
+    case 'in_progress':
+      // C2 audit fix — concurrent session detected. Tell the user to
+      // wait for the in-flight checkout to finish (~10 min TTL) and
+      // refresh the page rather than spawn a second GoalPay session.
+      revalidatePath(`/dashboard/leases/${leaseId}`)
+      return { ok: false, message: t('lease.error.alreadyPaid') }
     case 'lease_not_found':
       return { ok: false, message: t('lease.error.leaseNotFound') }
     case 'not_tenant':

@@ -71,6 +71,15 @@ export async function initiateLeaseAction(
   const result = await initiateLease(session.user.id, input)
 
   switch (result.kind) {
+    case 'owner_terms_not_accepted':
+      // The dashboard layout will catch this on the next render, but
+      // returning a typed error lets the wizard surface a clean
+      // message + link in the rare case the user reached the form
+      // directly.
+      return {
+        ok: false,
+        message: t('onboarding.owner.terms.error.checkRequired'),
+      }
     case 'ok':
       // Revised E-T26 (2026-05-27) — owner pays nothing. The wizard
       // returns the leaseId so the client navigates to the lease

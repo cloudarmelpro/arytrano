@@ -25,10 +25,34 @@ import { env } from '@/lib/env'
 
 const TIMEOUT_MS = 30_000
 
+// Audit H1 fix — host allowlist for the redirect URL we hand to the
+// tenant. Without this, a compromised or misconfigured GoalPay
+// response could return any URL and we'd faithfully redirect the
+// user, turning arytrano.com into a phishing amplifier.
+// The list is intentionally small : add hosts here only after manual
+// verification with GoalPay support.
+const TRUSTED_CHECKOUT_HOSTS = new Set<string>([
+  'goalpay.pro',
+  'api.goalpay.pro',
+  'checkout.goalpay.pro',
+  'pay.goalpay.pro',
+  'goalpay.mg',
+  'checkout.goalpay.mg',
+])
+
 const initiateResponseSchema = z.object({
   message: z.string(),
   data: z.object({
-    checkout_url: z.string().url(),
+    checkout_url: z
+      .string()
+      .url()
+      .refine((u) => {
+        try {
+          return TRUSTED_CHECKOUT_HOSTS.has(new URL(u).hostname)
+        } catch {
+          return false
+        }
+      }, 'GoalPay checkout_url host not in TRUSTED_CHECKOUT_HOSTS'),
     expires_in_minutes: z.number().int().positive(),
     order_reference: z.string().min(1),
   }),

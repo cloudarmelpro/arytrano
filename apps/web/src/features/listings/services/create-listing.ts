@@ -3,6 +3,7 @@ import type { Listing } from '@prisma/client'
 import { prisma } from '@/lib/db'
 import { errors } from '@/lib/api/errors'
 import { buildSlug } from '@/lib/format/slug'
+import { ownerTermsAcceptedFor } from '@/features/auth/services/require-owner-terms-accepted'
 import type { CreateListingInput } from '../schemas'
 
 /**
@@ -14,6 +15,16 @@ export async function createListing(
   ownerId: string,
   input: CreateListingInput,
 ): Promise<Listing> {
+  // T-049 Owner Terms gate — server-side enforcement so a mobile
+  // bearer-token caller cannot bypass the dashboard layout redirect.
+  // Audit C1.
+  const accepted = await ownerTermsAcceptedFor(ownerId)
+  if (!accepted) {
+    throw errors.conflict(
+      'Tu dois accepter les Conditions d’utilisation Propriétaire avant de publier une annonce.',
+    )
+  }
+
   const neighborhood = await prisma.neighborhood.findFirst({
     where: { id: input.neighborhoodId, cityId: input.cityId },
     select: { id: true },

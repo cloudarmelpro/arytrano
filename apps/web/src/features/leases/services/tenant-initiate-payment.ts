@@ -38,6 +38,10 @@ export type TenantInitiatePaymentResult =
   | { kind: 'not_tenant'; leaseId: string }
   | { kind: 'invalid_status'; leaseId: string; currentStatus: string }
   | { kind: 'already_paid'; leaseId: string; paymentId: string }
+  /** Audit C2 — another tab / double-click is already mid-checkout.
+   *  Tenant should wait or refresh ; the in-flight session expires in
+   *  ~10 min, after which a fresh attempt is allowed. */
+  | { kind: 'in_progress'; leaseId: string; paymentId: string }
 
 export async function tenantInitiatePayment(
   leaseId: string,
@@ -77,31 +81,73 @@ export async function tenantInitiatePayment(
     }
   }
 
+  // Audit C2 fix — if a payment is already INITIATED, return early
+  // so a double-click / second tab doesn't spawn a parallel GoalPay
+  // session (whose webhook would land on a lease pointing to the
+  // OTHER session's payment row → money lost).
+  if (lease.payment && lease.payment.status === 'INITIATED') {
+    return {
+      kind: 'in_progress',
+      leaseId,
+      paymentId: lease.paymentId!,
+    }
+  }
+
   // Fresh idempotency key per attempt — if a previous Payment is
-  // INITIATED/FAILED/EXPIRED we still let the tenant retry with a
-  // fresh GoalPay session.
+  // FAILED/EXPIRED/CANCELED we let the tenant retry with a fresh
+  // GoalPay session.
   const idempotencyKey = `lease_${cryptoRandomCuid()}`
+  const previousPaymentId = lease.paymentId
 
-  // Create the new Payment row.
-  const payment = await prisma.payment.create({
-    data: {
-      userId: tenantId,
-      listingId: null,
-      idempotencyKey,
-      provider: 'GOALPAY',
-      amountMGA: lease.platformFeeMGA,
-      purpose: 'LEASE_SUCCESS_FEE',
-      status: 'INITIATED',
-    },
-    select: { id: true },
-  })
+  // Reserve the lease atomically. The conditional `updateMany` only
+  // succeeds if `Lease.paymentId` is still what we read above (null
+  // or the previous failed/expired payment). A concurrent transaction
+  // that beat us would have set `Lease.paymentId` to its own new
+  // payment — our WHERE wouldn't match anymore and `count` returns 0.
+  //
+  // Postgres row locks serialize the UPDATEs even at READ COMMITTED,
+  // so this protects against the C2 race without needing Serializable
+  // isolation (which would force retries on every contended lease).
+  let payment: { id: string } | null = null
+  try {
+    payment = await prisma.$transaction(async (tx) => {
+      const created = await tx.payment.create({
+        data: {
+          userId: tenantId,
+          listingId: null,
+          idempotencyKey,
+          provider: 'GOALPAY',
+          amountMGA: lease.platformFeeMGA,
+          purpose: 'LEASE_SUCCESS_FEE',
+          status: 'INITIATED',
+        },
+        select: { id: true },
+      })
+      const reserveRes = await tx.lease.updateMany({
+        where: {
+          id: lease.id,
+          paymentId: previousPaymentId,
+        },
+        data: { paymentId: created.id },
+      })
+      if (reserveRes.count === 0) {
+        // Race lost — another transaction won. Throwing rolls back
+        // both the Payment.create and (no-op) Lease.update; we surface
+        // 'in_progress' below.
+        throw new Error('race_lost')
+      }
+      return created
+    })
+  } catch (err) {
+    if (err instanceof Error && err.message === 'race_lost') {
+      return { kind: 'in_progress', leaseId, paymentId: '' }
+    }
+    throw err
+  }
 
-  // Link the lease to the new payment attempt (replaces any prior
-  // INITIATED/FAILED row's link).
-  await prisma.lease.update({
-    where: { id: lease.id },
-    data: { paymentId: payment.id },
-  })
+  if (!payment) {
+    return { kind: 'in_progress', leaseId, paymentId: '' }
+  }
 
   // Call GoalPay.
   const goalPayResponse = await goalPayProvider.initiate({
