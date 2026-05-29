@@ -702,17 +702,23 @@ model PaymentEvent {
 }
 
 // ============================================================
-// LEASES — E-T26 (success-based monetization)
+// LEASES — E-T26 (revised 2026-05-27, tenant-pays model)
 //
 // A Lease materializes the agreement between an owner and a tenant
-// for a specific listing. It is the contractual event that triggers
-// the AryTrano success fee (15 000 Ar + 8% of caution).
+// for a specific listing. The AryTrano success fee (20% of monthly
+// rent, snapshotted on `platformFeeMGA`) is paid by the TENANT at
+// lease acceptance, not by the owner. Rent + caution flow OFFLINE
+// between tenant and owner.
 //
 // State machine :
-//   DRAFT             — owner started the wizard, no payment yet
-//   PENDING_TENANT    — owner paid the signature fee; tenant must accept
-//   ACTIVE            — both parties signed; Listing.status flipped to RENTED
-//   REFUSED           — tenant refused → manual refund flow (REFUND_PENDING on Payment)
+//   DRAFT             — vestigial in the new model; kept for backward
+//                       compat with historical rows
+//   PENDING_TENANT    — owner created the lease; tenant must accept + pay
+//                       the platform fee via GoalPay
+//   ACTIVE            — tenant accepted + paid; Listing.status → RENTED
+//   REFUSED           — tenant refused OR owner canceled before tenant paid
+//                       (manual refund queued on Payment.REFUND_PENDING
+//                       only if the tenant had already paid)
 //   TERMINATED        — lease ended naturally at the end of its term
 //   DISPUTED          — open dispute (E-T27 arbitrage)
 // ============================================================

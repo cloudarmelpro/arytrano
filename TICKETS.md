@@ -3782,6 +3782,55 @@ Ces items NE sont PAS du code que je peux écrire. Ils sont sur l'utilisateur ou
 
 ---
 
+### 📦 Session 2026-05-27 (cont. 3) — E-T26 business model switch
+
+**2 commits livrés** : `fa6c58d` (refactor monolithique) + `4d481aa` (email wiring). État `main` = **`4d481aa`** (avant ce commit docs).
+
+#### Switch : owner pays → tenant pays
+**Avant** : owner payait à AryTrano (15k signature + 8% caution commission).
+**Après** : tenant paie à AryTrano **20% du loyer mensuel** une fois à la signature. Owner ne paie rien. Loyer + caution restent offline entre tenant et owner.
+
+#### Migration Prisma
+- Fichier : `20260527120000_e_t26_tenant_pays_platform_fee/migration.sql`
+- DROP `Lease.signatureFeeMGA` + `Lease.cautionCommissionMGA`
+- ADD `Lease.platformFeeMGA Int DEFAULT 0`
+- ALTER `Lease.status` default → `PENDING_TENANT` (était `DRAFT`)
+- DRAFT enum kept vestigial pour backward compat
+- **À appliquer en local** : `npx prisma migrate dev` depuis `apps/web/`
+- Note : le row de test prod (S2-3, 100 Ar) aura `platformFeeMGA = 0` après migration ; user peut DELETE manuellement pour propreté
+
+#### Nouveaux fichiers
+- `services/tenant-initiate-payment.ts` : crée Payment + appelle GoalPay côté tenant
+- `actions/pay-lease.ts` : Server Action wrapping
+- `prisma/migrations/20260527120000_*/migration.sql`
+
+#### Supprimés
+- `services/tenant-sign-lease.ts` + test (logique absorbée par `apply-lease-payment-side-effect`)
+
+#### Modifiés (12 fichiers)
+- `services/initiate-lease.ts` : owner-side only, no GoalPay, status=PENDING_TENANT direct, envoie email tenant
+- `services/apply-lease-payment-side-effect.ts` : PENDING_TENANT → ACTIVE (au lieu de DRAFT → PENDING_TENANT)
+- `calculate-fees.ts` : `calculatePlatformFee({ monthlyRentMGA })`
+- `config.ts` : `PLATFORM_FEE_RATE = 0.20`
+- `LeaseWizard.tsx` : no GoalPay redirect, bouton "Créer le bail"
+- `LeaseTenantActions.tsx` : "Accepter et payer X Ar" → GoalPay
+- `actions/initiate-lease.ts` : pas de checkoutUrl en retour
+- `actions/sign-lease.ts` : retire tenantSignLeaseAction (Pay devient Pay action séparée)
+- `api/initiate.ts` : response shape revue
+- `app/api/v1/leases/[id]/sign/route.ts` : mobile reçoit checkoutUrl
+- `lease-invite-tenant.ts` template : nouvelle copy "paye 20%"
+- `queries/get-lease-by-id.ts` : new field
+- i18n fr-MG + mg : 8 nouvelles clés
+
+**Tests** : 203/203 (avant 209 — net 6 tests supprimés via tenant-sign-lease.test.ts). **Typecheck clean**.
+
+#### Reste à faire (post-batch)
+- Update runbook `payments-goalpay.md` (mention le nouveau flow)
+- Possible : update i18n + landing pages `/proprietaires` (présentation prix)
+- Mobile app : update copy "Accept" → "Accepter et payer" + flow WebView checkout (référence REST endpoint déjà adapté)
+
+---
+
 ### 📦 Session 2026-05-27 (cont.) — 4 lots cleanup post-audit GoalPay
 
 **4 commits livrés** sur `main` (de `2e7c6de` à `7aa5aed`). État `main` = **`7aa5aed`**.
