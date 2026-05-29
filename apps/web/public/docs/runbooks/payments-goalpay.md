@@ -1,9 +1,22 @@
-# Runbook — Paiements GoalPay (E-T15)
+# Runbook — Paiements GoalPay (E-T15 + E-T26 revised)
 
 **Provider** : GoalPay (Mobile Money Madagascar)
 **Docs officielles** : https://goalpay.pro/docs/api/integrations
 **Support marchand** : `goalpay.mg@gmail.com` · WhatsApp `+261 34 23 041 65`
 **Statut couverture API** : initiation + webhook seulement (pas de refund API, pas de lookup API, pas de sandbox)
+
+---
+
+## 0. Modèle de revenu actuel (E-T26 revised, 2026-05-27)
+
+**Le TENANT paie AryTrano, pas l'owner.**
+
+- Montant : **20 % du loyer mensuel**, paiement unique à l'acceptation du bail
+- Owner pays nothing to AryTrano. Le loyer + caution flow offline entre tenant et owner.
+- Trigger : tenant clique "Accepter et payer X Ar" → `tenant-initiate-payment.ts` → GoalPay checkout
+- Source de vérité : webhook (HMAC-verified). Pages `/transaction/*` sont des UI beacons replayables, jamais des state mutators.
+
+**T-049 Owner Terms gate (2026-05-29)** : owner doit accepter les CGU dédiées (article 5 = pénalité 10% paiement unique pour locations hors plateforme non déclarées) avant de pouvoir publier ou initier un bail. Gate enforced à la fois côté dashboard layout ET côté services (`ownerTermsAcceptedFor()`) pour bloquer le bypass via REST mobile.
 
 ---
 
