@@ -28,7 +28,7 @@ export function LandingTrustStrip({ locale }: { locale: Locale }) {
   const t = getT(locale)
   return (
     <section className="border-t border-border bg-background">
-      <div className="mx-auto max-w-[1280px] px-6 py-16">
+      <div className="mx-auto max-w-[1280px] px-6 py-16 lg:px-10">
         <header className="mb-12 grid items-end gap-8 lg:mb-16 lg:grid-cols-[1fr_2fr] lg:gap-16">
           <div>
             <span className="text-[12px] font-semibold uppercase tracking-[0.14em] text-primary">
