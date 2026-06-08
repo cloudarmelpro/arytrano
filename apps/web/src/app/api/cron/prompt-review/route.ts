@@ -1,7 +1,18 @@
 import { NextResponse } from 'next/server'
+import crypto from 'node:crypto'
 import * as Sentry from '@sentry/nextjs'
 import { env } from '@/lib/env'
+import { extractRequestInfo } from '@/lib/auth/request-info'
+import { rateLimiters } from '@/lib/rate-limit'
 import { sendReviewPrompts } from '@/features/reviews/services/send-review-prompts'
+
+// Audit SEC-C2 (2026-05-29) — timing-safe Bearer compare.
+function bearerEquals(received: string | null, expected: string): boolean {
+  if (!received) return false
+  const want = `Bearer ${expected}`
+  if (received.length !== want.length) return false
+  return crypto.timingSafeEqual(Buffer.from(received), Buffer.from(want))
+}
 
 /**
  * Daily cron — invites students to leave a review 14 days after they
@@ -27,12 +38,18 @@ export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
 
 export async function GET(request: Request) {
-  // 1. Auth — Bearer secret
-  if (!env.CRON_SECRET) {
-    return NextResponse.json({ ok: false, error: 'cron_disabled' }, { status: 503 })
+  // 1. Rate-limit BEFORE secret check (SEC-C2 pattern).
+  const { ipHash } = extractRequestInfo(request.headers)
+  const rl = await rateLimiters.cronAccess(ipHash)
+  if (!rl.success) {
+    return NextResponse.json({ ok: false, error: 'unauthorized' }, { status: 401 })
   }
-  const auth = request.headers.get('authorization')
-  if (auth !== `Bearer ${env.CRON_SECRET}`) {
+
+  // 2. Auth — Bearer secret, timing-safe compare.
+  if (
+    !env.CRON_SECRET ||
+    !bearerEquals(request.headers.get('authorization'), env.CRON_SECRET)
+  ) {
     return NextResponse.json({ ok: false, error: 'unauthorized' }, { status: 401 })
   }
 

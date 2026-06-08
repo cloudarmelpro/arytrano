@@ -1,7 +1,19 @@
 import { NextResponse } from 'next/server'
+import crypto from 'node:crypto'
 import * as Sentry from '@sentry/nextjs'
 import { env } from '@/lib/env'
+import { extractRequestInfo } from '@/lib/auth/request-info'
+import { rateLimiters } from '@/lib/rate-limit'
 import { processPushReceipts } from '@/lib/push/process-receipts'
+
+// Audit SEC-C2 (2026-05-29) — timing-safe Bearer compare. Mirror of
+// the pattern in /api/cron/reconcile-payments.
+function bearerEquals(received: string | null, expected: string): boolean {
+  if (!received) return false
+  const want = `Bearer ${expected}`
+  if (received.length !== want.length) return false
+  return crypto.timingSafeEqual(Buffer.from(received), Buffer.from(want))
+}
 
 /**
  * Every ~30 min — poll Expo Push API for receipts of recent sends.
@@ -23,6 +35,13 @@ export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
 
 export async function GET(request: Request) {
+  // SEC-C2 — rate-limit BEFORE secret check.
+  const { ipHash } = extractRequestInfo(request.headers)
+  const rl = await rateLimiters.cronAccess(ipHash)
+  if (!rl.success) {
+    return NextResponse.json({ ok: false, error: 'unauthorized' }, { status: 401 })
+  }
+
   if (!env.CRON_SECRET) {
     // Sec P1-4 : emit a Sentry breadcrumb so missing CRON_SECRET in
     // prod surfaces in the dashboard instead of silently disabling
@@ -31,12 +50,11 @@ export async function GET(request: Request) {
       level: 'error',
       tags: { cron: 'push-receipts', issue: 'disabled' },
     })
-    return NextResponse.json({ ok: false, error: 'cron_disabled' }, { status: 503 })
+    return NextResponse.json({ ok: false, error: 'unauthorized' }, { status: 401 })
   }
-  const auth = request.headers.get('authorization')
-  if (auth !== `Bearer ${env.CRON_SECRET}`) {
-    // Wrong secret = the scheduler config drifted. Surface in
-    // Sentry — the job has effectively stopped running.
+  if (!bearerEquals(request.headers.get('authorization'), env.CRON_SECRET)) {
+    // Wrong secret = the scheduler config drifted. Surface in Sentry —
+    // the job has effectively stopped running.
     Sentry.captureMessage('Cron auth failed (bad bearer)', {
       level: 'warning',
       tags: { cron: 'push-receipts', auth: 'failed' },

@@ -38,6 +38,7 @@ export async function authenticateWithPassword(input: {
       status: true,
       tokenVersion: true,
       totpEnabledAt: true,
+      emailVerified: true,
     },
   })
 
@@ -51,6 +52,14 @@ export async function authenticateWithPassword(input: {
   const ok = await verifyPassword(input.password, user.passwordHash)
   if (!ok) {
     throw errors.unauthorized('Email ou mot de passe incorrect')
+  }
+
+  // SEC-C1 (2026-05-29) — REST path was not enforcing email verification
+  // even though the web Credentials provider does (see auth.ts:98).
+  // Block authentication entirely if the email is not verified — the
+  // mobile UI surfaces this as "Vérifie ton email avant de te connecter".
+  if (user.emailVerified === null) {
+    throw errors.forbidden('Vérifie ton email avant de te connecter')
   }
 
   if (user.totpEnabledAt) {

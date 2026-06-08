@@ -1,7 +1,20 @@
 import { NextResponse } from 'next/server'
+import crypto from 'node:crypto'
 import * as Sentry from '@sentry/nextjs'
 import { env } from '@/lib/env'
+import { extractRequestInfo } from '@/lib/auth/request-info'
+import { rateLimiters } from '@/lib/rate-limit'
 import { processListingExpirations } from '@/features/listings/services/process-listing-expirations'
+
+// Audit SEC-C2 (2026-05-29) — timing-safe Bearer compare. The previous
+// `!==` byte-by-byte equality leaked the CRON_SECRET via response-time
+// differential. Pattern mirrors /api/cron/reconcile-payments.
+function bearerEquals(received: string | null, expected: string): boolean {
+  if (!received) return false
+  const want = `Bearer ${expected}`
+  if (received.length !== want.length) return false
+  return crypto.timingSafeEqual(Buffer.from(received), Buffer.from(want))
+}
 
 /**
  * Daily cron — sends 7-day warning emails + auto-expires past-due
@@ -20,11 +33,18 @@ export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
 
 export async function GET(request: Request) {
-  if (!env.CRON_SECRET) {
-    return NextResponse.json({ ok: false, error: 'cron_disabled' }, { status: 503 })
+  // Audit SEC-C2 — rate-limit BEFORE secret check so brute-force probes
+  // burn through the bucket without leaking 401-vs-503 timing signals.
+  const { ipHash } = extractRequestInfo(request.headers)
+  const rl = await rateLimiters.cronAccess(ipHash)
+  if (!rl.success) {
+    return NextResponse.json({ ok: false, error: 'unauthorized' }, { status: 401 })
   }
-  const auth = request.headers.get('authorization')
-  if (auth !== `Bearer ${env.CRON_SECRET}`) {
+
+  if (
+    !env.CRON_SECRET ||
+    !bearerEquals(request.headers.get('authorization'), env.CRON_SECRET)
+  ) {
     return NextResponse.json({ ok: false, error: 'unauthorized' }, { status: 401 })
   }
 

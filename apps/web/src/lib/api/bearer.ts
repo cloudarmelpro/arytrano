@@ -27,15 +27,23 @@ export async function requireBearer(req: Request): Promise<AppJwtPayload> {
 
   // Compare ver claim with DB tokenVersion. Mismatch = token was issued
   // before the user rotated credentials → revoked.
+  //
+  // SEC-C1 (2026-05-29) — also read emailVerified to enforce the same
+  // gate the web Credentials provider does. An attacker who obtained a
+  // token via a now-fixed register path (or a legacy unverified
+  // account) is denied every protected endpoint.
   const user = await prisma.user.findUnique({
     where: { id: payload.sub },
-    select: { tokenVersion: true, status: true },
+    select: { tokenVersion: true, status: true, emailVerified: true },
   })
   if (!user || user.status !== 'ACTIVE') {
     throw errors.unauthorized('User no longer active')
   }
   if (user.tokenVersion !== payload.ver) {
     throw errors.unauthorized('Token revoked. Sign in again.')
+  }
+  if (user.emailVerified === null) {
+    throw errors.forbidden('Email non vérifié')
   }
 
   return payload
