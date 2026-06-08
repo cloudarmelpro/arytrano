@@ -7,9 +7,22 @@ import { z } from 'zod'
 // ============================================================
 
 const isProd = process.env.NODE_ENV === 'production'
+/**
+ * Next.js sets `NEXT_PHASE='phase-production-build'` while compiling
+ * the prod bundle. Many server modules are loaded during page-data
+ * collection — they pull `env.ts` which would otherwise fail-fast on
+ * vars that are only present at runtime (CI builds, dev machines that
+ * test `npm run build` without real credentials, etc.). We treat the
+ * build phase like dev for validation purposes ; the runtime boot
+ * (`next start`) and the per-call use-site guards (e.g. `if
+ * (!env.GOALPAY_ACCESS_KEY) throw …`) still catch any missing prod
+ * value when the server actually starts serving traffic.
+ */
+const isBuild = process.env.NEXT_PHASE === 'phase-production-build'
 
-/** In prod the value must be present; in dev/test it's optional. */
+/** In prod the value must be present; in dev/test/build it's optional. */
 function requiredInProd(message: string) {
+  if (isBuild) return z.string().min(1).optional()
   return isProd ? z.string().min(1, message) : z.string().min(1).optional()
 }
 
