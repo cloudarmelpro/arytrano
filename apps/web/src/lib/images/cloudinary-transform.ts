@@ -22,3 +22,23 @@ function withTransform(url: string, transform: string): string {
 export function cloudinaryPanelThumb(url: string): string {
   return withTransform(url, 'c_fill,w_96,h_96,f_webp,q_70')
 }
+
+/**
+ * Listing card thumbnail — 800×600 WebP q_75. Performance audit H-2
+ * (2026-05-29).
+ *
+ * Pre-fix the query layer returned the upload URL (max 1600×1200) so
+ * the catalog cards downloaded ~250 KB per photo despite rendering at
+ * ~400 px. Cloudinary's `c_fill,w_800,h_600,f_webp,q_75` rewrite cuts
+ * the payload to ~30-50 KB while still serving crisp 2× retina (card
+ * displays around 400 px CSS width). Aspect 4:3 matches the
+ * `aspect-[4/3]` card frame.
+ *
+ * Apply at the query layer rather than in the React component so every
+ * consumer (web cards, mobile app, REST API) automatically receives
+ * the optimized URL — no risk of one consumer forgetting to pass it
+ * through the transform helper.
+ */
+export function cloudinaryCardThumb(url: string): string {
+  return withTransform(url, 'c_fill,w_800,h_600,f_webp,q_75')
+}

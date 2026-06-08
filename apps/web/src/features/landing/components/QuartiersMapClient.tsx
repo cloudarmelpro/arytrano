@@ -1,9 +1,39 @@
 'use client'
 
-import { useState } from 'react'
-import { Map, Overlay } from 'pigeon-maps'
+import { useState, type ComponentType } from 'react'
+import dynamic from 'next/dynamic'
 import type { Locale } from '@/lib/i18n/config'
 import type { QuartierRow } from '../queries/get-quartiers-data'
+
+/**
+ * Performance audit C-1 (2026-05-29) — see ListingsMapClient for the
+ * full rationale. Lazy-load pigeon-maps so the initial page bundle
+ * doesn't carry the ~45 kB gz lib for visitors who don't open the
+ * /quartiers landing.
+ */
+// pigeon-maps' `defaultProps.limitBounds` is typed as `string` upstream
+// — the `ComponentType<any>` cast bridges that to next/dynamic's stricter
+// component-type constraint. See ListingsMapClient for the matching note.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const Map = dynamic<any>(
+  () => import('pigeon-maps').then((m) => m.Map as ComponentType<unknown>),
+  {
+    ssr: false,
+    loading: () => (
+      <div
+        className="absolute inset-0 animate-pulse bg-muted/60"
+        aria-hidden
+      />
+    ),
+  },
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+) as ComponentType<any>
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const Overlay = dynamic<any>(
+  () => import('pigeon-maps').then((m) => m.Overlay as ComponentType<unknown>),
+  { ssr: false },
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+) as ComponentType<any>
 
 // Pre-multi-city fallback. The component now derives center from
 // the centroid of the passed quartiers so /quartiers/<anyCity>

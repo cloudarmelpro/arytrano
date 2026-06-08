@@ -1,9 +1,25 @@
+import dynamic from 'next/dynamic'
 import type { Locale } from '@/lib/i18n/config'
 import { getT } from '@/lib/i18n/translate'
 import { safeJsonLd } from '@/lib/seo/safe-json-ld'
 import type { MessageKey } from '@/lib/i18n/messages'
 import { Icon } from '@/components/shared/Icon'
-import { LandingFaqAccordion } from './LandingFaqAccordion'
+
+/**
+ * Performance audit H-1 (2026-05-29) — the accordion is below-the-fold
+ * and pulls in `motion/react` (~30 kB gz). Pre-fix it shipped in the
+ * landing page's initial client bundle, hurting LCP on slow Madagascar
+ * 3G connections. Wrapping in `next/dynamic` defers the JS chunk so
+ * the page becomes interactive without it.
+ *
+ * Note : no `ssr: false` because this is consumed from a Server
+ * Component (Next 16 disallows that combination from RSC). The first-
+ * paint HTML still includes the accordion frame (questions visible),
+ * but the heavy motion-driven open/close interaction loads on demand.
+ */
+const LandingFaqAccordion = dynamic(() =>
+  import('./LandingFaqAccordion').then((m) => m.LandingFaqAccordion),
+)
 
 const QUESTIONS: Array<{ q: MessageKey; a: MessageKey }> = [
   { q: 'landing.faq.q1.question', a: 'landing.faq.q1.answer' },

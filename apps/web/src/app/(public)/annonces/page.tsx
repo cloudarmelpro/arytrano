@@ -124,10 +124,17 @@ export default async function PublicListingsPage({
   })
   const query = parsed.success ? parsed.data : {}
 
-  // Fetch the listings + map points + neighborhood list + session in
-  // parallel. Map points (capped at 500) power the sidebar mini-map;
-  // they share the same filters as the grid so the map and the list
-  // always reflect the same search.
+  // Performance audit H-3 (2026-05-29) — gate the map query behind
+  // `isMapView`. Pre-fix, `listPublicListingsForMap` ran on every
+  // /annonces request (~500-row scan + neighborhood join), even though
+  // the result is only consumed by the sidebar mini-map (grid view)
+  // and the full map (map view). On mobile (<lg breakpoint) the
+  // sidebar is hidden, so the mini-map's payload was wasted bytes
+  // + DB time for every grid-view mobile load. We now fetch only
+  // when the URL says `?view=map`; the sidebar mini-map is removed
+  // from the grid view in exchange (users discover the map via the
+  // ListingsViewToggle pill).
+  const isMapView = sp.view === 'map'
   const [
     { items, nextCursor, hasMore },
     mapItems,
@@ -136,7 +143,7 @@ export default async function PublicListingsPage({
     session,
   ] = await Promise.all([
     listPublicListings(query),
-    listPublicListingsForMap(query),
+    isMapView ? listPublicListingsForMap(query) : Promise.resolve([]),
     listCitiesWithNeighborhoods(),
     // CityTabs counts. Separate query (cached 5min) — `listCitiesWith
     // Neighborhoods` doesn't aggregate, and we don't want to fold the
@@ -197,7 +204,8 @@ export default async function PublicListingsPage({
   // E-T10 — `?view=map` switches the grid for a full-width map view.
   // Default (no `?view=`) stays grid so the SEO-indexable listing cards
   // remain the canonical content of /annonces.
-  const isMapView = sp.view === 'map'
+  // (Note: `isMapView` is computed earlier so the parallel data fetch
+  // can gate the map query behind it — see Performance audit H-3.)
   const buildPageHref = (cursor: string) => {
     const next = new URLSearchParams()
     if (sp.type) next.set('type', sp.type)

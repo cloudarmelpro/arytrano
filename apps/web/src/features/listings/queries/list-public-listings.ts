@@ -3,6 +3,7 @@ import { z } from 'zod'
 import type { Amenity, ListingType, Prisma } from '@prisma/client'
 import { prisma } from '@/lib/db'
 import { escapeLike } from '@/lib/db/like-escape'
+import { cloudinaryCardThumb } from '@/lib/images/cloudinary-transform'
 import { amenitySchema } from '../schemas/create-listing'
 
 /**
@@ -217,19 +218,30 @@ export async function listPublicListings(
   const nextCursor = hasMore && lastItem ? lastItem.id : null
 
   return {
-    items: items.map((r) => ({
-      id: r.id,
-      slug: r.slug,
-      title: r.title,
-      type: r.type,
-      priceMonthlyMGA: r.priceMonthlyMGA,
-      cautionMonths: r.cautionMonths,
-      publishedAt: r.publishedAt,
-      verifiedAt: r.verifiedAt,
-      city: r.city,
-      neighborhood: r.neighborhood,
-      photo: r.photos[0] ?? null,
-    })),
+    items: items.map((r) => {
+      // Performance audit H-2 (2026-05-29) — rewrite the upload URL to
+      // a Cloudinary 800×600 WebP q_75 at the query layer so every
+      // consumer (web cards, mobile app, REST API) gets the optimized
+      // payload without having to call the helper themselves. See
+      // `cloudinaryCardThumb` for sizing rationale.
+      const rawPhoto = r.photos[0]
+      const photo = rawPhoto
+        ? { ...rawPhoto, url: cloudinaryCardThumb(rawPhoto.url) }
+        : null
+      return {
+        id: r.id,
+        slug: r.slug,
+        title: r.title,
+        type: r.type,
+        priceMonthlyMGA: r.priceMonthlyMGA,
+        cautionMonths: r.cautionMonths,
+        publishedAt: r.publishedAt,
+        verifiedAt: r.verifiedAt,
+        city: r.city,
+        neighborhood: r.neighborhood,
+        photo,
+      }
+    }),
     nextCursor,
     hasMore,
   }

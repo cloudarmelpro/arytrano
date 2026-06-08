@@ -1,9 +1,41 @@
 'use client'
 
 import Link from 'next/link'
-import { useEffect, useMemo, useRef, useState } from 'react'
-import { Map as PigeonMap, Overlay } from 'pigeon-maps'
+import dynamic from 'next/dynamic'
+import { useEffect, useMemo, useRef, useState, type ComponentType } from 'react'
 import { cloudinaryPanelThumb } from '@/lib/images/cloudinary-transform'
+
+/**
+ * Performance audit C-1 (2026-05-29) — `pigeon-maps` is ~45 kB
+ * gzipped + leaflet-style tile rendering and is ONLY needed when the
+ * map tab is mounted. `next/dynamic` with `ssr: false` extracts both
+ * exports into a separate Webpack chunk so they don't ship in the
+ * page's initial bundle. The shared loader path causes Webpack to
+ * collapse the two imports into one chunk so Map + Overlay land in
+ * the same network request.
+ */
+// pigeon-maps' `defaultProps.limitBounds` is typed as `string` upstream,
+// which conflicts with the `'center' | 'edge'` union next/dynamic expects.
+// Cast the loader result through ComponentType<any> — runtime behavior
+// is unchanged; only the structural type assignment is the problem.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const PigeonMap = dynamic<any>(
+  () => import('pigeon-maps').then((m) => m.Map as ComponentType<unknown>),
+  { ssr: false, loading: () => <MapSkeleton /> },
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+) as ComponentType<any>
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const Overlay = dynamic<any>(
+  () => import('pigeon-maps').then((m) => m.Overlay as ComponentType<unknown>),
+  { ssr: false },
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+) as ComponentType<any>
+
+function MapSkeleton() {
+  return (
+    <div className="absolute inset-0 animate-pulse bg-muted/60" aria-hidden />
+  )
+}
 
 const STADIA_API_KEY = process.env.NEXT_PUBLIC_STADIA_API_KEY
 const STADIA_STYLE = process.env.NEXT_PUBLIC_STADIA_STYLE ?? 'alidade_smooth'

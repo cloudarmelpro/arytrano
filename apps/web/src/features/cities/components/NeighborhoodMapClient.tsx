@@ -1,6 +1,35 @@
 'use client'
 
-import { Map, Overlay } from 'pigeon-maps'
+import dynamic from 'next/dynamic'
+import type { ComponentType } from 'react'
+
+/**
+ * Performance audit C-1 (2026-05-29) — defer pigeon-maps to a Webpack
+ * chunk separate from the initial /villes/<city>/quartiers/<n> page
+ * bundle. See ListingsMapClient for the full rationale, including the
+ * pigeon-maps `defaultProps.limitBounds` type quirk that forces the
+ * `ComponentType<any>` cast below.
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const Map = dynamic<any>(
+  () => import('pigeon-maps').then((m) => m.Map as ComponentType<unknown>),
+  {
+    ssr: false,
+    loading: () => (
+      <div
+        className="absolute inset-0 animate-pulse bg-muted/60"
+        aria-hidden
+      />
+    ),
+  },
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+) as ComponentType<any>
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const Overlay = dynamic<any>(
+  () => import('pigeon-maps').then((m) => m.Overlay as ComponentType<unknown>),
+  { ssr: false },
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+) as ComponentType<any>
 
 const STADIA_API_KEY = process.env.NEXT_PUBLIC_STADIA_API_KEY
 const STADIA_STYLE = process.env.NEXT_PUBLIC_STADIA_STYLE ?? 'alidade_smooth'
