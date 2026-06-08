@@ -4,7 +4,13 @@ import { TransactionResult } from '@/features/payments'
 
 export const metadata: Metadata = {
   title: 'Paiement échoué · AryTrano',
+  description: "Le paiement n'a pas pu aboutir. Tu peux réessayer avec un autre moyen.",
   robots: { index: false, follow: false },
+  openGraph: {
+    title: 'Paiement échoué · AryTrano',
+    description: "Le paiement n'a pas pu aboutir. Tu peux réessayer avec un autre moyen.",
+    images: ['/images/arytrano.webp'],
+  },
 }
 
 type SearchParams = Promise<{

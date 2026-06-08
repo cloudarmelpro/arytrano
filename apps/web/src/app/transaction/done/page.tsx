@@ -4,7 +4,13 @@ import { TransactionResult } from '@/features/payments'
 
 export const metadata: Metadata = {
   title: 'Paiement confirmé · AryTrano',
+  description: 'Ton paiement Mobile Money a bien été reçu.',
   robots: { index: false, follow: false },
+  openGraph: {
+    title: 'Paiement confirmé · AryTrano',
+    description: 'Ton paiement Mobile Money a bien été reçu.',
+    images: ['/images/arytrano.webp'],
+  },
 }
 
 type SearchParams = Promise<{

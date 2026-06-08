@@ -4,7 +4,13 @@ import { TransactionResult } from '@/features/payments'
 
 export const metadata: Metadata = {
   title: 'Paiement annulé · AryTrano',
+  description: 'Le paiement a été annulé. Tu peux relancer la signature à tout moment.',
   robots: { index: false, follow: false },
+  openGraph: {
+    title: 'Paiement annulé · AryTrano',
+    description: 'Le paiement a été annulé. Tu peux relancer la signature à tout moment.',
+    images: ['/images/arytrano.webp'],
+  },
 }
 
 type SearchParams = Promise<{
