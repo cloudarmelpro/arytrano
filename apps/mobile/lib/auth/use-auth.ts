@@ -33,9 +33,18 @@ export function useAuth() {
       // only expose what's in the JWT (sub, role) — screens that need
       // name/email still hit /users/me explicitly.
       const payload = decodeAccessToken(token)
+      // Arch audit M4 (2026-05-27) — explicit expiry check. Without
+      // this, an expired-but-not-yet-rotated token reports
+      // `signedIn: true` until the next API call fails, briefly
+      // flashing role-gated UI. Be conservative — if exp is missing
+      // or in the past, treat as signed out and let the next refresh
+      // attempt re-hydrate.
+      if (!payload || (payload.exp && payload.exp * 1000 < Date.now())) {
+        return { signedIn: false, user: null }
+      }
       return {
         signedIn: true,
-        user: payload ? { id: payload.sub, role: payload.role } : null,
+        user: { id: payload.sub, role: payload.role },
       }
     },
     // Auth state changes rarely; no need to refetch on focus.
