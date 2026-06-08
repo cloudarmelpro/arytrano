@@ -77,7 +77,11 @@ export function LeaseTenantActions({
     )
   }
 
-  const refuseErrorId = serverError ? 'lease-refuse-reason-error' : undefined
+  // A11y audit C-2 (2026-05-29) — shared error id covers BOTH the
+  // accept-and-pay path and the refuse form, so the `aria-describedby`
+  // hookup ties the visible error message to whichever button the
+  // user triggered.
+  const errorId = serverError ? 'lease-tenant-actions-error' : undefined
 
   return (
     <div className="flex flex-col gap-4" aria-busy={pending}>
@@ -88,6 +92,7 @@ export function LeaseTenantActions({
             size="lg"
             onClick={acceptAndPay}
             disabled={pending}
+            aria-describedby={errorId}
             className="gap-2 px-6"
           >
             {t('lease.tenant.cta.acceptAndPay', {
@@ -100,6 +105,7 @@ export function LeaseTenantActions({
             size="lg"
             onClick={() => setRefuseOpen(true)}
             disabled={pending}
+            aria-describedby={errorId}
             className="px-6"
           >
             {t('lease.tenant.cta.refuse')}
@@ -122,7 +128,7 @@ export function LeaseTenantActions({
                   maxLength={500}
                   placeholder={t('lease.tenant.refuse.reason.placeholder')}
                   aria-invalid={!!serverError}
-                  aria-describedby={refuseErrorId}
+                  aria-describedby={errorId}
                 />
               </Field>
             </FieldGroup>
@@ -149,7 +155,7 @@ export function LeaseTenantActions({
 
       {serverError ? (
         <p
-          id={refuseErrorId}
+          id={errorId}
           role="alert"
           className="rounded-md border border-destructive/30 bg-destructive/5 px-4 py-3 text-[13.5px] font-medium text-destructive"
         >

@@ -47,7 +47,15 @@ export function OwnerTermsForm() {
       aria-busy={pending}
     >
       <fieldset disabled={pending} className="contents">
-        <label className="flex cursor-pointer items-start gap-3 rounded-2xl border border-border bg-background p-4 transition hover:border-foreground/30">
+        {/* A11y audit C-1 (2026-05-29) — `htmlFor` explicit. The
+            shadcn `Checkbox` renders a `<button role="checkbox">`,
+            which is NOT a labelable element per HTML spec — the
+            implicit wrapping label association is unreliable across
+            Base UI versions. Wire `htmlFor` to the checkbox id. */}
+        <label
+          htmlFor="owner-terms-accepted"
+          className="flex cursor-pointer items-start gap-3 rounded-2xl border border-border bg-background p-4 transition hover:border-foreground/30"
+        >
           <Checkbox
             id="owner-terms-accepted"
             name="accepted"

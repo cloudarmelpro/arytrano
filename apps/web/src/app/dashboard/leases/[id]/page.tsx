@@ -139,8 +139,11 @@ export default async function LeaseDetailPage({
       </section>
 
       {/* Parties */}
-      <section className="mt-10">
-        <h2 className="font-serif text-[clamp(20px,2.2vw,28px)] font-normal leading-[1.15] tracking-[-0.018em] text-foreground">
+      <section className="mt-10" aria-labelledby="lease-detail-parties-heading">
+        <h2
+          id="lease-detail-parties-heading"
+          className="font-serif text-[clamp(20px,2.2vw,28px)] font-normal leading-[1.15] tracking-[-0.018em] text-foreground"
+        >
           {t('lease.detail.parties.title')}
         </h2>
         <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -179,11 +182,17 @@ export default async function LeaseDetailPage({
 
       {/* Tenant pay action — only when the viewer is the tenant + still pending */}
       {isTenant && lease.status === 'PENDING_TENANT' ? (
-        <section className="mt-12 rounded-2xl border border-primary/20 bg-primary/[0.04] p-7 lg:p-9">
+        <section
+          className="mt-12 rounded-2xl border border-primary/20 bg-primary/[0.04] p-7 lg:p-9"
+          aria-labelledby="lease-tenant-action-heading"
+        >
           <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-primary">
             {t('lease.detail.pendingAction')}
           </span>
-          <h2 className="mt-2 font-serif text-[clamp(22px,2.4vw,30px)] font-normal leading-[1.2] tracking-[-0.018em] text-foreground">
+          <h2
+            id="lease-tenant-action-heading"
+            className="mt-2 font-serif text-[clamp(22px,2.4vw,30px)] font-normal leading-[1.2] tracking-[-0.018em] text-foreground"
+          >
             {t('lease.tenant.title')}
           </h2>
           <p className="mt-2 max-w-[560px] text-[14.5px] leading-[1.55] text-foreground/65">
@@ -200,8 +209,14 @@ export default async function LeaseDetailPage({
 
       {/* Owner waiting state + cancel option */}
       {isOwner && lease.status === 'PENDING_TENANT' ? (
-        <section className="mt-12 rounded-2xl border border-border bg-muted/30 p-7 lg:p-9">
-          <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-foreground/55">
+        <section
+          className="mt-12 rounded-2xl border border-border bg-muted/30 p-7 lg:p-9"
+          aria-labelledby="lease-owner-waiting-heading"
+        >
+          <span
+            id="lease-owner-waiting-heading"
+            className="text-[11px] font-semibold uppercase tracking-[0.14em] text-foreground/55"
+          >
             {t('lease.detail.pendingAction')}
           </span>
           <p className="mt-2 max-w-[560px] text-[15px] leading-[1.55] text-foreground/75">
@@ -217,8 +232,14 @@ export default async function LeaseDetailPage({
 
       {/* ACTIVE — soft confirmation block, no action needed */}
       {lease.status === 'ACTIVE' ? (
-        <section className="mt-12 rounded-2xl border border-emerald-200/70 bg-emerald-50/60 p-7 lg:p-9">
-          <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-emerald-700">
+        <section
+          className="mt-12 rounded-2xl border border-emerald-200/70 bg-emerald-50/60 p-7 lg:p-9"
+          aria-labelledby="lease-active-heading"
+        >
+          <span
+            id="lease-active-heading"
+            className="text-[11px] font-semibold uppercase tracking-[0.14em] text-emerald-700"
+          >
             {t('lease.status.ACTIVE')}
           </span>
           <p className="mt-2 max-w-[560px] text-[15px] leading-[1.55] text-emerald-900">
@@ -237,8 +258,14 @@ export default async function LeaseDetailPage({
 
       {/* REFUSED — neutral exit + path forward */}
       {lease.status === 'REFUSED' ? (
-        <section className="mt-12 rounded-2xl border border-border bg-muted/30 p-7 lg:p-9">
-          <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-foreground/55">
+        <section
+          className="mt-12 rounded-2xl border border-border bg-muted/30 p-7 lg:p-9"
+          aria-labelledby="lease-refused-heading"
+        >
+          <span
+            id="lease-refused-heading"
+            className="text-[11px] font-semibold uppercase tracking-[0.14em] text-foreground/55"
+          >
             {t('lease.status.REFUSED')}
           </span>
           <p className="mt-2 max-w-[560px] text-[15px] leading-[1.55] text-foreground/75">

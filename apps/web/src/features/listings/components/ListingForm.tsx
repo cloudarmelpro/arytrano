@@ -417,8 +417,13 @@ export function ListingForm(props: ListingFormProps) {
           control={form.control}
           render={({ field }) => (
             <Field>
-              <Label className="font-normal">
+              {/* A11y audit H-3 (2026-05-29) — explicit id/htmlFor.
+                  shadcn Checkbox is a `<button role="checkbox">`, not a
+                  labelable element; wrapping a `<label>` around it does
+                  NOT establish a programmatic association. */}
+              <Label htmlFor="listing-furnished" className="font-normal">
                 <Checkbox
+                  id="listing-furnished"
                   checked={field.value === true || field.value === 'true'}
                   onCheckedChange={(c) => field.onChange(c)}
                 />
@@ -451,10 +456,19 @@ export function ListingForm(props: ListingFormProps) {
                 <ul className="mt-2 grid grid-cols-1 gap-2 sm:grid-cols-2">
                   {AMENITY_CATALOG.map((a) => {
                     const isOn = selected.has(a.value)
+                    // A11y audit H-3 (2026-05-29) — every amenity gets a
+                    // unique id and the wrapping Label points at it. See
+                    // furnished checkbox above for rationale.
+                    const checkboxId = `listing-amenity-${a.value}`
                     return (
                       <li key={a.value}>
-                        <Label className="cursor-pointer rounded-md border border-input bg-background px-3 py-2 transition hover:bg-muted data-[checked=true]:border-primary data-[checked=true]:bg-primary/5 font-normal" data-checked={isOn}>
+                        <Label
+                          htmlFor={checkboxId}
+                          className="cursor-pointer rounded-md border border-input bg-background px-3 py-2 transition hover:bg-muted data-[checked=true]:border-primary data-[checked=true]:bg-primary/5 font-normal"
+                          data-checked={isOn}
+                        >
                           <Checkbox
+                            id={checkboxId}
                             checked={isOn}
                             onCheckedChange={() => toggle(a.value)}
                           />
