@@ -3,6 +3,7 @@ import type { Listing } from '@prisma/client'
 import { prisma } from '@/lib/db'
 import { errors } from '@/lib/api/errors'
 import { buildSlug } from '@/lib/format/slug'
+import { ownerTermsAcceptedFor } from '@/features/auth/server'
 import type { UpdateListingInput } from '../schemas'
 
 /**
@@ -15,6 +16,13 @@ export async function updateListing(
   listingId: string,
   input: UpdateListingInput,
 ): Promise<Listing> {
+  // Audit Archi H-1 — Owner Terms gate (defense in depth).
+  if (!(await ownerTermsAcceptedFor(ownerId))) {
+    throw errors.conflict(
+      'Tu dois accepter les Conditions d’utilisation Propriétaire avant de modifier une annonce.',
+    )
+  }
+
   const existing = await prisma.listing.findFirst({
     where: { id: listingId, ownerId, status: { not: 'DELETED' } },
     select: { id: true, title: true, cityId: true },

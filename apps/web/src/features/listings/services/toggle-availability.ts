@@ -2,6 +2,7 @@ import 'server-only'
 import type { Listing } from '@prisma/client'
 import { prisma } from '@/lib/db'
 import { errors } from '@/lib/api/errors'
+import { ownerTermsAcceptedFor } from '@/features/auth/server'
 
 /**
  * Toggle between PUBLISHED and UNAVAILABLE for a listing.
@@ -12,6 +13,13 @@ export async function toggleListingAvailability(
   ownerId: string,
   listingId: string,
 ): Promise<Listing> {
+  // Audit Archi H-1 (2026-05-29) — Owner Terms gate.
+  if (!(await ownerTermsAcceptedFor(ownerId))) {
+    throw errors.conflict(
+      'Tu dois accepter les Conditions d’utilisation Propriétaire avant de gérer ta disponibilité.',
+    )
+  }
+
   const listing = await prisma.listing.findFirst({
     where: { id: listingId, ownerId, status: { not: 'DELETED' } },
     select: { id: true, status: true },

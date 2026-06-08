@@ -5,9 +5,17 @@ import { errors } from '@/lib/api/errors'
 import { uploadBuffer, deleteAsset } from '@/lib/cloudinary'
 import { sniffImage } from '@/lib/images/sniff'
 import { computeBlurDataURL } from '@/lib/images/blur-data-url'
+import { ownerTermsAcceptedFor } from '@/features/auth/server'
 import { parseListingPhotoFile, MAX_PHOTOS_PER_LISTING } from '../schemas'
 
 async function requireOwnerListing(ownerId: string, listingId: string) {
+  // Audit Archi H-1 — Owner Terms gate at the choke point shared by
+  // every photo mutation in this service.
+  if (!(await ownerTermsAcceptedFor(ownerId))) {
+    throw errors.conflict(
+      'Tu dois accepter les Conditions d’utilisation Propriétaire avant de gérer les photos.',
+    )
+  }
   const listing = await prisma.listing.findFirst({
     where: { id: listingId, ownerId, status: { not: 'DELETED' } },
     select: { id: true, _count: { select: { photos: true } } },

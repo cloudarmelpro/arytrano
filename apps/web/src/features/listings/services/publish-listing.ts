@@ -6,6 +6,7 @@ import { errors } from '@/lib/api/errors'
 import { fromPrismaLocale } from '@/lib/i18n/config'
 import { sendTransactionalEmail } from '@/lib/email/send-transactional'
 import { buildListingPublishedEmail } from '@/lib/email/templates/listing-published'
+import { ownerTermsAcceptedFor } from '@/features/auth/server'
 import { notifySavedSearchMatches } from '@/features/search/server'
 
 /**
@@ -30,6 +31,15 @@ export const LISTING_TTL_MS = LISTING_TTL_DAYS * 24 * 60 * 60 * 1000
  * down SMTP relay never blocks the publish flow.
  */
 export async function publishListing(ownerId: string, listingId: string): Promise<Listing> {
+  // Audit Archi H-1 (2026-05-29) — Owner Terms gate. The dashboard
+  // layout redirects unaccepted owners but a mobile bearer call to
+  // POST /api/v1/listings/:id/publish would otherwise bypass it.
+  if (!(await ownerTermsAcceptedFor(ownerId))) {
+    throw errors.conflict(
+      'Tu dois accepter les Conditions d’utilisation Propriétaire avant de publier une annonce.',
+    )
+  }
+
   const listing = await prisma.listing.findFirst({
     where: { id: listingId, ownerId, status: { not: 'DELETED' } },
     select: {

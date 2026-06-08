@@ -1,6 +1,6 @@
 import 'server-only'
 import type { Prisma } from '@prisma/client'
-import { ownerTermsAcceptedFor } from '@/features/auth/services/require-owner-terms-accepted'
+import { ownerTermsAcceptedFor } from '@/features/auth/server'
 import { after } from 'next/server'
 import * as Sentry from '@sentry/nextjs'
 import { prisma } from '@/lib/db'

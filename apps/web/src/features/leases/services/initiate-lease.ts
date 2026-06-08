@@ -8,7 +8,7 @@ import { sanitizeEmailHeaderValue } from '@/lib/email/sanitize-header'
 import { buildLeaseInviteTenantEmail } from '@/lib/email/templates/lease-invite-tenant'
 import { fromPrismaLocale } from '@/lib/i18n/config'
 import { formatAriary } from '@/lib/format/currency'
-import { ownerTermsAcceptedFor } from '@/features/auth/services/require-owner-terms-accepted'
+import { ownerTermsAcceptedFor } from '@/features/auth/server'
 import {
   initiateLeaseInputSchema,
   type InitiateLeaseInput,

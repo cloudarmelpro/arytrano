@@ -3,7 +3,7 @@ import type { Listing } from '@prisma/client'
 import { prisma } from '@/lib/db'
 import { errors } from '@/lib/api/errors'
 import { buildSlug } from '@/lib/format/slug'
-import { ownerTermsAcceptedFor } from '@/features/auth/services/require-owner-terms-accepted'
+import { ownerTermsAcceptedFor } from '@/features/auth/server'
 import type { CreateListingInput } from '../schemas'
 
 /**
