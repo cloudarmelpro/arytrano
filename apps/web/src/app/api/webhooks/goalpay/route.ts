@@ -20,11 +20,16 @@ export const dynamic = 'force-dynamic'
  * with HMAC-SHA256 signature in `x-gpay-signature` header (hex digest
  * over the raw body, keyed by `GOALPAY_WEBHOOK_SECRET`).
  *
- * Response semantics :
- *   - 401 invalid / missing signature                → GoalPay should NOT retry (we're refusing)
- *   - 400 malformed body                             → GoalPay should NOT retry (bad shape, won't fix on replay)
- *   - 422 amount/providerTxId mismatch with our row  → log + 422 (we suspect tampering)
- *   - 200 OK on apply, noop, or unknown_reference    → GoalPay stops retrying
+ * Response semantics (revised audit S2-20, 2026-05-29) :
+ *   - 200 OK on apply, noop, or unknown_reference     → GoalPay stops retrying
+ *   - 401 rejected (covers every error case below)    → GoalPay should NOT retry
+ *
+ * Every error path now returns a uniform `{ error: 'rejected' }` with
+ * status 401 — invalid signature, malformed body, mismatched amount,
+ * payload too large, all collapse to the same observable response.
+ * The specific reason still goes to Sentry tags for human triage, but
+ * it never leaks back to the caller — denies a probing attacker any
+ * differential signal about which check tripped.
  *
  * Important : we return 200 for `unknown_reference` because a future
  * webhook for a known reference might arrive after a delay, and we
@@ -48,6 +53,22 @@ export async function GET() {
   return NextResponse.json({ ok: true }, { status: 200 })
 }
 
+/**
+ * Audit S2-20 — uniform rejection helper. Every 4xx error path collapses
+ * to the same `{ error: 'rejected' }` body and 401 status. Reason goes
+ * to Sentry tags for human triage but never leaks back to the caller.
+ */
+function rejected(
+  reason: string,
+  extra?: Record<string, string | boolean>,
+) {
+  Sentry.captureMessage('webhook rejected', {
+    level: 'warning',
+    tags: { kind: 'rejected', reason, ...extra },
+  })
+  return NextResponse.json({ error: 'rejected' }, { status: 401 })
+}
+
 export async function POST(request: Request) {
   // Audit H1 fix — rate-limit BEFORE any work, including HMAC verify.
   // The webhook handler is exposed at 3 URLs (canonical + 2 aliases)
@@ -58,9 +79,7 @@ export async function POST(request: Request) {
   const { ipHash } = extractRequestInfo(request.headers)
   const rl = await rateLimiters.webhookIngress(ipHash)
   if (!rl.success) {
-    // 429 with no body — don't hint that this is a rate-limit response
-    // (an attacker enumerating endpoints can already see the status).
-    return NextResponse.json({ error: 'too_many' }, { status: 429 })
+    return rejected('rate_limited')
   }
 
   // SEC-M1 audit fix — bound the buffer BEFORE running HMAC over it.
@@ -70,7 +89,7 @@ export async function POST(request: Request) {
   // generous ceiling.
   const len = Number(request.headers.get('content-length') ?? 0)
   if (len > 32_768) {
-    return NextResponse.json({ error: 'too_large' }, { status: 413 })
+    return rejected('too_large')
   }
 
   // Read the raw body BEFORE any parsing — HMAC must be computed over
@@ -80,42 +99,22 @@ export async function POST(request: Request) {
   try {
     rawBody = await request.text()
   } catch {
-    return NextResponse.json(
-      { error: 'invalid_body' },
-      { status: 400 },
-    )
+    return rejected('invalid_body')
   }
 
   const signature = request.headers.get('x-gpay-signature')
 
   if (!goalPayProvider.verifyWebhookSignature(rawBody, signature)) {
-    // Audit fix — alert on EVERY invalid signature. This is either an
-    // attack (someone POSTing forged webhooks) or a rotated secret
-    // mismatch between dashboard and env. Both need admin attention.
-    // No PII in the tags : only the presence/absence of a sig header.
-    Sentry.captureMessage('webhook signature invalid', {
-      level: 'warning',
-      tags: {
-        kind: 'invalid_signature',
-        hasHeader: signature ? 'true' : 'false',
-      },
+    return rejected('invalid_signature', {
+      hasHeader: signature ? 'true' : 'false',
     })
-    // Don't leak why it failed (missing header vs mismatch) — both
-    // surface as 401 to avoid hinting at the verification mechanism.
-    return NextResponse.json(
-      { error: 'invalid_signature' },
-      { status: 401 },
-    )
   }
 
   let event
   try {
     event = goalPayProvider.parseWebhook(rawBody)
   } catch {
-    return NextResponse.json(
-      { error: 'invalid_payload' },
-      { status: 400 },
-    )
+    return rejected('invalid_payload')
   }
 
   const outcome = await recordWebhookEvent(event)
@@ -130,16 +129,16 @@ export async function POST(request: Request) {
 
   switch (outcome.kind) {
     case 'mismatch':
-      // SEC-L2 audit fix — DON'T leak the mismatch reason in the response.
-      // HMAC-valid callers are GoalPay (no need for hints) and any
-      // future bypass should not gain free reconnaissance on what
-      // tripped the check. Reason still goes to Sentry for human triage.
+      // S2-20 — same 401 surface as the auth-side rejections. The
+      // mismatch reason still hits Sentry for human triage. Critically,
+      // the paymentId DOES go in the extra context because dispute
+      // forensics depend on it ; that never reaches the caller body.
       Sentry.captureMessage('webhook mismatch', {
         level: 'warning',
         tags: { kind: 'mismatch', reason: outcome.reason },
         extra: { paymentId: outcome.paymentId },
       })
-      return NextResponse.json({ error: 'mismatch' }, { status: 422 })
+      return NextResponse.json({ error: 'rejected' }, { status: 401 })
     case 'applied':
     case 'noop':
     case 'unknown_reference':
