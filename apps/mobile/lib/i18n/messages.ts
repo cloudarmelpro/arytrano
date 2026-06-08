@@ -137,6 +137,9 @@ export const messages = {
       'Impossible de récupérer le contact.',
     'listing.detail.contact.whatsappMissing':
       "WhatsApp n'est pas installé sur cet appareil.",
+    'listing.detail.owner.createLease': 'Créer un bail',
+    'lease.tenant.error.checkoutOpen':
+      "Impossible d'ouvrir le checkout. Vérifie ta connexion puis réessaye.",
     'listing.detail.notFound.title': 'Annonce introuvable',
     'listing.detail.notFound.lead':
       "Le lien est peut-être expiré ou l'annonce a été retirée.",
@@ -320,6 +323,9 @@ export const messages = {
     'listing.detail.contact.errorBody': 'Tsy nahazo ny kontaka.',
     'listing.detail.contact.whatsappMissing':
       "Tsy voapetraka eto ny WhatsApp.",
+    'listing.detail.owner.createLease': 'Mamorona bail',
+    'lease.tenant.error.checkoutOpen':
+      'Tsy afaka manokatra ny checkout. Hamarino ny fifandraisanao dia andramo indray.',
     'listing.detail.notFound.title': 'Tsy hita ny filazana',
     'listing.detail.notFound.lead':
       'Mety tapitra ny rohy na nesorina ny filazana.',

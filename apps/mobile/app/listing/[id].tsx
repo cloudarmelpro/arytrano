@@ -19,6 +19,7 @@ import type {
   PublicListingDetail,
 } from '@arytrano/shared'
 import { ApiError, getListingById, revealContact } from '@/lib/api/client'
+import { useAuth } from '@/lib/auth/use-auth'
 import { Button } from '@/components/ui/Button'
 import { useLocale, useT } from '@/lib/i18n/use-locale'
 import type { MessageKey } from '@/lib/i18n/messages'
@@ -56,6 +57,7 @@ function formatPrice(amount: number): string {
 
 export default function ListingDetail() {
   const { id } = useLocalSearchParams<{ id: string }>()
+  const { user } = useAuth()
   const t = useT()
   const { locale } = useLocale()
 
@@ -64,6 +66,11 @@ export default function ListingDetail() {
     queryFn: () => getListingById(id),
     enabled: Boolean(id),
   })
+
+  // S2-10 — viewer is the owner of this listing → show "Créer un bail"
+  // CTA instead of the contact buttons (contacting yourself makes no
+  // sense, plus the owner needs an entry point into the lease wizard).
+  const isOwner = Boolean(user?.id && data?.owner?.id === user.id)
 
   const contactMutation = useMutation({
     mutationFn: (channel: ContactChannel) =>
@@ -307,8 +314,21 @@ export default function ListingDetail() {
         </View>
       </ScrollView>
 
-      {/* Sticky contact CTAs — bottom bar */}
-      {data.owner.hasPhone && (
+      {/* Sticky CTA bar — owner sees the lease wizard entry, visitor
+          sees the concierge contact buttons. */}
+      {isOwner ? (
+        <View className="absolute inset-x-0 bottom-0 border-t border-border bg-background px-5 pb-6 pt-3">
+          <Button
+            title={t('listing.detail.owner.createLease')}
+            onPress={() =>
+              router.push({
+                pathname: '/leases/new',
+                params: { listingId: id },
+              })
+            }
+          />
+        </View>
+      ) : data.owner.hasPhone ? (
         <View className="absolute inset-x-0 bottom-0 border-t border-border bg-background px-5 pb-6 pt-3">
           <View className="flex-row gap-3">
             <View className="flex-1">
@@ -328,7 +348,7 @@ export default function ListingDetail() {
             </View>
           </View>
         </View>
-      )}
+      ) : null}
     </SafeAreaView>
   )
 }

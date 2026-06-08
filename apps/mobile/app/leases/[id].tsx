@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import {
   ActivityIndicator,
   Alert,
+  Linking,
   Pressable,
   ScrollView,
   Text,
@@ -84,7 +85,22 @@ export default function LeaseDetailScreen() {
 
   const signMutation = useMutation({
     mutationFn: () => signLease(id),
-    onSuccess: () => onMutationSuccess('signed'),
+    onSuccess: (res) => {
+      // E-T26 revised — the /sign endpoint now initiates a GoalPay
+      // checkout and returns its URL. We hand the URL off to the OS
+      // (external browser / Mobile Money app via deep link) so the
+      // tenant completes the payment outside the Expo container.
+      // After payment success, the webhook flips the lease to ACTIVE
+      // server-side ; the user can tap back into the app and refresh
+      // to see the new state.
+      Linking.openURL(res.checkoutUrl).catch(() => {
+        Alert.alert(
+          t('lease.tenant.error.generic'),
+          t('lease.tenant.error.checkoutOpen'),
+        )
+      })
+      onMutationSuccess('signed')
+    },
     onError: (err: unknown) => {
       const msg =
         err instanceof ApiError ? err.message : t('lease.tenant.error.generic')
