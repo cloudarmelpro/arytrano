@@ -42,3 +42,20 @@ export function cloudinaryPanelThumb(url: string): string {
 export function cloudinaryCardThumb(url: string): string {
   return withTransform(url, 'c_fill,w_800,h_600,f_webp,q_75')
 }
+
+/**
+ * Social-card image — 1200×630 WebP q_80. Performance audit follow-up
+ * (2026-06-08) — the listing detail page's `og:image` previously used
+ * the raw upload URL (1–3 MB), so every Facebook/WhatsApp/Twitter
+ * link-preview crawler fetched the full original. 1200×630 is the
+ * canonical Open Graph aspect (1.91:1) that Facebook and Twitter
+ * Card both use, and the higher quality (q_80 vs q_75) compensates
+ * for the harsher recompression that social platforms apply.
+ *
+ * Cap-friendly: a 1200×630 WebP at q_80 lands at ~50–100 KB, which
+ * is what the OG protocol expects — crawlers reject images > 8 MB
+ * but rate-limit on slow ones.
+ */
+export function cloudinarySocialCard(url: string): string {
+  return withTransform(url, 'c_fill,w_1200,h_630,f_webp,q_80')
+}

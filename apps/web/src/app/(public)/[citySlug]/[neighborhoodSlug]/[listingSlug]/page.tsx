@@ -10,6 +10,7 @@ import {
   buildBreadcrumbListLd,
   buildRealEstateListingLd,
 } from '@/lib/seo/realestate-listing'
+import { cloudinarySocialCard } from '@/lib/images/cloudinary-transform'
 import { safeJsonLd } from '@/lib/seo/safe-json-ld'
 import { localeAlternates } from '@/lib/seo/alternates'
 import {
@@ -79,7 +80,15 @@ export async function generateMetadata({
   // never let Next.js silently bubble up to the root layout's image (the
   // generic AryTrano card could get cached by WhatsApp/Facebook before the
   // owner uploads photos, locking in the wrong share preview).
-  const ogImage = listing.photos[0]?.url ?? `${baseUrl()}/images/arytrano.webp`
+  // Performance audit follow-up (2026-06-08) — transform the OG image
+  // URL to a 1200×630 WebP q_80 (~50–100 KB). Pre-fix Facebook /
+  // WhatsApp / Twitter Card crawlers were fetching the raw upload
+  // URL (1–3 MB), slowing link-preview rendering. Fallback uses the
+  // static brand asset which is already optimized.
+  const rawOgImage = listing.photos[0]?.url
+  const ogImage = rawOgImage
+    ? cloudinarySocialCard(rawOgImage)
+    : `${baseUrl()}/images/arytrano.webp`
 
   return {
     title,

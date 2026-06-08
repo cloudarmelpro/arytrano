@@ -502,7 +502,16 @@ export function ListingForm(props: ListingFormProps) {
           control={form.control}
           render={({ field, fieldState }) => (
             <Field data-invalid={fieldState.invalid}>
-              <span className="text-sm font-medium text-foreground">
+              {/* A11y audit (2026-06-08) — the `<span>` label is now
+                  `id`-tagged so the text input inside
+                  `CustomAmenitiesEditor` can reference it via
+                  `aria-labelledby`. Pre-fix the input had only a
+                  `placeholder`, which fails WCAG 1.3.1 (placeholder is
+                  not an accessible name). */}
+              <span
+                id="listing-custom-amenities-label"
+                className="text-sm font-medium text-foreground"
+              >
                 {t('listingForm.customAmenities.label')}
               </span>
               <p className="-mt-1 text-xs text-muted-foreground">
@@ -607,6 +616,11 @@ function CustomAmenitiesEditor({
             }
           }}
           placeholder={t('listingForm.customAmenities.placeholder')}
+          // A11y audit (2026-06-08) — reference the field's visible
+          // label `<span id="listing-custom-amenities-label">` above
+          // so the input has a real accessible name (placeholder is
+          // not one per WCAG 1.3.1).
+          aria-labelledby="listing-custom-amenities-label"
           maxLength={60}
           disabled={limitReached}
           className="h-10 flex-1"

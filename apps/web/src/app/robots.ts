@@ -8,8 +8,8 @@ export default function robots(): MetadataRoute.Robots {
   // URLs for auth/dashboard/admin don't get indexed either.
   // Additions over time :
   //   - /u/         (T-045 unsubscribe tokens — sensitive + ephemeral)
-  //   - /api/cron/  (T-049/T-050 crons — protected by Bearer but we
-  //                  don't want them crawled either)
+  //   - Note: `/api/cron/` is intentionally NOT listed — `/api/` already
+  //     covers all sub-routes per the robots.txt spec.
   const privatePaths = [
     '/sign-in',
     '/sign-up',
@@ -24,7 +24,6 @@ export default function robots(): MetadataRoute.Robots {
     // was harmless but ambiguous.
     '/dashboard/',
     '/api/',
-    '/api/cron/',
     '/admin/',
     '/u/',
     // SEO audit C-2 (2026-05-29) — onboarding wizard is auth-gated
