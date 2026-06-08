@@ -121,7 +121,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.7,
       alternates: { languages: languages('/proprietaires') },
     },
-    ...['/legal/terms', '/legal/privacy', '/legal/cookies', '/legal/mentions'].map(
+    // SEO audit C-1 (2026-05-29) — `/legal/terms-owner` was missing
+    // from the sitemap. The page is publicly indexable (T-049), but
+    // without an entry Googlebot only reaches it via the footer
+    // anchor (which itself is rendered in many slow-rendered pages
+    // and may not be picked up during a fast crawl).
+    ...['/legal/terms', '/legal/terms-owner', '/legal/privacy', '/legal/cookies', '/legal/mentions'].map(
       (path) => ({
         url: `${baseUrl}${path}`,
         lastModified: staticLastMod,

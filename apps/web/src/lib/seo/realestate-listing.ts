@@ -144,12 +144,19 @@ export function buildRealEstateListingLd(
         unitCode: 'MTK', // ISO 8601: square meters
       },
     }),
-    // `numberOfBedrooms` is the precise property; `numberOfRooms` (total
-    // rooms incl. living/dining/etc.) is dropped because we only have
-    // bedroom count — setting it to `bedrooms` would mis-signal a studio
-    // as a 1-piece dwelling.
+    // `numberOfBedrooms` is the precise property; `numberOfRooms` is the
+    // habitable-room total (bedrooms + living/dining, excludes
+    // bathrooms + kitchen + hall) — Google's RealEstateListing rich
+    // results panel surfaces both. We approximate `numberOfRooms` as
+    // bedrooms + 1 because every Madagascar listing on the platform
+    // has at least a salon/living room and there's no current schema
+    // field for living-room count. The +1 is conservative and matches
+    // the typical Fianarantsoa/Antananarivo apartment layout, where
+    // even studios are listed with bedrooms=1.
+    // SEO audit C-3 (2026-05-29) — adds numberOfRooms.
     ...(typeof listing.bedrooms === 'number' && {
       numberOfBedrooms: listing.bedrooms,
+      numberOfRooms: listing.bedrooms + 1,
     }),
     ...(typeof listing.bathrooms === 'number' && {
       numberOfBathroomsTotal: listing.bathrooms,
