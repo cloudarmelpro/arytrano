@@ -23,6 +23,11 @@ import {
   savedSearchRowSchema,
   leaseRowSchema,
   leaseDetailSchema,
+  initiateLeaseResponseSchema,
+  tenantPayLeaseResponseSchema,
+  type InitiateLeaseBody,
+  type InitiateLeaseResponse,
+  type TenantPayLeaseResponse,
 } from '@arytrano/shared'
 import { z } from 'zod'
 import { API_BASE_URL } from '../config'
@@ -406,12 +411,40 @@ export async function getLeaseById(id: string): Promise<LeaseDetail> {
   return r.data
 }
 
-/** Tenant accepts the lease. Server transitions PENDING_TENANT → ACTIVE. */
-export async function signLease(id: string): Promise<{ leaseId: string }> {
+/**
+ * Tenant accepts the lease — initiates the GoalPay checkout. The
+ * caller opens `checkoutUrl` in a WebView / external browser. After
+ * the payment lands, the GoalPay webhook flips the lease to ACTIVE
+ * server-side ; the app refreshes `/leases/[id]` to see the new state.
+ *
+ * Revised E-T26 (2026-05-27) — was `signLease(id) → { leaseId }`,
+ * is now the tenant-pays initiation that returns the checkout URL.
+ */
+export async function signLease(id: string): Promise<TenantPayLeaseResponse> {
   const r = await request(
     `/api/v1/leases/${encodeURIComponent(id)}/sign`,
-    z.object({ leaseId: z.string() }),
+    tenantPayLeaseResponseSchema,
     { method: 'POST' },
+  )
+  return r.data
+}
+
+/**
+ * Owner creates a lease draft (S2-10 mobile owner — 2026-05-29).
+ * Mirrors the web wizard at /dashboard/listings/[id]/lease/new ; the
+ * server derives `cautionMGA` + `platformFeeMGA` from the listing so
+ * the mobile form only collects tenant email + dates.
+ *
+ * After success the app navigates to /leases/[id]. The tenant receives
+ * an invite email and accepts (+ pays) from their own device.
+ */
+export async function initiateLease(
+  body: InitiateLeaseBody,
+): Promise<InitiateLeaseResponse> {
+  const r = await request(
+    '/api/v1/leases',
+    initiateLeaseResponseSchema,
+    { method: 'POST', body },
   )
   return r.data
 }
