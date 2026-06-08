@@ -1,5 +1,6 @@
 import 'server-only'
 import { prisma } from '@/lib/db'
+import { cloudinaryCardThumb } from '@/lib/images/cloudinary-transform'
 import type { PublicListingCard } from './list-public-listings'
 
 /**
@@ -62,17 +63,28 @@ export async function listRelatedListings(input: {
     },
   })
 
-  return rows.map((r) => ({
-    id: r.id,
-    slug: r.slug,
-    title: r.title,
-    type: r.type,
-    priceMonthlyMGA: r.priceMonthlyMGA,
-    cautionMonths: r.cautionMonths,
-    publishedAt: r.publishedAt,
-    verifiedAt: r.verifiedAt,
-    city: r.city,
-    neighborhood: r.neighborhood,
-    photo: r.photos[0] ?? null,
-  }))
+  return rows.map((r) => {
+    // Performance audit H-2 round 2 (2026-06-08) — apply the same
+    // 800×600 WebP q_75 transform that `list-public-listings` uses
+    // at the query layer. Pre-fix the related-listings strip at the
+    // bottom of every detail page shipped 4 raw upload URLs (~2 MB
+    // total worst case) below the fold. See `cloudinaryCardThumb`.
+    const rawPhoto = r.photos[0]
+    const photo = rawPhoto
+      ? { ...rawPhoto, url: cloudinaryCardThumb(rawPhoto.url) }
+      : null
+    return {
+      id: r.id,
+      slug: r.slug,
+      title: r.title,
+      type: r.type,
+      priceMonthlyMGA: r.priceMonthlyMGA,
+      cautionMonths: r.cautionMonths,
+      publishedAt: r.publishedAt,
+      verifiedAt: r.verifiedAt,
+      city: r.city,
+      neighborhood: r.neighborhood,
+      photo,
+    }
+  })
 }

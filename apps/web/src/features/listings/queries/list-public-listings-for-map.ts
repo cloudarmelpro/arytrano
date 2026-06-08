@@ -2,6 +2,7 @@ import 'server-only'
 import type { Prisma } from '@prisma/client'
 import { prisma } from '@/lib/db'
 import { escapeLike } from '@/lib/db/like-escape'
+import { cloudinaryPanelThumb } from '@/lib/images/cloudinary-transform'
 import { listPublicListingsQuerySchema, type ListPublicListingsQuery } from './list-public-listings'
 
 /**
@@ -90,16 +91,26 @@ export async function listPublicListingsForMap(
     },
   })
 
-  return rows.map((r) => ({
-    id: r.id,
-    slug: r.slug,
-    title: r.title,
-    priceMonthlyMGA: r.priceMonthlyMGA,
-    citySlug: r.city.slug,
-    neighborhoodSlug: r.neighborhood.slug,
-    neighborhoodLat: Number(r.neighborhood.lat),
-    neighborhoodLng: Number(r.neighborhood.lng),
-    neighborhoodNameFr: r.neighborhood.nameFr,
-    photoUrl: r.photos[0]?.url ?? null,
-  }))
+  return rows.map((r) => {
+    // Performance audit H-2 round 2 (2026-06-08) — apply
+    // `cloudinaryPanelThumb` (96×96 WebP q_70) at the query layer.
+    // The web `ListingsMapClient` panel was already calling this
+    // helper component-side, but mobile REST consumers of
+    // `/api/v1/listings?view=map` received the raw upload URL. Moving
+    // the transform to the query layer means every consumer gets the
+    // optimized URL by default.
+    const rawUrl = r.photos[0]?.url ?? null
+    return {
+      id: r.id,
+      slug: r.slug,
+      title: r.title,
+      priceMonthlyMGA: r.priceMonthlyMGA,
+      citySlug: r.city.slug,
+      neighborhoodSlug: r.neighborhood.slug,
+      neighborhoodLat: Number(r.neighborhood.lat),
+      neighborhoodLng: Number(r.neighborhood.lng),
+      neighborhoodNameFr: r.neighborhood.nameFr,
+      photoUrl: rawUrl ? cloudinaryPanelThumb(rawUrl) : null,
+    }
+  })
 }

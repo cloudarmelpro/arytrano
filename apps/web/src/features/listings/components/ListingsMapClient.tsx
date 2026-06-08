@@ -3,7 +3,11 @@
 import Link from 'next/link'
 import dynamic from 'next/dynamic'
 import { useEffect, useMemo, useRef, useState, type ComponentType } from 'react'
-import { cloudinaryPanelThumb } from '@/lib/images/cloudinary-transform'
+// Performance audit H-2 round 2 (2026-06-08) — `cloudinaryPanelThumb`
+// is now applied at the query layer (`list-public-listings-for-map.ts`)
+// so `MapListing.photoUrl` arrives pre-transformed. Removed the
+// component-level call to avoid stacking duplicate transforms in the
+// URL (Cloudinary would chain them; output is identical but ugly).
 
 /**
  * Performance audit C-1 (2026-05-29) — `pigeon-maps` is ~45 kB
@@ -300,7 +304,7 @@ export function ListingsMapClient({
                       {l.photoUrl ? (
                         // eslint-disable-next-line @next/next/no-img-element
                         <img
-                          src={cloudinaryPanelThumb(l.photoUrl)}
+                          src={l.photoUrl}
                           alt=""
                           width={48}
                           height={48}
