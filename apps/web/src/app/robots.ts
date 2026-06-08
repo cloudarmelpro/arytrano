@@ -17,7 +17,11 @@ export default function robots(): MetadataRoute.Robots {
     '/reset-password',
     '/verify-email',
     '/auth-error',
-    '/dashboard',
+    // SEO audit cleanup (2026-06-08) — `/dashboard/` alone covers the
+    // index page AND all sub-routes per the robots.txt spec
+    // (`Disallow: /dashboard/` matches `/dashboard`, `/dashboard/x`,
+    // etc). The earlier duplicate `/dashboard` + `/dashboard/` pair
+    // was harmless but ambiguous.
     '/dashboard/',
     '/api/',
     '/api/cron/',

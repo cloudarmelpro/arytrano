@@ -30,6 +30,13 @@ import { applyLeasePaymentSideEffect } from './apply-lease-payment-side-effect'
  */
 
 export type ReconcileStuckLeaseActivationsResult = {
+  /**
+   * Number of PENDING_TENANT leases scanned by the replay leg ONLY —
+   * does NOT include the orphan-listings sweep, which has its own
+   * counter (`orphanListingsFreed`). Audit doc-clarification
+   * (2026-06-08): telemetry consumers should not treat `scanned: 0`
+   * as "nothing happened" — check `orphanListingsFreed` too.
+   */
   scanned: number
   replayed: number
   alreadyActive: number
