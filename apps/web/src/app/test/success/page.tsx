@@ -4,7 +4,13 @@ import { TransactionResult } from '@/features/payments'
 
 export const metadata: Metadata = {
   title: 'Paiement test confirmé · AryTrano',
+  description: 'Mode TEST GoalPay — simulation de paiement confirmé.',
   robots: { index: false, follow: false },
+  openGraph: {
+    title: 'Paiement test confirmé · AryTrano',
+    description: 'Mode TEST GoalPay — simulation de paiement confirmé.',
+    images: ['/images/arytrano.webp'],
+  },
 }
 
 type SearchParams = Promise<{
