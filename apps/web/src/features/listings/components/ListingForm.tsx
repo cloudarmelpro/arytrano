@@ -417,17 +417,22 @@ export function ListingForm(props: ListingFormProps) {
           control={form.control}
           render={({ field }) => (
             <Field>
-              {/* A11y audit H-3 (2026-05-29) — explicit id/htmlFor.
-                  shadcn Checkbox is a `<button role="checkbox">`, not a
-                  labelable element; wrapping a `<label>` around it does
-                  NOT establish a programmatic association. */}
-              <Label htmlFor="listing-furnished" className="font-normal">
+              {/* A11y audit H-3 round 2 (2026-06-08) — shadcn Checkbox
+                  renders `<button role="checkbox">`, so `<label htmlFor>`
+                  doesn't establish the screen-reader association. Use
+                  `aria-labelledby` on the Checkbox itself, pointing at
+                  the visible text span. The wrapping `<Label>` stays
+                  for the visual click target. */}
+              <Label className="font-normal">
                 <Checkbox
                   id="listing-furnished"
                   checked={field.value === true || field.value === 'true'}
                   onCheckedChange={(c) => field.onChange(c)}
+                  aria-labelledby="listing-furnished-label"
                 />
-                <span>{t('listingForm.furnished.label')}</span>
+                <span id="listing-furnished-label">
+                  {t('listingForm.furnished.label')}
+                </span>
               </Label>
             </Field>
           )}
@@ -456,14 +461,16 @@ export function ListingForm(props: ListingFormProps) {
                 <ul className="mt-2 grid grid-cols-1 gap-2 sm:grid-cols-2">
                   {AMENITY_CATALOG.map((a) => {
                     const isOn = selected.has(a.value)
-                    // A11y audit H-3 (2026-05-29) — every amenity gets a
-                    // unique id and the wrapping Label points at it. See
-                    // furnished checkbox above for rationale.
+                    // A11y audit H-3 round 2 (2026-06-08) — same pattern as
+                    // the furnished checkbox above: `aria-labelledby` on the
+                    // Checkbox (button role=checkbox) instead of `htmlFor`
+                    // on the wrapping Label, since the spec doesn't allow
+                    // labeling a button via <label>.
                     const checkboxId = `listing-amenity-${a.value}`
+                    const labelId = `${checkboxId}-label`
                     return (
                       <li key={a.value}>
                         <Label
-                          htmlFor={checkboxId}
                           className="cursor-pointer rounded-md border border-input bg-background px-3 py-2 transition hover:bg-muted data-[checked=true]:border-primary data-[checked=true]:bg-primary/5 font-normal"
                           data-checked={isOn}
                         >
@@ -471,11 +478,14 @@ export function ListingForm(props: ListingFormProps) {
                             id={checkboxId}
                             checked={isOn}
                             onCheckedChange={() => toggle(a.value)}
+                            aria-labelledby={labelId}
                           />
                           <span className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-muted text-foreground">
                             <AmenityIcon amenity={a.value} />
                           </span>
-                          <span className="text-sm">{t(a.labelKey)}</span>
+                          <span id={labelId} className="text-sm">
+                            {t(a.labelKey)}
+                          </span>
                         </Label>
                       </li>
                     )

@@ -47,15 +47,16 @@ export function OwnerTermsForm() {
       aria-busy={pending}
     >
       <fieldset disabled={pending} className="contents">
-        {/* A11y audit C-1 (2026-05-29) — `htmlFor` explicit. The
-            shadcn `Checkbox` renders a `<button role="checkbox">`,
-            which is NOT a labelable element per HTML spec — the
-            implicit wrapping label association is unreliable across
-            Base UI versions. Wire `htmlFor` to the checkbox id. */}
-        <label
-          htmlFor="owner-terms-accepted"
-          className="flex cursor-pointer items-start gap-3 rounded-2xl border border-border bg-background p-4 transition hover:border-foreground/30"
-        >
+        {/* A11y audit C-1 round 2 (2026-06-08) — shadcn `Checkbox`
+            renders `<button role="checkbox">`, which is NOT a
+            labelable element per HTML spec, so `<label htmlFor>` was
+            silently ignored by screen readers. The accessible name
+            now comes from `aria-labelledby` on the Checkbox pointing
+            at the visible text span. The wrapping `<label>` stays
+            for the visual click target (clicks within label bounds
+            still activate descendant buttons), but the SR
+            association is established via aria-labelledby. */}
+        <label className="flex cursor-pointer items-start gap-3 rounded-2xl border border-border bg-background p-4 transition hover:border-foreground/30">
           <Checkbox
             id="owner-terms-accepted"
             name="accepted"
@@ -64,11 +65,15 @@ export function OwnerTermsForm() {
               setAccepted(v === true)
               if (v === true) setError(null)
             }}
+            aria-labelledby="owner-terms-label"
             aria-invalid={!!error}
             aria-describedby={error ? 'owner-terms-error' : undefined}
             className="mt-0.5"
           />
-          <span className="text-[14.5px] leading-[1.55] text-foreground/80">
+          <span
+            id="owner-terms-label"
+            className="text-[14.5px] leading-[1.55] text-foreground/80"
+          >
             {t('onboarding.owner.terms.checkbox')}
           </span>
         </label>
