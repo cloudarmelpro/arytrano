@@ -56,7 +56,13 @@ export async function tenantInitiatePayment(
       paymentId: true,
       platformFeeMGA: true,
       listing: { select: { title: true } },
-      payment: { select: { status: true, providerTxId: true } },
+      payment: {
+        select: {
+          status: true,
+          providerTxId: true,
+          expiresAt: true,
+        },
+      },
     },
   })
 
@@ -85,12 +91,46 @@ export async function tenantInitiatePayment(
   // so a double-click / second tab doesn't spawn a parallel GoalPay
   // session (whose webhook would land on a lease pointing to the
   // OTHER session's payment row → money lost).
+  //
+  // S2-26 follow-up : the previous INITIATED may simply be a stale
+  // checkout the tenant abandoned (browser close, network drop).
+  // GoalPay's TTL on the checkout URL is ~10 min ; once `expiresAt`
+  // has passed, the session is dead and the tenant must be able to
+  // retry. We mark the orphan as EXPIRED (with a `superseded` audit
+  // row) so the create path below can proceed cleanly.
   if (lease.payment && lease.payment.status === 'INITIATED') {
-    return {
-      kind: 'in_progress',
-      leaseId,
-      paymentId: lease.paymentId!,
+    const now = new Date()
+    const isStale =
+      lease.payment.expiresAt !== null && lease.payment.expiresAt < now
+    if (!isStale) {
+      // Concurrent click — block.
+      return {
+        kind: 'in_progress',
+        leaseId,
+        paymentId: lease.paymentId!,
+      }
     }
+    // Stale — mark EXPIRED + audit, then continue to create a fresh
+    // session. Run BOTH writes in a transaction so a crash mid-step
+    // doesn't leave the lease pointing at a row whose status we just
+    // started flipping.
+    await prisma.$transaction([
+      prisma.payment.update({
+        where: { id: lease.paymentId! },
+        data: { status: 'EXPIRED' },
+      }),
+      prisma.paymentEvent.create({
+        data: {
+          paymentId: lease.paymentId!,
+          status: 'EXPIRED',
+          rawPayload: {
+            reason: 'superseded',
+            leaseId: lease.id,
+            note: 'Stale INITIATED checkout replaced by a fresh tenant retry.',
+          },
+        },
+      }),
+    ])
   }
 
   // Fresh idempotency key per attempt — if a previous Payment is
