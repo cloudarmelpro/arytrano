@@ -1,4 +1,5 @@
 import 'server-only'
+import { z } from 'zod'
 import { created, withErrorHandling } from '@/lib/api/response'
 import { errors } from '@/lib/api/errors'
 import { extractRequestInfo } from '@/lib/auth/request-info'
@@ -6,7 +7,27 @@ import { rateLimiters } from '@/lib/rate-limit'
 import { registerUser } from '../services/register-user'
 import { recordLoginEvent } from '../services/record-login-event'
 import { sendVerificationEmail } from '../services/send-verification-email'
-import { signUpSchema } from '../schemas'
+
+/**
+ * Mobile-only sign-up schema — DELIBERATELY omits the `role` field
+ * the web `signUpSchema` accepts. Mobile self-registration may only
+ * create STUDENT accounts; OWNER promotion needs a dedicated
+ * authenticated upgrade endpoint, not a self-serve switch at signup.
+ *
+ * Defense-in-depth (round 2, 2026-06-08): the registerUser() call
+ * below also hard-codes `role: 'STUDENT'`, but parsing through a
+ * schema that has no `role` field means an attacker's `{role:"OWNER"}`
+ * is dropped at the Zod boundary — no chance of a future maintainer
+ * accidentally spreading `input` into the service call.
+ */
+const mobileRegisterSchema = z.object({
+  email: z.string().email('Email invalide'),
+  password: z
+    .string()
+    .min(8, 'Au moins 8 caractères')
+    .max(128, '128 caractères maximum'),
+  name: z.string().min(2, 'Au moins 2 caractères').max(80).optional(),
+})
 
 /**
  * POST /api/v1/auth/register — mobile
@@ -36,9 +57,10 @@ export const POST = withErrorHandling(async (req: Request) => {
   }
 
   const body = await req.json()
-  const input = signUpSchema.parse(body)
+  const input = mobileRegisterSchema.parse(body)
 
-  // SEC-C1 — strip any role override the caller tried to inject.
+  // SEC-C1 — `role` is forced STUDENT here AND there's no `role` field
+  // on `mobileRegisterSchema` to begin with (double belt-and-braces).
   const user = await registerUser({
     email: input.email,
     password: input.password,

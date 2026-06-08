@@ -41,10 +41,23 @@ export async function GET(request: Request) {
     return NextResponse.json({ ok: false, error: 'unauthorized' }, { status: 401 })
   }
 
-  if (
-    !env.CRON_SECRET ||
-    !bearerEquals(request.headers.get('authorization'), env.CRON_SECRET)
-  ) {
+  if (!env.CRON_SECRET) {
+    // Sec audit (2026-06-08) — mirror the push-receipts pattern:
+    // missing CRON_SECRET silently disables the job. Surface the
+    // misconfig in Sentry instead of letting it rot for weeks.
+    Sentry.captureMessage('Cron disabled (CRON_SECRET missing)', {
+      level: 'error',
+      tags: { cron: 'listing-expiration', issue: 'disabled' },
+    })
+    return NextResponse.json({ ok: false, error: 'unauthorized' }, { status: 401 })
+  }
+  if (!bearerEquals(request.headers.get('authorization'), env.CRON_SECRET)) {
+    // Wrong secret = scheduler config drifted. The cron has effectively
+    // stopped running; warning-level Sentry surfaces it.
+    Sentry.captureMessage('Cron auth failed (bad bearer)', {
+      level: 'warning',
+      tags: { cron: 'listing-expiration', auth: 'failed' },
+    })
     return NextResponse.json({ ok: false, error: 'unauthorized' }, { status: 401 })
   }
 

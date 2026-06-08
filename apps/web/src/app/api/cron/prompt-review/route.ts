@@ -46,10 +46,21 @@ export async function GET(request: Request) {
   }
 
   // 2. Auth — Bearer secret, timing-safe compare.
-  if (
-    !env.CRON_SECRET ||
-    !bearerEquals(request.headers.get('authorization'), env.CRON_SECRET)
-  ) {
+  if (!env.CRON_SECRET) {
+    // Sec audit (2026-06-08) — mirror the push-receipts pattern:
+    // missing CRON_SECRET silently disables the job. Surface the
+    // misconfig in Sentry instead of letting it rot for weeks.
+    Sentry.captureMessage('Cron disabled (CRON_SECRET missing)', {
+      level: 'error',
+      tags: { cron: 'prompt-review', issue: 'disabled' },
+    })
+    return NextResponse.json({ ok: false, error: 'unauthorized' }, { status: 401 })
+  }
+  if (!bearerEquals(request.headers.get('authorization'), env.CRON_SECRET)) {
+    Sentry.captureMessage('Cron auth failed (bad bearer)', {
+      level: 'warning',
+      tags: { cron: 'prompt-review', auth: 'failed' },
+    })
     return NextResponse.json({ ok: false, error: 'unauthorized' }, { status: 401 })
   }
 
