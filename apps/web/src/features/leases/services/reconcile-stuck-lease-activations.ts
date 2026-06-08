@@ -34,9 +34,65 @@ export type ReconcileStuckLeaseActivationsResult = {
   replayed: number
   alreadyActive: number
   failed: number
+  /**
+   * Payment audit H-4 (2026-05-29) — count of orphan
+   * `Lease.TERMINATED + Listing.RENTED` pairs flipped back to PUBLISHED.
+   * Source paths that emit this orphan now wrap in a transaction (see
+   * `terminate-completed-leases.ts` H-3 fix); this counter exists to
+   * catch pre-fix legacy rows AND any future regression in another
+   * lease-termination path (manual cancel, dispute, etc.).
+   */
+  orphanListingsFreed: number
 }
 
 export async function reconcileStuckLeaseActivations(): Promise<ReconcileStuckLeaseActivationsResult> {
+  // H-4 sweep — find Listings stuck on RENTED whose latest lease is
+  // already TERMINATED. Run BEFORE the PENDING_TENANT sweep so the
+  // sweep order is deterministic in tests (no overlap — different
+  // status sets).
+  const orphanListings = await prisma.listing.findMany({
+    where: {
+      status: 'RENTED',
+      leases: { every: { status: { not: 'ACTIVE' } } },
+    },
+    select: { id: true },
+    take: 200,
+  })
+
+  let orphanListingsFreed = 0
+  for (const listing of orphanListings) {
+    try {
+      const result = await prisma.listing.updateMany({
+        where: {
+          id: listing.id,
+          status: 'RENTED',
+          leases: { every: { status: { not: 'ACTIVE' } } },
+        },
+        data: { status: 'PUBLISHED' },
+      })
+      orphanListingsFreed += result.count
+    } catch (err) {
+      Sentry.captureException(err, {
+        tags: {
+          cron: 'reconcile-stuck-lease-activations',
+          step: 'free-orphan-listing',
+        },
+        extra: { listingId: listing.id },
+      })
+    }
+  }
+
+  if (orphanListingsFreed > 0) {
+    Sentry.captureMessage(
+      'reconcile-stuck-lease-activations freed orphan RENTED listings',
+      {
+        level: 'warning',
+        tags: { cron: 'reconcile-stuck-lease-activations' },
+        extra: { orphanListingsFreed },
+      },
+    )
+  }
+
   // Find Leases stuck in PENDING_TENANT whose linked Payment is
   // already CONFIRMED. The CONFIRMED Payment means the webhook DID
   // arrive — only the side-effect leg failed to advance the lease.
@@ -51,7 +107,13 @@ export async function reconcileStuckLeaseActivations(): Promise<ReconcileStuckLe
   })
 
   if (stuck.length === 0) {
-    return { scanned: 0, replayed: 0, alreadyActive: 0, failed: 0 }
+    return {
+      scanned: 0,
+      replayed: 0,
+      alreadyActive: 0,
+      failed: 0,
+      orphanListingsFreed,
+    }
   }
 
   let replayed = 0
@@ -120,5 +182,6 @@ export async function reconcileStuckLeaseActivations(): Promise<ReconcileStuckLe
     replayed,
     alreadyActive,
     failed,
+    orphanListingsFreed,
   }
 }

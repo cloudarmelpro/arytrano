@@ -86,21 +86,35 @@ export async function terminateCompletedLeases(opts?: {
 
   for (const lease of expired) {
     try {
-      const updateResult = await prisma.lease.updateMany({
-        where: { id: lease.id, status: 'ACTIVE' },
-        data: { status: 'TERMINATED', terminatedAt: now },
+      // Payment audit H-3 (2026-05-29) — wrap the lease+listing flip in
+      // a single transaction. Pre-fix the lease was set TERMINATED
+      // with a separate listing.update call — if the worker crashed
+      // (or the listing.update threw because the row had been deleted
+      // mid-cron) between the two calls, the DB ended up with the
+      // orphan pair `Lease.TERMINATED + Listing.RENTED`, which keeps
+      // the listing locked out of re-publish and the partial unique
+      // `Lease_listing_active_unique` from accepting a new lease.
+      // The reconcile-stuck-lease-activations cron now sweeps any
+      // remaining orphans (H-4), but the source-of-truth path here
+      // shouldn't manufacture them in the first place.
+      //
+      // Both writes are updateMany-on-status so a concurrent dispute
+      // / manual transition that wins the race won't be clobbered.
+      const txResult = await prisma.$transaction(async (tx) => {
+        const leaseUpdate = await tx.lease.updateMany({
+          where: { id: lease.id, status: 'ACTIVE' },
+          data: { status: 'TERMINATED', terminatedAt: now },
+        })
+        if (leaseUpdate.count === 0) return { transitioned: false }
+        await tx.listing.updateMany({
+          where: { id: lease.listingId, status: 'RENTED' },
+          data: { status: 'PUBLISHED' },
+        })
+        return { transitioned: true }
       })
-      if (updateResult.count === 0) {
-        // Race lost — someone else transitioned the row.
-        continue
-      }
-      terminated += 1
 
-      // Free the listing so the owner can re-publish on the same row.
-      await prisma.listing.update({
-        where: { id: lease.listingId },
-        data: { status: 'PUBLISHED' },
-      })
+      if (!txResult.transitioned) continue
+      terminated += 1
 
       notifyQueue.push({
         leaseId: lease.id,

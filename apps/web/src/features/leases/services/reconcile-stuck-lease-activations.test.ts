@@ -8,6 +8,7 @@ vi.mock('@sentry/nextjs', () => ({
 vi.mock('@/lib/db', () => ({
   prisma: {
     lease: { findMany: vi.fn() },
+    listing: { findMany: vi.fn(), updateMany: vi.fn() },
   },
 }))
 vi.mock('./apply-lease-payment-side-effect', () => ({
@@ -20,6 +21,10 @@ import { applyLeasePaymentSideEffect } from './apply-lease-payment-side-effect'
 
 beforeEach(() => {
   vi.clearAllMocks()
+  // Default the H-4 orphan-listing sweep to empty so existing tests
+  // don't have to wire it; per-test cases override as needed.
+  vi.mocked(prisma.listing.findMany).mockResolvedValue([] as never)
+  vi.mocked(prisma.listing.updateMany).mockResolvedValue({ count: 0 } as never)
 })
 
 describe('reconcileStuckLeaseActivations', () => {
@@ -31,6 +36,7 @@ describe('reconcileStuckLeaseActivations', () => {
       replayed: 0,
       alreadyActive: 0,
       failed: 0,
+      orphanListingsFreed: 0,
     })
     expect(applyLeasePaymentSideEffect).not.toHaveBeenCalled()
   })
@@ -109,5 +115,40 @@ describe('reconcileStuckLeaseActivations', () => {
 
     expect(result.scanned).toBe(1)
     expect(applyLeasePaymentSideEffect).not.toHaveBeenCalled()
+  })
+
+  // ---------- Payment audit H-4 (2026-05-29) ---------- //
+  // Orphan listing sweep — flip TERMINATED+RENTED back to PUBLISHED.
+
+  it('frees orphan RENTED listings whose lease is already TERMINATED', async () => {
+    vi.mocked(prisma.listing.findMany).mockResolvedValue([
+      { id: 'listing_1' },
+      { id: 'listing_2' },
+    ] as never)
+    vi.mocked(prisma.listing.updateMany).mockResolvedValue({
+      count: 1,
+    } as never)
+    vi.mocked(prisma.lease.findMany).mockResolvedValue([] as never)
+
+    const result = await reconcileStuckLeaseActivations()
+
+    expect(result.orphanListingsFreed).toBe(2)
+    expect(prisma.listing.updateMany).toHaveBeenCalledTimes(2)
+  })
+
+  it('counts only listings that actually flipped (race-safe count)', async () => {
+    vi.mocked(prisma.listing.findMany).mockResolvedValue([
+      { id: 'listing_1' },
+      { id: 'listing_2' },
+    ] as never)
+    vi.mocked(prisma.listing.updateMany)
+      .mockResolvedValueOnce({ count: 1 } as never)
+      // Second listing was raced — another path already flipped it.
+      .mockResolvedValueOnce({ count: 0 } as never)
+    vi.mocked(prisma.lease.findMany).mockResolvedValue([] as never)
+
+    const result = await reconcileStuckLeaseActivations()
+
+    expect(result.orphanListingsFreed).toBe(1)
   })
 })

@@ -13,12 +13,20 @@ vi.mock('@sentry/nextjs', () => ({
   captureException: vi.fn(),
   captureMessage: vi.fn(),
 }))
-vi.mock('@/lib/db', () => ({
-  prisma: {
+// `$transaction` is mocked to invoke the callback with the same
+// `prisma` stub (treating it as `tx`) so the inner updateMany calls
+// route through the mocked methods. The H-3 audit fix wrapped the
+// lease+listing flip in `prisma.$transaction(async (tx) => …)`.
+vi.mock('@/lib/db', () => {
+  const prisma = {
     lease: { findMany: vi.fn(), updateMany: vi.fn() },
-    listing: { update: vi.fn() },
-  },
-}))
+    listing: { updateMany: vi.fn() },
+    $transaction: vi.fn(async (fn: (tx: unknown) => Promise<unknown>) =>
+      fn(prisma),
+    ),
+  }
+  return { prisma }
+})
 vi.mock('@/lib/email/send-transactional', () => ({
   sendTransactionalEmail: vi.fn().mockResolvedValue(undefined),
 }))
@@ -31,6 +39,14 @@ beforeEach(() => {
   vi.mocked(prisma.lease.updateMany).mockResolvedValue({
     count: 1,
   } as never)
+  vi.mocked(prisma.listing.updateMany).mockResolvedValue({
+    count: 1,
+  } as never)
+  // Re-apply the $transaction stub after clearAllMocks() wipes it.
+  vi.mocked(prisma.$transaction).mockImplementation(
+    async (fn: unknown) =>
+      (fn as (tx: unknown) => Promise<unknown>)(prisma),
+  )
 })
 
 const mkLease = (id: string, startDate: Date, durationMonths: number) => ({
@@ -73,7 +89,7 @@ describe('terminateCompletedLeases', () => {
     expect(result.scanned).toBe(1)
     expect(result.terminated).toBe(1)
     expect(prisma.lease.updateMany).toHaveBeenCalledOnce()
-    expect(prisma.listing.update).toHaveBeenCalledOnce()
+    expect(prisma.listing.updateMany).toHaveBeenCalledOnce()
   })
 
   it('skips leases still within their term', async () => {
@@ -89,7 +105,7 @@ describe('terminateCompletedLeases', () => {
     expect(result.scanned).toBe(1)
     expect(result.terminated).toBe(0)
     expect(prisma.lease.updateMany).not.toHaveBeenCalled()
-    expect(prisma.listing.update).not.toHaveBeenCalled()
+    expect(prisma.listing.updateMany).not.toHaveBeenCalled()
   })
 
   it('handles a mixed batch — only the expired ones are processed', async () => {
@@ -108,7 +124,7 @@ describe('terminateCompletedLeases', () => {
     expect(result.scanned).toBe(2)
     expect(result.terminated).toBe(1)
     expect(prisma.lease.updateMany).toHaveBeenCalledOnce()
-    expect(prisma.listing.update).toHaveBeenCalledOnce()
+    expect(prisma.listing.updateMany).toHaveBeenCalledOnce()
   })
 
   it('skips race-lost rows (updateMany returns count=0)', async () => {
@@ -124,7 +140,7 @@ describe('terminateCompletedLeases', () => {
     const result = await terminateCompletedLeases()
 
     expect(result.terminated).toBe(0)
-    expect(prisma.listing.update).not.toHaveBeenCalled()
+    expect(prisma.listing.updateMany).not.toHaveBeenCalled()
   })
 
   it('continues the batch when a single transition throws', async () => {
