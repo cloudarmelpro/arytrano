@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache'
 import { ZodError } from 'zod'
 import { ApiError } from '@/lib/api/errors'
 import { auth } from '@/features/auth'
+import { rateLimiters } from '@/lib/rate-limit'
 import { createReviewSchema } from '../schemas/create-review'
 import { createReview } from '../services/create-review'
 
@@ -24,6 +25,15 @@ export async function submitReviewAction(
 ): Promise<SubmitReviewState> {
   const session = await auth()
   if (!session?.user?.id) return { ok: false, needsAuth: true }
+
+  // Security audit H-1 (2026-05-29) — bucket by authorId so the same
+  // bucket throttles both the Server Action and the REST handler. 5/h
+  // is enough for a real renter spread across multiple listings,
+  // tight enough to bound rating manipulation.
+  const rl = await rateLimiters.reviewSubmit(session.user.id)
+  if (!rl.success) {
+    return { ok: false, message: 'Trop d’avis publiés récemment. Réessaie dans une heure.' }
+  }
 
   let input
   try {

@@ -167,6 +167,19 @@ const cronAccessLimiter = makeLimiter('cron-access', {
   window: '1 h',
 })
 
+// Review submission (Security audit H-1, 2026-05-29) — 5/h per userId.
+// Reviews go straight to the public listing detail page; without a
+// cap a single signed-in user could spam dozens of 1-star reviews on
+// a competitor listing in seconds, gaming both rating display and
+// SEO content freshness signals. 5/h covers legitimate "I rented in
+// multiple places this month" traffic and bounds abuse. Bearer-keyed
+// via authorId — both the Server Action and the REST handler share
+// the same bucket.
+const reviewSubmitLimiter = makeLimiter('review-submit', {
+  requests: 5,
+  window: '1 h',
+})
+
 // GoalPay webhook ingress (audit H1) — 100/min per IP. HMAC verify
 // short-circuits invalid signatures, but each rejected POST still
 // runs `request.text()` + HMAC compute + Sentry capture. An attacker
@@ -282,4 +295,7 @@ export const rateLimiters = {
   /** GoalPay webhook ingress — 100/min per IP. Fail-CLOSED on null IP. */
   webhookIngress: (ipHash: string | null) =>
     check(webhookIngressLimiter, ipHash ?? 'noip:webhook-ingress'),
+
+  /** Review submit — 5/h per authorId. Bearer-keyed; same bucket for web + mobile. */
+  reviewSubmit: (authorId: string) => check(reviewSubmitLimiter, authorId),
 }

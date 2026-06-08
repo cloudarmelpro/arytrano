@@ -61,6 +61,20 @@ export function scrubPii<T extends Event | ErrorEvent>(event: T): T {
     }
   }
 
+  // 6. Security audit H-4 (2026-05-29) — recursively scrub `event.extra`
+  // and `event.contexts`. Many services pass structured payloads via
+  // `Sentry.captureException(err, { extra: { leaseId, bodyExcerpt, … } })`
+  // — pre-fix, the GoalPay webhook excerpt and any error context that
+  // held an email/phone/CIN flowed to Sentry unmodified. Recursion
+  // handles arrays + nested objects (the existing breadcrumb path is
+  // shallow-array-aware, this one is not).
+  if (event.extra) {
+    maskPiiInObject(event.extra as Record<string, unknown>)
+  }
+  if (event.contexts) {
+    maskPiiInObject(event.contexts as unknown as Record<string, unknown>)
+  }
+
   return event
 }
 
@@ -84,7 +98,19 @@ function maskPiiInObject(obj: Record<string, unknown>) {
     const value = obj[key]
     if (typeof value === 'string') {
       obj[key] = maskPii(value)
-    } else if (value && typeof value === 'object' && !Array.isArray(value)) {
+    } else if (Array.isArray(value)) {
+      // H-4 (2026-05-29) — recurse into arrays. The breadcrumb path
+      // pre-fix dropped arrays silently; an `extra: { ids: [emails…] }`
+      // payload would leak.
+      for (let i = 0; i < value.length; i++) {
+        const item = value[i]
+        if (typeof item === 'string') {
+          value[i] = maskPii(item)
+        } else if (item && typeof item === 'object') {
+          maskPiiInObject(item as Record<string, unknown>)
+        }
+      }
+    } else if (value && typeof value === 'object') {
       maskPiiInObject(value as Record<string, unknown>)
     }
   }
