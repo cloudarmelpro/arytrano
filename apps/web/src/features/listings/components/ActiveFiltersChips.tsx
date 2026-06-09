@@ -77,6 +77,12 @@ export function ActiveFiltersChips({
   const priceMax = safeFiniteNumber(params.get('priceMax'))
   const amenities = (params.get('amenities') ?? '').split(',').filter(Boolean)
   const q = params.get('q')
+  // 2026-06-09 — sidebar refining filters surface as chips too.
+  const bedrooms = safeFiniteNumber(params.get('bedrooms'))
+  const bathrooms = safeFiniteNumber(params.get('bathrooms'))
+  const furnishedRaw = params.get('furnished')
+  const furnished =
+    furnishedRaw === 'true' ? true : furnishedRaw === 'false' ? false : null
 
   const chips: Chip[] = []
 
@@ -121,6 +127,38 @@ export function ActiveFiltersChips({
         remove: () => removeParams('neighborhood'),
       })
     }
+  }
+
+  // 2026-06-09 — bedrooms / bathrooms / furnished chips. Each chip
+  // removes only its own URL param (other filters preserved).
+  if (bedrooms !== null && bedrooms >= 1) {
+    const label = t('filters.bedrooms.chip', { count: bedrooms })
+    chips.push({
+      key: 'bedrooms',
+      label,
+      ariaText: label,
+      remove: () => removeParams('bedrooms'),
+    })
+  }
+  if (bathrooms !== null && bathrooms >= 1) {
+    const label = t('filters.bathrooms.chip', { count: bathrooms })
+    chips.push({
+      key: 'bathrooms',
+      label,
+      ariaText: label,
+      remove: () => removeParams('bathrooms'),
+    })
+  }
+  if (furnished !== null) {
+    const label = furnished
+      ? t('filters.furnished.yes')
+      : t('filters.furnished.no')
+    chips.push({
+      key: 'furnished',
+      label,
+      ariaText: label,
+      remove: () => removeParams('furnished'),
+    })
   }
 
   if (priceMin !== null || priceMax !== null) {

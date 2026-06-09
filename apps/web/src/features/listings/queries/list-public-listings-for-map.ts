@@ -59,6 +59,11 @@ export async function listPublicListingsForMap(
       ...(q.priceMax !== undefined && { lte: q.priceMax }),
     }
   }
+  // 2026-06-09 sidebar additions — mirror the grid-side filters so the
+  // map pins reflect the same query the cards do.
+  if (q.bedrooms !== undefined) where.bedrooms = { gte: q.bedrooms }
+  if (q.bathrooms !== undefined) where.bathrooms = { gte: q.bathrooms }
+  if (q.furnished !== undefined) where.furnished = q.furnished
   if (q.amenities && q.amenities.length > 0) {
     where.amenities = { hasEvery: q.amenities }
   }

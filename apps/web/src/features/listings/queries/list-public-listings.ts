@@ -31,6 +31,20 @@ const priceSchema = z.coerce
   .max(100_000_000)
   .optional()
 
+// Bedrooms / bathrooms filters use "at least N" semantics — a visitor
+// who picks "2 chambres" wants every listing with 2 or more bedrooms,
+// not strictly 2. Caps are generous enough to cover real listings (5
+// bedrooms is rare on the platform; the URL still accepts higher
+// values, the sidebar just stops the pill row at 5+).
+const minCountSchema = z.coerce.number().int().min(1).max(20).optional()
+
+// Furnished filter: `'true'` / `'false'` boolean strings via URL. The
+// schema coerces to a real boolean for the Prisma where clause.
+const furnishedSchema = z
+  .enum(['true', 'false'])
+  .optional()
+  .transform((v) => (v === undefined ? undefined : v === 'true'))
+
 export const LISTING_SORT_VALUES = ['newest', 'price-asc', 'price-desc'] as const
 export type ListingSort = (typeof LISTING_SORT_VALUES)[number]
 
@@ -71,6 +85,12 @@ export const listPublicListingsQuerySchema = z
     neighborhood: slugSchema, // neighborhood slug
     priceMin: priceSchema,
     priceMax: priceSchema,
+    // Refining filters added 2026-06-09 — sidebar adds bedrooms count,
+    // bathrooms count, furnished yes/no. All optional; bedrooms /
+    // bathrooms use "≥ N" semantics, furnished is strict equality.
+    bedrooms: minCountSchema,
+    bathrooms: minCountSchema,
+    furnished: furnishedSchema,
     sort: z.enum(LISTING_SORT_VALUES).optional(),
     amenities: amenitiesFromUrl,
     // E-T14 full-text search. Bounded to 120 chars to keep the
@@ -142,6 +162,17 @@ export async function listPublicListings(
       ...(input.priceMin !== undefined && { gte: input.priceMin }),
       ...(input.priceMax !== undefined && { lte: input.priceMax }),
     }
+  }
+  // Bedrooms / bathrooms: "≥ N" semantics so the sidebar can offer
+  // "2+ chambres" UX without the visitor missing 3+ matches.
+  if (input.bedrooms !== undefined) {
+    where.bedrooms = { gte: input.bedrooms }
+  }
+  if (input.bathrooms !== undefined) {
+    where.bathrooms = { gte: input.bathrooms }
+  }
+  if (input.furnished !== undefined) {
+    where.furnished = input.furnished
   }
   // Amenities: AND semantics — every selected amenity must be present
   // on the listing. `hasEvery` does the array-contains-all check.

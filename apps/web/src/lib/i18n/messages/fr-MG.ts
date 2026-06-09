@@ -503,6 +503,20 @@ export const frMG = {
   'annonces.map.empty.title': 'Aucune annonce à afficher sur la carte',
   'annonces.map.empty.lead': 'Modifiez vos filtres ou repassez en vue Grille.',
   'filters.amenities.label': 'Ce que propose ce logement',
+  // 2026-06-09 sidebar additions — bedrooms / bathrooms / furnished
+  // (filters.type.label + filters.type.all reuse existing keys above)
+  'filters.bedrooms.label': 'Chambres',
+  'filters.bedrooms.any': 'Indifférent',
+  'filters.bedrooms.atLeast': '{count}+',
+  'filters.bedrooms.chip': '{count}+ ch.',
+  'filters.bathrooms.label': 'Salles de bain',
+  'filters.bathrooms.any': 'Indifférent',
+  'filters.bathrooms.atLeast': '{count}+',
+  'filters.bathrooms.chip': '{count}+ sdb',
+  'filters.furnished.label': 'Meublé',
+  'filters.furnished.any': 'Indifférent',
+  'filters.furnished.yes': 'Meublé',
+  'filters.furnished.no': 'Non meublé',
 
   // Sort
   'sort.label': 'Trier :',

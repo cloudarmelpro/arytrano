@@ -7,9 +7,6 @@ import { useUrlFilters } from '@/lib/hooks/use-url-filters'
 import { Icon, type IconName } from '@/components/shared/Icon'
 import { Button } from '@/components/ui/button'
 
-const LISTING_TYPES = ['ROOM', 'STUDIO', 'APARTMENT', 'HOUSE'] as const
-type ListingType = (typeof LISTING_TYPES)[number]
-
 export type CityOption = {
   slug: string
   label: string
@@ -17,16 +14,21 @@ export type CityOption = {
 }
 
 /**
- * Compact pivot/refine search strip on /annonces — three Combobox
- * autocompletes (City / Quartier / Type) + a "Rechercher" CTA, all
- * inside a single card with hairline dividers between segments.
+ * Compact pivot/refine search strip on /annonces — two Combobox
+ * autocompletes (City / Quartier) + a "Rechercher" CTA inside a
+ * single card with hairline dividers between segments.
+ *
+ * 2026-06-09 — Type moved to the sidebar `ListingFiltersSidebar`
+ * alongside the new Bedrooms / Bathrooms / Furnished pill rows. The
+ * strip now focuses on geographic scope (the primary pivot) and
+ * leaves refining filters to the sidebar.
  *
  * Mirrors the landing hero's Combobox UX (same dropdown style, same
  * cascade logic) but in a light/compact theme suited to a results
  * page where the visitor already committed.
  *
  * URL is the source of truth. Local draft state lets the visitor
- * stage city/quartier/type then commit via the CTA in one shot.
+ * stage city/quartier then commit via the CTA in one shot.
  */
 export function ResultsSearchStrip({ cities }: { cities: CityOption[] }) {
   const { params, pending, updateMultiple } = useUrlFilters()
@@ -34,16 +36,10 @@ export function ResultsSearchStrip({ cities }: { cities: CityOption[] }) {
 
   const urlCity = params.get('city') ?? ''
   const urlNeighborhood = params.get('neighborhood') ?? ''
-  const urlType = params.get('type') ?? ''
 
   // Slug-level state — what we'll commit to the URL on submit.
   const [city, setCity] = useState(urlCity)
   const [quartier, setQuartier] = useState(urlNeighborhood)
-  const [type, setType] = useState<ListingType | ''>(
-    (LISTING_TYPES as ReadonlyArray<string>).includes(urlType)
-      ? (urlType as ListingType)
-      : '',
-  )
 
   // Text shown in each Combobox.Input — keeps the visible label
   // in sync with the picked slug, and lets the visitor free-type.
@@ -53,23 +49,14 @@ export function ResultsSearchStrip({ cities }: { cities: CityOption[] }) {
     const c = cities.find((x) => x.slug === urlCity)
     return c?.neighborhoods.find((n) => n.slug === urlNeighborhood)?.label ?? ''
   })()
-  const initialTypeLabel = (LISTING_TYPES as ReadonlyArray<string>).includes(
-    urlType,
-  )
-    ? t(`listing.type.${urlType as ListingType}` as const)
-    : ''
 
   const [cityText, setCityText] = useState(initialCityLabel)
   const [quartierText, setQuartierText] = useState(initialQuartierLabel)
-  const [typeText, setTypeText] = useState(initialTypeLabel)
 
   // PERF-M3 audit note — `useMemo` from URL was considered but rejected:
-  // the wizard uses a "stage then submit" UX (visitor types in the
-  // Combobox, picks, then clicks Rechercher to commit). Deriving the
-  // slug state from URL would force every pick to commit immediately,
-  // breaking that flow. The 3 useEffect pairs below stay — they sync
-  // state when the URL changes EXTERNALLY (chip removal, browser back).
-  // Re-sync on external URL changes (chip removed, browser back, reset).
+  // the wizard uses a "stage then submit" UX. The useEffect pairs below
+  // sync state when the URL changes EXTERNALLY (chip removal, browser
+  // back).
   useEffect(() => {
     setCity(urlCity)
     setCityText(cities.find((c) => c.slug === urlCity)?.label ?? '')
@@ -83,19 +70,8 @@ export function ResultsSearchStrip({ cities }: { cities: CityOption[] }) {
     )
   }, [urlNeighborhood, urlCity, cities])
 
-  useEffect(() => {
-    if ((LISTING_TYPES as ReadonlyArray<string>).includes(urlType)) {
-      setType(urlType as ListingType)
-      setTypeText(t(`listing.type.${urlType as ListingType}` as const))
-    } else {
-      setType('')
-      setTypeText('')
-    }
-  }, [urlType, t])
-
   const cityAnchorRef = useRef<HTMLLabelElement>(null)
   const quartierAnchorRef = useRef<HTMLLabelElement>(null)
-  const typeAnchorRef = useRef<HTMLLabelElement>(null)
 
   const cityItems = useMemo(
     () => cities.map((c) => ({ value: c.slug, label: c.label })),
@@ -109,15 +85,6 @@ export function ResultsSearchStrip({ cities }: { cities: CityOption[] }) {
       label: n.label,
     }))
   }, [cities, city])
-
-  const typeItems = useMemo(
-    () =>
-      LISTING_TYPES.map((value) => ({
-        value,
-        label: t(`listing.type.${value}` as const),
-      })),
-    [t],
-  )
 
   function handleCityPick(slug: string, label: string) {
     setCity(slug)
@@ -133,7 +100,6 @@ export function ResultsSearchStrip({ cities }: { cities: CityOption[] }) {
     updateMultiple({
       city: city || null,
       neighborhood: quartier || null,
-      type: type || null,
     })
   }
 
@@ -143,7 +109,7 @@ export function ResultsSearchStrip({ cities }: { cities: CityOption[] }) {
       role="search"
       aria-label={t('annonces.search.aria')}
       aria-busy={pending}
-      className="mb-6 grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-[1.1fr_1.3fr_1.1fr_auto]"
+      className="mb-6 grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-[1.2fr_1.4fr_auto]"
     >
       {/* CITY */}
       <Combobox.Root
@@ -243,48 +209,6 @@ export function ResultsSearchStrip({ cities }: { cities: CityOption[] }) {
         </ComboPopup>
       </Combobox.Root>
 
-      {/* TYPE */}
-      <Combobox.Root
-        items={typeItems}
-        inputValue={typeText}
-        onInputValueChange={(v) => {
-          setTypeText(v)
-          if (type) setType('')
-        }}
-      >
-        <Segment
-          anchorRef={typeAnchorRef}
-          eyebrow={t('annonces.search.type.label')}
-          iconName="house"
-          className=""
-        >
-          <Combobox.Input
-            placeholder={t('landing.hero.search.type.placeholder')}
-            disabled={pending}
-            aria-label={t('annonces.search.type.label')}
-            className="w-full bg-transparent text-[15px] font-bold leading-[1.15] tracking-[-0.01em] text-foreground outline-none placeholder:font-medium placeholder:text-foreground/45 disabled:opacity-60"
-          />
-        </Segment>
-        <ComboPopup
-          anchorRef={typeAnchorRef}
-          emptyMessage={t('landing.hero.search.type.noResults')}
-        >
-          {(o: { value: ListingType; label: string }) => (
-            <Combobox.Item
-              key={o.value}
-              value={o}
-              onClick={() => {
-                setType(o.value)
-                setTypeText(o.label)
-              }}
-              className="cursor-pointer rounded-md px-3 py-2.5 outline-none data-highlighted:bg-primary/10"
-            >
-              <Row icon={TYPE_ICON[o.value]} label={o.label} />
-            </Combobox.Item>
-          )}
-        </ComboPopup>
-      </Combobox.Root>
-
       <Button
         type="submit"
         disabled={pending}
@@ -303,13 +227,6 @@ export function ResultsSearchStrip({ cities }: { cities: CityOption[] }) {
       </Button>
     </form>
   )
-}
-
-const TYPE_ICON: Record<ListingType, IconName> = {
-  ROOM: 'bed',
-  STUDIO: 'house',
-  APARTMENT: 'building',
-  HOUSE: 'home-heart',
 }
 
 function Segment({

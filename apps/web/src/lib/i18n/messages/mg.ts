@@ -505,6 +505,20 @@ export const mg: Record<MessageKey, string> = {
   'annonces.map.empty.title': 'Tsy misy filazana hita amin\'ny sarintany',
   'annonces.map.empty.lead': 'Ovay ny sivana na miverena amin\'ny tabilao.',
   'filters.amenities.label': 'Izay omen\'ity trano ity',
+  // 2026-06-09 sidebar additions — Malagasy translations
+  // (filters.type.label + filters.type.all reuse existing keys above)
+  'filters.bedrooms.label': 'Efitra fatoriana',
+  'filters.bedrooms.any': 'Tsy mampaninona',
+  'filters.bedrooms.atLeast': '{count}+',
+  'filters.bedrooms.chip': '{count}+ ef.',
+  'filters.bathrooms.label': 'Efitra fandroana',
+  'filters.bathrooms.any': 'Tsy mampaninona',
+  'filters.bathrooms.atLeast': '{count}+',
+  'filters.bathrooms.chip': '{count}+ fd.',
+  'filters.furnished.label': 'Misy fanaka',
+  'filters.furnished.any': 'Tsy mampaninona',
+  'filters.furnished.yes': 'Misy fanaka',
+  'filters.furnished.no': 'Tsy misy fanaka',
 
   // Sort
   'sort.label': 'Alamino :',
