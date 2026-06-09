@@ -85,8 +85,14 @@ export function ListingFiltersSidebar() {
     urlPriceMax,
   ])
 
-  // Re-sync local draft if URL changes externally (reset, browser back).
+  // Re-sync local draft when the URL changes EXTERNALLY (reset button,
+  // chip removal, browser back). The slider keeps its own draft state
+  // while the visitor drags — committing on `onValueCommitted` only —
+  // so we can't derive the draft directly from URL. This is the
+  // intentional way to bridge an external state change into a
+  // controlled local draft.
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setPriceDraft([urlPriceMin, urlPriceMax])
   }, [urlPriceMin, urlPriceMax])
 
@@ -133,8 +139,8 @@ export function ListingFiltersSidebar() {
 
   return (
     <aside aria-busy={pending}>
-      <div className="overflow-hidden rounded-xl border border-border bg-background shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
-        <header className="flex items-center justify-between px-5 py-4">
+      <div className="overflow-hidden rounded-xl border bg-background shadow-none">
+        <header className="flex items-center justify-between px-3 py-3">
           <h2 className="text-[15px] font-bold tracking-[-0.01em] text-foreground">
             {t('filters.sidebar.title')}
           </h2>
@@ -155,7 +161,7 @@ export function ListingFiltersSidebar() {
         <Separator />
 
         {/* Price slider */}
-        <section className="flex flex-col gap-4 px-5 py-5">
+        <section className="flex flex-col gap-2 px-3 py-3">
           <div className="flex items-baseline justify-between gap-2">
             <p className="text-[12px] font-semibold uppercase tracking-[0.08em] text-foreground/70">
               {t('filters.price.label')}
@@ -178,6 +184,7 @@ export function ListingFiltersSidebar() {
             step={PRICE_STEP}
             largeStep={PRICE_LARGE_STEP}
             disabled={pending}
+            className='px-2'
             aria-label={t('filters.price.range.aria')}
             onValueChange={(v) => {
               if (Array.isArray(v) && v.length === 2) {
@@ -205,7 +212,7 @@ export function ListingFiltersSidebar() {
         {/* Type de logement (2026-06-09) — checkbox list, single-select
             semantics : cocher un autre type décoche le précédent.
             Visuellement aligné sur la section Équipements ci-dessous. */}
-        <section className="flex flex-col gap-3 px-5 py-5">
+        <section className="flex flex-col gap-2 px-3 py-3">
           <p className="text-[12px] font-semibold uppercase tracking-[0.08em] text-foreground/70">
             {t('filters.type.label')}
           </p>
@@ -236,7 +243,7 @@ export function ListingFiltersSidebar() {
         <Separator />
 
         {/* Chambres (2026-06-09) — "≥ N" semantics */}
-        <section className="flex flex-col gap-3 px-5 py-5">
+        <section className="flex flex-col gap-2 px-3 py-3">
           <p className="text-[12px] font-semibold uppercase tracking-[0.08em] text-foreground/70">
             {t('filters.bedrooms.label')}
           </p>
@@ -267,7 +274,7 @@ export function ListingFiltersSidebar() {
         <Separator />
 
         {/* Salles de bain (2026-06-09) — "≥ N" semantics */}
-        <section className="flex flex-col gap-3 px-5 py-5">
+        <section className="flex flex-col gap-2 px-3 py-3">
           <p className="text-[12px] font-semibold uppercase tracking-[0.08em] text-foreground/70">
             {t('filters.bathrooms.label')}
           </p>
@@ -298,7 +305,7 @@ export function ListingFiltersSidebar() {
         <Separator />
 
         {/* Meublé (2026-06-09) */}
-        <section className="flex flex-col gap-3 px-5 py-5">
+        <section className="flex flex-col gap-2 px-3 py-3">
           <p className="text-[12px] font-semibold uppercase tracking-[0.08em] text-foreground/70">
             {t('filters.furnished.label')}
           </p>
@@ -330,7 +337,7 @@ export function ListingFiltersSidebar() {
         <Separator />
 
         {/* Amenities */}
-        <section className="flex flex-col gap-3 px-5 py-5">
+        <section className="flex flex-col gap-2 px-3 py-3">
           <p className="text-[12px] font-semibold uppercase tracking-[0.08em] text-foreground/70">
             {t('filters.amenities.label')}
           </p>

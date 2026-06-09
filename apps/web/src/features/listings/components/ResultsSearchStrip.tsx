@@ -59,15 +59,22 @@ export function ResultsSearchStrip({ cities }: { cities: CityOption[] }) {
   const [quartierText, setQuartierText] = useState(initialQuartierLabel)
 
   // PERF-M3 audit note — `useMemo` from URL was considered but rejected:
-  // the wizard uses a "stage then submit" UX. The useEffect pairs below
-  // sync state when the URL changes EXTERNALLY (chip removal, browser
-  // back).
+  // the strip uses a "stage then submit" UX. The visitor types in the
+  // Combobox / keyword input, then commits via the Rechercher CTA. If
+  // we derived city/quartier/q directly from the URL we'd lose typed
+  // drafts mid-flight. The useEffect pairs below sync state when the
+  // URL changes EXTERNALLY (chip removal, browser back, reset).
+  // `react-hooks/set-state-in-effect` is suppressed at each call —
+  // this IS the recommended bridge for controlled drafts vs external
+  // state changes.
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setCity(urlCity)
     setCityText(cities.find((c) => c.slug === urlCity)?.label ?? '')
   }, [urlCity, cities])
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setQuartier(urlNeighborhood)
     const c = cities.find((x) => x.slug === urlCity)
     setQuartierText(
@@ -76,6 +83,7 @@ export function ResultsSearchStrip({ cities }: { cities: CityOption[] }) {
   }, [urlNeighborhood, urlCity, cities])
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setQ(urlQ)
   }, [urlQ])
 
@@ -238,12 +246,12 @@ export function ResultsSearchStrip({ cities }: { cities: CityOption[] }) {
         type="submit"
         disabled={pending}
         aria-busy={pending}
-        className="min-h-16 gap-2 rounded-xl border-2 border-primary px-7 text-[14px] font-bold tracking-[-0.005em]"
+        className="min-h-16 gap-2 rounded-xl border border-primary px-7 text-[14px] font-bold tracking-[-0.005em]"
       >
         {pending ? (
           <span
             aria-hidden
-            className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-primary-foreground/30 border-t-primary-foreground"
+            className="h-3.5 w-3.5 animate-spin rounded-full border border-primary-foreground/30 border-t-primary-foreground"
           />
         ) : (
           <Icon name="search" size={16} />
@@ -277,7 +285,7 @@ function KeywordSegment({
   disabled: boolean
 }) {
   return (
-    <label className="flex min-h-16 items-center gap-3 rounded-xl border-2 border-primary/15 bg-background px-4 py-2.5 text-left transition focus-within:border-primary/40 hover:border-primary/30">
+    <label className="flex min-h-16 items-center gap-3 rounded-xl border border-primary/15 bg-background px-4 py-2.5 text-left transition focus-within:border-primary/40 hover:border-primary/30">
       <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary/[0.08] text-primary">
         <Icon name="search" size={16} />
       </span>
@@ -317,7 +325,7 @@ function Segment({
   return (
     <label
       ref={anchorRef}
-      className={`flex min-h-16 items-center gap-3 rounded-xl border-2 border-primary/15 bg-background px-4 py-2.5 text-left transition focus-within:border-primary/40 hover:border-primary/30 ${className ?? ''}`}
+      className={`flex min-h-16 items-center gap-3 rounded-xl border border-primary/15 bg-background px-4 py-2.5 text-left transition focus-within:border-primary/40 hover:border-primary/30 ${className ?? ''}`}
     >
       <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary/[0.08] text-primary">
         <Icon name={iconName} size={16} />
