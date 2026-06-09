@@ -1,4 +1,4 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "installCommand": "npm install && npm install --prefix apps/web --no-save --force lightningcss-linux-x64-gnu@1.32.0"
+  "installCommand": "npm install && npm install --no-save --force lightningcss-linux-x64-gnu@1.32.0"
 }
