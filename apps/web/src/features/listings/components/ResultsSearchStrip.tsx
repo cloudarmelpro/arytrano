@@ -36,10 +36,15 @@ export function ResultsSearchStrip({ cities }: { cities: CityOption[] }) {
 
   const urlCity = params.get('city') ?? ''
   const urlNeighborhood = params.get('neighborhood') ?? ''
+  const urlQ = params.get('q') ?? ''
 
   // Slug-level state — what we'll commit to the URL on submit.
   const [city, setCity] = useState(urlCity)
   const [quartier, setQuartier] = useState(urlNeighborhood)
+  // 2026-06-09 — keyword search merged into this strip so the three
+  // inputs (Ville / Quartier / Recherche) line up on a single row.
+  // The previous standalone `UnifiedToolbar` row was dropped.
+  const [q, setQ] = useState(urlQ)
 
   // Text shown in each Combobox.Input — keeps the visible label
   // in sync with the picked slug, and lets the visitor free-type.
@@ -70,6 +75,10 @@ export function ResultsSearchStrip({ cities }: { cities: CityOption[] }) {
     )
   }, [urlNeighborhood, urlCity, cities])
 
+  useEffect(() => {
+    setQ(urlQ)
+  }, [urlQ])
+
   const cityAnchorRef = useRef<HTMLLabelElement>(null)
   const quartierAnchorRef = useRef<HTMLLabelElement>(null)
 
@@ -97,9 +106,12 @@ export function ResultsSearchStrip({ cities }: { cities: CityOption[] }) {
 
   function onSubmit(e: React.FormEvent) {
     e.preventDefault()
+    const trimmedQ = q.trim()
     updateMultiple({
       city: city || null,
       neighborhood: quartier || null,
+      // Keyword schema requires min 2 chars; below threshold ⇒ drop.
+      q: trimmedQ.length >= 2 ? trimmedQ : null,
     })
   }
 
@@ -109,7 +121,7 @@ export function ResultsSearchStrip({ cities }: { cities: CityOption[] }) {
       role="search"
       aria-label={t('annonces.search.aria')}
       aria-busy={pending}
-      className="mb-6 grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-[1.2fr_1.4fr_auto]"
+      className="mb-6 grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-[1.1fr_1.3fr_1.3fr_auto]"
     >
       {/* CITY */}
       <Combobox.Root
@@ -209,6 +221,19 @@ export function ResultsSearchStrip({ cities }: { cities: CityOption[] }) {
         </ComboPopup>
       </Combobox.Root>
 
+      {/* RECHERCHE PAR MOT-CLÉ (2026-06-09) — déplacée depuis
+          `UnifiedToolbar` pour aligner les 3 inputs sur une seule
+          ligne. Plain `<input type="search">` — pas de Combobox ici,
+          le visiteur saisit librement. */}
+      <KeywordSegment
+        value={q}
+        onChange={setQ}
+        placeholder={t('toolbar.query.placeholder')}
+        ariaLabel={t('toolbar.query.label')}
+        eyebrow={t('toolbar.search.label')}
+        disabled={pending}
+      />
+
       <Button
         type="submit"
         disabled={pending}
@@ -226,6 +251,53 @@ export function ResultsSearchStrip({ cities }: { cities: CityOption[] }) {
         {t('annonces.search.cta')}
       </Button>
     </form>
+  )
+}
+
+/**
+ * Segment-styled keyword input. Same visual frame as `Segment` for
+ * the Combobox cells, but wraps a plain `<input>` instead of a
+ * Combobox so the value commits via the parent form's submit
+ * handler. Eyebrow + icon mirror the City / Quartier segments so
+ * the 3 inputs land on the same baseline.
+ */
+function KeywordSegment({
+  value,
+  onChange,
+  placeholder,
+  ariaLabel,
+  eyebrow,
+  disabled,
+}: {
+  value: string
+  onChange: (v: string) => void
+  placeholder: string
+  ariaLabel: string
+  eyebrow: string
+  disabled: boolean
+}) {
+  return (
+    <label className="flex min-h-16 items-center gap-3 rounded-xl border-2 border-primary/15 bg-background px-4 py-2.5 text-left transition focus-within:border-primary/40 hover:border-primary/30">
+      <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary/[0.08] text-primary">
+        <Icon name="search" size={16} />
+      </span>
+      <span className="flex min-w-0 flex-1 flex-col gap-0.5">
+        <span className="text-[10px] font-semibold uppercase leading-none tracking-[0.12em] text-foreground/55">
+          {eyebrow}
+        </span>
+        <input
+          type="search"
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder={placeholder}
+          aria-label={ariaLabel}
+          disabled={disabled}
+          minLength={2}
+          maxLength={120}
+          className="w-full bg-transparent text-[15px] font-bold leading-[1.15] tracking-[-0.01em] text-foreground outline-none placeholder:font-medium placeholder:text-foreground/45 disabled:opacity-60"
+        />
+      </span>
+    </label>
   )
 }
 

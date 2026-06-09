@@ -202,30 +202,35 @@ export function ListingFiltersSidebar() {
 
         <Separator />
 
-        {/* Type de logement (2026-06-09) */}
+        {/* Type de logement (2026-06-09) — checkbox list, single-select
+            semantics : cocher un autre type décoche le précédent.
+            Visuellement aligné sur la section Équipements ci-dessous. */}
         <section className="flex flex-col gap-3 px-5 py-5">
           <p className="text-[12px] font-semibold uppercase tracking-[0.08em] text-foreground/70">
             {t('filters.type.label')}
           </p>
-          <div className="flex flex-wrap gap-1.5">
-            <PillButton
-              active={currentType === null}
-              onClick={() => pickType(null)}
-              disabled={pending}
-            >
-              {t('filters.type.all')}
-            </PillButton>
-            {LISTING_TYPES.map((v) => (
-              <PillButton
-                key={v}
-                active={currentType === v}
-                onClick={() => pickType(currentType === v ? null : v)}
-                disabled={pending}
-              >
-                {t(`listing.type.${v}` as const)}
-              </PillButton>
-            ))}
-          </div>
+          <ul className="flex flex-col gap-0.5">
+            {LISTING_TYPES.map((v) => {
+              const checked = currentType === v
+              return (
+                <li key={v}>
+                  <Label
+                    className="cursor-pointer rounded-md py-1.5 font-normal transition data-[checked=true]:text-foreground"
+                    data-checked={checked}
+                  >
+                    <Checkbox
+                      checked={checked}
+                      onCheckedChange={() => pickType(checked ? null : v)}
+                      disabled={pending}
+                    />
+                    <span className="leading-tight">
+                      {t(`listing.type.${v}` as const)}
+                    </span>
+                  </Label>
+                </li>
+              )
+            })}
+          </ul>
         </section>
 
         <Separator />
@@ -235,25 +240,28 @@ export function ListingFiltersSidebar() {
           <p className="text-[12px] font-semibold uppercase tracking-[0.08em] text-foreground/70">
             {t('filters.bedrooms.label')}
           </p>
-          <div className="flex flex-wrap gap-1.5">
-            <PillButton
-              active={currentBedrooms === null}
-              onClick={() => pickBedrooms(null)}
-              disabled={pending}
-            >
-              {t('filters.bedrooms.any')}
-            </PillButton>
-            {BEDROOM_OPTIONS.map((n) => (
-              <PillButton
-                key={n}
-                active={currentBedrooms === n}
-                onClick={() => pickBedrooms(currentBedrooms === n ? null : n)}
-                disabled={pending}
-              >
-                {t('filters.bedrooms.atLeast', { count: n })}
-              </PillButton>
-            ))}
-          </div>
+          <ul className="flex flex-col gap-0.5">
+            {BEDROOM_OPTIONS.map((n) => {
+              const checked = currentBedrooms === n
+              return (
+                <li key={n}>
+                  <Label
+                    className="cursor-pointer rounded-md py-1.5 font-normal transition data-[checked=true]:text-foreground"
+                    data-checked={checked}
+                  >
+                    <Checkbox
+                      checked={checked}
+                      onCheckedChange={() => pickBedrooms(checked ? null : n)}
+                      disabled={pending}
+                    />
+                    <span className="leading-tight">
+                      {t('filters.bedrooms.atLeast', { count: n })}
+                    </span>
+                  </Label>
+                </li>
+              )
+            })}
+          </ul>
         </section>
 
         <Separator />
@@ -263,25 +271,28 @@ export function ListingFiltersSidebar() {
           <p className="text-[12px] font-semibold uppercase tracking-[0.08em] text-foreground/70">
             {t('filters.bathrooms.label')}
           </p>
-          <div className="flex flex-wrap gap-1.5">
-            <PillButton
-              active={currentBathrooms === null}
-              onClick={() => pickBathrooms(null)}
-              disabled={pending}
-            >
-              {t('filters.bathrooms.any')}
-            </PillButton>
-            {BATHROOM_OPTIONS.map((n) => (
-              <PillButton
-                key={n}
-                active={currentBathrooms === n}
-                onClick={() => pickBathrooms(currentBathrooms === n ? null : n)}
-                disabled={pending}
-              >
-                {t('filters.bathrooms.atLeast', { count: n })}
-              </PillButton>
-            ))}
-          </div>
+          <ul className="flex flex-col gap-0.5">
+            {BATHROOM_OPTIONS.map((n) => {
+              const checked = currentBathrooms === n
+              return (
+                <li key={n}>
+                  <Label
+                    className="cursor-pointer rounded-md py-1.5 font-normal transition data-[checked=true]:text-foreground"
+                    data-checked={checked}
+                  >
+                    <Checkbox
+                      checked={checked}
+                      onCheckedChange={() => pickBathrooms(checked ? null : n)}
+                      disabled={pending}
+                    />
+                    <span className="leading-tight">
+                      {t('filters.bathrooms.atLeast', { count: n })}
+                    </span>
+                  </Label>
+                </li>
+              )
+            })}
+          </ul>
         </section>
 
         <Separator />
@@ -291,31 +302,29 @@ export function ListingFiltersSidebar() {
           <p className="text-[12px] font-semibold uppercase tracking-[0.08em] text-foreground/70">
             {t('filters.furnished.label')}
           </p>
-          <div className="flex flex-wrap gap-1.5">
-            <PillButton
-              active={currentFurnished === null}
-              onClick={() => pickFurnished(null)}
-              disabled={pending}
-            >
-              {t('filters.furnished.any')}
-            </PillButton>
-            <PillButton
-              active={currentFurnished === true}
-              onClick={() => pickFurnished(currentFurnished === true ? null : true)}
-              disabled={pending}
-            >
-              {t('filters.furnished.yes')}
-            </PillButton>
-            <PillButton
-              active={currentFurnished === false}
-              onClick={() =>
-                pickFurnished(currentFurnished === false ? null : false)
-              }
-              disabled={pending}
-            >
-              {t('filters.furnished.no')}
-            </PillButton>
-          </div>
+          <ul className="flex flex-col gap-0.5">
+            {[
+              { value: true as const, labelKey: 'filters.furnished.yes' as const },
+              { value: false as const, labelKey: 'filters.furnished.no' as const },
+            ].map((opt) => {
+              const checked = currentFurnished === opt.value
+              return (
+                <li key={String(opt.value)}>
+                  <Label
+                    className="cursor-pointer rounded-md py-1.5 font-normal transition data-[checked=true]:text-foreground"
+                    data-checked={checked}
+                  >
+                    <Checkbox
+                      checked={checked}
+                      onCheckedChange={() => pickFurnished(checked ? null : opt.value)}
+                      disabled={pending}
+                    />
+                    <span className="leading-tight">{t(opt.labelKey)}</span>
+                  </Label>
+                </li>
+              )
+            })}
+          </ul>
         </section>
 
         <Separator />
@@ -358,36 +367,3 @@ function clamp(n: number, min: number, max: number): number {
   return Math.max(min, Math.min(max, n))
 }
 
-/**
- * Pill-row button used by Type / Bedrooms / Bathrooms / Furnished
- * filter sections (2026-06-09 sidebar additions). Same visual
- * treatment across the four sections so the visitor learns the
- * affordance once.
- */
-function PillButton({
-  active,
-  disabled,
-  onClick,
-  children,
-}: {
-  active: boolean
-  disabled: boolean
-  onClick: () => void
-  children: React.ReactNode
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      disabled={disabled}
-      aria-pressed={active}
-      className={`inline-flex h-8 items-center rounded-full border px-3 text-[12.5px] font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50 ${
-        active
-          ? 'border-primary bg-primary text-primary-foreground'
-          : 'border-border bg-background text-foreground/80 hover:border-primary/40 hover:bg-primary/[0.04]'
-      }`}
-    >
-      {children}
-    </button>
-  )
-}

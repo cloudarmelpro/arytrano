@@ -8,7 +8,6 @@ import {
 import { PublicListingCard } from '@/features/listings'
 import {
   ListingFiltersSidebar,
-  UnifiedToolbar,
   ListingSortButtons,
   ActiveFiltersChips,
   ResultsSearchStrip,
@@ -247,14 +246,12 @@ export default async function PublicListingsPage({
         <ActiveFiltersChips locale={locale} neighborhoods={neighborhoods} />
       </header>
 
-      {/* Results search strip — city / quartier / type pivot row.
-          Replaces the CityTabs pill row : same affordance + adds
-          quartier + type in one place, Booking-results-bar style. */}
+      {/* Results search strip — city / quartier / keyword pivot row.
+          2026-06-09 — keyword search merged into the strip (was the
+          standalone `UnifiedToolbar` below); the three inputs now
+          align on a single row. Type / chambres / sdb / meublé
+          live in the sidebar via `ListingFiltersSidebar`. */}
       <ResultsSearchStrip cities={cityOptions} />
-
-      {/* Toolbar — keyword search + sort. City/quartier/type live in
-          the strip above; this is the "secondary refine" row. */}
-      <UnifiedToolbar />
 
       {/* Two-column layout: sidebar (live map + filters) + results main.
           E-T10 — when ?view=map, swap the embedded sidebar map for a
