@@ -85,7 +85,7 @@ export function AuthAltLink({
       {prompt}{' '}
       <Link
         href={href}
-        className="font-semibold text-primary underline decoration-[1.5px] underline-offset-4 transition hover:opacity-80"
+        className="text-primary underline underline-offset-4 transition hover:opacity-80"
       >
         {linkLabel}
       </Link>
