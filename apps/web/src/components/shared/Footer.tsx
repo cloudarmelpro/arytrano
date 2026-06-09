@@ -70,16 +70,57 @@ type PaymentBrand = {
 const PAYMENTS: PaymentBrand[] = [
   { key: 'footerV3.pay.mvola', logo: '/payments/Mvola.svg', logoWidth: 76 },
   { key: 'footerV3.pay.orangeMoney', logo: '/payments/Orange.svg', logoWidth: 76 },
-  { key: 'footerV3.pay.airtelMoney', logo: '/payments/Airtel.svg', logoWidth: 76 },
-  { key: 'footerV3.pay.bankTransfer', icon: 'building' },
-  { key: 'footerV3.pay.cash', icon: 'wallet' },
+  // { key: 'footerV3.pay.airtelMoney', logo: '/payments/Airtel.svg', logoWidth: 76 },
+  // { key: 'footerV3.pay.bankTransfer', icon: 'building' },
+  // { key: 'footerV3.pay.cash', icon: 'wallet' },
 ]
 
-const SOCIAL: Array<{ icon: IconName; label: string; href: string }> = [
-  { icon: 'whatsapp', label: 'WhatsApp Channel', href: '#' },
-  { icon: 'facebook', label: 'Facebook', href: '#' },
-  { icon: 'instagram', label: 'Instagram', href: '#' },
-  { icon: 'tiktok', label: 'TikTok', href: '#' },
+/**
+ * Social icons hover to each network's official brand color.
+ * Hover classes must be full literal strings (not interpolated) so the
+ * Tailwind JIT picks them up — arbitrary values like `hover:bg-[#25D366]`
+ * only ship if they appear verbatim in source.
+ */
+const SOCIAL: Array<{
+  icon: IconName
+  label: string
+  href: string
+  hoverClass: string
+}> = [
+  {
+    icon: 'whatsapp',
+    label: 'WhatsApp Channel',
+    href: '#',
+    // WhatsApp official green #25D366
+    hoverClass:
+      'hover:border-[#25D366] hover:bg-[#25D366] hover:text-white',
+  },
+  {
+    icon: 'facebook',
+    label: 'Facebook',
+    href: '#',
+    // Facebook official blue #1877F2
+    hoverClass:
+      'hover:border-[#1877F2] hover:bg-[#1877F2] hover:text-white',
+  },
+  {
+    icon: 'instagram',
+    label: 'Instagram',
+    href: '#',
+    // Instagram official gradient — orange → pink → purple (the
+    // classic Instagram "Sunset" stops Meta itself uses on the logo).
+    hoverClass:
+      'hover:border-transparent hover:bg-gradient-to-tr hover:from-[#F58529] hover:via-[#DD2A7B] hover:to-[#515BD4] hover:text-white',
+  },
+  {
+    icon: 'tiktok',
+    label: 'TikTok',
+    href: '#',
+    // TikTok official primary is solid black; the cyan/magenta is
+    // reserved for the wordmark stack, not the avatar tile.
+    hoverClass:
+      'hover:border-black hover:bg-black hover:text-white',
+  },
 ]
 
 export async function Footer() {
@@ -156,7 +197,7 @@ function MainGrid({ t }: { t: Translator }) {
               key={s.label}
               href={s.href}
               aria-label={s.label}
-              className="inline-flex h-9 w-9 items-center justify-center rounded-[10px] border border-border bg-muted/40 text-foreground/70 transition hover:border-primary hover:bg-primary hover:text-primary-foreground"
+              className={`inline-flex h-9 w-9 items-center justify-center rounded-[10px] border border-border bg-muted/40 text-foreground/70 transition ${s.hoverClass}`}
             >
               <Icon name={s.icon} size={16} />
             </a>
