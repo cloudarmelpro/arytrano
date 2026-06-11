@@ -47,3 +47,5 @@ __pycache__/
 
 # claude code local settings (machine-specific)
 .claude/settings.local.json
+
+.vercel

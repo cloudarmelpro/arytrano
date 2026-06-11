@@ -170,6 +170,19 @@ const cronAccessLimiter = makeLimiter('cron-access', {
   window: '1 h',
 })
 
+// Lead submission (E-T28, 2026-06-10) — 3/h per phoneHash (an
+// anonymous student can't spam-spawn leads from the same SIM) and
+// 10/h per ipHash (caps account-wide abuse from a single network).
+// fail-CLOSED on null ipHash via the rateLimiters.leadSubmit wrapper.
+const leadSubmitByPhone = makeLimiter('lead-submit-phone', {
+  requests: 3,
+  window: '1 h',
+})
+const leadSubmitByIp = makeLimiter('lead-submit-ip', {
+  requests: 10,
+  window: '1 h',
+})
+
 // Review submission (Security audit H-1, 2026-05-29) — 5/h per userId.
 // Reviews go straight to the public listing detail page; without a
 // cap a single signed-in user could spam dozens of 1-star reviews on
@@ -301,4 +314,20 @@ export const rateLimiters = {
 
   /** Review submit — 5/h per authorId. Bearer-keyed; same bucket for web + mobile. */
   reviewSubmit: (authorId: string) => check(reviewSubmitLimiter, authorId),
+
+  /**
+   * Lead submission (E-T28) — fails CLOSED if BOTH buckets fail. Returns
+   * success only when both the phoneHash bucket (3/h) AND the ipHash
+   * bucket (10/h) pass. Either-or-fail-closed ensures a tenant who
+   * cycles SIMs is still capped, and a phone shared across NATted
+   * students still gets a fair shot.
+   */
+  leadSubmit: async (
+    phoneHash: string,
+    ipHash: string | null,
+  ): Promise<RateLimitResult> => {
+    const byPhone = await check(leadSubmitByPhone, phoneHash)
+    if (!byPhone.success) return byPhone
+    return check(leadSubmitByIp, ipHash ?? 'noip:lead-submit')
+  },
 }
