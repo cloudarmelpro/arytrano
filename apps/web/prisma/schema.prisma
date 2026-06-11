@@ -28,8 +28,8 @@ model User {
   emailVerified DateTime?
   name          String?
   image         String?
-  phone         String?    // E.164, e.g. +261341234567
-  passwordHash  String?    // credentials provider; null for OAuth-only users
+  phone         String? // E.164, e.g. +261341234567
+  passwordHash  String? // credentials provider; null for OAuth-only users
   role          UserRole   @default(STUDENT)
   locale        Locale     @default(FR_MG)
   status        UserStatus @default(ACTIVE)
@@ -40,8 +40,8 @@ model User {
   // TOTP 2FA — encrypted shared secret + activation timestamp. When
   // `totpEnabledAt` is non-null, the credentials sign-in flow demands a
   // step-2 6-digit code (or a one-time recovery code).
-  totpSecret      String?
-  totpEnabledAt   DateTime?
+  totpSecret    String?
+  totpEnabledAt DateTime?
 
   // Owner CGU acceptance (T-049, 2026-05-29) — set when an OWNER
   // account accepts the dedicated Owner Terms via /onboarding/owner/terms.
@@ -74,29 +74,44 @@ model User {
   // share the same Expo token — if the same user signs into a new
   // device the old token gets overwritten on POST /api/v1/users/me/
   // push-token. Nullable since OAuth web users never have one.
-  expoPushToken   String?    @unique
+  expoPushToken String? @unique
 
-  createdAt     DateTime   @default(now())
-  updatedAt     DateTime   @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  accounts      Account[]
-  sessions      Session[]
-  ownerProfile  OwnerProfile?
-  listings      Listing[]
-  reports       Report[]
-  reviews         Review[]
-  reviewReactions ReviewReaction[]
-  favorites       Favorite[]
-  savedSearches   SavedSearch[]
-  payments        Payment[]
-  loginEvents     LoginEvent[]
-  recoveryCodes   RecoveryCode[]
-  contactEvents   ContactEvent[]
-  pushReceipts    PushReceipt[]
+  accounts            Account[]
+  sessions            Session[]
+  ownerProfile        OwnerProfile?
+  listings            Listing[]
+  reports             Report[]
+  reviews             Review[]
+  reviewReactions     ReviewReaction[]
+  favorites           Favorite[]
+  savedSearches       SavedSearch[]
+  payments            Payment[]
+  loginEvents         LoginEvent[]
+  recoveryCodes       RecoveryCode[]
+  contactEvents       ContactEvent[]
+  pushReceipts        PushReceipt[]
   // E-T26 — leases the user owns (as landlord) and leases where they
   // are the tenant. Two separate relations via `@relation` name.
-  ownerLeases     Lease[]            @relation("OwnerLeases")
-  tenantLeases    Lease[]            @relation("TenantLeases")
+  ownerLeases         Lease[]          @relation("OwnerLeases")
+  tenantLeases        Lease[]          @relation("TenantLeases")
+  // E-T28 — concierge lead queue (2026-06-10).
+  //  - `interestLeads`        : leads submitted while signed-in (anonymous
+  //                              leads have tenantUserId NULL, so they
+  //                              never appear here).
+  //  - `claimedLeads`         : leads an ADMIN operator is currently
+  //                              working. `claimedByUserId` FK.
+  //  - `leadActivitiesActed`  : LeadActivity rows where this user was the
+  //                              actor (operator note, tenant message,
+  //                              etc.). SYSTEM-actor rows have actorUserId
+  //                              NULL and never appear here.
+  // Operator shift declarations (E-T28 T-RES-09 push-on-shift).
+  interestLeads       LeadRequest[]    @relation("LeadTenant")
+  claimedLeads        LeadRequest[]    @relation("LeadClaimedBy")
+  leadActivitiesActed LeadActivity[]   @relation("LeadActivityActor")
+  operatorShifts      OperatorShift[]
 
   @@index([status, role])
 }
@@ -110,14 +125,14 @@ model User {
  * once it's handled (success or terminal error).
  */
 model PushReceipt {
-  id        String   @id @default(cuid())
+  id       String   @id @default(cuid())
   // Expo's receipt id (one per recipient per send). UNIQUE because
   // Expo guarantees uniqueness across all customers.
-  ticketId  String   @unique
-  userId    String
-  sentAt    DateTime @default(now())
+  ticketId String   @unique
+  userId   String
+  sentAt   DateTime @default(now())
 
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   // The cron filter is `sentAt < now() - 15min` — index makes that scan O(log n).
   @@index([sentAt])
@@ -201,11 +216,11 @@ model LoginEvent {
   userId      String
   occurredAt  DateTime        @default(now())
   authMethod  LoginAuthMethod
-  ipHash      String?         // SHA-256(ip + AUTH_SECRET), no raw IP
+  ipHash      String? // SHA-256(ip + AUTH_SECRET), no raw IP
   userAgent   String?         @db.Text
-  browser     String?         // "Chrome"
-  os          String?         // "Windows"
-  deviceType  String?         // "desktop" | "mobile" | "tablet"
+  browser     String? // "Chrome"
+  os          String? // "Windows"
+  deviceType  String? // "desktop" | "mobile" | "tablet"
   isMobileApp Boolean         @default(false)
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -226,34 +241,34 @@ enum LoginAuthMethod {
 // ============================================================
 
 model OwnerProfile {
-  id                  String    @id @default(cuid())
-  userId              String    @unique
+  id                 String    @id @default(cuid())
+  userId             String    @unique
   // CIN (national ID) — encrypted at rest with AES-256-GCM, key derived
   // from `env.PII_ENCRYPTION_KEY`. NEVER decrypt outside the admin
   // verification flow. The DB rows are useless without the env key.
-  cinCiphertext       Bytes?
-  cinIv               Bytes?
-  cinAuthTag          Bytes?
+  cinCiphertext      Bytes?
+  cinIv              Bytes?
+  cinAuthTag         Bytes?
   // Key version — bumped on rotation so old ciphertext can be decrypted
   // with the previous key while new uploads use the current one.
-  cinKeyVersion       Int       @default(1)
+  cinKeyVersion      Int       @default(1)
   // Stored alongside the ciphertext so the admin viewer can serve the
   // right Content-Type when displaying the decrypted image.
-  cinMimeType         String?
-  cinUploadedAt       DateTime?
+  cinMimeType        String?
+  cinUploadedAt      DateTime?
   // Admin verification outcome (T-039). `verifiedAt` is set on approve;
   // `cinRejectionReason` is set on reject (user-facing message). The two
   // are mutually exclusive — an admin re-review clears the previous
   // outcome before writing the new one.
-  verifiedAt          DateTime?
-  verifiedBy          String?   // admin userId who approved
-  cinRejectionReason  String?   @db.Text
-  cinRejectedAt       DateTime?
-  cinRejectedBy       String?   // admin userId who rejected
+  verifiedAt         DateTime?
+  verifiedBy         String? // admin userId who approved
+  cinRejectionReason String?   @db.Text
+  cinRejectedAt      DateTime?
+  cinRejectedBy      String? // admin userId who rejected
   // Admin-internal annotations — not shown to the owner.
-  notes               String?   @db.Text
-  createdAt           DateTime  @default(now())
-  updatedAt           DateTime  @updatedAt
+  notes              String?   @db.Text
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
@@ -279,7 +294,7 @@ model City {
 model Neighborhood {
   id        String   @id @default(cuid())
   cityId    String
-  slug      String   // "andrainjato"
+  slug      String // "andrainjato"
   nameFr    String
   nameMg    String
   lat       Decimal  @db.Decimal(9, 6)
@@ -312,14 +327,14 @@ model Neighborhood {
 // ============================================================
 
 model Listing {
-  id              String        @id @default(cuid())
-  ownerId         String
-  cityId          String
-  neighborhoodId  String
+  id             String @id @default(cuid())
+  ownerId        String
+  cityId         String
+  neighborhoodId String
 
   title           String
-  slug            String        // SEO slug, computed from title + suffix of id
-  description     String        @db.Text
+  slug            String // SEO slug, computed from title + suffix of id
+  description     String      @db.Text
   type            ListingType
   // Ariary has no subunit (the iraimbilanja is defunct). Integer storage
   // saves bytes, avoids Decimal/string interop bugs in JS, and matches
@@ -330,25 +345,25 @@ model Listing {
   // practice : 1-3 months. The actual caution amount (in Ariary) is
   // derived at lease-signing time = priceMonthlyMGA × cautionMonths,
   // never re-asked from the owner. Set to 0 if no caution is required.
-  cautionMonths   Int           @default(2)
+  cautionMonths   Int         @default(2)
   surfaceM2       Int?
   bedrooms        Int?
   bathrooms       Int?
-  furnished       Boolean       @default(false)
+  furnished       Boolean     @default(false)
   // Amenities — Postgres enum array, defaults to empty so existing rows
   // stay valid without a backfill.
-  amenities       Amenity[]     @default([])
+  amenities       Amenity[]   @default([])
   // Owner-defined amenities (free-form labels). Each entry max 60 chars
   // — validated at the schema layer. Use sparingly: well-known equipment
   // belongs in the `Amenity` enum so it benefits from i18n + icons.
-  customAmenities String[]      @default([])
+  customAmenities String[]    @default([])
 
   // geo (optional — falls back to neighborhood centroid)
-  lat             Decimal?      @db.Decimal(9, 6)
-  lng             Decimal?      @db.Decimal(9, 6)
+  lat Decimal? @db.Decimal(9, 6)
+  lng Decimal? @db.Decimal(9, 6)
 
-  status          ListingStatus @default(DRAFT)
-  publishedAt     DateTime?
+  status      ListingStatus @default(DRAFT)
+  publishedAt DateTime?
 
   // admin moderation (when suspended)
   suspendedReason String?
@@ -360,22 +375,22 @@ model Listing {
   // unverifyListing(). `verifiedBy` is a soft FK (admin user id) kept
   // even after re-verification cycles for audit, not modelled as a
   // hard relation to survive admin deletion gracefully.
-  verifiedAt      DateTime?
-  verifiedBy      String?
+  verifiedAt DateTime?
+  verifiedBy String?
 
   // T-049 — auto-expiration lifecycle. Set on first publish to
   // (publishedAt + 60d) so abandoned listings don't pollute the
   // catalog forever. The daily cron flips PUBLISHED → UNAVAILABLE
   // when this date passes and emails the owner so they can extend
   // with a single click. NULL while the listing is still DRAFT.
-  expiresAt              DateTime?
+  expiresAt             DateTime?
   // Set when the 7-day-warning email has been delivered so the cron
   // doesn't re-spam an owner who already got the notice. Cleared when
   // the owner extends — they get a fresh warning at the next cycle.
-  expirationAlertSentAt  DateTime?
+  expirationAlertSentAt DateTime?
 
-  createdAt       DateTime      @default(now())
-  updatedAt       DateTime      @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   owner         User           @relation(fields: [ownerId], references: [id], onDelete: Restrict)
   city          City           @relation(fields: [cityId], references: [id], onDelete: Restrict)
@@ -387,6 +402,9 @@ model Listing {
   favorites     Favorite[]
   payments      Payment[]
   leases        Lease[]
+  // E-T28 — concierge lead queue. Multiple concurrent leads allowed per
+  // listing by design (operator arbitrates which one converts).
+  leadRequests  LeadRequest[]
 
   // Slug is unique PER neighborhood (matches the URL path
   // /[city]/[neighborhood]/[slug]) so the same slug can recur across
@@ -421,23 +439,23 @@ enum ListingType {
 // additions as new student needs come up. Values are stable identifiers
 // (i18n labels + icons live in code), so renaming a label here is safe.
 enum Amenity {
-  WIFI                  // Internet WiFi inclus
-  PARKING               // Parking voiture
-  MOTO_PARKING          // Parking moto / vélo
-  HOT_WATER             // Eau chaude
-  WATER_TANK            // Citerne / réserve d'eau
-  GENERATOR             // Groupe électrogène
-  AIR_CONDITIONING      // Climatisation
-  KITCHEN_EQUIPPED      // Cuisine équipée (frigo, gazinière)
-  WASHING_MACHINE       // Machine à laver
-  GUARD                 // Gardiennage 24/7
-  SECURITY_GATE         // Portail fermé / clôture
-  TERRACE               // Terrasse / balcon
-  GARDEN                // Jardin
-  STUDY_DESK            // Bureau / coin étude
-  CLOSE_TO_UNIVERSITY   // Proche université
-  CLOSE_TO_MARKET       // Proche marché
-  PUBLIC_TRANSPORT      // Transport en commun proche
+  WIFI // Internet WiFi inclus
+  PARKING // Parking voiture
+  MOTO_PARKING // Parking moto / vélo
+  HOT_WATER // Eau chaude
+  WATER_TANK // Citerne / réserve d'eau
+  GENERATOR // Groupe électrogène
+  AIR_CONDITIONING // Climatisation
+  KITCHEN_EQUIPPED // Cuisine équipée (frigo, gazinière)
+  WASHING_MACHINE // Machine à laver
+  GUARD // Gardiennage 24/7
+  SECURITY_GATE // Portail fermé / clôture
+  TERRACE // Terrasse / balcon
+  GARDEN // Jardin
+  STUDY_DESK // Bureau / coin étude
+  CLOSE_TO_UNIVERSITY // Proche université
+  CLOSE_TO_MARKET // Proche marché
+  PUBLIC_TRANSPORT // Transport en commun proche
 }
 
 enum ListingStatus {
@@ -446,14 +464,14 @@ enum ListingStatus {
   UNAVAILABLE
   SUSPENDED
   DELETED
-  RENTED       // E-T26 — bail actif sur la plateforme, masqué de la grille publique
+  RENTED // E-T26 — bail actif sur la plateforme, masqué de la grille publique
 }
 
 model ListingPhoto {
   id           String   @id @default(cuid())
   listingId    String
-  url          String   // Cloudinary delivery URL
-  cloudinaryId String   // Cloudinary public ID (for deletion / transforms)
+  url          String // Cloudinary delivery URL
+  cloudinaryId String // Cloudinary public ID (for deletion / transforms)
   width        Int
   height       Int
   blurhash     String?
@@ -473,17 +491,17 @@ model ListingPhoto {
 // ============================================================
 
 model ContactEvent {
-  id        String         @id @default(cuid())
-  listingId String
+  id                 String         @id @default(cuid())
+  listingId          String
   // Signed-in viewer's userId when known. Null for anonymous reveals.
   // Powers `Review.verifiedStay` (T-031) — a review is "verified" when
   // its author has at least one prior ContactEvent on the listing.
   // SetNull on user delete so the event row survives account anonymisation.
-  viewerId  String?
-  channel   ContactChannel
-  ipHash    String         // SHA-256(ip + secret), no raw IP
-  uaHash    String?        // SHA-256(user agent + secret)
-  createdAt DateTime       @default(now())
+  viewerId           String?
+  channel            ContactChannel
+  ipHash             String // SHA-256(ip + secret), no raw IP
+  uaHash             String? // SHA-256(user agent + secret)
+  createdAt          DateTime       @default(now())
   // Set when the prompt-review cron has emailed the viewer to ask
   // for a review. Prevents the cron from re-emailing the same
   // viewer for the same listing every day. Null = never prompted.
@@ -510,16 +528,16 @@ enum ContactChannel {
 model Report {
   id         String       @id @default(cuid())
   listingId  String
-  reporterId String?      // null = anonymous (rate-limited by IP server-side)
+  reporterId String? // null = anonymous (rate-limited by IP server-side)
   reason     ReportReason
-  details    String?      @db.Text  // free text from the reporter
+  details    String?      @db.Text // free text from the reporter
   status     ReportStatus @default(OPEN)
   /// Visible to the reporter (email) + the listing owner (dashboard).
   /// Captured when admin resolves / dismisses — explains the decision.
   /// NOT for internal-only notes.
   adminNote  String?      @db.Text
   resolvedAt DateTime?
-  resolvedBy String?      // admin userId
+  resolvedBy String? // admin userId
   createdAt  DateTime     @default(now())
 
   listing  Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
@@ -553,7 +571,7 @@ model Review {
   id            String       @id @default(cuid())
   listingId     String
   authorId      String
-  rating        Int          // 1..5 (validated server-side)
+  rating        Int // 1..5 (validated server-side)
   body          String       @db.Text
   verifiedStay  Boolean      @default(false) // set true if linked to a verified contact event / payment
   ownerResponse String?      @db.Text
@@ -620,7 +638,7 @@ model SavedSearch {
   id          String    @id @default(cuid())
   userId      String
   name        String
-  filters     Json      // serialized search criteria (validated via Zod app-side)
+  filters     Json // serialized search criteria (validated via Zod app-side)
   alertsOn    Boolean   @default(false)
   lastFiredAt DateTime?
   createdAt   DateTime  @default(now())
@@ -649,24 +667,24 @@ model SavedSearch {
 // has no subunit, `iraimbilanja` is defunct. GoalPay's API works in
 // integer Ariary too.
 model Payment {
-  id                 String           @id @default(cuid())
-  userId             String
-  listingId          String?
-  idempotencyKey     String           @unique
-  provider           PaymentProviderName
-  providerTxId       String?          @unique
-  amountMGA          Int
-  purpose            PaymentPurpose
-  status             PaymentStatus    @default(INITIATED)
-  payerPhone         String?          // E.164
-  createdAt          DateTime         @default(now())
+  id                String              @id @default(cuid())
+  userId            String
+  listingId         String?
+  idempotencyKey    String              @unique
+  provider          PaymentProviderName
+  providerTxId      String?             @unique
+  amountMGA         Int
+  purpose           PaymentPurpose
+  status            PaymentStatus       @default(INITIATED)
+  payerPhone        String? // E.164
+  createdAt         DateTime            @default(now())
   // Expiry of the GoalPay checkout link (createdAt + 10 min, per docs).
   // Used by the E-T20 reconciliation cron to mark stuck INITIATED rows.
-  expiresAt          DateTime?
+  expiresAt         DateTime?
   // Set on the first webhook arrival, regardless of status. Audit trail.
-  webhookReceivedAt  DateTime?
+  webhookReceivedAt DateTime?
   // Set when status transitions to CONFIRMED (a successful payment).
-  completedAt        DateTime?
+  completedAt       DateTime?
 
   user    User           @relation(fields: [userId], references: [id], onDelete: Restrict)
   listing Listing?       @relation(fields: [listingId], references: [id], onDelete: SetNull)
@@ -682,28 +700,28 @@ enum PaymentProviderName {
 }
 
 enum PaymentPurpose {
-  PREMIUM_LISTING       // legacy (superseded by LEASE_SUCCESS_FEE in v2 model)
-  FEATURED_PLACEMENT    // legacy (superseded)
-  LEASE_SUCCESS_FEE     // E-T26 — 15k Ar + 8% caution per signed lease
+  PREMIUM_LISTING // legacy (superseded by LEASE_SUCCESS_FEE in v2 model)
+  FEATURED_PLACEMENT // legacy (superseded)
+  LEASE_SUCCESS_FEE // E-T26 — 15k Ar + 8% caution per signed lease
   // future: DEPOSIT, FIRST_MONTH (à valider légalement — E-T18 frozen)
 }
 
 enum PaymentStatus {
-  INITIATED        // POST to GoalPay sent, checkout_url returned, awaiting user
-  PENDING          // Reserved for future async states (not used by GoalPay v1)
-  CONFIRMED        // Webhook payment.success received + verified
-  FAILED           // Webhook payment.failed received
-  CANCELED         // Webhook payment.canceled received (user abandoned)
-  EXPIRED          // Webhook payment.expired received (10 min checkout TTL)
-  REFUND_PENDING   // Admin opened a manual refund (GoalPay has no refund API)
-  REFUNDED         // Manual refund confirmed via GoalPay support
+  INITIATED // POST to GoalPay sent, checkout_url returned, awaiting user
+  PENDING // Reserved for future async states (not used by GoalPay v1)
+  CONFIRMED // Webhook payment.success received + verified
+  FAILED // Webhook payment.failed received
+  CANCELED // Webhook payment.canceled received (user abandoned)
+  EXPIRED // Webhook payment.expired received (10 min checkout TTL)
+  REFUND_PENDING // Admin opened a manual refund (GoalPay has no refund API)
+  REFUNDED // Manual refund confirmed via GoalPay support
 }
 
 model PaymentEvent {
   id         String        @id @default(cuid())
   paymentId  String
   status     PaymentStatus
-  rawPayload Json          // raw provider response (kept for disputes)
+  rawPayload Json // raw provider response (kept for disputes)
   occurredAt DateTime      @default(now())
 
   payment Payment @relation(fields: [paymentId], references: [id], onDelete: Cascade)
@@ -734,36 +752,40 @@ model PaymentEvent {
 // ============================================================
 
 model Lease {
-  id                   String       @id @default(cuid())
-  listingId            String
-  ownerId              String
-  tenantId             String
-  monthlyRentMGA       Int
-  cautionMGA           Int          @default(0)
-  startDate            DateTime
-  durationMonths       Int
+  id             String      @id @default(cuid())
+  listingId      String
+  ownerId        String
+  tenantId       String
+  monthlyRentMGA Int
+  cautionMGA     Int         @default(0)
+  startDate      DateTime
+  durationMonths Int
   // E-T26 (revised 2026-05-27) — platform fee charged to the TENANT
   // at lease acceptance, NOT the owner. Default rate is 20% of the
   // monthly rent (= PLATFORM_FEE_RATE × monthlyRentMGA, floored).
   // Snapshotted on the row so a future rate change leaves audit trails
   // intact. Owner pays nothing to AryTrano — the rent + caution flow
   // directly between tenant and owner offline.
-  platformFeeMGA       Int          @default(0)
-  paymentId            String?      @unique
-  status               LeaseStatus  @default(PENDING_TENANT)
+  platformFeeMGA Int         @default(0)
+  paymentId      String?     @unique
+  status         LeaseStatus @default(PENDING_TENANT)
   // ownerSignedAt now set at lease CREATION (owner commit = create
   // the lease wizard; no payment step on owner side). tenantSignedAt
   // set when the tenant pays + transition to ACTIVE.
-  ownerSignedAt        DateTime?
-  tenantSignedAt       DateTime?
-  terminatedAt         DateTime?
-  createdAt            DateTime     @default(now())
-  updatedAt            DateTime     @updatedAt
+  ownerSignedAt  DateTime?
+  tenantSignedAt DateTime?
+  terminatedAt   DateTime?
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
 
-  listing Listing  @relation(fields: [listingId], references: [id], onDelete: Restrict)
-  owner   User     @relation("OwnerLeases", fields: [ownerId], references: [id], onDelete: Restrict)
-  tenant  User     @relation("TenantLeases", fields: [tenantId], references: [id], onDelete: Restrict)
-  payment Payment? @relation(fields: [paymentId], references: [id])
+  listing     Listing      @relation(fields: [listingId], references: [id], onDelete: Restrict)
+  owner       User         @relation("OwnerLeases", fields: [ownerId], references: [id], onDelete: Restrict)
+  tenant      User         @relation("TenantLeases", fields: [tenantId], references: [id], onDelete: Restrict)
+  payment     Payment?     @relation(fields: [paymentId], references: [id])
+  // E-T28 — when a lead converts via an operator deep-link, the resulting
+  // Lease has a back-pointer to the originating LeadRequest. Unique side
+  // is on LeadRequest.leaseId — one lead converts to at most one lease.
+  leadRequest LeadRequest? @relation("LeadConvertedLease")
 
   @@index([listingId])
   @@index([ownerId, status])
@@ -777,11 +799,195 @@ enum LeaseStatus {
   // backward compatibility with historical rows and future flows
   // (admin tooling that might park a lease in DRAFT pre-tenant invite).
   DRAFT
-  PENDING_TENANT    // owner created the lease; tenant must accept + pay
-  ACTIVE            // tenant accepted, paid the platform fee, lease live
-  REFUSED           // tenant refused OR owner canceled before tenant paid
-  TERMINATED        // lease ended (at end of durationMonths)
-  DISPUTED          // E-T27 arbitrage open
+  PENDING_TENANT // owner created the lease; tenant must accept + pay
+  ACTIVE // tenant accepted, paid the platform fee, lease live
+  REFUSED // tenant refused OR owner canceled before tenant paid
+  TERMINATED // lease ended (at end of durationMonths)
+  DISPUTED // E-T27 arbitrage open
+}
+
+// ============================================================
+// E-T28 · Concierge lead queue (2026-06-10)
+// ============================================================
+
+/**
+ * A signed-out OR signed-in student declares interest in a listing
+ * via the public detail-page CTA ("Je suis intéressé(e)" / "Liana
+ * aho"). The AryTrano operator desk claims the lead, negotiates with
+ * the owner on WhatsApp (off-platform), and converts the lead to a
+ * Lease via the LeaseWizard with a signed `operatorActingForOwnerId`
+ * deep-link.
+ * Design choices (workflow synthesis 2026-06-10) :
+ * - Concurrent leads ALLOWED per listing — no partial unique on
+ * listingId. The operator arbitrates which one converts; losers
+ * transition to REJECTED with a NOTE LeadActivity.
+ * - Anonymous submission allowed via phone OTP — `tenantUserId` is
+ * nullable. When the lead later signs up, an operator can attach
+ * the User via `transitionLeadStatus`. `tenantPhone` is stored
+ * in clear (E.164) for operator contact; `tenantPhoneHash` is the
+ * pepper-keyed SHA-256 used in rate-limit keys + log scrubbing.
+ * - `claimedByUserId` is server-enforced to a maximum WIP of 6 per
+ * operator (T-RES-06). Race-safe via a SERIALIZABLE transaction.
+ * - `slaDueAt` is set on claim (= now + 4h). The
+ * `sweep-stale-claimed` cron auto-reverts to NEW + reassigns past
+ * that deadline (T-RES-10).
+ * - `leaseId` is nullable + `@unique` — one lead converts to at most
+ * one lease. The back-pointer lives on Lease via `leadRequest`.
+ * - All state transitions are mirrored to `LeadActivity` rows so the
+ * operator dashboard shows a full history + dispute evidence.
+ */
+model LeadRequest {
+  id               String       @id @default(cuid())
+  listingId        String
+  // Nullable — anonymous tenant via phone OTP. Once linked
+  // (tenant signs up later), the operator runs `attachLeadToUser`.
+  tenantUserId     String?
+  // Display name shown to the operator in the queue. Not validated
+  // against an account because anonymous leads exist.
+  tenantName       String
+  // E.164 normalized, e.g. `+261341234567`. Stored in clear for the
+  // operator to dial — protected by ADMIN role-gate on every read.
+  tenantPhone      String
+  // SHA-256(phone + pepper). Used in rate-limit keys (per memory
+  // `feedback_rate_limit_null_ip` fail-CLOSED pattern) and in
+  // Sentry/log payloads (per memory `feedback_debug_logs_no_pii`).
+  tenantPhoneHash  String
+  // OTP-only flows always set `email = NULL`. When the tenant later
+  // links a User, we keep `email` derived from the User (not stored
+  // here) — admins read it via the relation.
+  moveInWindow     MoveInWindow
+  // Tenant ticks "j'ai le budget pour ce loyer" before submission —
+  // false = tenant skipped the check, raised lead. Operator uses
+  // this signal during qualification.
+  budgetConfirmed  Boolean      @default(false)
+  status           LeadStatus   @default(NEW)
+  source           LeadSource   @default(WEB)
+  claimedByUserId  String?
+  claimedAt        DateTime?
+  // Computed = claimedAt + 4h. `sweep-stale-claimed` cron scans
+  // `WHERE status = CLAIMED AND slaDueAt < now()` — index
+  // `[status, slaDueAt]` makes that O(log n).
+  slaDueAt         DateTime?
+  // Set the first time the operator logs a MESSAGED activity. Used
+  // to compute "first response latency" metric for analytics.
+  firstContactedAt DateTime?
+  // Back-pointer to the converted Lease. `@unique` so a single lead
+  // can't be linked to two Lease rows. `leadRequest` relation on
+  // Lease completes the round-trip.
+  leaseId          String?      @unique
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+
+  listing    Listing        @relation(fields: [listingId], references: [id], onDelete: Restrict)
+  tenant     User?          @relation("LeadTenant", fields: [tenantUserId], references: [id], onDelete: SetNull)
+  claimedBy  User?          @relation("LeadClaimedBy", fields: [claimedByUserId], references: [id], onDelete: SetNull)
+  lease      Lease?         @relation("LeadConvertedLease", fields: [leaseId], references: [id], onDelete: SetNull)
+  activities LeadActivity[]
+
+  // Cron scan: sweep-unclaimed (status=NEW) + sweep-stale-claimed
+  // (status=CLAIMED + slaDueAt) all hit this single composite index.
+  @@index([status, slaDueAt])
+  // Per-listing operator view (admin filters by listing + status).
+  @@index([listingId, status])
+  // Operator dashboard "leads I'm currently working" filter.
+  @@index([claimedByUserId, status])
+  // Anti-duplicate-spam : a tenant phone soumitting twice on the
+  // same listing within a short window is filtered in-service
+  // (service-side check, not a DB unique because the second lead
+  // 25h later is legitimate). Index keeps the lookup O(log n).
+  @@index([tenantPhoneHash, listingId, createdAt])
+}
+
+/**
+ * Append-only activity log on a LeadRequest. Every status transition,
+ * every operator note, every system event (cron escalation,
+ * auto-revert) writes a row here. The operator dashboard renders
+ * the timeline; the disputes path uses it as evidence.
+ * NEVER updated, only inserted — no `updatedAt`. The `payload` JSON
+ * column holds type-specific data (e.g. for MESSAGED:
+ * `{channel:'whatsapp', summary, direction:'outbound'}`).
+ */
+model LeadActivity {
+  id          String           @id @default(cuid())
+  leadId      String
+  type        LeadActivityType
+  // Nullable for SYSTEM-acted rows (cron jobs).
+  actorUserId String?
+  actorRole   LeadActorRole
+  payload     Json
+  createdAt   DateTime         @default(now())
+
+  lead  LeadRequest @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  actor User?       @relation("LeadActivityActor", fields: [actorUserId], references: [id], onDelete: SetNull)
+
+  // Timeline render on lead detail page (operator dashboard).
+  @@index([leadId, createdAt])
+  // Operator analytics — "how many MESSAGED activities did operator X
+  // log this week ?" hits this index.
+  @@index([actorUserId, type, createdAt])
+}
+
+/**
+ * Operator shift declarations. An ADMIN operator marks themselves as
+ * "on shift" so the `createInterestLead` push-fan-out (T-RES-09)
+ * only notifies operators who can actually answer. Shifts are
+ * non-overlapping per-operator (enforced service-side).
+ */
+model OperatorShift {
+  id         String   @id @default(cuid())
+  operatorId String
+  startsAt   DateTime
+  endsAt     DateTime
+  createdAt  DateTime @default(now())
+
+  operator User @relation(fields: [operatorId], references: [id], onDelete: Cascade)
+
+  // Hot scan : `WHERE startsAt <= now() AND endsAt >= now()`.
+  @@index([startsAt, endsAt])
+  @@index([operatorId, startsAt])
+}
+
+enum LeadStatus {
+  NEW // Just submitted, no operator claimed yet
+  CLAIMED // An operator is working it; SLA running
+  IN_DISCUSSION // Operator + owner + tenant exchanging
+  AWAITING_OWNER // Operator waiting on owner reply
+  AWAITING_TENANT // Operator waiting on tenant reply
+  CONVERTED // Linked to a Lease via leaseId
+  LAPSED // No activity > 14 days, auto-archived
+  REJECTED // Tenant changed mind, owner off-platform, etc.
+}
+
+enum LeadSource {
+  WEB // Public detail page CTA
+  MOBILE // Mobile app (Expo) — REST POST /api/v1/leads
+  REST // Third-party / partner integration
+}
+
+enum LeadActivityType {
+  CREATED // LeadRequest created (system, on insert)
+  CLAIMED // Operator claimed the lead
+  MESSAGED // Operator logged a WhatsApp / phone message
+  NO_RESPONSE_WARN // Cron flagged the lead near its SLA
+  CONVERTED // Operator converted to Lease via deep-link
+  LAPSED // Cron archived after 14d inactivity
+  REASSIGNED // Cron auto-reverted from CLAIMED → NEW
+  REJECTED // Operator marked rejected (with reason)
+  NOTE // Free-form operator note
+}
+
+enum LeadActorRole {
+  TENANT // The student
+  OWNER // The listing owner
+  OPERATOR // AryTrano admin
+  SYSTEM // Cron job, no human actor
+}
+
+enum MoveInWindow {
+  THIS_MONTH
+  NEXT_MONTH
+  IN_2_MONTHS
+  FLEXIBLE
 }
 
 // Editorial testimonials shown on marketing surfaces (landing owner
@@ -828,27 +1034,27 @@ enum TestimonialAudience {
 // Indexed on createdAt so the admin dashboard can paginate recent
 // submissions, and on email so we can dedupe / look up by user.
 model QuizSubmission {
-  id              String   @id @default(cuid())
+  id               String   @id @default(cuid())
   // ISO 639-1 + region of the submission ("fr-MG" or "mg"). Useful
   // when emailing back so the message language matches.
   // TODO(audit P2): migrate to `Locale` enum (FR_MG / MG) before the
   // table fills up — see prisma audit followup in TICKETS.
-  locale          String
+  locale           String
   // Null when the user skipped the optional email step.
-  email           String?
+  email            String?
   // 6 raw answer values as a JSON blob — keys match the quiz schema
   // (budget, school, housingType, vibe, mobility, priority). We
   // intentionally store these flat rather than as separate columns so
   // adding/removing a question is a code-only change, no migration.
-  answers         Json
+  answers          Json
   // Slugs of the 3 quartiers we recommended, ranked best → worst.
   // Stored at submission time so reco audit isn't affected by later
   // changes to the scoring algorithm.
   recommendedSlugs String[]
   // IP hash for rate-limiting + abuse pattern detection. We never
   // store the raw IP. Null when proxy could not derive one.
-  ipHash          String?
-  createdAt       DateTime @default(now())
+  ipHash           String?
+  createdAt        DateTime @default(now())
 
   @@index([createdAt])
   @@index([email])
@@ -866,20 +1072,20 @@ model QuizSubmission {
 // no-op upsert (touches updatedAt), not a duplicate row. ipHash lets
 // us spot abuse without storing PII.
 model WhatsAppAlert {
-  id          String   @id @default(cuid())
+  id               String    @id @default(cuid())
   // E.164 format ("+2613XXXXXXX"). Normalized server-side; never trust
   // the raw input from the form.
-  phoneE164   String   @unique
+  phoneE164        String    @unique
   // Submission locale — drives the language of the future broadcast.
   // TODO(audit P2): migrate to `Locale` enum (FR_MG / MG) before the
   // table fills up — see prisma audit followup in TICKETS.
-  locale      String
+  locale           String
   // Optional neighborhood filter — students can subscribe to a specific
   // quartier. Null = "any new listing".
-  quartierSlug String?
-  ipHash      String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  quartierSlug     String?
+  ipHash           String?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
   // T-045 — public unsubscribe via one-click link.
   // `unsubscribeToken` is a long-lived crypto-random string included
   // in every outbound broadcast. When the user clicks the link,
