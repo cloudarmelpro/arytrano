@@ -7,7 +7,14 @@ export const LISTING_PHOTO_ACCEPTED_TYPES = [
   'image/webp',
   'image/heic',
 ] as const
-export const MAX_PHOTOS_PER_LISTING = 8
+// Bumped 8 → 20 (2026-06-10) — owners requested richer galleries to
+// reduce on-site visit need. PhotoGallery (1+4 grid + +N overlay),
+// PhotoLightbox (modulo nav), PhotoManager (counter), JSON-LD, i18n
+// `{max}` interpolations and the `reorderPhotosSchema` .max() below
+// all derive from this constant — no other call site to touch.
+// Companion bump : `photoUploadByListing` rate limiter (8/min → 25/min)
+// in `lib/rate-limit/index.ts` so owners don't hit 429 mid-session.
+export const MAX_PHOTOS_PER_LISTING = 20
 
 export const listingPhotoFileSchema = z.object({
   type: z.enum(LISTING_PHOTO_ACCEPTED_TYPES, {

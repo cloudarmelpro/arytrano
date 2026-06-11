@@ -61,9 +61,12 @@ const registerLimiter = makeLimiter('register', { requests: 5, window: '1 h' })
 // Listings — owner creates a DRAFT: 10 / 1h / user
 const createListingLimiter = makeLimiter('listing-create', { requests: 10, window: '1 h' })
 
-// Photo upload — 30 / 1h / user (account-wide), 8 / 1min / listing (burst)
+// Photo upload — 30 / 1h / user (account-wide), 25 / 1min / listing (burst).
+// 2026-06-10 — per-listing burst bumped 8 → 25 in lock-step with
+// MAX_PHOTOS_PER_LISTING going 8 → 20. The +5 headroom absorbs
+// retry-after-network-flake without re-opening the abuse vector.
 const photoUploadByUser = makeLimiter('listing-photo-user', { requests: 30, window: '1 h' })
-const photoUploadByListing = makeLimiter('listing-photo-listing', { requests: 8, window: '1 m' })
+const photoUploadByListing = makeLimiter('listing-photo-listing', { requests: 25, window: '1 m' })
 
 // Reporting — 10 / 1h / IP (broad cap), 3 / 1h / IP+listingId (anti-pile-on)
 const reportByIp = makeLimiter('report-ip', { requests: 10, window: '1 h' })
