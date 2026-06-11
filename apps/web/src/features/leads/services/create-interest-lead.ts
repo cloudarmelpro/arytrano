@@ -1,10 +1,12 @@
 import 'server-only'
+import { after } from 'next/server'
 import * as Sentry from '@sentry/nextjs'
 import { prisma } from '@/lib/db'
 import { errors } from '@/lib/api/errors'
 import { hashPhone } from '@/lib/auth/hash-phone'
 import { rateLimiters } from '@/lib/rate-limit'
 import type { CreateInterestLeadInput } from '../schemas'
+import { notifyOperatorsOnNewLead } from './notify-operators-on-new-lead'
 import { writeLeadActivity } from './write-lead-activity'
 
 /**
@@ -63,9 +65,11 @@ export async function createInterestLead(
   // 2) Listing must exist + be rentable. RENTED + UNAVAILABLE listings
   //    are still on the platform but visitors can't generate leads
   //    against them (the queue would clutter with dead requests).
+  //    Pull title here too so the push fan-out below (T-RES-09)
+  //    doesn't need a second round-trip.
   const listing = await prisma.listing.findUnique({
     where: { id: input.listingId },
-    select: { id: true, status: true },
+    select: { id: true, status: true, title: true },
   })
   if (!listing) return { kind: 'listing_not_found' }
   if (listing.status !== 'PUBLISHED') {
@@ -131,6 +135,29 @@ export async function createInterestLead(
     tags: { feature: 'leads', source: context.source },
     extra: { leadId: id, listingId: input.listingId },
   })
+
+  // 6) Push fan-out to on-shift operators (T-RES-09). Deferred via
+  //    `after()` so the visitor's response flushes immediately —
+  //    Expo's HTTP round-trip is ~150-400 ms and adds nothing the
+  //    submitter cares about.
+  //    `after()` throws outside a request scope (tests, scripts) —
+  //    catch and fall through to fire-and-forget so the happy path
+  //    is unchanged.
+  const notifyTask = () =>
+    notifyOperatorsOnNewLead(id, {
+      listingTitle: listing.title,
+      listingId: input.listingId,
+    }).catch((err) =>
+      Sentry.captureException(err, {
+        tags: { feature: 'leads', step: 'notify-after' },
+        extra: { leadId: id },
+      }),
+    )
+  try {
+    after(notifyTask)
+  } catch {
+    void notifyTask()
+  }
 
   return { kind: 'ok', leadId: id, createdAt }
 }
