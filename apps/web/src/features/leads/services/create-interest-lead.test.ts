@@ -13,6 +13,9 @@ vi.mock('@/lib/rate-limit', () => ({
     leadSubmit: vi.fn(),
   },
 }))
+vi.mock('@/features/phone-otp/server', () => ({
+  hasRecentlyVerifiedPhone: vi.fn(),
+}))
 vi.mock('@/lib/db', () => ({
   prisma: {
     listing: { findUnique: vi.fn() },
@@ -25,6 +28,7 @@ vi.mock('@/lib/db', () => ({
 import { createInterestLead } from './create-interest-lead'
 import { prisma } from '@/lib/db'
 import { rateLimiters } from '@/lib/rate-limit'
+import { hasRecentlyVerifiedPhone } from '@/features/phone-otp/server'
 
 const baseInput = {
   listingId: 'cabc1234567890123456789a',
@@ -42,6 +46,7 @@ const baseContext = {
 beforeEach(() => {
   vi.clearAllMocks()
   vi.mocked(rateLimiters.leadSubmit).mockResolvedValue({ success: true })
+  vi.mocked(hasRecentlyVerifiedPhone).mockResolvedValue(true)
   vi.mocked(prisma.listing.findUnique).mockResolvedValue({
     id: baseInput.listingId,
     status: 'PUBLISHED',
@@ -79,6 +84,24 @@ describe('createInterestLead', () => {
     const result = await createInterestLead(baseInput, baseContext)
     expect(result.kind).toBe('rate_limited')
     expect(prisma.listing.findUnique).not.toHaveBeenCalled()
+  })
+
+  // T-002 gate
+  it('returns otp_required when anonymous submitter has no recent verification', async () => {
+    vi.mocked(hasRecentlyVerifiedPhone).mockResolvedValue(false)
+    const result = await createInterestLead(baseInput, baseContext)
+    expect(result.kind).toBe('otp_required')
+    expect(prisma.listing.findUnique).not.toHaveBeenCalled()
+  })
+
+  it('skips the OTP gate when tenantUserId is set (signed-in tenant)', async () => {
+    vi.mocked(hasRecentlyVerifiedPhone).mockResolvedValue(false)
+    const result = await createInterestLead(baseInput, {
+      ...baseContext,
+      tenantUserId: 'cusersignedinusersignedinuser',
+    })
+    expect(result.kind).toBe('ok')
+    expect(hasRecentlyVerifiedPhone).not.toHaveBeenCalled()
   })
 
   it('returns listing_not_found when the listing is missing', async () => {

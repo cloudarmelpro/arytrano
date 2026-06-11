@@ -183,6 +183,20 @@ const EnvSchema = z.object({
   // triggerable. In dev (no scheduler), the routes still respond if
   // the secret is set locally — set a random value in .env to test.
   CRON_SECRET: requiredInProd('CRON_SECRET is required in production'),
+
+  // --- SMS provider (T-002 — phone OTP gate on lead form) -----
+  // When unset OR `console` AND NODE_ENV !== production, fall back
+  // to the in-process console mock that just logs SMS payloads to
+  // stdout. Production rejects boot if neither `twilio` nor
+  // `console` (explicit dry-run) is configured.
+  SMS_PROVIDER: z.enum(['console', 'twilio']).optional(),
+  TWILIO_ACCOUNT_SID: z.string().optional(),
+  TWILIO_AUTH_TOKEN: z.string().optional(),
+  // Either an E.164 number we lease from Twilio (`+1...`) OR a
+  // pre-approved sender alias for international destinations.
+  // Madagascar destinations work best with a US/EU long-code that
+  // doesn't get blocked by sender-id restrictions.
+  TWILIO_FROM_NUMBER: z.string().optional(),
 })
 
 export type Env = z.infer<typeof EnvSchema>

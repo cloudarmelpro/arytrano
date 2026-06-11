@@ -183,6 +183,21 @@ const leadSubmitByIp = makeLimiter('lead-submit-ip', {
   window: '1 h',
 })
 
+// Phone OTP request (T-002, 2026-06-11) — same shape as leadSubmit
+// but a tighter envelope on the IP axis (5/h instead of 10) because
+// each request burns SMS credits and is more expensive than a free
+// lead form post. Phone-axis stays at 3/h so a legit user who needs
+// to re-send the code 2-3 times because of carrier delay still
+// works.
+const phoneOtpRequestByPhone = makeLimiter('phone-otp-request-phone', {
+  requests: 3,
+  window: '1 h',
+})
+const phoneOtpRequestByIp = makeLimiter('phone-otp-request-ip', {
+  requests: 5,
+  window: '1 h',
+})
+
 // Review submission (Security audit H-1, 2026-05-29) — 5/h per userId.
 // Reviews go straight to the public listing detail page; without a
 // cap a single signed-in user could spam dozens of 1-star reviews on
@@ -329,5 +344,19 @@ export const rateLimiters = {
     const byPhone = await check(leadSubmitByPhone, phoneHash)
     if (!byPhone.success) return byPhone
     return check(leadSubmitByIp, ipHash ?? 'noip:lead-submit')
+  },
+
+  /**
+   * Phone OTP request (T-002) — same shape as leadSubmit but tighter
+   * on the IP axis (5/h vs 10) because each call burns SMS credits.
+   * Fail-CLOSED on null ipHash.
+   */
+  phoneOtpRequest: async (
+    phoneHash: string,
+    ipHash: string | null,
+  ): Promise<RateLimitResult> => {
+    const byPhone = await check(phoneOtpRequestByPhone, phoneHash)
+    if (!byPhone.success) return byPhone
+    return check(phoneOtpRequestByIp, ipHash ?? 'noip:phone-otp-request')
   },
 }

@@ -208,6 +208,59 @@ model VerificationToken {
 }
 
 // ============================================================
+// T-002 — Phone OTP (2026-06-11)
+//
+// Anonymous-friendly verification gate for the public lead form
+// (E-T28 T-RES-05). The flow :
+//   1. Visitor enters phone in the lead dialog.
+//   2. Action calls `requestPhoneOtp(phoneE164)` which generates a
+//      6-digit code, bcrypt-hashes it, stores a PhoneOtp row, and
+//      sends SMS via the provider abstraction (lib/sms/).
+//   3. Visitor types the code into the dialog. Action calls
+//      `verifyPhoneOtp(phoneE164, code)` which sets `verifiedAt`.
+//   4. `createInterestLead` checks for a recent verifiedAt row
+//      (15 min window) before persisting the lead.
+//
+// Security :
+//  - `phoneHash` only (peppered with AUTH_SECRET). Clear phone never
+//    persisted on this table — the visitor proves possession by
+//    typing the code, not by us storing the number.
+//  - `codeHash` via bcrypt (work factor 10). One-shot — verified
+//    rows can't be re-verified.
+//  - `attempts` counter caps brute-force at 3 ; row marked
+//    `consumedAt` on cap reached so the visitor has to request a
+//    fresh code.
+//  - `expiresAt` = createdAt + 10 min. Verify rejects expired.
+//  - Cron sweep daily clears rows older than 24h (privacy).
+// ============================================================
+model PhoneOtp {
+  id         String    @id @default(cuid())
+  // SHA-256(phoneE164 + AUTH_SECRET) — never the raw phone.
+  // Matches the `hashPhone` helper used by E-T28 rate-limit keys.
+  phoneHash  String
+  // bcrypt(code, 10). One-way.
+  codeHash   String
+  // Set ONCE on successful verify. Used by downstream consumers
+  // (createInterestLead) to gate writes.
+  verifiedAt DateTime?
+  // Brute-force counter — reset to 0 on a fresh request, capped at 3.
+  attempts   Int       @default(0)
+  // Marked when attempts reach the cap OR when the row was already
+  // consumed by a downstream use-case. Either way, can't be re-used.
+  consumedAt DateTime?
+  // createdAt + 10 min. Verify rejects past this.
+  expiresAt  DateTime
+  createdAt  DateTime  @default(now())
+
+  // Hot path: a verify lookup is `WHERE phoneHash = ? AND
+  // verifiedAt IS NULL AND consumedAt IS NULL AND expiresAt > now()`.
+  // Ordering by createdAt DESC to get the latest unconsumed row.
+  @@index([phoneHash, createdAt])
+  // Cron sweep filter : `WHERE createdAt < now() - 24h`.
+  @@index([createdAt])
+}
+
+// ============================================================
 // LOGIN EVENTS — audit trail per user, shown in /dashboard/settings
 // ============================================================
 

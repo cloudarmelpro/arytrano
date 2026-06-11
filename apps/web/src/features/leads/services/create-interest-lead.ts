@@ -5,6 +5,7 @@ import { prisma } from '@/lib/db'
 import { errors } from '@/lib/api/errors'
 import { hashPhone } from '@/lib/auth/hash-phone'
 import { rateLimiters } from '@/lib/rate-limit'
+import { hasRecentlyVerifiedPhone } from '@/features/phone-otp/server'
 import type { CreateInterestLeadInput } from '../schemas'
 import { notifyOperatorsOnNewLead } from './notify-operators-on-new-lead'
 import { writeLeadActivity } from './write-lead-activity'
@@ -36,6 +37,8 @@ export type CreateInterestLeadOutcome =
   | { kind: 'listing_not_found' }
   | { kind: 'listing_not_rentable'; currentStatus: string }
   | { kind: 'rate_limited' }
+  /** T-002 — phone OTP gate not satisfied. Caller redirects to verify dialog. */
+  | { kind: 'otp_required' }
 
 // A second submission from the same SIM on the same listing within this
 // window is treated as a duplicate. 24h was chosen to match the
@@ -60,6 +63,15 @@ export async function createInterestLead(
   const rl = await rateLimiters.leadSubmit(tenantPhoneHash, context.ipHash)
   if (!rl.success) {
     return { kind: 'rate_limited' }
+  }
+
+  // 1bis) T-002 — phone OTP gate. The visitor MUST have a recent
+  //       PhoneOtp.verifiedAt for this phone (15 min window) before
+  //       we persist the lead. Signed-in tenants are exempted because
+  //       their account is already trusted.
+  if (!context.tenantUserId) {
+    const ok = await hasRecentlyVerifiedPhone(input.tenantPhone)
+    if (!ok) return { kind: 'otp_required' }
   }
 
   // 2) Listing must exist + be rentable. RENTED + UNAVAILABLE listings

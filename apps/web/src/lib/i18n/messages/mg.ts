@@ -2614,4 +2614,22 @@ export const mg: Record<MessageKey, string> = {
   'lead.confirmation.title': 'Voarainay ny fangatahanao !',
   'lead.confirmation.body':
     'Hifandray aminao amin’ny WhatsApp na finday tsy ho ela ny ekipa AryTrano. Azonao hidiana ity efijery ity.',
+
+  // T-002 — Phone OTP step (2026-06-11)
+  'lead.otp.title': 'Hamarino ny laharanao',
+  'lead.otp.subtitle':
+    'Nalefa tamin’ny {phone} ny kaody 6 isa. Ho lany andro afaka 10 minitra.',
+  'lead.otp.codeLabel': 'Kaody noraisina an-SMS',
+  'lead.otp.codePlaceholder': '123456',
+  'lead.otp.submit': 'Hamarino',
+  'lead.otp.submitting': 'Manamarina…',
+  'lead.otp.resend': 'Andefaso indray',
+  'lead.otp.resending': 'Mandefa…',
+  'lead.otp.changeNumber': '← Ovay ny laharana',
+  'lead.otp.error.invalid': 'Kaody diso.',
+  'lead.otp.error.expired': 'Lany andro. Mangataha kaody vaovao.',
+  'lead.otp.error.tooMany':
+    'Be loatra ny fanandramana. Mangataha kaody vaovao.',
+  'lead.otp.smsConsole.banner':
+    'Fomba dev : aseho amin’ny console ny kaody. Jereo ny tamberina.',
 }

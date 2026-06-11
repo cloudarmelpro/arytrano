@@ -2604,6 +2604,24 @@ export const frMG = {
   'lead.confirmation.title': 'On vous a noté(e) !',
   'lead.confirmation.body':
     'L’équipe AryTrano vous recontacte par WhatsApp ou téléphone bientôt. Vous pouvez fermer cette fenêtre.',
+
+  // T-002 — Phone OTP step (2026-06-11)
+  'lead.otp.title': 'Vérifie ton numéro',
+  'lead.otp.subtitle':
+    'On vient d’envoyer un code à 6 chiffres au {phone}. Il expire dans 10 minutes.',
+  'lead.otp.codeLabel': 'Code reçu par SMS',
+  'lead.otp.codePlaceholder': '123456',
+  'lead.otp.submit': 'Vérifier',
+  'lead.otp.submitting': 'Vérification…',
+  'lead.otp.resend': 'Renvoyer un code',
+  'lead.otp.resending': 'Envoi…',
+  'lead.otp.changeNumber': '← Changer de numéro',
+  'lead.otp.error.invalid': 'Code incorrect.',
+  'lead.otp.error.expired': 'Code expiré. Demande un nouveau code.',
+  'lead.otp.error.tooMany':
+    'Trop de tentatives. Demande un nouveau code.',
+  'lead.otp.smsConsole.banner':
+    'Mode dev : le code est imprimé dans le terminal du serveur. Vérifie la console.',
 } as const
 
 export type MessageKey = keyof typeof frMG

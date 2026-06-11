@@ -83,6 +83,13 @@ export async function createInterestLeadAction(
         message:
           'Trop de demandes depuis ce numéro. Réessaie dans une heure.',
       }
+    case 'otp_required':
+      return {
+        ok: false,
+        message: 'Vérifie d’abord ton numéro avec le code SMS.',
+        // Signal to the dialog UI : flip to the OTP step.
+        fields: { _form: ['otp_required'] },
+      }
     case 'listing_not_found':
       return { ok: false, message: 'Annonce introuvable.' }
     case 'listing_not_rentable':

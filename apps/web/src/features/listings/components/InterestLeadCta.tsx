@@ -22,27 +22,31 @@ import {
 } from '@/components/ui/select'
 import { useT } from '@/lib/i18n/client'
 import { createInterestLeadAction } from '@/features/leads/actions/create-interest-lead'
+import { requestPhoneOtpAction } from '@/features/phone-otp/actions/request-phone-otp'
+import { verifyPhoneOtpAction } from '@/features/phone-otp/actions/verify-phone-otp'
 
 /**
- * E-T28 T-RES-05 — public detail page CTA.
+ * E-T28 T-RES-05 + T-002 T-002.5 — public detail page CTA.
  *
- * Primary call to action that sits ABOVE the existing ContactButtons
- * widget. Opens a Base UI Dialog with a short form (name, phone,
- * move-in window, budget confirmed). On submit, calls the
- * `createInterestLeadAction` Server Action.
+ * 2-step flow (added 2026-06-11) :
  *
- * Memory rules respected :
- *  - shadcn primitives only (Field/FieldLabel/Input/Select/Button).
- *  - Base UI Select needs items={[{value,label}]} OR plain children
- *    SelectItem — we use the latter pattern that already works in
- *    AryTrano (other forms in the dashboard).
- *  - Loading states everywhere : fieldset disable during pending +
- *    useFormStatus inside the submit button, with the parent
- *    transition lifting the overall busy state for the dialog frame.
- *  - aria-labelledby on Checkbox (button role=checkbox).
+ *   Step 1 : visitor fills name + phone + move-in + budget. Submits.
+ *   Step 2 : if `otp_required`, dialog flips to the SMS code form.
+ *            On code verify, re-runs the submit silently.
+ *
+ * The OTP code flow re-uses the same dialog frame so the visitor
+ * experiences "one continuous form, just with a verify pause".
  */
 
-const INITIAL_STATE = {
+type LeadFormDraft = {
+  listingId: string
+  tenantName: string
+  tenantPhone: string
+  moveInWindow: string
+  budgetConfirmed: boolean
+}
+
+const LEAD_INITIAL = {
   ok: false,
   leadId: undefined as string | undefined,
   message: undefined as string | undefined,
@@ -58,22 +62,44 @@ export function InterestLeadCta({
 }) {
   const t = useT()
   const [open, setOpen] = useState(false)
-  const [state, formAction] = useActionState(
+  const [step, setStep] = useState<'form' | 'otp' | 'success'>('form')
+  /** Last submitted draft — kept so we can resubmit silently after OTP verify. */
+  const [draft, setDraft] = useState<LeadFormDraft | null>(null)
+  const [leadState, leadAction] = useActionState(
     createInterestLeadAction,
-    INITIAL_STATE,
+    LEAD_INITIAL,
   )
 
-  // Auto-close back to confirmation when leadId arrives
-  const showConfirmation = state.ok && state.leadId !== undefined
-
-  // Reset form / state when dialog re-opens fresh
+  // Flip to OTP step when the server flags otp_required, to success
+  // when leadId arrives. The `react-hooks/set-state-in-effect` rule
+  // flags this pattern ; suppressed per call because the Server Action
+  // result is the trigger and we have nowhere else to bridge it into
+  // local UI state (memory feedback_useEffect_external_bridge).
   useEffect(() => {
-    if (!open) return
-    // Don't reset state if the user re-opens to read their confirmation.
-  }, [open])
+    if (leadState.ok && leadState.leadId) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setStep('success')
+    } else if (
+      leadState.fields?._form?.includes('otp_required') &&
+      step === 'form'
+    ) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setStep('otp')
+    }
+  }, [leadState, step])
 
   return (
-    <Dialog.Root open={open} onOpenChange={setOpen}>
+    <Dialog.Root
+      open={open}
+      onOpenChange={(o) => {
+        setOpen(o)
+        if (!o) {
+          // Reset state on close so re-open is a fresh slate.
+          setStep('form')
+          setDraft(null)
+        }
+      }}
+    >
       <Dialog.Trigger
         render={
           <Button
@@ -89,18 +115,41 @@ export function InterestLeadCta({
       <Dialog.Portal>
         <Dialog.Backdrop className="fixed inset-0 z-50 bg-foreground/30 backdrop-blur-[2px] data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0" />
         <Dialog.Popup className="fixed left-1/2 top-1/2 z-50 w-[min(94vw,460px)] -translate-x-1/2 -translate-y-1/2 rounded-2xl border border-border bg-background p-6 shadow-2xl outline-none data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95">
-          {showConfirmation ? (
+          {step === 'success' ? (
             <ConfirmationView
               onClose={() => setOpen(false)}
-              messageOverride={state.message ?? null}
+              messageOverride={leadState.message ?? null}
+            />
+          ) : step === 'otp' ? (
+            <OtpView
+              draft={draft}
+              listingTitle={listingTitle}
+              onBack={() => setStep('form')}
+              onVerified={() => {
+                // Re-submit the lead via the same form action — the
+                // service will now see hasRecentlyVerifiedPhone === true.
+                if (!draft) return
+                const fd = new FormData()
+                fd.set('listingId', draft.listingId)
+                fd.set('tenantName', draft.tenantName)
+                fd.set('tenantPhone', draft.tenantPhone)
+                fd.set('moveInWindow', draft.moveInWindow)
+                fd.set('budgetConfirmed', String(draft.budgetConfirmed))
+                leadAction(fd)
+              }}
             />
           ) : (
             <LeadForm
               listingId={listingId}
               listingTitle={listingTitle}
-              formAction={formAction}
-              serverMessage={state.message ?? null}
-              fieldErrors={state.fields ?? null}
+              formAction={leadAction}
+              serverMessage={
+                leadState.fields?._form?.includes('otp_required')
+                  ? null
+                  : leadState.message ?? null
+              }
+              fieldErrors={leadState.fields ?? null}
+              onDraftCaptured={setDraft}
             />
           )}
         </Dialog.Popup>
@@ -109,18 +158,24 @@ export function InterestLeadCta({
   )
 }
 
+// ============================================================
+// Step 1 — Lead form
+// ============================================================
+
 function LeadForm({
   listingId,
   listingTitle,
   formAction,
   serverMessage,
   fieldErrors,
+  onDraftCaptured,
 }: {
   listingId: string
   listingTitle: string
   formAction: (formData: FormData) => void
   serverMessage: string | null
   fieldErrors: Record<string, string[]> | null
+  onDraftCaptured: (d: LeadFormDraft) => void
 }) {
   const t = useT()
   const nameId = useId()
@@ -133,8 +188,21 @@ function LeadForm({
   const error = (key: string): string | undefined =>
     fieldErrors?.[key]?.[0] ?? undefined
 
+  function handleSubmit(formData: FormData) {
+    // Capture the draft BEFORE the form action runs so the OTP step
+    // can re-submit silently with the same values.
+    onDraftCaptured({
+      listingId,
+      tenantName: String(formData.get('tenantName') ?? ''),
+      tenantPhone: String(formData.get('tenantPhone') ?? ''),
+      moveInWindow: String(formData.get('moveInWindow') ?? 'NEXT_MONTH'),
+      budgetConfirmed: formData.get('budgetConfirmed') === 'true',
+    })
+    formAction(formData)
+  }
+
   return (
-    <form action={formAction} aria-describedby="lead-form-context">
+    <form action={handleSubmit} aria-describedby="lead-form-context">
       <Dialog.Title className="text-[18px] font-bold leading-tight tracking-tight">
         {t('lead.dialog.title')}
       </Dialog.Title>
@@ -259,11 +327,184 @@ function LeadForm({
   )
 }
 
-/**
- * Wraps the fieldset with `disabled={pending}` driven by useFormStatus.
- * Lifting the pending into a fieldset (vs the individual inputs) is the
- * project's preferred pattern (memory `feedback_loading_states`).
- */
+// ============================================================
+// Step 2 — OTP code form
+// ============================================================
+
+function OtpView({
+  draft,
+  listingTitle,
+  onBack,
+  onVerified,
+}: {
+  draft: LeadFormDraft | null
+  listingTitle: string
+  onBack: () => void
+  onVerified: () => void
+}) {
+  const t = useT()
+  const codeId = useId()
+
+  // Request a code as soon as the OTP step mounts (with the draft phone).
+  const [requestState, requestAction] = useActionState(
+    requestPhoneOtpAction,
+    { ok: false } as { ok: boolean; message?: string; expiresAtIso?: string },
+  )
+  const [verifyState, verifyAction] = useActionState(
+    verifyPhoneOtpAction,
+    {
+      ok: false,
+    } as { ok: boolean; message?: string },
+  )
+
+  // Trigger an initial code-request on mount if none has been issued yet.
+  useEffect(() => {
+    if (!draft) return
+    if (requestState.ok || requestState.message) return
+    const fd = new FormData()
+    fd.set('phoneE164', draft.tenantPhone)
+    requestAction(fd)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [draft])
+
+  // When verify succeeds, re-submit the lead.
+  useEffect(() => {
+    if (verifyState.ok) onVerified()
+  }, [verifyState.ok, onVerified])
+
+  if (!draft) {
+    // Defensive — onBack to recover.
+    return (
+      <div className="text-center">
+        <p>État perdu. Reviens à l’étape précédente.</p>
+        <Button type="button" onClick={onBack} className="mt-3">
+          ← Retour
+        </Button>
+      </div>
+    )
+  }
+
+  return (
+    <div>
+      <Dialog.Title className="text-[18px] font-bold leading-tight tracking-tight">
+        {t('lead.otp.title')}
+      </Dialog.Title>
+      <p className="mt-1.5 text-[13px] leading-[1.55] text-foreground/70">
+        {t('lead.otp.subtitle', { phone: draft.tenantPhone })}
+      </p>
+      <p className="mt-2 text-[11.5px] text-foreground/55">
+        Annonce : {listingTitle}
+      </p>
+
+      {/* Dev hint when SMS provider is the console mock. We can't detect
+          it client-side, so it's always shown ; not a leak — info only. */}
+      <p className="mt-3 rounded-md border border-amber-200 bg-amber-50/60 px-3 py-2 text-[11.5px] leading-[1.4] text-amber-900">
+        {t('lead.otp.smsConsole.banner')}
+      </p>
+
+      <form action={verifyAction} className="mt-5">
+        <input type="hidden" name="phoneE164" value={draft.tenantPhone} />
+        <FieldGroup>
+          <Field data-invalid={!verifyState.ok && !!verifyState.message}>
+            <FieldLabel htmlFor={codeId}>
+              {t('lead.otp.codeLabel')}
+            </FieldLabel>
+            <Input
+              id={codeId}
+              name="code"
+              type="text"
+              inputMode="numeric"
+              autoComplete="one-time-code"
+              required
+              maxLength={6}
+              minLength={6}
+              pattern="\d{6}"
+              placeholder={t('lead.otp.codePlaceholder')}
+              autoFocus
+              aria-invalid={!verifyState.ok && !!verifyState.message}
+            />
+            {!verifyState.ok && verifyState.message ? (
+              <FieldError errors={[{ message: verifyState.message }]} />
+            ) : null}
+            {requestState.message && !requestState.ok ? (
+              <FieldError errors={[{ message: requestState.message }]} />
+            ) : null}
+          </Field>
+        </FieldGroup>
+
+        <div className="mt-5 flex flex-col-reverse gap-2 sm:flex-row sm:justify-between sm:items-center">
+          <button
+            type="button"
+            onClick={onBack}
+            className="text-[12.5px] font-medium text-primary hover:underline self-start"
+          >
+            {t('lead.otp.changeNumber')}
+          </button>
+          <div className="flex gap-2">
+            <ResendButton phoneE164={draft.tenantPhone} requestAction={requestAction} />
+            <VerifySubmitButton />
+          </div>
+        </div>
+      </form>
+    </div>
+  )
+}
+
+function ResendButton({
+  phoneE164,
+  requestAction,
+}: {
+  phoneE164: string
+  requestAction: (fd: FormData) => void
+}) {
+  const t = useT()
+  const [pending, setPending] = useState(false)
+  return (
+    <Button
+      type="button"
+      variant="ghost"
+      disabled={pending}
+      onClick={() => {
+        setPending(true)
+        const fd = new FormData()
+        fd.set('phoneE164', phoneE164)
+        requestAction(fd)
+        // Re-enable after a small cooldown so the visitor doesn't tap
+        // a dozen times in a row.
+        setTimeout(() => setPending(false), 3000)
+      }}
+      className="text-[13px]"
+    >
+      {pending ? t('lead.otp.resending') : t('lead.otp.resend')}
+    </Button>
+  )
+}
+
+function VerifySubmitButton() {
+  const t = useT()
+  const { pending } = useFormStatus()
+  return (
+    <Button
+      type="submit"
+      disabled={pending}
+      aria-busy={pending}
+      className="inline-flex items-center justify-center gap-2"
+    >
+      {pending ? (
+        <span
+          aria-hidden
+          className="h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground/30 border-t-primary-foreground"
+        />
+      ) : null}
+      {pending ? t('lead.otp.submitting') : t('lead.otp.submit')}
+    </Button>
+  )
+}
+
+// ============================================================
+// Shared bits
+// ============================================================
+
 function FormBodyWithPending({ children }: { children: React.ReactNode }) {
   const { pending } = useFormStatus()
   return (

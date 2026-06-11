@@ -44,6 +44,8 @@ export const makeCreateInterestLeadHandler = () =>
         })
       case 'rate_limited':
         throw errors.rateLimited('Trop de demandes depuis ce numéro.')
+      case 'otp_required':
+        throw errors.conflict('OTP required.')
       case 'listing_not_found':
         throw errors.notFound('Annonce introuvable.')
       case 'listing_not_rentable':
