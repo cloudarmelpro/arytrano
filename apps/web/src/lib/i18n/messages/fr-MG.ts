@@ -2166,6 +2166,7 @@ export const frMG = {
   'admin.nav.overview': 'Vue d\'ensemble',
   'admin.nav.geo': 'Géographie',
   'admin.nav.listings': 'Annonces',
+  'admin.nav.leads': 'Leads (E-T28)',
   'admin.nav.reports': 'Signalements',
   'admin.nav.testimonials': 'Témoignages',
   'admin.nav.whatsappAlerts': 'Alertes WhatsApp',
