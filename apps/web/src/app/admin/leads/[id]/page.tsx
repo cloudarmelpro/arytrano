@@ -4,6 +4,7 @@ import { auth } from '@/features/auth'
 import { getLeadById } from '@/features/leads/server'
 import { ClaimLeadButton } from '@/features/leads/components/ClaimLeadButton'
 import { TransitionLeadForm } from '@/features/leads/components/TransitionLeadForm'
+import { ConvertLeadForm } from '@/features/leads/components/ConvertLeadForm'
 import {
   buildNewLeadOwnerLink,
   buildOwnerReminderLink,
@@ -171,14 +172,34 @@ export default async function AdminLeadDetailPage({
           </section>
 
           {isMine ? (
-            <section className="rounded-xl border border-border bg-background p-5">
-              <h2 className="text-[12px] font-semibold uppercase tracking-[0.08em] text-foreground/70">
-                Avancer le lead
-              </h2>
-              <div className="mt-3">
-                <TransitionLeadForm leadId={lead.id} />
-              </div>
-            </section>
+            <>
+              <section className="rounded-xl border border-border bg-background p-5">
+                <h2 className="text-[12px] font-semibold uppercase tracking-[0.08em] text-foreground/70">
+                  Avancer le lead
+                </h2>
+                <div className="mt-3">
+                  <TransitionLeadForm leadId={lead.id} />
+                </div>
+              </section>
+
+              {lead.status !== 'CONVERTED' && lead.status !== 'REJECTED' && lead.status !== 'LAPSED' ? (
+                <section className="rounded-xl border border-primary/30 bg-primary/[0.04] p-5">
+                  <h2 className="text-[12px] font-semibold uppercase tracking-[0.08em] text-primary">
+                    Convertir en bail
+                  </h2>
+                  <p className="mt-1 text-[12.5px] text-foreground/70">
+                    Crée le Lease en PENDING_TENANT au nom du propriétaire et
+                    flippe le lead vers CONVERTED.
+                  </p>
+                  <div className="mt-3">
+                    <ConvertLeadForm
+                      leadId={lead.id}
+                      defaultTenantEmail={lead.tenant?.email ?? undefined}
+                    />
+                  </div>
+                </section>
+              ) : null}
+            </>
           ) : null}
 
           <section className="rounded-xl border border-border bg-background p-5">

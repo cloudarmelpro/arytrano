@@ -34,6 +34,12 @@ export {
 } from './services/link-lead-to-lease'
 
 export {
+  convertLeadToLease,
+  type ConvertLeadOutcome,
+  type ConvertLeadInput,
+} from './services/convert-lead-to-lease'
+
+export {
   sweepUnclaimedLeads,
   type SweepUnclaimedLeadsResult,
 } from './services/sweep-unclaimed-leads'
