@@ -174,6 +174,13 @@ const buildSections = (openReports: number): Section[] => [
     labelKey: 'admin.section.moderation',
     items: [
       { href: '/admin/listings', labelKey: 'admin.nav.listings', icon: <IconList /> },
+      // E-T28 — concierge lead queue. Below Annonces because operators
+      // typically scan listings + leads side by side.
+      {
+        href: '/admin/leads',
+        labelKey: 'admin.nav.leads',
+        icon: <IconInbox />,
+      },
       {
         href: '/admin/reports',
         labelKey: 'admin.nav.reports',
