@@ -65,3 +65,17 @@ export {
   getLeadById,
   type LeadDetail,
 } from './queries/get-lead-by-id'
+
+export {
+  getActiveShiftForOperator,
+} from './queries/get-active-shift-for-operator'
+
+export {
+  startOperatorShift,
+  type StartOperatorShiftOutcome,
+} from './services/start-operator-shift'
+
+export {
+  endOperatorShift,
+  type EndOperatorShiftOutcome,
+} from './services/end-operator-shift'

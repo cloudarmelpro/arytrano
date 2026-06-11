@@ -1,7 +1,11 @@
 import Link from 'next/link'
 import { auth } from '@/features/auth'
-import { listLeadsForOperator } from '@/features/leads/server'
+import {
+  listLeadsForOperator,
+  getActiveShiftForOperator,
+} from '@/features/leads/server'
 import { ClaimLeadButton } from '@/features/leads/components/ClaimLeadButton'
+import { OperatorShiftBanner } from '@/features/leads/components/OperatorShiftBanner'
 import { formatAriary } from '@/lib/format/currency'
 
 export const dynamic = 'force-dynamic'
@@ -49,11 +53,14 @@ export default async function AdminLeadsPage({
     | undefined
   const claimedByMe = sp.me === '1'
 
-  const leads = await listLeadsForOperator({
-    operatorId,
-    status: status ?? 'ALL_OPEN',
-    claimedByMe,
-  })
+  const [leads, activeShift] = await Promise.all([
+    listLeadsForOperator({
+      operatorId,
+      status: status ?? 'ALL_OPEN',
+      claimedByMe,
+    }),
+    getActiveShiftForOperator(operatorId),
+  ])
 
   const filterChip = (label: string, href: string, active: boolean) => (
     <Link
@@ -78,6 +85,8 @@ export default async function AdminLeadsPage({
           Queue concierge — file d’attente E-T28. WIP cap = 6 par opérateur.
         </p>
       </header>
+
+      <OperatorShiftBanner activeShift={activeShift} />
 
       <div className="mb-5 flex flex-wrap gap-2">
         {filterChip('Tous ouverts', '/admin/leads', !status && !claimedByMe)}
