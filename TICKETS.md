@@ -2895,7 +2895,34 @@ enum DisputeStatus {
 
 **Effort estimé** : **v1 = 16 dev-days** · v2 = +24 · v3 = +38
 
-**Priorité** : P0 (premier vrai workflow de réservation sur arytrano.com) · **Statut** : 📋 todo — v1 démarrée 2026-06-10, schema (T-RES-01) en cours
+**Priorité** : P0 (premier vrai workflow de réservation sur arytrano.com) · **Statut** : ✅ **v1 shippé 2026-06-10** — 12 tickets + photo-cap bonus tous livrés, 0 erreurs lint / 269/269 tests / typecheck clean.
+
+**v1 — commits clés (2026-06-10)**
+- `db5ee43` — Photo cap 8→20 (quick win parallèle)
+- `6bbdd09` — Plan E-T28 dans TICKETS.md
+- `0648d4d` + `c958605` — T-RES-01 schema LeadRequest + LeadActivity + OperatorShift + migration
+- `10a5633` — T-RES-02/03 services + 41 Vitest tests + Zod schemas
+- `2a63f2d` — T-RES-04/08/10 Server Actions + REST + wa.me builder + 3 crons
+- `24c8b28` — T-RES-05 detail page CTA "Je suis intéressé(e)" + dialog
+- `e38d9bd` — T-RES-06 /admin/leads list + detail + claim + transition + activity log
+- `1354cb9` — T-RES-07 convertLeadToLease (operator-on-behalf)
+- `fc2d0ae` — T-RES-09 Expo push fan-out aux on-shift operators
+- `e4c83fd` — T-RES-12 runbook concierge-leads.md (11 sections)
+
+**v1 — décisions transverses gravées**
+- WhatsApp : `wa.me` fallback définitif (pas de Meta Business API).
+- LeadActivity : table dédiée (pas JSON inline) → queryable + preuves dispute.
+- REST mobile mirror day-one : 4 routes `/api/v1/leads/*`.
+- Phone OTP : déféré à v1.1 (T-002 pas shippé). Rate-limit 3/h/phoneHash + 10/h/ipHash + 24h anti-dup + opérateur vérifie au 1er WhatsApp = trust mechanism v1.
+- HMAC URL token (T-RES-07 original) → simplifié en orchestrateur same-server-action (tighter security, no URL token to leak).
+- Owner Terms bypass dans `convertLeadToLease` → opérateur prend la responsabilité, documenté dans runbook §3 étape 5.
+- WIP cap = 6 opérateur, server-enforced. Queue assignment FCFS via conditional `updateMany`.
+
+**v1 — connu à raffiner en v1.1**
+- T-002 phone OTP infra → gate la soumission anonyme du formulaire
+- UI dédiée pour OperatorShift (au lieu du seed DB)
+- Template wa.me `leaseLink` injecté automatiquement post-conversion
+- Native MG copywriter pass sur les 14 nouvelles strings i18n
 
 ---
 
