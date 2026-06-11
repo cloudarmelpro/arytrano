@@ -2721,6 +2721,184 @@ enum DisputeStatus {
 
 ---
 
+#### E-T28 · Concierge lead queue — page détail "Je suis intéressé(e)" + opérateur admin
+**En tant que** étudiant qui regarde une annonce sur arytrano.com
+**Je veux** déclarer mon intérêt via un seul CTA sans avoir à organiser une visite physique
+**Afin de** déclencher la prise en charge concierge AryTrano (qui contacte le proprio par WhatsApp, négocie, et m'invite à signer le bail en ligne quand l'accord est conclu)
+
+**En tant que** opérateur AryTrano
+**Je veux** un queue admin où je claim les leads, je log mes échanges WhatsApp, et je convertis en bail via un deep-link signé
+**Afin de** porter la responsabilité de la qualification + de la médiation (au lieu que le tenant et l'owner se débrouillent seuls)
+
+**Contexte stratégique** (workflow synthesis 2026-06-10) — A 3 approches étudiées (instant-lock Booking, visit-first, concierge-mediated). Recommandation = **C concierge** pour v1 :
+1. T-018 hotline + infra concierge déjà en place — réutilisation 100%.
+2. Trust > Speed dans le marché MG (refund GoalPay lag 5j, owners non-tech, étudiants épargnent 3-6 mois).
+3. A et B sur-fittent Booking dont les préconditions (pros 24/7, refunds régulés, unités fongibles) n'existent pas ici.
+14 dev-days pour v1 vs 22 (B) vs 42 (A).
+
+**Décisions tranchées (2026-06-10) — gravées ici pour ne pas les reperdre**
+- **WhatsApp** : `wa.me` deep-link définitif. Pas de Meta Business API. Opérateur copie-colle le texte pré-rempli.
+- **Submission anon** : Phone OTP autorisé (étudiants n'ont pas tous un email perso). Réutilise infra T-002.
+- **Activity log** : table `LeadActivity` séparée (queryable + preuves dispute), pas une colonne JSON.
+- **REST mobile** : `/api/v1/leads` mirror dès v1 (services + Zod schemas partagés).
+- **Defaults silencieux** : WIP cap opérateur = **6**, queue assignment = **FCFS + non-discrimination log**, diaspora autorisée avec OTP, headcount baseline = **2 full-time** (couvre ~200 leads/mois + redondance maladie).
+
+**Implementation outline — v1 (16 dev-days)**
+
+1. **Prisma schema** (T-RES-01) :
+   - `LeadRequest` model : id, listingId FK, tenantUserId FK nullable, tenantName, tenantPhone E.164, moveInWindow enum (THIS_MONTH, NEXT_MONTH, IN_2_MONTHS, FLEXIBLE), budgetConfirmed bool, status enum, source enum, claimedByUserId FK nullable, claimedAt, slaDueAt, firstContactedAt, leaseId FK nullable, createdAt, updatedAt
+   - `LeadActivity` model : id, leadId FK, type enum, actorUserId FK nullable, actorRole enum (TENANT, OWNER, OPERATOR, SYSTEM), payload JSONB, createdAt
+   - Enums : `LeadStatus` (NEW, CLAIMED, IN_DISCUSSION, AWAITING_OWNER, AWAITING_TENANT, CONVERTED, LAPSED, REJECTED), `LeadSource` (WEB, MOBILE, REST), `LeadActivityType` (CREATED, CLAIMED, MESSAGED, NO_RESPONSE_WARN, CONVERTED, LAPSED, REASSIGNED, NOTE)
+   - Indexes : `[status, slaDueAt]` (cron scan), `[listingId, status]` (per-listing view), `LeadActivity[leadId, createdAt]`
+   - **PAS de partial unique sur listingId** — concurrent leads autorisés par design (plusieurs étudiants peuvent négocier en parallèle sur la même annonce, l'opérateur tranche).
+   - Migration safe (additive only).
+
+2. **Services** (T-RES-02) `features/leads/services/` + Vitest :
+   - `createInterestLead(input, source)` — phone OTP gate, rate-limit ipHash+phoneHash fail-CLOSED, write LeadRequest + LeadActivity(CREATED), push Expo aux opérateurs on-shift
+   - `claimLead(leadId, operatorId)` — WIP cap 6 server-enforced, transaction lock pour FCFS, écrit LeadActivity(CLAIMED), set slaDueAt = now + 4h
+   - `transitionLeadStatus(leadId, operatorId, nextStatus, note?)` — valide la transition, écrit LeadActivity(MESSAGED|NO_RESPONSE_WARN|NOTE)
+   - `linkLeadToLease(leadId, leaseId, operatorId)` — appelle initiate-lease via deep-link signé HMAC (T-RES-07), transition LeadRequest → CONVERTED, écrit LeadActivity(CONVERTED)
+   - `sweepUnclaimedLeads()` — cron 15min, lead NEW > 4h sans claim → push opérateurs de niveau supérieur
+   - `sweepStaleClaimedLeads()` — cron 1h, lead CLAIMED + slaDueAt < now → revert vers NEW + LeadActivity(REASSIGNED) + notify opérateur original
+   - `sweepLapsedLeads()` — cron daily, lead IN_DISCUSSION sans activité > 14j → LAPSED + LeadActivity(LAPSED)
+   - Pure functions, server-only, barrel `features/leads/server.ts`.
+
+3. **Zod schemas** (T-RES-03) `features/leads/schemas/` :
+   - `createInterestLeadSchema`, `claimLeadSchema`, `transitionLeadSchema`, `activityLogEntrySchema`
+   - Partagés web + REST + mobile via `packages/shared/src/schemas/lead.ts`.
+
+4. **Server Actions + REST** (T-RES-04) :
+   - `features/leads/actions/` : `createInterestLeadAction`, `claimLeadAction`, `transitionLeadAction` (web forms / dashboards)
+   - `features/leads/api/` : handlers REST
+   - `src/app/api/v1/leads/route.ts` (POST create, GET list), `src/app/api/v1/leads/[id]/route.ts` (GET), `src/app/api/v1/leads/[id]/claim/route.ts` (POST), `src/app/api/v1/leads/[id]/transition/route.ts` (POST)
+   - Mirrors day-one per ARCHITECTURE rule 3.
+
+5. **Detail page CTA + dialog** (T-RES-05) :
+   - Refactor `ContactButtons` (déjà concierge-routed via T-018) :
+     - Primary CTA : **« Je suis intéressé(e) »** (MG : **« Liana aho »**) — ouvre Base UI Dialog
+     - Secondary CTA : **« Parler à AryTrano »** — reste le flux WhatsApp existant pour questions générales
+   - Dialog form (shadcn Field/Input/Select primitives per memory `feedback_base_ui_select` — items=[{value,label}]) :
+     - tenantName, tenantPhone (E.164 with country code picker), moveInWindow (Select), budgetConfirmed (Checkbox)
+     - Phone OTP gate avant submission (réutilise T-002)
+     - Rate limit : ipHash + phoneHash fail-CLOSED (per memory `feedback_rate_limit_null_ip`)
+     - Loading states partout (per memory `feedback_loading_states`)
+   - Disclaimer dialog body : « D'autres candidats peuvent négocier en parallèle. AryTrano vous recontacte sous 4h en moyenne. »
+   - Confirmation screen : « On vous a noté(e) ! Notre équipe vous appelle bientôt. »
+
+6. **Admin /admin/leads** (T-RES-06) :
+   - Route ADMIN role-gated
+   - Liste : leads triés par slaDueAt asc, badges status + age + listing thumbnail
+   - Detail : LeadRequest + LeadActivity timeline + listing context (price, address, owner) + tenant contact
+   - Bouton **« Je claim »** — server-enforced WIP=6 + retour 409 si dépassé
+   - Activity log paste UI : opérateur colle son échange WhatsApp + crée un LeadActivity(MESSAGED) avec payload {channel: 'whatsapp', summary, actorRole}
+   - Bouton **« Convertir en bail »** — deep-link signé HMAC vers LeaseWizard prefilled (T-RES-07)
+   - Filtres : status, claimedByMe, listing, city, dateRange
+
+7. **LeaseWizard accepte operatorActingForOwnerId** (T-RES-07) :
+   - `features/leases/services/initiate-lease.ts` : nouveau param optionnel `operatorActingForOwnerId: string` (HMAC signé, 30 min TTL)
+   - Auth check : ADMIN role + listing avec LeadRequest CLAIMED actif par cet opérateur sur cet ownerId (anti-cherry-picking)
+   - Audit log : chaque initiation operator-acting écrit dans `LeadActivity(CONVERTED)` + dans le Lease (column `initiatedByOperatorId` nullable)
+
+8. **wa.me deep-link builder** (T-RES-08) :
+   - `lib/wa-me/` : 6 templates pré-remplis FR + MG
+     - `newLead(operator, listing, tenant)` — pour owner
+     - `ownerReminder(operator, listing)` — owner n'a pas répondu sous 24h
+     - `tenantFollowUp(operator, listing)` — tenant à relancer
+     - `noResponse(operator, listing)` — annonce de l'archivage
+     - `leaseLink(operator, listing, leaseUrl)` — invite paiement signature
+     - `leasePaid(operator, listing)` — confirmation pour proprio
+   - URL-encoded, cap 1500 chars (limite WhatsApp), strip CRLF (per memory `feedback_email_header_injection`).
+
+9. **Push opérateur on-shift** (T-RES-09) :
+   - Réutilise `lib/push` (T-018 Expo)
+   - Modèle `OperatorShift` : operatorId, startsAt, endsAt
+   - Sur `createInterestLead`, query opérateurs en shift, push individuel
+   - Cap 1 push / 10 min / opérateur (anti-flood)
+
+10. **Crons** (T-RES-10) :
+    - Bundle dans le dispatcher `/api/cron/` existant
+    - `sweep-unclaimed-leads` 15min · `sweep-stale-claimed` 1h · `sweep-lapsed-leads` daily · `reopen-after-lease-expiry` daily (7d window post-bail)
+    - Auth bearer + rate-limit pattern partagé (cf cron crons existants)
+
+11. **i18n FR-MG + MG** (T-RES-11) :
+    - Toutes les nouvelles strings (CTA, dialog, emails, wa.me templates)
+    - Native MG copywriter pass — pas Google Translate. Budget 0,5 jour/surface.
+
+12. **Runbook opérateur** (T-RES-12) :
+    - `public/docs/runbooks/concierge-leads.md`
+    - Scripts d'accueil FR + MG · escalation matrix · WIP cap · anti-disintermediation language (« Tous les paiements transitent par AryTrano pour votre protection ») · PII discipline (CIN/baux toujours sur dashboard, jamais en pièce jointe WhatsApp) · clause anti-circumvention (rappel contrat opérateur).
+
+**Quick win parallèle (livré 2026-06-10) — commit `db5ee43`**
+- T-007-bis : `MAX_PHOTOS_PER_LISTING` 8 → **20** + `photoUploadByListing` 8 → 25/min/listing. Trust signal direct sur les annonces, indépendant de E-T28.
+
+**v2 (~24 dev-days, après ~50 leads/sem)**
+- HLS video tour Cloudinary + lecteur dans détail
+- Concierge-films-for-you (opérateur filme pour le proprio, 30k Ar one-time après les 100 premières gratuites)
+- Twilio numéro masqué tenant↔owner après ACTIVE (~200 leads/mois)
+- Phone-IVR auto-accept owner
+- Tiering opérateurs junior/senior
+
+**v3 (~38 dev-days, seulement si métriques v2 le justifient)**
+- Reservation model + partial unique listingId WHERE status ∈ HOLD_PENDING_PAYMENT/HOLD_AWAITING_OWNER/CONFIRMED
+- Instant-lock **gated** : verifiedAt + walkthrough video + owner avec ≥3 ACTIVE-sans-dispute
+- 72h cooling-off + reverse-credit GoalPay
+- Repeat-tenant fast track (1 lease ACTIVE-sans-dispute → skip queue)
+- A/B vs queue 60 jours, cut over si dispute rate <5% ET conversion lift >25%
+
+**Dependencies**
+- T-018 concierge contact (✅ shipped 2026-05-29)
+- E-T26 lease tenant-pays (✅ shipped, commit `4d481aa`)
+- T-002 phone OTP infra (vérifier statut)
+- T-049 owner terms gate (✅ shipped)
+- `lib/push` Expo (✅ shipped via T-018)
+
+**Tests**
+- `create-interest-lead.test.ts` : OTP success/fail, rate-limit, push opérateurs
+- `claim-lead.test.ts` : WIP cap dépassé → 409, FCFS race avec 2 opérateurs simultanés, slaDueAt calculé
+- `transition-lead.test.ts` : transitions valides/invalides (state machine)
+- `link-lead-to-lease.test.ts` : HMAC valide, listing+owner match, écrit LeadActivity
+- `sweep-unclaimed-leads.test.ts` : > 4h sans claim → push escalation
+- `sweep-stale-claimed.test.ts` : > 48h sans activité → revert + notify
+- `sweep-lapsed-leads.test.ts` : > 14j → LAPSED
+- E2E : visiteur soumet via dialog → opérateur claim → log 3 messages → convert en bail → tenant paye signature
+
+**Edge cases**
+- Tenant soumet 2 leads sur la même annonce avec le même phone → reject duplicate dans 24h
+- Opérateur claim puis disparaît (vacances) → cron auto-revert sous 48h
+- Owner accepte off-platform pendant que le lead est CLAIMED → opérateur transition vers REJECTED + LeadActivity(NOTE='owner off-platform')
+- Tenant ne répond plus à l'opérateur → 2 relances WhatsApp espacées 24h puis LAPSED
+- Listing passe UNAVAILABLE pendant qu'un lead est actif → lead transition automatique vers REJECTED + email tenant explication
+- 2 opérateurs claim simultanément → transaction lock garantit FCFS, le second reçoit 409
+- Phone OTP renvoyé en boucle → rate-limit séparé sur le send-OTP path
+
+**A11y**
+- Dialog form keyboard-navigable + focus trap (Base UI gère)
+- Toutes les checkboxes via `aria-labelledby` (per memory round 4 audit)
+- Loading states sur tous les boutons + fieldset disable pendant pending
+- Confirmation screen avec `role="status"` `aria-live="polite"` pour annoncer le succès
+- Admin queue trié visible avec `aria-sort` sur les colonnes
+
+**Security**
+- Phone OTP avec rate-limit fail-CLOSED sur (ipHash, phoneHash)
+- HMAC signature deep-link operator avec TTL 30 min (anti-replay)
+- ADMIN role check sur toutes les routes /admin/leads + /api/v1/leads/*/claim
+- Audit log opérateur exhaustif (qui claim, qui transition, qui convertit)
+- PII : phone hash uniquement dans rate-limit keys, valeur claire stockée chiffrée en DB
+- wa.me text strip CRLF (per memory `feedback_email_header_injection`)
+- Sentry scrub : phone + name dans event.extra (per memory `feedback_debug_logs_no_pii`)
+
+**Legal/Compliance**
+- CGU section « Service concierge » à rédiger : limites de responsabilité AryTrano (médiation, pas mandat juridique)
+- Contrat opérateur avec clause anti-circumvention (interdiction de référer un tenant vers un owner off-platform pendant 12 mois post-lead)
+- RGPD : LeadRequest = PII étudiant — purge auto après 24 mois si LAPSED, conservation indefinite si CONVERTED (preuve transaction)
+- Mention « D'autres candidats peuvent négocier en parallèle » dans le dialog = transparence requise
+
+**Effort estimé** : **v1 = 16 dev-days** · v2 = +24 · v3 = +38
+
+**Priorité** : P0 (premier vrai workflow de réservation sur arytrano.com) · **Statut** : 📋 todo — v1 démarrée 2026-06-10, schema (T-RES-01) en cours
+
+---
+
 ### Paiement infra
 
 #### E-T15 · Intégration GoalPay (PaymentProvider abstraction) — REWRITTEN 2026-05-25 with actual GoalPay API
