@@ -2588,4 +2588,29 @@ export const mg: Record<MessageKey, string> = {
   'verifyOwner.upload.submitting': 'Mandefa…',
   'verifyOwner.legal.notice':
     'Voafonosina (AES-256-GCM) ny tahirin-kevitra ary ny ekipa moderasiona ihany no afaka mijery. Afaka mangataka ny famafana izy io amin’ny alalan’ny support. Maharitra 6 volana taorian’ny fanamarinana ny fitehirizana.',
+
+  // E-T28 — Lead CTA + dialog (2026-06-10, T-RES-05 / T-RES-11)
+  // Native MG copywriter pass à passer post-launch (placeholder fr-MG-leaning ici).
+  'lead.cta.interested': 'Liana aho',
+  'lead.cta.submit': 'Alefa ny fangatahako',
+  'lead.cta.submitting': 'Mandefa…',
+  'lead.dialog.title': 'Lazao mazava ny tetikasanao',
+  'lead.dialog.subtitle':
+    'Hifandray aminao ao anatin’ny 4 ora ny ekipa AryTrano momba ny « {listing} ».',
+  'lead.dialog.disclaimer':
+    'Mety hisy kandida hafa miara-miresaka aminao. Ny AryTrano no manamafy ny fifampiresahana sy mikarakara ny fitsidihana an-tserasera rehefa manamarina ny tompon-trano.',
+  'lead.form.name': 'Ny anaranao',
+  'lead.form.phone': 'Ny laharana WhatsApp',
+  'lead.form.phoneHint':
+    'Endrika iraisam-pirenena, ohatra : +261 34 12 345 67. Hampiasainay hifandraisana aminao ihany.',
+  'lead.form.moveInWindow': 'Rahoviana no tianao hifindra ?',
+  'lead.form.budgetConfirmed':
+    'Manamafy aho fa manana ny vola ho an’ity hofa ity (anisan’izany ny antoka).',
+  'lead.moveInWindow.thisMonth': 'Ity volana ity',
+  'lead.moveInWindow.nextMonth': 'Volana manaraka',
+  'lead.moveInWindow.in2Months': 'Ao anatin’ny 2 volana',
+  'lead.moveInWindow.flexible': 'Mailamailaka',
+  'lead.confirmation.title': 'Voarainay ny fangatahanao !',
+  'lead.confirmation.body':
+    'Hifandray aminao amin’ny WhatsApp na finday tsy ho ela ny ekipa AryTrano. Azonao hidiana ity efijery ity.',
 }

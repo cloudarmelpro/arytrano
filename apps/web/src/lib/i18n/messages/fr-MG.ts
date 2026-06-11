@@ -2579,6 +2579,30 @@ export const frMG = {
   'verifyOwner.upload.submitting': 'Envoi en cours…',
   'verifyOwner.legal.notice':
     'Le document est chiffré au repos (AES-256-GCM) et n’est consulté que par l’équipe modération. Tu peux demander sa suppression à tout moment via le support. Politique de conservation : 6 mois après vérification.',
+
+  // E-T28 — Lead CTA + dialog (2026-06-10, T-RES-05 / T-RES-11)
+  'lead.cta.interested': 'Je suis intéressé(e)',
+  'lead.cta.submit': 'Envoyer ma demande',
+  'lead.cta.submitting': 'Envoi en cours…',
+  'lead.dialog.title': 'Décrivez votre projet',
+  'lead.dialog.subtitle':
+    'L’équipe AryTrano vous recontacte sous 4h en moyenne au sujet de « {listing} ».',
+  'lead.dialog.disclaimer':
+    'D’autres candidats peuvent négocier en parallèle. AryTrano sécurise les échanges et organise la visite virtuelle quand le propriétaire confirme.',
+  'lead.form.name': 'Votre nom',
+  'lead.form.phone': 'Votre numéro WhatsApp',
+  'lead.form.phoneHint':
+    'Format international, ex : +261 34 12 345 67. Nous l’utilisons uniquement pour vous recontacter.',
+  'lead.form.moveInWindow': 'Quand souhaitez-vous emménager ?',
+  'lead.form.budgetConfirmed':
+    'Je confirme avoir le budget pour ce loyer (caution incluse).',
+  'lead.moveInWindow.thisMonth': 'Ce mois-ci',
+  'lead.moveInWindow.nextMonth': 'Le mois prochain',
+  'lead.moveInWindow.in2Months': 'Dans 2 mois',
+  'lead.moveInWindow.flexible': 'Flexible',
+  'lead.confirmation.title': 'On vous a noté(e) !',
+  'lead.confirmation.body':
+    'L’équipe AryTrano vous recontacte par WhatsApp ou téléphone bientôt. Vous pouvez fermer cette fenêtre.',
 } as const
 
 export type MessageKey = keyof typeof frMG

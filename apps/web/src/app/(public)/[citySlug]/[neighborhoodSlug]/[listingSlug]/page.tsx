@@ -23,6 +23,7 @@ import {
   AMENITY_CATALOG,
   AmenityIcon,
 } from '@/features/listings'
+import { InterestLeadCta } from '@/features/listings/components/InterestLeadCta'
 import {
   getPublicListing,
   getListingStatusBySlug,
@@ -421,6 +422,15 @@ export default async function PublicListingDetailPage({
                   {t('detail.price.perMonth')}
                 </p>
               </div>
+
+              {/* E-T28 T-RES-05 — primary CTA "Je suis intéressé(e)".
+                  Opens a Base UI Dialog form that creates a LeadRequest.
+                  Below it, the legacy ContactButtons stays as the
+                  "general question" path (concierge WhatsApp / phone). */}
+              <InterestLeadCta
+                listingId={listing.id}
+                listingTitle={listing.title}
+              />
 
               <ContactButtons
                 listingId={listing.id}
