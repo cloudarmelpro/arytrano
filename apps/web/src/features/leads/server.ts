@@ -9,6 +9,7 @@ import 'server-only'
  * `feedback_feature_index_client_safe`).
  */
 
+// Services — write side
 export {
   createInterestLead,
   throwIfRateLimited,
@@ -46,3 +47,15 @@ export {
   sweepLapsedLeads,
   type SweepLapsedLeadsResult,
 } from './services/sweep-lapsed-leads'
+
+// Queries — read side
+export {
+  listLeadsForOperator,
+  type OperatorLeadsFilter,
+  type OperatorLeadRow,
+} from './queries/list-leads-for-operator'
+
+export {
+  getLeadById,
+  type LeadDetail,
+} from './queries/get-lead-by-id'
