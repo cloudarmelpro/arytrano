@@ -330,21 +330,36 @@ export default function ListingDetail() {
         </View>
       ) : data.owner.hasPhone ? (
         <View className="absolute inset-x-0 bottom-0 border-t border-border bg-background px-5 pb-6 pt-3">
-          <View className="flex-row gap-3">
-            <View className="flex-1">
-              <Button
-                title={t('listing.detail.contact.whatsapp')}
-                loading={contactMutation.isPending && contactMutation.variables === 'WHATSAPP'}
-                onPress={() => contactMutation.mutate('WHATSAPP')}
-              />
-            </View>
-            <View className="flex-1">
-              <Button
-                title={t('listing.detail.contact.phone')}
-                variant="outline"
-                loading={contactMutation.isPending && contactMutation.variables === 'PHONE'}
-                onPress={() => contactMutation.mutate('PHONE')}
-              />
+          <View className="gap-2">
+            {/* E-T28 mobile — concierge lead CTA (top of stack so it's
+                the primary action). Tap navigates to /interest/[id]
+                where the 3-step funnel lives. */}
+            <Button
+              title={t('listing.detail.interest.cta')}
+              onPress={() =>
+                router.push({
+                  pathname: '/interest/[listingId]',
+                  params: { listingId: id },
+                })
+              }
+            />
+            <View className="flex-row gap-3">
+              <View className="flex-1">
+                <Button
+                  title={t('listing.detail.contact.whatsapp')}
+                  variant="outline"
+                  loading={contactMutation.isPending && contactMutation.variables === 'WHATSAPP'}
+                  onPress={() => contactMutation.mutate('WHATSAPP')}
+                />
+              </View>
+              <View className="flex-1">
+                <Button
+                  title={t('listing.detail.contact.phone')}
+                  variant="outline"
+                  loading={contactMutation.isPending && contactMutation.variables === 'PHONE'}
+                  onPress={() => contactMutation.mutate('PHONE')}
+                />
+              </View>
             </View>
           </View>
         </View>

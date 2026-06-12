@@ -28,6 +28,17 @@ import {
   type InitiateLeaseBody,
   type InitiateLeaseResponse,
   type TenantPayLeaseResponse,
+  // E-T28 mobile — concierge leads.
+  type CreateInterestLeadBody,
+  type CreateInterestLeadResponse,
+  createInterestLeadResponseSchema,
+  // T-002 mobile — phone OTP.
+  type RequestPhoneOtpBody,
+  type RequestPhoneOtpResponse,
+  type VerifyPhoneOtpBody,
+  type VerifyPhoneOtpResponse,
+  requestPhoneOtpResponseSchema,
+  verifyPhoneOtpResponseSchema,
 } from '@arytrano/shared'
 import { z } from 'zod'
 import { API_BASE_URL } from '../config'
@@ -445,6 +456,59 @@ export async function initiateLease(
     '/api/v1/leases',
     initiateLeaseResponseSchema,
     { method: 'POST', body },
+  )
+  return r.data
+}
+
+// ────────────────────────────────────────────────────────────────────
+// E-T28 — Concierge lead funnel + T-002 phone OTP gate (anon-friendly)
+// ────────────────────────────────────────────────────────────────────
+
+/**
+ * Submit the public-form concierge lead. The server returns either
+ * `{ kind:'ok', leadId }` or `{ kind:'otp_required' }` — in the latter
+ * case the caller must run the OTP dance below and re-submit. Bearer
+ * is OPTIONAL : signed-in users skip the OTP gate automatically.
+ */
+export async function createInterestLead(
+  body: CreateInterestLeadBody,
+): Promise<CreateInterestLeadResponse> {
+  const r = await request(
+    '/api/v1/leads',
+    createInterestLeadResponseSchema,
+    { method: 'POST', body, anon: true },
+  )
+  return r.data
+}
+
+/**
+ * Ask the server to send a fresh 6-digit OTP to `phoneE164`. Rate-
+ * limited at 3/h/phone + 5/h/IP — surface the 429 to the user with a
+ * "Réessaie dans une heure" copy.
+ */
+export async function requestPhoneOtp(
+  body: RequestPhoneOtpBody,
+): Promise<RequestPhoneOtpResponse> {
+  const r = await request(
+    '/api/v1/phone/request-otp',
+    requestPhoneOtpResponseSchema,
+    { method: 'POST', body, anon: true },
+  )
+  return r.data
+}
+
+/**
+ * Verify the code the user typed. The server tracks attempts on its
+ * own (3-attempt cap + 30/h/phone + 100/h/IP). On success the lead
+ * submission can be retried and will not see `otp_required`.
+ */
+export async function verifyPhoneOtp(
+  body: VerifyPhoneOtpBody,
+): Promise<VerifyPhoneOtpResponse> {
+  const r = await request(
+    '/api/v1/phone/verify-otp',
+    verifyPhoneOtpResponseSchema,
+    { method: 'POST', body, anon: true },
   )
   return r.data
 }

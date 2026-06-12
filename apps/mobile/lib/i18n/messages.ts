@@ -138,6 +138,38 @@ export const messages = {
     'listing.detail.contact.whatsappMissing':
       "WhatsApp n'est pas installé sur cet appareil.",
     'listing.detail.owner.createLease': 'Créer un bail',
+    'listing.detail.interest.cta': 'Je suis intéressé(e)',
+    // E-T28 mobile — concierge lead funnel
+    'lead.form.title': 'Demande de visite',
+    'lead.form.subtitle':
+      'Un opérateur AryTrano te recontacte sous 24h pour fixer la visite.',
+    'lead.form.name': 'Ton prénom',
+    'lead.form.phone': 'Numéro de téléphone',
+    'lead.form.phone.help': 'On t’enverra un code de vérification.',
+    'lead.form.budget': 'Budget mensuel (Ar)',
+    'lead.form.moveIn': 'Disponibilité',
+    'lead.form.moveIn.IMMEDIATE': 'Immédiatement',
+    'lead.form.moveIn.WITHIN_2_WEEKS': 'Dans 2 semaines',
+    'lead.form.moveIn.WITHIN_1_MONTH': 'Dans 1 mois',
+    'lead.form.moveIn.LATER': 'Plus tard',
+    'lead.form.notes': 'Message (optionnel)',
+    'lead.form.budgetConfirmed': 'Je confirme mon budget',
+    'lead.form.submit': 'Envoyer la demande',
+    'lead.form.submitting': 'Envoi…',
+    'lead.otp.title': 'Vérifie ton numéro',
+    'lead.otp.subtitle':
+      'On t’a envoyé un code à 6 chiffres par SMS. Saisis-le pour confirmer.',
+    'lead.otp.code': 'Code à 6 chiffres',
+    'lead.otp.verify': 'Vérifier',
+    'lead.otp.resend': 'Renvoyer le code',
+    'lead.otp.resending': 'Envoi…',
+    'lead.success.title': 'Demande envoyée !',
+    'lead.success.subtitle':
+      'L’équipe AryTrano te recontacte sous 24h. Garde ton téléphone à portée.',
+    'lead.success.back': 'Retour à l’annonce',
+    'lead.error.generic':
+      'Impossible d’envoyer la demande. Réessaie dans un instant.',
+    'lead.error.rateLimited': 'Trop d’essais. Réessaie dans une heure.',
     'lease.tenant.error.checkoutOpen':
       "Impossible d'ouvrir le checkout. Vérifie ta connexion puis réessaye.",
     'listing.detail.notFound.title': 'Annonce introuvable',
@@ -324,6 +356,38 @@ export const messages = {
     'listing.detail.contact.whatsappMissing':
       "Tsy voapetraka eto ny WhatsApp.",
     'listing.detail.owner.createLease': 'Mamorona bail',
+    'listing.detail.interest.cta': 'Mahaliana ahy',
+    // E-T28 mobile — concierge lead funnel (MG)
+    'lead.form.title': 'Hangataka famangiana',
+    'lead.form.subtitle':
+      'Ho antsoin\'ny AryTrano ianao ao anatin\'ny 24 ora hanaovana fotoana.',
+    'lead.form.name': 'Anaranao',
+    'lead.form.phone': 'Laharan-tariby',
+    'lead.form.phone.help': 'Handefasanay kaody fanamarinana ho anao.',
+    'lead.form.budget': 'Tetibola isam-bolana (Ar)',
+    'lead.form.moveIn': 'Vonona rahoviana ?',
+    'lead.form.moveIn.IMMEDIATE': 'Avy hatrany',
+    'lead.form.moveIn.WITHIN_2_WEEKS': 'Anatin\'ny 2 herinandro',
+    'lead.form.moveIn.WITHIN_1_MONTH': 'Anatin\'ny 1 volana',
+    'lead.form.moveIn.LATER': 'Aoriana kokoa',
+    'lead.form.notes': 'Hafatra (azo ialana)',
+    'lead.form.budgetConfirmed': 'Manamafy ny tetibolako aho',
+    'lead.form.submit': 'Alefa ny fangatahana',
+    'lead.form.submitting': 'Alefa…',
+    'lead.otp.title': 'Hamarino ny laharanao',
+    'lead.otp.subtitle':
+      'Nandefa kaody 6 marika tamin\'ny SMS izahay. Soraty mba hamaranana.',
+    'lead.otp.code': 'Kaody 6 marika',
+    'lead.otp.verify': 'Hamarino',
+    'lead.otp.resend': 'Mandefasa kaody indray',
+    'lead.otp.resending': 'Alefa…',
+    'lead.success.title': 'Voaray ny fangatahana !',
+    'lead.success.subtitle':
+      'Hifandray aminao ny AryTrano ao anatin\'ny 24 ora. Tano akaiky ny finao.',
+    'lead.success.back': 'Hiverina amin\'ny filazana',
+    'lead.error.generic':
+      'Tsy afaka mandefa ny fangatahana. Andramo indray.',
+    'lead.error.rateLimited': 'Be loatra ny andrana. Andramo ao anatin\'ny ora iray.',
     'lease.tenant.error.checkoutOpen':
       'Tsy afaka manokatra ny checkout. Hamarino ny fifandraisanao dia andramo indray.',
     'listing.detail.notFound.title': 'Tsy hita ny filazana',
