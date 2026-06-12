@@ -112,6 +112,8 @@ model User {
   claimedLeads        LeadRequest[]    @relation("LeadClaimedBy")
   leadActivitiesActed LeadActivity[]   @relation("LeadActivityActor")
   operatorShifts      OperatorShift[]
+  // E-T27.2 — inventory uploads (ENTRY/EXIT) the user authored.
+  inventoryItems      InventoryItem[]
 
   @@index([status, role])
 }
@@ -840,19 +842,72 @@ model Lease {
   createdAt              DateTime    @default(now())
   updatedAt              DateTime    @updatedAt
 
-  listing     Listing      @relation(fields: [listingId], references: [id], onDelete: Restrict)
-  owner       User         @relation("OwnerLeases", fields: [ownerId], references: [id], onDelete: Restrict)
-  tenant      User         @relation("TenantLeases", fields: [tenantId], references: [id], onDelete: Restrict)
-  payment     Payment?     @relation(fields: [paymentId], references: [id])
+  listing        Listing         @relation(fields: [listingId], references: [id], onDelete: Restrict)
+  owner          User            @relation("OwnerLeases", fields: [ownerId], references: [id], onDelete: Restrict)
+  tenant         User            @relation("TenantLeases", fields: [tenantId], references: [id], onDelete: Restrict)
+  payment        Payment?        @relation(fields: [paymentId], references: [id])
   // E-T28 — when a lead converts via an operator deep-link, the resulting
   // Lease has a back-pointer to the originating LeadRequest. Unique side
   // is on LeadRequest.leaseId — one lead converts to at most one lease.
-  leadRequest LeadRequest? @relation("LeadConvertedLease")
+  leadRequest    LeadRequest?    @relation("LeadConvertedLease")
+  // E-T27.2 — état des lieux ENTRY + EXIT.
+  inventoryItems InventoryItem[]
 
   @@index([listingId])
   @@index([ownerId, status])
   @@index([tenantId, status])
   @@index([status, createdAt])
+}
+
+// E-T27.2 — état des lieux numérique (2026-06-12)
+//
+// One InventoryItem per (lease, phase, room) — owner and tenant
+// co-upload photos at lease ACTIVE (ENTRY phase) and at TERMINATED
+// (EXIT phase). The arbitrage path (E-T27.3) compares ENTRY vs
+// EXIT side-by-side when a dispute opens.
+//
+// roomKey is a STRING (not an enum) so owners can add custom rooms
+// without a migration ("Chambre des parents", "Garage", etc.).
+// We seed the UI with a canonical list (SALON, CUISINE, CHAMBRE_1,
+// CHAMBRE_2, SALLE_DE_BAIN, WC, BALCON, ENTREE, AUTRE) and let the
+// visitor free-text beyond that.
+//
+// photoUrls : array of Cloudinary secure_urls. Same upload pipeline
+// as listing photos (EXIF strip, 5MB cap, JPG/PNG/WebP/HEIC).
+// Each photo lives in `arytrano/leases/<leaseId>/inventory/<phase>/`
+// so a Cloudinary admin sees the lease structure at a glance.
+//
+// @@unique([leaseId, phase, roomKey]) — one row per room per phase.
+// Updating photos = updating the row. The cron at lease termination
+// nudges both parties to upload but never auto-creates rows.
+model InventoryItem {
+  id           String         @id @default(cuid())
+  leaseId      String
+  phase        InventoryPhase
+  // String, not enum — owners add custom labels.
+  roomKey      String
+  // Free-text observations (taches, défauts, équipements présents).
+  // Bounded server-side at 2000 chars to keep the dispute UI legible.
+  notes        String?
+  // Cloudinary secure_urls. Postgres text[] for predictable queries.
+  // Bounded at 20 per room (DB-side check enforced via service).
+  photoUrls    String[]       @default([])
+  uploadedById String
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+
+  lease      Lease @relation(fields: [leaseId], references: [id], onDelete: Cascade)
+  uploadedBy User  @relation(fields: [uploadedById], references: [id], onDelete: Restrict)
+
+  @@unique([leaseId, phase, roomKey])
+  // Dashboard render scans `WHERE leaseId=? AND phase=?` to assemble
+  // the room list ; the unique above doubles as the index.
+  @@index([leaseId, phase])
+}
+
+enum InventoryPhase {
+  ENTRY // taken at Lease ACTIVE — before key handover
+  EXIT // taken at Lease TERMINATED — triggers caution release
 }
 
 enum LeaseStatus {

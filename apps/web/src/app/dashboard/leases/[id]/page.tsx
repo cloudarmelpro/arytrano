@@ -101,6 +101,16 @@ export default async function LeaseDetailPage({
               isAvailable={Boolean(lease.contractPdfPublicId)}
             />
           ) : null}
+          {/* E-T27.2 — open the inventory wizard. Visible on every
+              status that allows ENTRY or EXIT uploads. */}
+          {['ACTIVE', 'TERMINATED', 'DISPUTED'].includes(lease.status) ? (
+            <Link
+              href={`/dashboard/leases/${lease.id}/inventory`}
+              className="inline-flex h-9 items-center rounded-md border border-border bg-background px-3 text-[13px] font-medium text-foreground hover:border-primary/40 hover:text-primary"
+            >
+              🏠 État des lieux
+            </Link>
+          ) : null}
         </div>
       </header>
 
