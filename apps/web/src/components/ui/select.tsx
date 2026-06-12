@@ -124,11 +124,12 @@ function SelectItem({
     <SelectPrimitive.Item
       data-slot="select-item"
       className={cn(
-        // 2026-06-12 — unified with the Combobox items on /annonces
-        // (City / Quartier). Hover/keyboard highlight now uses a
-        // primary/10 background — louder than the previous text-only
-        // highlight, but consistent across every Select in the app.
-        "relative flex w-full cursor-pointer items-center gap-1.5 rounded-md py-2.5 pr-9 pl-3 text-sm outline-hidden select-none data-highlighted:bg-primary/10 data-highlighted:text-foreground data-disabled:pointer-events-none data-disabled:cursor-default data-disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 *:[span]:last:flex *:[span]:last:items-center *:[span]:last:gap-2",
+        // 2026-06-12 — unified with the Combobox items on /annonces.
+        // A11y audit raised that bg-primary/10 over white was a 1.3:1
+        // ratio, below the 3:1 WCAG non-text contrast minimum. Bumped
+        // to /15 + a 1px primary ring so the focused item is
+        // unambiguously highlighted even for low-vision users.
+        "relative flex w-full cursor-pointer items-center gap-1.5 rounded-md py-2.5 pr-9 pl-3 text-sm outline-hidden select-none data-highlighted:bg-primary/15 data-highlighted:text-foreground data-highlighted:ring-1 data-highlighted:ring-primary/40 data-disabled:pointer-events-none data-disabled:cursor-default data-disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 *:[span]:last:flex *:[span]:last:items-center *:[span]:last:gap-2",
         className
       )}
       {...props}

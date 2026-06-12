@@ -29,7 +29,10 @@ export function OpenDisputeDialog({ leaseId }: { leaseId: string }) {
       />
       <Dialog.Portal>
         <Dialog.Backdrop className="fixed inset-0 z-50 bg-foreground/30 backdrop-blur-[2px]" />
-        <Dialog.Popup className="fixed left-1/2 top-1/2 z-50 w-[min(94vw,520px)] -translate-x-1/2 -translate-y-1/2 rounded-2xl border border-border bg-background p-6 shadow-2xl">
+        <Dialog.Popup
+          aria-labelledby="open-dispute-dialog-title"
+          className="fixed left-1/2 top-1/2 z-50 w-[min(94vw,520px)] -translate-x-1/2 -translate-y-1/2 rounded-2xl border border-border bg-background p-6 shadow-2xl"
+        >
           {state.ok && state.disputeId ? (
             <Resolution onClose={() => setOpen(false)} />
           ) : (
@@ -41,7 +44,10 @@ export function OpenDisputeDialog({ leaseId }: { leaseId: string }) {
                 startTransition(() => formAction(fd))
               }}
             >
-              <Dialog.Title className="text-[18px] font-bold leading-tight">
+              <Dialog.Title
+                id="open-dispute-dialog-title"
+                className="text-[18px] font-bold leading-tight"
+              >
                 Ouvrir un litige
               </Dialog.Title>
               <p className="mt-1.5 text-[13px] leading-[1.55] text-foreground/65">
@@ -123,10 +129,16 @@ function SubmitButton() {
 function Resolution({ onClose }: { onClose: () => void }) {
   return (
     <div className="text-center">
-      <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-amber-100 text-amber-600">
+      <div
+        aria-hidden="true"
+        className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-amber-100 text-amber-600"
+      >
         ⚠️
       </div>
-      <Dialog.Title className="text-[18px] font-bold leading-tight">
+      <Dialog.Title
+        id="open-dispute-dialog-title"
+        className="text-[18px] font-bold leading-tight"
+      >
         Litige ouvert
       </Dialog.Title>
       <p className="mt-2 text-[13.5px] leading-[1.55] text-foreground/70">

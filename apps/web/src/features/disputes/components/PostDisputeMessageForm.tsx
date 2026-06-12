@@ -3,6 +3,7 @@
 import { useActionState } from 'react'
 import { useFormStatus } from 'react-dom'
 import { Button } from '@/components/ui/button'
+import { Field, FieldLabel } from '@/components/ui/field'
 import { Textarea } from '@/components/ui/textarea'
 import { postDisputeMessageAction } from '../actions/post-message'
 
@@ -11,6 +12,7 @@ export function PostDisputeMessageForm({ disputeId }: { disputeId: string }) {
     ok: false,
     message: undefined as string | undefined,
   })
+  const inputId = `dispute-msg-${disputeId}`
 
   return (
     <form
@@ -20,16 +22,22 @@ export function PostDisputeMessageForm({ disputeId }: { disputeId: string }) {
       }}
       className="flex flex-col gap-2"
     >
-      <Textarea
-        name="body"
-        rows={3}
-        maxLength={3000}
-        minLength={2}
-        required
-        placeholder="Ajoute des éléments de réponse…"
-      />
+      <Field>
+        <FieldLabel htmlFor={inputId}>Ajouter un message</FieldLabel>
+        <Textarea
+          id={inputId}
+          name="body"
+          rows={3}
+          maxLength={3000}
+          minLength={2}
+          required
+          placeholder="Ajoute des éléments de réponse…"
+        />
+      </Field>
       {state.message ? (
-        <p className="text-[12.5px] text-destructive">{state.message}</p>
+        <p role="alert" className="text-[12.5px] text-destructive">
+          {state.message}
+        </p>
       ) : null}
       <SubmitButton />
     </form>

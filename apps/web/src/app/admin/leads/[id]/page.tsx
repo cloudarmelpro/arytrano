@@ -289,6 +289,7 @@ function WaLink({ href, label }: { href: string; label: string }) {
       className="rounded-md border border-border bg-background px-3 py-2 text-[12.5px] font-medium text-foreground/85 transition hover:border-primary/40 hover:bg-primary/[0.04]"
     >
       {label}
+      <span className="sr-only"> (ouvre WhatsApp dans un nouvel onglet)</span>
     </a>
   )
 }

@@ -112,6 +112,7 @@ export function InventoryPhaseColumn({
             value={draftCustom}
             onChange={(e) => setDraftCustom(e.target.value)}
             placeholder="GARAGE, ATELIER, …"
+            aria-label="Nom de la pièce à ajouter"
             className="h-9 max-w-[180px]"
           />
           <Button

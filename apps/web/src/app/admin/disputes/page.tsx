@@ -22,6 +22,18 @@ const STATUS_BADGE: Record<string, string> = {
   WITHDRAWN: 'bg-slate-100 text-slate-600 border-slate-200',
 }
 
+// A11y audit fix (2026-06-12) — render a human label so screen
+// readers + colour-blind users can tell RESOLVED_OWNER apart from
+// RESOLVED_TENANT (which shared identical green styling).
+const STATUS_LABEL: Record<string, string> = {
+  OPEN: 'Ouvert',
+  IN_REVIEW: 'En revue',
+  RESOLVED_OWNER: 'Résolu — propriétaire',
+  RESOLVED_TENANT: 'Résolu — locataire',
+  RESOLVED_SPLIT: 'Résolu — partagé',
+  WITHDRAWN: 'Retiré',
+}
+
 function fmtRelative(d: Date | null): string {
   if (!d) return '—'
   const diffMs = d.getTime() - Date.now()
@@ -44,6 +56,7 @@ export default async function AdminDisputesPage({
   const chip = (label: string, href: string, active: boolean) => (
     <Link
       href={href}
+      aria-current={active ? 'page' : undefined}
       className={`inline-flex items-center rounded-full border px-3 py-1 text-[12.5px] font-medium ${
         active
           ? 'border-primary bg-primary text-primary-foreground'
@@ -79,12 +92,12 @@ export default async function AdminDisputesPage({
           <table className="w-full text-left text-[13.5px]">
             <thead className="border-b border-border bg-muted/30 text-[11.5px] uppercase tracking-[0.06em] text-foreground/60">
               <tr>
-                <th className="px-4 py-3">Bail</th>
-                <th className="px-4 py-3">Ouvert par</th>
-                <th className="px-4 py-3">Montant</th>
-                <th className="px-4 py-3">Statut</th>
-                <th className="px-4 py-3">SLA</th>
-                <th className="px-4 py-3 text-right">Action</th>
+                <th scope="col" className="px-4 py-3">Bail</th>
+                <th scope="col" className="px-4 py-3">Ouvert par</th>
+                <th scope="col" className="px-4 py-3">Montant</th>
+                <th scope="col" className="px-4 py-3">Statut</th>
+                <th scope="col" className="px-4 py-3">SLA</th>
+                <th scope="col" className="px-4 py-3 text-right">Action</th>
               </tr>
             </thead>
             <tbody>
@@ -114,7 +127,7 @@ export default async function AdminDisputesPage({
                     <span
                       className={`inline-flex items-center rounded-md border px-2 py-0.5 text-[11.5px] font-semibold uppercase tracking-[0.04em] ${STATUS_BADGE[d.status] ?? ''}`}
                     >
-                      {d.status}
+                      {STATUS_LABEL[d.status] ?? d.status}
                     </span>
                   </td>
                   <td className="px-4 py-3 align-top text-[12.5px] text-foreground/70">

@@ -71,6 +71,7 @@ export default async function AdminLeadsPage({
   const filterChip = (label: string, href: string, active: boolean) => (
     <Link
       href={href}
+      aria-current={active ? 'page' : undefined}
       className={`inline-flex items-center rounded-full border px-3 py-1 text-[12.5px] font-medium transition ${
         active
           ? 'border-primary bg-primary text-primary-foreground'
@@ -132,12 +133,12 @@ export default async function AdminLeadsPage({
           <table className="w-full text-left text-[13.5px]">
             <thead className="border-b border-border bg-muted/30 text-[11.5px] uppercase tracking-[0.06em] text-foreground/60">
               <tr>
-                <th className="px-4 py-3">Lead</th>
-                <th className="px-4 py-3">Annonce</th>
-                <th className="px-4 py-3">Statut</th>
-                <th className="px-4 py-3">Opérateur</th>
-                <th className="px-4 py-3">SLA</th>
-                <th className="px-4 py-3 text-right">Action</th>
+                <th scope="col" className="px-4 py-3">Lead</th>
+                <th scope="col" className="px-4 py-3">Annonce</th>
+                <th scope="col" className="px-4 py-3">Statut</th>
+                <th scope="col" className="px-4 py-3">Opérateur</th>
+                <th scope="col" className="px-4 py-3">SLA</th>
+                <th scope="col" className="px-4 py-3 text-right">Action</th>
               </tr>
             </thead>
             <tbody>
