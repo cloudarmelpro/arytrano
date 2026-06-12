@@ -145,6 +145,18 @@ function IconInbox() {
   )
 }
 
+function IconScale() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M12 3v18" />
+      <path d="M5 5h14" />
+      <path d="M5 21h14" />
+      <path d="m7 11-4 6h8z" />
+      <path d="m17 11-4 6h8z" />
+    </svg>
+  )
+}
+
 /**
  * Top-level section roots (e.g. `/admin`, `/dashboard`) match only on
  * exact pathname — otherwise their prefix swallows every sub-route and
@@ -180,6 +192,11 @@ const buildSections = (openReports: number): Section[] => [
         href: '/admin/leads',
         labelKey: 'admin.nav.leads',
         icon: <IconInbox />,
+      },
+      {
+        href: '/admin/disputes',
+        labelKey: 'admin.nav.disputes',
+        icon: <IconScale />,
       },
       {
         href: '/admin/reports',

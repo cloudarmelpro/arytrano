@@ -2183,6 +2183,7 @@ export const mg: Record<MessageKey, string> = {
   'admin.nav.geo': 'Jeografika',
   'admin.nav.listings': 'Trano hofaina',
   'admin.nav.leads': 'Liana (E-T28)',
+  'admin.nav.disputes': 'Fifanolanana (E-T27)',
   'admin.nav.reports': 'Fitarainana',
   'admin.nav.testimonials': 'Fijoroana ho vavolombelona',
   'admin.nav.whatsappAlerts': 'Fanairana WhatsApp',

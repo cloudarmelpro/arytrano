@@ -114,6 +114,10 @@ model User {
   operatorShifts      OperatorShift[]
   // E-T27.2 — inventory uploads (ENTRY/EXIT) the user authored.
   inventoryItems      InventoryItem[]
+  // E-T27.3 — disputes raised + resolved + messages.
+  disputesOpened      Dispute[]        @relation("DisputesOpened")
+  disputesResolved    Dispute[]        @relation("DisputesResolved")
+  disputeMessages     DisputeMessage[] @relation("DisputeMessages")
 
   @@index([status, role])
 }
@@ -852,11 +856,109 @@ model Lease {
   leadRequest    LeadRequest?    @relation("LeadConvertedLease")
   // E-T27.2 — état des lieux ENTRY + EXIT.
   inventoryItems InventoryItem[]
+  // E-T27.3 — caution arbitrage. At most one ACTIVE dispute per lease
+  // is enforced service-side ; we don't add a partial unique because
+  // historical resolved disputes can coexist with a new one.
+  disputes       Dispute[]
 
   @@index([listingId])
   @@index([ownerId, status])
   @@index([tenantId, status])
   @@index([status, createdAt])
+}
+
+// E-T27.3 — Arbitrage caution (2026-06-12)
+//
+// When a Lease in TERMINATED has an unresolved disagreement about
+// the caution (typically : owner withholds part of the deposit
+// citing damages ; tenant disputes), either party can OPEN a
+// Dispute. The lease transitions to DISPUTED. An admin compares
+// the ENTRY and EXIT InventoryItems side by side, reads the
+// claims and counter-claims, and renders a verdict (resolved
+// for owner / tenant / split) under a 7-day SLA target.
+//
+// AryTrano does NOT escrow the caution — it's released directly
+// between the parties offline. The arbitrage verdict is a
+// non-binding mediation (the runbook + CGU sections state this).
+// The verdict drives reputation impact : a verdict against an
+// owner counts toward losing the "Propriétaire vérifié" badge
+// after N repeated rulings.
+model Dispute {
+  id               String        @id @default(cuid())
+  leaseId          String
+  // Who opened it. Either party can ; we also track in the activity
+  // log who said what.
+  openedById       String
+  // OWNER / TENANT — the role the opener was playing when they
+  // raised it. Lets us render the correct prompt copy without a
+  // join into Lease.
+  openedByRole     DisputeParty
+  status           DisputeStatus @default(OPEN)
+  // First message — typically the reason + amount the owner is
+  // withholding. Stored separately from `claims` because it's the
+  // anchor of the conversation.
+  initialClaim     String
+  // Total amount the parties disagree on (typically owner-withheld
+  // share of the caution). Helps the admin prioritize.
+  amountAtStakeMGA Int
+  // SLA target = openedAt + 7 days. Admin nudge cron warns when
+  // close to the deadline (E-T27.3 follow-up).
+  slaDueAt         DateTime
+  resolvedAt       DateTime?
+  // Final ruling — set when status flips to RESOLVED_*. Free-text
+  // for now ; could become structured per the E-T27 runbook.
+  verdict          String?
+  // Admin who rendered the verdict. SetNull on admin delete so the
+  // dispute row survives an account purge.
+  resolvedById     String?
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+
+  lease      Lease            @relation(fields: [leaseId], references: [id], onDelete: Restrict)
+  openedBy   User             @relation("DisputesOpened", fields: [openedById], references: [id], onDelete: Restrict)
+  resolvedBy User?            @relation("DisputesResolved", fields: [resolvedById], references: [id], onDelete: SetNull)
+  messages   DisputeMessage[]
+
+  // Hot scan : `WHERE status IN (OPEN, IN_REVIEW) ORDER BY slaDueAt`.
+  @@index([status, slaDueAt])
+  @@index([leaseId])
+}
+
+enum DisputeParty {
+  OWNER
+  TENANT
+}
+
+enum DisputeStatus {
+  OPEN // freshly opened, waiting for admin triage
+  IN_REVIEW // admin claimed it, gathering both sides
+  RESOLVED_OWNER // verdict : owner's position wins (or partially)
+  RESOLVED_TENANT // verdict : tenant's position wins (or partially)
+  RESOLVED_SPLIT // both sides have a partial valid claim
+  WITHDRAWN // opening party withdrew before resolution
+}
+
+// Append-only conversation log for a dispute. Both parties + the
+// admin write to it. The admin's verdict ALSO writes a final message
+// flagged isVerdict.
+model DisputeMessage {
+  id          String       @id @default(cuid())
+  disputeId   String
+  authorId    String
+  authorRole  DisputeParty // who's speaking — used for visual styling
+  body        String
+  // Set true when this message IS the admin verdict (single row per
+  // dispute, enforced application-side).
+  isVerdict   Boolean      @default(false)
+  // Optional attachments — Cloudinary URLs. Same allowed list as
+  // inventory photos.
+  attachments String[]     @default([])
+  createdAt   DateTime     @default(now())
+
+  dispute Dispute @relation(fields: [disputeId], references: [id], onDelete: Cascade)
+  author  User    @relation("DisputeMessages", fields: [authorId], references: [id], onDelete: Restrict)
+
+  @@index([disputeId, createdAt])
 }
 
 // E-T27.2 — état des lieux numérique (2026-06-12)

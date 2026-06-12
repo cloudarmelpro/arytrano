@@ -6,6 +6,7 @@ import { auth } from '@/features/auth'
 import { getLeaseById } from '@/features/leases/queries/get-lease-by-id'
 import { LeaseStatusBadge } from '@/features/leases/components/LeaseStatusBadge'
 import { DownloadLeasePdfButton } from '@/features/leases/components/DownloadLeasePdfButton'
+import { OpenDisputeDialog } from '@/features/disputes/components/OpenDisputeDialog'
 import { LeaseTenantActions } from '@/features/leases/components/LeaseTenantActions'
 import { LeaseOwnerCancel } from '@/features/leases/components/LeaseOwnerCancel'
 import { buttonVariants } from '@/components/ui/button'
@@ -110,6 +111,13 @@ export default async function LeaseDetailPage({
             >
               🏠 État des lieux
             </Link>
+          ) : null}
+          {/* E-T27.3 — open a dispute. Available on ACTIVE/TERMINATED
+              for either party. Hidden if a dispute already exists
+              (the service rejects with 'already_open' anyway, but
+              the button hide keeps the UI honest). */}
+          {['ACTIVE', 'TERMINATED'].includes(lease.status) ? (
+            <OpenDisputeDialog leaseId={lease.id} />
           ) : null}
         </div>
       </header>
