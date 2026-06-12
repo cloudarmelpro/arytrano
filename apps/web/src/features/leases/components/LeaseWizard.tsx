@@ -46,8 +46,9 @@ export function LeaseWizard({
 
   // Caution is DERIVED from the listing — never asked from the owner
   // here. This keeps the public listing display and the lease totals
-  // perfectly aligned (no surprise upcharge at signing).
-  const cautionMGA = monthlyRentMGA * cautionMonths
+  // perfectly aligned (no surprise upcharge at signing). Rounded
+  // because cautionMonths is Float (½-mois) and MGA has no subunit.
+  const cautionMGA = Math.round(monthlyRentMGA * cautionMonths)
   // Revised E-T26 (2026-05-27) — the owner pays nothing. The preview
   // shows what the TENANT will be charged at lease acceptance, as a
   // transparency / educational block for the owner.
@@ -193,9 +194,11 @@ export function LeaseWizard({
                   <span className="text-[11.5px] text-foreground/55">
                     {cautionMonths === 0
                       ? t('lease.caution.derived.none')
-                      : t('lease.caution.derived.months', {
-                          count: cautionMonths,
-                        })}
+                      : cautionMonths === 0.5
+                        ? t('lease.caution.derived.half')
+                        : t('lease.caution.derived.months', {
+                            count: cautionMonths,
+                          })}
                   </span>
                 </dd>
               </div>

@@ -35,11 +35,13 @@ type FormValues = z.input<typeof createListingSchema>
 
 const LISTING_TYPES: ReadonlyArray<FormValues['type']> = ['ROOM', 'STUDIO', 'APARTMENT', 'HOUSE']
 
-// Caution policy options (E-T26) — Madagascar standard practice is 1-3
-// months of rent. 0 = no caution (some bailleurs). 4+ is rare and would
+// Caution policy options (E-T26) — Madagascar standard practice is 0.5-3
+// months of rent. 0 = no caution (some bailleurs). Half-month added
+// 2026-06-12 for smaller rooms / short stays. 4+ is rare and would
 // signal "we don't trust the platform" — keep the list short on purpose.
 const CAUTION_MONTHS_OPTIONS: ReadonlyArray<{ value: string; label: string }> = [
   { value: '0', label: 'Pas de caution' },
+  { value: '0.5', label: '½ mois de loyer' },
   { value: '1', label: '1 mois de loyer' },
   { value: '2', label: '2 mois de loyer' },
   { value: '3', label: '3 mois de loyer' },

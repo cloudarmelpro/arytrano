@@ -51,10 +51,12 @@ export const createListingSchema = z.object({
     .max(100_000_000, 'Prix invalide'),
   // E-T26 — caution declared as a multiplier on the monthly rent.
   // 0 = no caution (some bailleurs MG don't take one). Range 0-3
-  // covers standard Madagascar practice.
+  // covers standard Madagascar practice. Half-month allowed (0.5)
+  // since 2026-06-12 ; finer granularity rejected to keep the
+  // dropdown short.
   cautionMonths: z.coerce
     .number({ message: 'Nombre de mois de caution' })
-    .int('Nombre de mois entier')
+    .multipleOf(0.5, 'Mois entier ou demi-mois uniquement')
     .min(0, 'Au moins 0')
     .max(3, '3 mois maximum')
     .optional()

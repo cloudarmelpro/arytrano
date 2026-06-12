@@ -153,7 +153,11 @@ export async function convertLeadToLease(
 
   // 4) Snapshot the fee derived from the listing's current monthly rent
   //    (SEC-H2 audit pattern — never trust client-supplied rent).
-  const cautionMGA = lead.listing.priceMonthlyMGA * lead.listing.cautionMonths
+  //    Round — cautionMonths is Float (½-mois supported), MGA has no
+  //    subunit.
+  const cautionMGA = Math.round(
+    lead.listing.priceMonthlyMGA * lead.listing.cautionMonths,
+  )
   const { platformFeeMGA } = calculatePlatformFee({
     monthlyRentMGA: lead.listing.priceMonthlyMGA,
   })

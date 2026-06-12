@@ -401,10 +401,11 @@ model Listing {
   priceMonthlyMGA Int
   // E-T26 — caution policy declared at listing time. Stored as a
   // multiplier on `priceMonthlyMGA`. Standard Madagascar housing
-  // practice : 1-3 months. The actual caution amount (in Ariary) is
+  // practice : 0.5-3 months. The caution amount (in Ariary) is
   // derived at lease-signing time = priceMonthlyMGA × cautionMonths,
-  // never re-asked from the owner. Set to 0 if no caution is required.
-  cautionMonths   Int         @default(2)
+  // rounded — MGA has no subunit. Set to 0 if no caution is required.
+  // Float (not Int) since 2026-06-12 to support a half-month option.
+  cautionMonths   Float       @default(2)
   surfaceM2       Int?
   bedrooms        Int?
   bathrooms       Int?

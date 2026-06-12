@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "Listing" ALTER COLUMN "cautionMonths" SET DEFAULT 2,
+ALTER COLUMN "cautionMonths" SET DATA TYPE DOUBLE PRECISION;

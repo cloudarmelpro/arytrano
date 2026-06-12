@@ -50,6 +50,7 @@ export const mg: Record<MessageKey, string> = {
   'lease.fields.durationMonths': 'Faharetana (volana)',
   'lease.fields.durationMonths.help': 'Hatramin\'ny 60 volana (5 taona).',
   'lease.caution.derived.none': 'Tsy misy antoka amin\'ity filazana ity',
+  'lease.caution.derived.half': 'Antsasaky ny volana × hofa',
   'lease.caution.derived.months': '{count} volana × hofa',
   'lease.fees.signature': 'Saran\'ny sonia AryTrano',
   'lease.fees.commission': 'Commission antoka (8%)',
@@ -533,6 +534,7 @@ export const mg: Record<MessageKey, string> = {
   // Card
   'card.perMonth': '/ volana',
   'card.caution': 'Antoka : {count} volana ({amount})',
+  'card.caution.half': 'Antoka : antsasaky ny volana ({amount})',
   'card.noPhoto': 'Tsy misy sary',
 
   // Detail page
@@ -1887,7 +1889,7 @@ export const mg: Record<MessageKey, string> = {
   'listingForm.price.label': 'Vidiny isam-bolana (Ar)',
   'listingForm.cautionMonths.label': 'Antoka takiana',
   'listingForm.cautionMonths.help':
-    'Mahazatra eto Madagasikara : 2-3 volana. Ny antoka dia mitovy ho an\'ny hofa rehetra amin\'ity filazana ity.',
+    'Mahazatra eto Madagasikara : 1-3 volana. Azo atao ihany koa ny antsasaky ny volana ho an\'ny efitra na hofa fohy. Ny antoka dia mitovy ho an\'ny hofa rehetra amin\'ity filazana ity.',
   'listingForm.city.label': 'Tanàna',
   'listingForm.city.placeholder': 'Misafidiana tanàna',
   'listingForm.neighborhood.label': 'Faritra',

@@ -137,7 +137,11 @@ export async function initiateLease(
   }
 
   // 5) Snapshot the fee derived from the listing's current monthly rent.
-  const cautionMGA = listing.priceMonthlyMGA * listing.cautionMonths
+  //    Round — cautionMonths is Float (½-mois supported), MGA has no
+  //    subunit.
+  const cautionMGA = Math.round(
+    listing.priceMonthlyMGA * listing.cautionMonths,
+  )
   const { platformFeeMGA } = calculatePlatformFee({
     monthlyRentMGA: listing.priceMonthlyMGA,
   })

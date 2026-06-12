@@ -44,6 +44,7 @@ export const frMG = {
   'lease.fields.durationMonths': 'Durée (mois)',
   'lease.fields.durationMonths.help': 'Maximum 60 mois (5 ans).',
   'lease.caution.derived.none': 'Aucune caution sur cette annonce',
+  'lease.caution.derived.half': '½ mois × loyer',
   'lease.caution.derived.months': '{count} mois × loyer',
   'lease.fees.signature': 'Frais de signature AryTrano',
   'lease.fees.commission': 'Commission caution (8%)',
@@ -531,6 +532,7 @@ export const frMG = {
   // Card
   'card.perMonth': '/ mois',
   'card.caution': 'Caution : {count} mois ({amount})',
+  'card.caution.half': 'Caution : ½ mois ({amount})',
   'card.noPhoto': 'Pas de photo',
 
   // Detail page
@@ -1870,7 +1872,7 @@ export const frMG = {
   'listingForm.price.label': 'Prix par mois (Ar)',
   'listingForm.cautionMonths.label': 'Caution demandée',
   'listingForm.cautionMonths.help':
-    'Standard à Madagascar : 2-3 mois. La caution est figée pour toutes les locations de cette annonce.',
+    'Standard à Madagascar : 1-3 mois. ½ mois possible pour les chambres / courtes durées. La caution est figée pour toutes les locations de cette annonce.',
   'listingForm.city.label': 'Ville',
   'listingForm.city.placeholder': 'Choisir une ville',
   'listingForm.neighborhood.label': 'Quartier',

@@ -106,15 +106,24 @@ export function PublicListingCard({
             </span>
           </p>
           {/* E-T26 — caution disclosure, calmly muted so it doesn't
-              compete with the rent number. Hidden when no caution. */}
+              compete with the rent number. Hidden when no caution.
+              0.5 gets its own copy ("½ mois") instead of "0.5 mois". */}
           {listing.cautionMonths > 0 ? (
             <p className="mt-0.5 text-[11.5px] text-foreground/55">
-              {t('card.caution', {
-                count: listing.cautionMonths,
-                amount: formatAriary(
-                  listing.priceMonthlyMGA * listing.cautionMonths,
-                ),
-              })}
+              {listing.cautionMonths === 0.5
+                ? t('card.caution.half', {
+                    amount: formatAriary(
+                      Math.round(listing.priceMonthlyMGA * 0.5),
+                    ),
+                  })
+                : t('card.caution', {
+                    count: listing.cautionMonths,
+                    amount: formatAriary(
+                      Math.round(
+                        listing.priceMonthlyMGA * listing.cautionMonths,
+                      ),
+                    ),
+                  })}
             </p>
           ) : null}
         </div>
