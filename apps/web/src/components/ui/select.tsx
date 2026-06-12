@@ -60,10 +60,14 @@ function SelectContent({
   className,
   children,
   side = "bottom",
-  sideOffset = 4,
-  align = "center",
+  sideOffset = 6,
+  align = "start",
   alignOffset = 0,
-  alignItemWithTrigger = true,
+  // 2026-06-12 — default to FALSE so the popup drops below the trigger,
+  // matching the City / Quartier Combobox on /annonces. Base UI's
+  // default (true) aligns the selected item ON the trigger which makes
+  // the popup overlap. Consumers can still opt in per-instance.
+  alignItemWithTrigger = false,
   ...props
 }: SelectPrimitive.Popup.Props &
   Pick<
