@@ -12,10 +12,12 @@ import type { SmsMessage, SmsProvider, SmsSendResult } from './types'
  *
  * Selection rules :
  *  1. `SMS_PROVIDER=twilio` + Twilio creds present → Twilio.
- *  2. Anything else AND `NODE_ENV !== 'production'` → console mock.
- *  3. Production without a real provider → throws on first send so
- *     the visitor sees a clean 500 + we get a Sentry signal instead
- *     of silently dropping codes.
+ *  2. NODE_ENV !== production → ConsoleSmsProvider (mock, logs the
+ *     code locally).
+ *  3. Production without a real provider → hard throw. The console
+ *     provider is HARD-REFUSED in production (security audit
+ *     2026-06-12) because it writes OTPs in stdout / Sentry
+ *     breadcrumbs, which is a credential leak channel.
  *
  * Add Africa's Talking by mirroring the Twilio branch once we have
  * a contract — same `SmsProvider` interface, no caller change.
@@ -27,6 +29,17 @@ export function getSmsProvider(): SmsProvider {
   if (cached) return cached
 
   const choice = env.SMS_PROVIDER ?? null
+  const isProd = env.NODE_ENV === 'production'
+
+  // SECURITY (audit fix 2026-06-12) — Console provider in production
+  // writes the OTP body in stdout. Even with SMS_PROVIDER=console
+  // set explicitly we refuse, because the "emergency dry-run"
+  // escape hatch is worth less than the credential leak risk.
+  if (isProd && choice === 'console') {
+    throw new Error(
+      'SMS_PROVIDER=console is forbidden in production. Use a real provider (twilio).',
+    )
+  }
 
   if (choice === 'twilio') {
     if (
@@ -46,14 +59,12 @@ export function getSmsProvider(): SmsProvider {
     return cached
   }
 
-  // Dev / test default. In production this branch is intentional
-  // ONLY when SMS_PROVIDER=console is set explicitly (emergency
-  // dry-run scenario). Otherwise we want a hard failure.
-  if (env.NODE_ENV === 'production' && choice !== 'console') {
+  if (isProd) {
     throw new Error(
-      'No real SMS provider configured in production. Set SMS_PROVIDER=twilio or =console.',
+      'No real SMS provider configured in production. Set SMS_PROVIDER=twilio.',
     )
   }
+
   cached = new ConsoleSmsProvider()
   return cached
 }

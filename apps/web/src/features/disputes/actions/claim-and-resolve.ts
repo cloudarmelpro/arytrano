@@ -35,6 +35,11 @@ export async function claimDisputeAction(
       return { ok: true }
     case 'dispute_not_found':
       return { ok: false, message: 'Litige introuvable.' }
+    case 'already_claimed':
+      return {
+        ok: false,
+        message: 'Ce litige est déjà claimé par un autre admin.',
+      }
     case 'wrong_status':
       return {
         ok: false,
@@ -79,7 +84,7 @@ export async function resolveDisputeAction(
       return { ok: true }
     case 'dispute_not_found':
       return { ok: false, message: 'Litige introuvable.' }
-    case 'not_reviewer':
+    case 'not_claimer':
       return {
         ok: false,
         message: 'Ce litige est claimé par un autre admin.',

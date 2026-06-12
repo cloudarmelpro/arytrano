@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { env } from '@/lib/env'
 
 /**
  * E-T27.2 — inventory schemas.
@@ -35,15 +36,21 @@ const roomKey = z
     'Caractères autorisés : majuscules, chiffres et underscore. Exemple : "CHAMBRE_2".',
   )
 
+// SECURITY (audit fix 2026-06-12) — the prior check accepted any
+// `https://res.cloudinary.com/*` URL, which let an attacker host
+// fabricated "evidence" on their OWN Cloudinary account and
+// reference it as if it had passed our upload pipeline. We now
+// pin the cloud name to the platform's account so only assets
+// produced by our `uploadInventoryPhoto` action are admissible.
+const ALLOWED_CLOUDINARY_PREFIX = `https://res.cloudinary.com/${env.CLOUDINARY_CLOUD_NAME}/`
+
 const photoUrl = z
   .string()
   .trim()
   .url('URL invalide.')
   .refine(
-    (u) =>
-      u.startsWith('https://res.cloudinary.com/') ||
-      u.startsWith('https://cloudinary.com/'),
-    'Seules les URLs Cloudinary sont acceptées.',
+    (u) => u.startsWith(ALLOWED_CLOUDINARY_PREFIX),
+    'URL externe rejetée — la photo doit passer par AryTrano.',
   )
 
 export const upsertInventoryItemSchema = z.object({

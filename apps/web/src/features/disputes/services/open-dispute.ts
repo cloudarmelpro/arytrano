@@ -1,14 +1,25 @@
 import 'server-only'
+import { Prisma } from '@prisma/client'
 import { prisma } from '@/lib/db'
 import type { OpenDisputeInput } from '../schemas'
 
 /**
  * E-T27.3 — open a Dispute. Either party of a Lease can open. We
- * cap one OPEN/IN_REVIEW dispute per lease at a time to keep the
- * admin queue tractable ; previously resolved disputes can coexist.
+ * cap one OPEN/IN_REVIEW dispute per lease at a time ; previously
+ * resolved disputes can coexist.
+ *
+ * The cap is now enforced by a PARTIAL UNIQUE INDEX (migration
+ * 20260612120000) — the prior service-side findFirst+create had a
+ * TOCTOU window. We still do a friendly pre-check to return a
+ * clean outcome, then catch P2002 as the race-loser.
+ *
+ * We also SNAPSHOT lease.status at open time into
+ * `leaseStatusAtOpen`. The resolve step restores the lease to THAT
+ * status — opening a frivolous dispute on an ACTIVE lease no longer
+ * unilaterally ends the bail when the verdict is rendered.
  *
  * Side effects in a single tx :
- *  - Insert Dispute (status OPEN, slaDueAt = now + 7 days)
+ *  - Insert Dispute (status OPEN, slaDueAt = now + 7 days, snapshot)
  *  - Insert DisputeMessage (the initial claim, isVerdict=false)
  *  - Flip Lease.status to DISPUTED
  */
@@ -20,7 +31,7 @@ export type OpenDisputeOutcome =
   | { kind: 'lease_not_found' }
   | { kind: 'not_a_party' }
   | { kind: 'wrong_lease_status'; currentStatus: string }
-  | { kind: 'already_open'; existingDisputeId: string }
+  | { kind: 'already_open' }
 
 export async function openDispute(
   input: OpenDisputeInput,
@@ -46,50 +57,51 @@ export async function openDispute(
     return { kind: 'wrong_lease_status', currentStatus: lease.status }
   }
 
-  const existing = await prisma.dispute.findFirst({
-    where: {
-      leaseId: lease.id,
-      status: { in: ['OPEN', 'IN_REVIEW'] },
-    },
-    select: { id: true },
-  })
-  if (existing) {
-    return { kind: 'already_open', existingDisputeId: existing.id }
-  }
-
   const role = lease.ownerId === userId ? 'OWNER' : 'TENANT'
+  const leaseStatusAtOpen = lease.status
   const now = new Date()
   const slaDueAt = new Date(now.getTime() + SLA_MS)
 
-  const dispute = await prisma.$transaction(async (tx) => {
-    const d = await tx.dispute.create({
-      data: {
-        leaseId: lease.id,
-        openedById: userId,
-        openedByRole: role,
-        initialClaim: input.initialClaim,
-        amountAtStakeMGA: input.amountAtStakeMGA,
-        slaDueAt,
-      },
-      select: { id: true, slaDueAt: true },
+  try {
+    const dispute = await prisma.$transaction(async (tx) => {
+      const d = await tx.dispute.create({
+        data: {
+          leaseId: lease.id,
+          openedById: userId,
+          openedByRole: role,
+          initialClaim: input.initialClaim,
+          amountAtStakeMGA: input.amountAtStakeMGA,
+          leaseStatusAtOpen,
+          slaDueAt,
+        },
+        select: { id: true, slaDueAt: true },
+      })
+      await tx.disputeMessage.create({
+        data: {
+          disputeId: d.id,
+          authorId: userId,
+          authorRole: role,
+          body: input.initialClaim,
+          isVerdict: false,
+        },
+      })
+      // Flip lease status to DISPUTED. updateMany with the source
+      // status filter so a parallel transition can't race.
+      await tx.lease.updateMany({
+        where: { id: lease.id, status: leaseStatusAtOpen },
+        data: { status: 'DISPUTED' },
+      })
+      return d
     })
-    await tx.disputeMessage.create({
-      data: {
-        disputeId: d.id,
-        authorId: userId,
-        authorRole: role,
-        body: input.initialClaim,
-        isVerdict: false,
-      },
-    })
-    // Flip lease status to DISPUTED. updateMany with the source
-    // status filter so a parallel transition can't race.
-    await tx.lease.updateMany({
-      where: { id: lease.id, status: lease.status },
-      data: { status: 'DISPUTED' },
-    })
-    return d
-  })
-
-  return { kind: 'ok', disputeId: dispute.id, slaDueAt: dispute.slaDueAt }
+    return { kind: 'ok', disputeId: dispute.id, slaDueAt: dispute.slaDueAt }
+  } catch (err) {
+    // Partial unique index caught a concurrent open — race-loser.
+    if (
+      err instanceof Prisma.PrismaClientKnownRequestError &&
+      err.code === 'P2002'
+    ) {
+      return { kind: 'already_open' }
+    }
+    throw err
+  }
 }

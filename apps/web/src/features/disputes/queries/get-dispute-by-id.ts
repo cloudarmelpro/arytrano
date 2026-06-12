@@ -12,6 +12,9 @@ export async function getDisputeById(disputeId: string) {
       initialClaim: true,
       amountAtStakeMGA: true,
       slaDueAt: true,
+      leaseStatusAtOpen: true,
+      claimedById: true,
+      claimedAt: true,
       resolvedAt: true,
       verdict: true,
       resolvedById: true,
@@ -41,6 +44,7 @@ export async function getDisputeById(disputeId: string) {
           },
         },
       },
+      claimedBy: { select: { id: true, name: true } },
       resolvedBy: { select: { id: true, name: true } },
       messages: {
         orderBy: { createdAt: 'asc' },

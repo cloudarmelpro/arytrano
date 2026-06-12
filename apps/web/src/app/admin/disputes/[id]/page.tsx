@@ -31,8 +31,12 @@ export default async function AdminDisputeDetailPage({
   const d = await getDisputeById(id)
   if (!d) notFound()
 
-  const isClaimed = d.resolvedById === adminId && d.status === 'IN_REVIEW'
-  const isResolvable = isClaimed
+  // After the audit fix (2026-06-12) claim and resolve are tracked
+  // separately. isClaimedByMe drives the "Rendre le verdict" form ;
+  // hijack attempts on someone else's claim now hit a service-side
+  // reject (`already_claimed`).
+  const isClaimedByMe = d.claimedById === adminId && d.status === 'IN_REVIEW'
+  const isResolvable = isClaimedByMe
   const entry = d.lease.inventoryItems.filter((i) => i.phase === 'ENTRY')
   const exit = d.lease.inventoryItems.filter((i) => i.phase === 'EXIT')
 
@@ -157,13 +161,12 @@ export default async function AdminDisputeDetailPage({
               {d.status === 'OPEN' ? (
                 <ClaimDisputeButton disputeId={d.id} />
               ) : null}
-              {d.status === 'IN_REVIEW' && !isClaimed ? (
-                <>
-                  <p className="text-[12.5px] text-foreground/60">
-                    Claimé par {d.resolvedBy?.name ?? '?'}.
-                  </p>
-                  <ClaimDisputeButton disputeId={d.id} />
-                </>
+              {d.status === 'IN_REVIEW' && !isClaimedByMe ? (
+                <p className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-[12.5px] text-amber-900">
+                  Claimé par <strong>{d.claimedBy?.name ?? '?'}</strong>.
+                  Pour reprendre la main, l’admin doit relâcher d’abord
+                  (hors flow self-service).
+                </p>
               ) : null}
               {isResolvable ? <ResolveDisputeForm disputeId={d.id} /> : null}
               {d.resolvedAt ? (
