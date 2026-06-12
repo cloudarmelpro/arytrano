@@ -5,6 +5,7 @@ import type { LeaseStatus } from '@prisma/client'
 import { auth } from '@/features/auth'
 import { getLeaseById } from '@/features/leases/queries/get-lease-by-id'
 import { LeaseStatusBadge } from '@/features/leases/components/LeaseStatusBadge'
+import { DownloadLeasePdfButton } from '@/features/leases/components/DownloadLeasePdfButton'
 import { LeaseTenantActions } from '@/features/leases/components/LeaseTenantActions'
 import { LeaseOwnerCancel } from '@/features/leases/components/LeaseOwnerCancel'
 import { buttonVariants } from '@/components/ui/button'
@@ -92,6 +93,14 @@ export default async function LeaseDetailPage({
           <p className="text-[13.5px] leading-[1.55] text-foreground/65">
             {statusNextText(t, lease.status, isOwner, isTenant)}
           </p>
+          {/* E-T27.1 — lease PDF download. Visible only on ACTIVE leases
+              (PDF generation is triggered by the ACTIVE transition). */}
+          {lease.status === 'ACTIVE' ? (
+            <DownloadLeasePdfButton
+              leaseId={lease.id}
+              isAvailable={Boolean(lease.contractPdfPublicId)}
+            />
+          ) : null}
         </div>
       </header>
 

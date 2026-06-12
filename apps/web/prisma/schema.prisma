@@ -805,31 +805,40 @@ model PaymentEvent {
 // ============================================================
 
 model Lease {
-  id             String      @id @default(cuid())
-  listingId      String
-  ownerId        String
-  tenantId       String
-  monthlyRentMGA Int
-  cautionMGA     Int         @default(0)
-  startDate      DateTime
-  durationMonths Int
+  id                     String      @id @default(cuid())
+  listingId              String
+  ownerId                String
+  tenantId               String
+  monthlyRentMGA         Int
+  cautionMGA             Int         @default(0)
+  startDate              DateTime
+  durationMonths         Int
   // E-T26 (revised 2026-05-27) — platform fee charged to the TENANT
   // at lease acceptance, NOT the owner. Default rate is 20% of the
   // monthly rent (= PLATFORM_FEE_RATE × monthlyRentMGA, floored).
   // Snapshotted on the row so a future rate change leaves audit trails
   // intact. Owner pays nothing to AryTrano — the rent + caution flow
   // directly between tenant and owner offline.
-  platformFeeMGA Int         @default(0)
-  paymentId      String?     @unique
-  status         LeaseStatus @default(PENDING_TENANT)
+  platformFeeMGA         Int         @default(0)
+  paymentId              String?     @unique
+  status                 LeaseStatus @default(PENDING_TENANT)
   // ownerSignedAt now set at lease CREATION (owner commit = create
   // the lease wizard; no payment step on owner side). tenantSignedAt
   // set when the tenant pays + transition to ACTIVE.
-  ownerSignedAt  DateTime?
-  tenantSignedAt DateTime?
-  terminatedAt   DateTime?
-  createdAt      DateTime    @default(now())
-  updatedAt      DateTime    @updatedAt
+  ownerSignedAt          DateTime?
+  tenantSignedAt         DateTime?
+  terminatedAt           DateTime?
+  // E-T27.1 (2026-06-12) — auto-generated lease PDF.
+  // Trigger : Lease.status flips PENDING_TENANT → ACTIVE.
+  // Storage : Cloudinary `raw` resource in the private
+  // `arytrano/leases/` folder. Downloaded via signed URL with 7-day
+  // TTL — the dashboard re-signs on every render so paste-the-link
+  // sharing expires fast.
+  contractPdfUrl         String?
+  contractPdfPublicId    String?
+  contractPdfGeneratedAt DateTime?
+  createdAt              DateTime    @default(now())
+  updatedAt              DateTime    @updatedAt
 
   listing     Listing      @relation(fields: [listingId], references: [id], onDelete: Restrict)
   owner       User         @relation("OwnerLeases", fields: [ownerId], references: [id], onDelete: Restrict)

@@ -152,6 +152,21 @@ export async function applyLeasePaymentSideEffect(
   )
 
   const deferNotifications = async () => {
+    // E-T27.1 — generate the lease PDF in the same deferred batch. Runs
+    // BEFORE the email send so the email already mentions the PDF as
+    // available in the dashboard. Idempotent on retry.
+    try {
+      const { generateLeaseContractPdf } = await import(
+        './generate-lease-contract-pdf'
+      )
+      await generateLeaseContractPdf(lease.id)
+    } catch (err) {
+      Sentry.captureException(err, {
+        tags: { kind: 'lease-active-pdf-after' },
+        extra: { leaseId: lease.id },
+      })
+    }
+
     // Email
     try {
       const email = buildLeaseTenantSignedEmail(

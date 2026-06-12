@@ -25,6 +25,11 @@ export async function getLeaseById(leaseId: string, viewerId: string) {
       ownerSignedAt: true,
       tenantSignedAt: true,
       terminatedAt: true,
+      // E-T27.1 — surface PDF availability + generated timestamp on
+      // the detail page so the download button can render the right
+      // state without an extra query.
+      contractPdfPublicId: true,
+      contractPdfGeneratedAt: true,
       createdAt: true,
       updatedAt: true,
       listing: {

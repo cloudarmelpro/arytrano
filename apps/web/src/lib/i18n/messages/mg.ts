@@ -2632,4 +2632,9 @@ export const mg: Record<MessageKey, string> = {
     'Be loatra ny fanandramana. Mangataha kaody vaovao.',
   'lead.otp.smsConsole.banner':
     'Fomba dev : aseho amin’ny console ny kaody. Jereo ny tamberina.',
+
+  // E-T27.1 — lease PDF (2026-06-12)
+  'lease.pdf.download': '📄 Alaina ny bail',
+  'lease.pdf.signing': 'Mikarakara…',
+  'lease.pdf.pending': 'Mbola amboarina ny PDF…',
 }

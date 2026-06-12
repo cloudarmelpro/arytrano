@@ -2622,6 +2622,11 @@ export const frMG = {
     'Trop de tentatives. Demande un nouveau code.',
   'lead.otp.smsConsole.banner':
     'Mode dev : le code est imprimé dans le terminal du serveur. Vérifie la console.',
+
+  // E-T27.1 — lease PDF (2026-06-12)
+  'lease.pdf.download': '📄 Télécharger le bail',
+  'lease.pdf.signing': 'Préparation…',
+  'lease.pdf.pending': 'PDF en cours de génération…',
 } as const
 
 export type MessageKey = keyof typeof frMG
