@@ -67,17 +67,20 @@ export function NeighborhoodAutocomplete({
         )}
       </div>
       <Combobox.Portal>
-        <Combobox.Positioner sideOffset={4} className="z-50 outline-none">
-          <Combobox.Popup className="max-h-72 w-[var(--anchor-width)] overflow-auto rounded-md border border-border bg-popover py-1 text-sm shadow-lg outline-none">
-            <Combobox.Empty className="px-3 py-2 text-muted-foreground">
+        <Combobox.Positioner sideOffset={6} className="z-50 outline-none">
+          {/* 2026-06-12 — unified dropdown style. Matches the City /
+              Quartier Combobox on /annonces and the shadcn Select :
+              rounded-xl popup, shadow-lg, items with primary/10 hover. */}
+          <Combobox.Popup className="max-h-72 w-[var(--anchor-width)] overflow-auto rounded-xl bg-popover p-1 text-sm text-popover-foreground shadow-lg ring-1 ring-foreground/10 outline-none data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0">
+            <Combobox.Empty className="empty:p-0 px-3 py-4 text-center text-[13px] text-muted-foreground">
               {t('filters.neighborhood.empty')}
             </Combobox.Empty>
-            <Combobox.List>
+            <Combobox.List className="flex flex-col">
               {items.map((it) => (
                 <Combobox.Item
                   key={it.value}
                   value={it}
-                  className="flex cursor-pointer select-none items-center px-3 py-2 outline-none data-highlighted:bg-accent data-highlighted:text-accent-foreground data-selected:font-medium"
+                  className="flex cursor-pointer select-none items-center rounded-md px-3 py-2.5 outline-none data-highlighted:bg-primary/10 data-highlighted:text-foreground data-selected:font-semibold"
                 >
                   {it.label}
                 </Combobox.Item>

@@ -71,7 +71,10 @@ export function HeaderAvatarMenu({
 
       <Menu.Portal>
         <Menu.Positioner side="bottom" align="end" sideOffset={8} className="z-50 outline-none">
-          <Menu.Popup className="min-w-[16rem] overflow-hidden rounded-md border border-border bg-popover py-1 text-sm shadow-xl outline-none data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0">
+          {/* 2026-06-12 — unified popup chrome. Same DNA as the Select
+              and Combobox dropdowns across the app : rounded-xl,
+              shadow-lg, ring-1 ring-foreground/10, inner p-1. */}
+          <Menu.Popup className="min-w-[16rem] overflow-hidden rounded-xl bg-popover p-1 text-sm text-popover-foreground shadow-lg ring-1 ring-foreground/10 outline-none data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0">
             {/* User info card at top — full-width header (no divider) */}
             <div className="flex items-center gap-3 px-4 py-3">
               <Avatar className="h-10 w-10 ring-1 ring-border">
@@ -133,9 +136,9 @@ export function HeaderAvatarMenu({
                 >
                   <button
                     type="submit"
-                    className="group/item flex w-full cursor-pointer items-center gap-3 px-4 py-2 text-sm text-destructive outline-none transition data-highlighted:text-destructive/70"
+                    className="group/item flex w-full cursor-pointer items-center gap-3 rounded-md px-3 py-2 text-sm text-destructive outline-none transition data-highlighted:bg-destructive/10"
                   >
-                    <span className="flex h-5 w-5 items-center justify-center text-destructive transition group-data-highlighted/item:text-destructive/70">
+                    <span className="flex h-5 w-5 items-center justify-center text-destructive transition">
                       <IconLogOut />
                     </span>
                     <span>{t('header.avatarMenu.signOut')}</span>
@@ -173,7 +176,7 @@ function MenuItem({
       render={
         <Link
           href={href}
-          className="group/item flex cursor-pointer items-center gap-3 px-4 py-2 text-sm text-foreground outline-none transition data-highlighted:text-primary"
+          className="group/item flex cursor-pointer items-center gap-3 rounded-md px-3 py-2 text-sm text-foreground outline-none transition data-highlighted:bg-primary/10 data-highlighted:text-foreground"
         >
           <span className="flex h-5 w-5 items-center justify-center text-muted-foreground transition group-data-highlighted/item:text-primary">
             {icon}

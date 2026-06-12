@@ -33,17 +33,18 @@ export function CommentActionsMenu({
       </Menu.Trigger>
       <Menu.Portal>
         <Menu.Positioner side="bottom" align="end" sideOffset={4} className="z-50 outline-none">
-          <Menu.Popup className="min-w-[11rem] overflow-hidden rounded-lg border border-border bg-popover py-1.5 text-sm shadow-lg outline-none data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0">
+          {/* 2026-06-12 — unified dropdown popup DNA. */}
+          <Menu.Popup className="min-w-[11rem] overflow-hidden rounded-xl bg-popover p-1 text-sm text-popover-foreground shadow-lg ring-1 ring-foreground/10 outline-none data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0">
             <Menu.Item
               onClick={onEdit}
-              className="flex cursor-pointer select-none items-center gap-3 px-3.5 py-2 font-medium text-foreground outline-none transition data-highlighted:bg-accent data-highlighted:text-accent-foreground"
+              className="flex cursor-pointer select-none items-center gap-3 rounded-md px-3 py-2.5 font-medium text-foreground outline-none transition data-highlighted:bg-primary/10 data-highlighted:text-foreground"
             >
               <PencilIcon />
               <span>{t('commentActions.edit')}</span>
             </Menu.Item>
             <Menu.Item
               onClick={onDelete}
-              className="flex cursor-pointer select-none items-center gap-3 px-3.5 py-2 font-medium text-destructive outline-none transition data-highlighted:bg-destructive/10"
+              className="flex cursor-pointer select-none items-center gap-3 rounded-md px-3 py-2.5 font-medium text-destructive outline-none transition data-highlighted:bg-destructive/10"
             >
               <TrashIcon />
               <span>{t('commentActions.delete')}</span>

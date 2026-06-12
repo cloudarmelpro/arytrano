@@ -140,12 +140,13 @@ export function ListingActionsMenu({
           sideOffset={6}
           className="z-50 outline-none"
         >
-          <Menu.Popup className="min-w-[11rem] overflow-hidden rounded-md border border-border bg-popover py-1 text-sm shadow-lg outline-none data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0">
+          {/* 2026-06-12 — unified dropdown popup DNA. */}
+          <Menu.Popup className="min-w-[11rem] overflow-hidden rounded-xl bg-popover p-1 text-sm text-popover-foreground shadow-lg ring-1 ring-foreground/10 outline-none data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0">
             {canPublish && (
               <Menu.Item
                 disabled={pending}
                 onClick={() => callAction('publish', publishListingAction)}
-                className="group/item flex cursor-pointer items-center gap-2.5 px-3 py-2 text-foreground outline-none transition data-disabled:cursor-not-allowed data-disabled:opacity-50 data-highlighted:text-primary"
+                className="group/item flex cursor-pointer items-center gap-2.5 rounded-md px-3 py-2.5 text-foreground outline-none transition data-disabled:cursor-not-allowed data-disabled:opacity-50 data-highlighted:bg-primary/10 data-highlighted:text-foreground"
               >
                 <span className="flex h-4 w-4 items-center justify-center text-muted-foreground transition group-data-highlighted/item:text-primary">
                   <IconUpload />
@@ -159,7 +160,7 @@ export function ListingActionsMenu({
               <Menu.Item
                 disabled={pending}
                 onClick={() => callAction('toggle', toggleAvailabilityAction)}
-                className="group/item flex cursor-pointer items-center gap-2.5 px-3 py-2 text-foreground outline-none transition data-disabled:cursor-not-allowed data-disabled:opacity-50 data-highlighted:text-primary"
+                className="group/item flex cursor-pointer items-center gap-2.5 rounded-md px-3 py-2.5 text-foreground outline-none transition data-disabled:cursor-not-allowed data-disabled:opacity-50 data-highlighted:bg-primary/10 data-highlighted:text-foreground"
               >
                 <span className="flex h-4 w-4 items-center justify-center text-muted-foreground transition group-data-highlighted/item:text-primary">
                   {status === 'PUBLISHED' ? <IconEyeOff /> : <IconEye />}
@@ -174,9 +175,9 @@ export function ListingActionsMenu({
             <Menu.Item
               disabled={pending}
               onClick={() => setDeleting(true)}
-              className="group/item flex cursor-pointer items-center gap-2.5 px-3 py-2 text-destructive outline-none transition data-disabled:cursor-not-allowed data-disabled:opacity-50 data-highlighted:text-destructive/70"
+              className="group/item flex cursor-pointer items-center gap-2.5 rounded-md px-3 py-2.5 text-destructive outline-none transition data-disabled:cursor-not-allowed data-disabled:opacity-50 data-highlighted:bg-destructive/10"
             >
-              <span className="flex h-4 w-4 items-center justify-center text-destructive transition group-data-highlighted/item:text-destructive/70">
+              <span className="flex h-4 w-4 items-center justify-center text-destructive transition">
                 <IconTrash />
               </span>
               {t('listingActions.delete')}
