@@ -18,12 +18,16 @@ export const contentType = 'image/png'
 export default async function NeighborhoodOpenGraphImage({
   params,
 }: {
-  params: { citySlug: string; neighborhoodSlug: string }
+  params: Promise<{ citySlug: string; neighborhoodSlug: string }>
 }) {
+  // Next 15+ — params is a Promise on the OG image route too.
+  // Audit fix 2026-06-12.
+  const { citySlug, neighborhoodSlug } = await params
+
   const neighborhood = await prisma.neighborhood.findFirst({
     where: {
-      slug: params.neighborhoodSlug,
-      city: { slug: params.citySlug },
+      slug: neighborhoodSlug,
+      city: { slug: citySlug },
     },
     select: {
       nameFr: true,

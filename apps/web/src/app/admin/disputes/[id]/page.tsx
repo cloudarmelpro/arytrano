@@ -1,3 +1,4 @@
+import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { auth } from '@/features/auth'
@@ -5,9 +6,15 @@ import { getDisputeById } from '@/features/disputes/server'
 import { ClaimDisputeButton } from '@/features/disputes/components/ClaimDisputeButton'
 import { ResolveDisputeForm } from '@/features/disputes/components/ResolveDisputeForm'
 import { PostDisputeMessageForm } from '@/features/disputes/components/PostDisputeMessageForm'
+import { cloudinaryThumbnail } from '@/lib/cloudinary/thumbnail'
 import { formatAriary } from '@/lib/format/currency'
 
 export const dynamic = 'force-dynamic'
+
+export const metadata: Metadata = {
+  title: 'Litige — Admin',
+  robots: { index: false, follow: false },
+}
 
 function fmtDate(d: Date | null): string {
   if (!d) return '—'
@@ -216,8 +223,12 @@ function InventoryColumn({
                     /* eslint-disable-next-line @next/next/no-img-element */
                     <img
                       key={url}
-                      src={url}
-                      alt=""
+                      src={cloudinaryThumbnail(url, { width: 96, height: 96 })}
+                      alt={`Photo ${it.roomKey}${it.notes ? ' — ' + it.notes.slice(0, 60) : ''}`}
+                      width={48}
+                      height={48}
+                      loading="lazy"
+                      decoding="async"
                       className="h-12 w-12 rounded object-cover"
                     />
                   ))}

@@ -24,13 +24,16 @@ export const contentType = 'image/png'
 export default async function CityOpenGraphImage({
   params,
 }: {
-  params: { citySlug: string }
+  params: Promise<{ citySlug: string }>
 }) {
-  // Resolve params before any data fetch — Next 16 expects params to
-  // be awaited if Promise-shaped, but image route handlers receive
-  // a synchronous params object.
+  // Next 15+ passes `params` as a Promise on every dynamic segment
+  // including the OG image route handler. Without the await the
+  // citySlug was `undefined` and every city OG card silently fell
+  // through to the "Madagascar" fallback. Audit fix 2026-06-12.
+  const { citySlug } = await params
+
   const city = await prisma.city.findUnique({
-    where: { slug: params.citySlug },
+    where: { slug: citySlug },
     select: {
       nameFr: true,
       _count: {

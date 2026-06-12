@@ -488,6 +488,13 @@ model Listing {
   // their expiration date. Composite covers both the 7d-warning and
   // the auto-expire queries.
   @@index([status, expiresAt])
+  // 2026-06-09 sidebar filters (bedrooms / bathrooms / furnished / type).
+  // Composite (status, X) lets the planner index-scan instead of
+  // seq-scanning all PUBLISHED rows. Audit fix 2026-06-12.
+  @@index([status, type])
+  @@index([status, bedrooms])
+  @@index([status, bathrooms])
+  @@index([status, furnished])
 }
 
 enum ListingType {
@@ -860,7 +867,8 @@ model Lease {
   // E-T27.2 — état des lieux ENTRY + EXIT.
   inventoryItems InventoryItem[]
   // E-T27.3 — caution arbitrage. At most one ACTIVE dispute per lease
-  // is enforced service-side ; we don't add a partial unique because
+  // is enforced by a partial UNIQUE INDEX (migration
+  // 20260612120000) WHERE status IN ('OPEN', 'IN_REVIEW') ;
   // historical resolved disputes can coexist with a new one.
   disputes       Dispute[]
 
@@ -986,6 +994,9 @@ model DisputeMessage {
   author  User    @relation("DisputeMessages", fields: [authorId], references: [id], onDelete: Restrict)
 
   @@index([disputeId, createdAt])
+  // FK coverage — "messages I authored" + cheaper RESTRICT check on
+  // User delete. Audit fix 2026-06-12.
+  @@index([authorId])
 }
 
 // E-T27.2 — état des lieux numérique (2026-06-12)
@@ -1029,9 +1040,9 @@ model InventoryItem {
   uploadedBy User  @relation(fields: [uploadedById], references: [id], onDelete: Restrict)
 
   @@unique([leaseId, phase, roomKey])
-  // Dashboard render scans `WHERE leaseId=? AND phase=?` to assemble
-  // the room list ; the unique above doubles as the index.
-  @@index([leaseId, phase])
+  // FK coverage — "items I uploaded" + cheaper RESTRICT check on
+  // User delete. Audit fix 2026-06-12.
+  @@index([uploadedById])
 }
 
 enum InventoryPhase {

@@ -1,8 +1,17 @@
+import type { Metadata } from 'next'
 import Link from 'next/link'
 import { listDisputesForAdmin } from '@/features/disputes/server'
 import { formatAriary } from '@/lib/format/currency'
 
 export const dynamic = 'force-dynamic'
+
+// Explicit page-level noindex — the admin layout already sets it
+// but we don't want to rely on inheritance for sensitive surfaces
+// (audit fix 2026-06-12).
+export const metadata: Metadata = {
+  title: 'Litiges — Admin',
+  robots: { index: false, follow: false },
+}
 
 const STATUS_BADGE: Record<string, string> = {
   OPEN: 'bg-blue-50 text-blue-800 border-blue-200',

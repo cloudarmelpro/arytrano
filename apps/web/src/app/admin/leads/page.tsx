@@ -1,3 +1,4 @@
+import type { Metadata } from 'next'
 import Link from 'next/link'
 import { auth } from '@/features/auth'
 import {
@@ -9,6 +10,11 @@ import { OperatorShiftBanner } from '@/features/leads/components/OperatorShiftBa
 import { formatAriary } from '@/lib/format/currency'
 
 export const dynamic = 'force-dynamic'
+
+export const metadata: Metadata = {
+  title: 'Leads — Admin',
+  robots: { index: false, follow: false },
+}
 
 const STATUS_BADGE: Record<string, string> = {
   NEW: 'bg-blue-50 text-blue-800 border-blue-200',

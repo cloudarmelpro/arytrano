@@ -6,6 +6,7 @@ import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Field, FieldLabel } from '@/components/ui/field'
 import { Textarea } from '@/components/ui/textarea'
+import { cloudinaryThumbnail } from '@/lib/cloudinary/thumbnail'
 import { upsertInventoryItemAction } from '../actions/upsert-inventory-item'
 import { uploadInventoryPhotoAction } from '../actions/upload-inventory-photo'
 import { deleteInventoryItemAction } from '../actions/delete-inventory-item'
@@ -121,10 +122,18 @@ export function InventoryRoomCard({
       <div className="mt-4 grid grid-cols-3 gap-2 sm:grid-cols-4">
         {photoUrls.map((url) => (
           <div key={url} className="group relative overflow-hidden rounded-md border border-border">
+            {/* Perf audit fix (2026-06-12) — inject a Cloudinary
+                thumbnail transform (~3KB) instead of streaming the
+                original (~300KB) into a 240px tile. `loading="lazy"`
+                + explicit dimensions kill the CLS. */}
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src={url}
-              alt={`${roomLabel} photo`}
+              src={cloudinaryThumbnail(url, { width: 320, height: 320 })}
+              alt={`État ${roomLabel}`}
+              width={320}
+              height={320}
+              loading="lazy"
+              decoding="async"
               className="aspect-square w-full object-cover"
             />
             {!disabled ? (

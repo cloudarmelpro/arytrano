@@ -1,7 +1,13 @@
+import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { auth } from '@/features/auth'
 import { getLeadById } from '@/features/leads/server'
+
+export const metadata: Metadata = {
+  title: 'Lead — Admin',
+  robots: { index: false, follow: false },
+}
 import { ClaimLeadButton } from '@/features/leads/components/ClaimLeadButton'
 import { TransitionLeadForm } from '@/features/leads/components/TransitionLeadForm'
 import { ConvertLeadForm } from '@/features/leads/components/ConvertLeadForm'

@@ -86,13 +86,15 @@ export async function generateMetadata({
   const isPaginated = Boolean(sp.cursor)
   const isFiltered = hasAnyFilter(sp)
   const cityLabel = await getCityLabel(sp.city, locale)
+  const title = cityLabel
+    ? t('annonces.title.city', { city: cityLabel })
+    : t('annonces.title')
+  const description = cityLabel
+    ? t('annonces.metaDescription.city', { city: cityLabel })
+    : t('annonces.metaDescription')
   return {
-    title: cityLabel
-      ? t('annonces.title.city', { city: cityLabel })
-      : t('annonces.title'),
-    description: cityLabel
-      ? t('annonces.metaDescription.city', { city: cityLabel })
-      : t('annonces.metaDescription'),
+    title,
+    description,
     // Consolidate paginated/filtered variants on the canonical landing URL.
     // `localeAlternates` adds the `/mg/annonces` hreflang.
     alternates: await localeAlternates('/annonces'),
@@ -100,6 +102,15 @@ export async function generateMetadata({
     // we want Google's signal consolidated on `/annonces` + the listing detail pages.
     robots:
       isPaginated || isFiltered ? { index: false, follow: true } : undefined,
+    // SEO audit fix (2026-06-12) — without an openGraph block, social
+    // shares of /annonces (incl. ?city=) fell through to the static
+    // brand card. The image inherits from root layout.
+    openGraph: {
+      title,
+      description,
+      url: '/annonces',
+      type: 'website',
+    },
   }
 }
 
