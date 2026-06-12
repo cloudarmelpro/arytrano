@@ -1,7 +1,7 @@
 import 'server-only'
 import { z } from 'zod'
 import { prisma } from '@/lib/db'
-import { calculatePlatformFee } from '@/features/leases/calculate-fees'
+import { calculatePlatformFee } from '@/features/leases'
 import { linkLeadToLease } from './link-lead-to-lease'
 import { writeLeadActivity } from './write-lead-activity'
 

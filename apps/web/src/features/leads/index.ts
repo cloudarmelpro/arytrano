@@ -21,3 +21,9 @@ export {
   type TransitionLeadStatusInput,
   type LinkLeadToLeaseInput,
 } from './schemas'
+
+// Server Actions — usable from Client Components (they're proxied
+// over the wire by Next, no server imports leak). Surfacing them
+// here so cross-feature consumers (e.g. listings InterestLeadCta)
+// stop deep-importing from ./actions/. Audit fix 2026-06-12.
+export { createInterestLeadAction } from './actions/create-interest-lead'

@@ -27,9 +27,11 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { useT } from '@/lib/i18n/client'
-import { createInterestLeadAction } from '@/features/leads/actions/create-interest-lead'
-import { requestPhoneOtpAction } from '@/features/phone-otp/actions/request-phone-otp'
-import { verifyPhoneOtpAction } from '@/features/phone-otp/actions/verify-phone-otp'
+import { createInterestLeadAction } from '@/features/leads'
+import {
+  requestPhoneOtpAction,
+  verifyPhoneOtpAction,
+} from '@/features/phone-otp'
 
 /**
  * E-T28 T-RES-05 + T-002 T-002.5 — public detail page CTA.

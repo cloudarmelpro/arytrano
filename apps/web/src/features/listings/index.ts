@@ -4,6 +4,7 @@ export {
   listingIdSchema,
   listingTypeSchema,
   amenitySchema,
+  parseListingPhotoFile,
   type CreateListingInput,
   type UpdateListingInput,
 } from './schemas'

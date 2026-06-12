@@ -198,6 +198,21 @@ const phoneOtpRequestByIp = makeLimiter('phone-otp-request-ip', {
   window: '1 h',
 })
 
+// Phone OTP verify (audit follow-up 2026-06-12). The request side is
+// already gated above ; the verify side was un-gated and let an
+// attacker burn the 3-attempt cap on a victim's live OTP in <300ms,
+// blocking the victim for an hour on every fresh code (DoS).
+// 30/h/phone covers extreme legitimate carrier mistyping +
+// 100/h/IP for shared NATs.
+const phoneOtpVerifyByPhone = makeLimiter('phone-otp-verify-phone', {
+  requests: 30,
+  window: '1 h',
+})
+const phoneOtpVerifyByIp = makeLimiter('phone-otp-verify-ip', {
+  requests: 100,
+  window: '1 h',
+})
+
 // Review submission (Security audit H-1, 2026-05-29) — 5/h per userId.
 // Reviews go straight to the public listing detail page; without a
 // cap a single signed-in user could spam dozens of 1-star reviews on
@@ -358,5 +373,21 @@ export const rateLimiters = {
     const byPhone = await check(phoneOtpRequestByPhone, phoneHash)
     if (!byPhone.success) return byPhone
     return check(phoneOtpRequestByIp, ipHash ?? 'noip:phone-otp-request')
+  },
+
+  /**
+   * Phone OTP verify — caps how many guesses an attacker can fire
+   * at a victim's live OTP row. The 3-attempts service cap is per
+   * ROW ; without this Redis layer, an attacker can repeatedly
+   * trigger 3-attempt burns until the legitimate user gives up.
+   * Fail-CLOSED on null ipHash.
+   */
+  phoneOtpVerify: async (
+    phoneHash: string,
+    ipHash: string | null,
+  ): Promise<RateLimitResult> => {
+    const byPhone = await check(phoneOtpVerifyByPhone, phoneHash)
+    if (!byPhone.success) return byPhone
+    return check(phoneOtpVerifyByIp, ipHash ?? 'noip:phone-otp-verify')
   },
 }

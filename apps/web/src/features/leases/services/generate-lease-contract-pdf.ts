@@ -6,6 +6,7 @@ import {
   signLeasePdfUrl,
 } from '@/lib/cloudinary/upload-pdf'
 import { renderLeaseContractPdf } from '@/lib/pdf/render-lease-contract'
+import { sanitizePdfText } from '@/lib/pdf/sanitize-text'
 
 /**
  * E-T27.1 — generate the lease-contract PDF, upload to Cloudinary,
@@ -72,18 +73,20 @@ export async function generateLeaseContractPdf(
     leaseId: lease.id,
     refShort,
     owner: {
-      name: lease.owner.name ?? lease.owner.email,
+      name: sanitizePdfText(lease.owner.name ?? lease.owner.email),
       email: lease.owner.email,
       phone: lease.owner.phone,
     },
     tenant: {
-      name: lease.tenant.name ?? lease.tenant.email,
+      name: sanitizePdfText(lease.tenant.name ?? lease.tenant.email),
       email: lease.tenant.email,
       phone: lease.tenant.phone,
     },
     listing: {
-      title: lease.listing.title,
-      address: `${lease.listing.neighborhood.nameFr}, ${lease.listing.city.nameFr}`,
+      title: sanitizePdfText(lease.listing.title),
+      address: sanitizePdfText(
+        `${lease.listing.neighborhood.nameFr}, ${lease.listing.city.nameFr}`,
+      ),
     },
     monthlyRentMGA: lease.monthlyRentMGA,
     cautionMGA: lease.cautionMGA,

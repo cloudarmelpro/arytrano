@@ -15,3 +15,5 @@ export {
   hasRecentlyVerifiedPhone,
   type VerifyPhoneOtpOutcome,
 } from './services/verify-phone-otp'
+
+export { sweepOldPhoneOtps } from './services/sweep-old-phone-otps'

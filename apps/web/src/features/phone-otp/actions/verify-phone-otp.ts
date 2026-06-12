@@ -1,6 +1,10 @@
 'use server'
 
+import { headers } from 'next/headers'
 import { ZodError } from 'zod'
+import { hashPhone } from '@/lib/auth/hash-phone'
+import { extractRequestInfo } from '@/lib/auth/request-info'
+import { rateLimiters } from '@/lib/rate-limit'
 import { verifyPhoneOtpSchema } from '../schemas'
 import { verifyPhoneOtp } from '../services/verify-phone-otp'
 
@@ -25,6 +29,22 @@ export async function verifyPhoneOtpAction(
       return { ok: false, message: err.issues[0]?.message ?? 'Saisie invalide.' }
     }
     throw err
+  }
+
+  // Audit fix 2026-06-12 — rate-limit verify on (phone, ip). Without
+  // this, an attacker who knows a target phone could burn the 3-
+  // attempts row cap in <300ms and lock the victim out for an hour.
+  const h = await headers()
+  const { ipHash } = extractRequestInfo(h)
+  const limited = await rateLimiters.phoneOtpVerify(
+    hashPhone(input.phoneE164),
+    ipHash,
+  )
+  if (!limited.success) {
+    return {
+      ok: false,
+      message: 'Trop d’essais. Réessaie dans une heure.',
+    }
   }
 
   const outcome = await verifyPhoneOtp(input)

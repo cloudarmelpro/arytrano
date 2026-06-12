@@ -13,3 +13,8 @@ export {
   applyLeasePaymentSideEffect,
   type LeaseSideEffectOutcome,
 } from './services/apply-lease-payment-side-effect'
+
+// Pure pricing helper — client-safe (no Prisma, no env). Re-exposed
+// here so cross-feature consumers (e.g. lead conversion) don't deep
+// import from `./calculate-fees`. Audit fix 2026-06-12.
+export { calculatePlatformFee } from './calculate-fees'

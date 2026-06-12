@@ -1,4 +1,5 @@
 import 'server-only'
+import { randomInt } from 'node:crypto'
 import bcrypt from 'bcryptjs'
 import * as Sentry from '@sentry/nextjs'
 import { prisma } from '@/lib/db'
@@ -108,17 +109,9 @@ export async function requestPhoneOtp(
 }
 
 function randomSixDigits(): string {
-  // crypto.randomInt avoids modulo bias. 100_000 inclusive, 1_000_000
-  // exclusive → always 6 digits.
-  const n = Math.floor(
-    Number(
-      (() => {
-        const buf = new Uint32Array(1)
-        // Node 20+ crypto webcrypto API.
-        globalThis.crypto.getRandomValues(buf)
-        return buf[0]!
-      })(),
-    ) % 900_000,
-  )
-  return String(100_000 + n).padStart(6, '0')
+  // node:crypto's randomInt uses rejection sampling — no modulo bias.
+  // The prior implementation took `getRandomValues % 900_000` which
+  // had a sub-percent bias because 2^32 is not a multiple of 900_000.
+  // Audit fix 2026-06-12.
+  return String(randomInt(100_000, 1_000_000))
 }

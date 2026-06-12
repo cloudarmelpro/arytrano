@@ -5,7 +5,7 @@ import { auth } from '@/features/auth'
 import { uploadBuffer } from '@/lib/cloudinary'
 import { sniffImage } from '@/lib/images/sniff'
 import { prisma } from '@/lib/db'
-import { parseListingPhotoFile } from '@/features/listings/schemas'
+import { parseListingPhotoFile } from '@/features/listings'
 
 export type UploadInventoryPhotoActionState = {
   ok: boolean

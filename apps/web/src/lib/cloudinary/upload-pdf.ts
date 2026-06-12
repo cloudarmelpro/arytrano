@@ -76,14 +76,16 @@ export async function uploadLeasePdfBuffer(
 }
 
 /**
- * Re-sign a lease PDF URL for download. TTL 7 days — long enough for
- * a tenant to forget to download immediately but short enough that a
- * leaked link goes stale.
+ * Re-sign a lease PDF URL for download. TTL 1 hour (audit fix
+ * 2026-06-12 — was 7 days, but the PDF contains full names + email
+ * + phone + amounts, so 168h of validity on a leaked URL was too
+ * generous). The download button calls `getLeaseContractPdfUrlAction`
+ * on every click, so 1h is invisible to legit users.
  */
 export function signLeasePdfUrl(publicId: string): string {
   ensureConfigured()
   return cloudinary.utils.private_download_url(publicId, 'pdf', {
     resource_type: 'raw',
-    expires_at: Math.floor(Date.now() / 1000) + 7 * 24 * 60 * 60,
+    expires_at: Math.floor(Date.now() / 1000) + 60 * 60,
   })
 }
