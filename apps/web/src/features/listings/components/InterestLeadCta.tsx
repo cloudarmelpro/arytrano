@@ -1,6 +1,12 @@
 'use client'
 
-import { useActionState, useEffect, useId, useState } from 'react'
+import {
+  startTransition,
+  useActionState,
+  useEffect,
+  useId,
+  useState,
+} from 'react'
 import { useFormStatus } from 'react-dom'
 import { Dialog } from '@base-ui/react/dialog'
 import { Button } from '@/components/ui/button'
@@ -135,7 +141,9 @@ export function InterestLeadCta({
                 fd.set('tenantPhone', draft.tenantPhone)
                 fd.set('moveInWindow', draft.moveInWindow)
                 fd.set('budgetConfirmed', String(draft.budgetConfirmed))
-                leadAction(fd)
+                // React 19 : dispatcher must run inside startTransition
+                // when not bound to a form action.
+                startTransition(() => leadAction(fd))
               }}
             />
           ) : (
@@ -357,13 +365,15 @@ function OtpView({
     } as { ok: boolean; message?: string },
   )
 
-  // Trigger an initial code-request on mount if none has been issued yet.
+  // Trigger an initial code-request on mount if none has been issued
+  // yet. React 19 / Next 16 require useActionState dispatchers to be
+  // wrapped in startTransition when not bound to a <form action>.
   useEffect(() => {
     if (!draft) return
     if (requestState.ok || requestState.message) return
     const fd = new FormData()
     fd.set('phoneE164', draft.tenantPhone)
-    requestAction(fd)
+    startTransition(() => requestAction(fd))
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [draft])
 
@@ -468,7 +478,9 @@ function ResendButton({
         setPending(true)
         const fd = new FormData()
         fd.set('phoneE164', phoneE164)
-        requestAction(fd)
+        // React 19 : dispatcher must run inside startTransition when not
+        // bound to a form action.
+        startTransition(() => requestAction(fd))
         // Re-enable after a small cooldown so the visitor doesn't tap
         // a dozen times in a row.
         setTimeout(() => setPending(false), 3000)
