@@ -430,6 +430,11 @@ export default async function PublicListingDetailPage({
               <InterestLeadCta
                 listingId={listing.id}
                 listingTitle={listing.title}
+                smsConsoleMock={
+                  env.SMS_PROVIDER === 'console' ||
+                  (env.SMS_PROVIDER === undefined &&
+                    env.NODE_ENV !== 'production')
+                }
               />
 
               <ContactButtons

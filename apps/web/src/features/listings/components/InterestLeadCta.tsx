@@ -62,9 +62,17 @@ const LEAD_INITIAL = {
 export function InterestLeadCta({
   listingId,
   listingTitle,
+  smsConsoleMock = false,
 }: {
   listingId: string
   listingTitle: string
+  /**
+   * True when the SMS provider is the dev console mock. Surfaces a
+   * hint banner on the OTP step so the visitor knows where to look
+   * for the code (stdout). Hidden when a real provider (Twilio etc.)
+   * is sending real SMS to the visitor's phone.
+   */
+  smsConsoleMock?: boolean
 }) {
   const t = useT()
   const [open, setOpen] = useState(false)
@@ -130,6 +138,7 @@ export function InterestLeadCta({
             <OtpView
               draft={draft}
               listingTitle={listingTitle}
+              smsConsoleMock={smsConsoleMock}
               onBack={() => setStep('form')}
               onVerified={() => {
                 // Re-submit the lead via the same form action — the
@@ -342,11 +351,13 @@ function LeadForm({
 function OtpView({
   draft,
   listingTitle,
+  smsConsoleMock,
   onBack,
   onVerified,
 }: {
   draft: LeadFormDraft | null
   listingTitle: string
+  smsConsoleMock: boolean
   onBack: () => void
   onVerified: () => void
 }) {
@@ -406,11 +417,14 @@ function OtpView({
         Annonce : {listingTitle}
       </p>
 
-      {/* Dev hint when SMS provider is the console mock. We can't detect
-          it client-side, so it's always shown ; not a leak — info only. */}
-      <p className="mt-3 rounded-md border border-amber-200 bg-amber-50/60 px-3 py-2 text-[11.5px] leading-[1.4] text-amber-900">
-        {t('lead.otp.smsConsole.banner')}
-      </p>
+      {/* Dev hint only when the SMS provider is the console mock —
+          surfaces the "look at stdout for the code" reminder. Hidden
+          when a real provider (Twilio etc.) sends real SMS. */}
+      {smsConsoleMock ? (
+        <p className="mt-3 rounded-md border border-amber-200 bg-amber-50/60 px-3 py-2 text-[11.5px] leading-[1.4] text-amber-900">
+          {t('lead.otp.smsConsole.banner')}
+        </p>
+      ) : null}
 
       <form action={verifyAction} className="mt-5">
         <input type="hidden" name="phoneE164" value={draft.tenantPhone} />
