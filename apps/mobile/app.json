@@ -17,14 +17,28 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "mg.arytrano.app",
-      "associatedDomains": ["applinks:arytrano.mg"]
+      "buildNumber": "1",
+      "associatedDomains": ["applinks:arytrano.mg"],
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSLocationWhenInUseUsageDescription": "AryTrano utilise ta position pour afficher les annonces proches.",
+        "NSPhotoLibraryUsageDescription": "AryTrano accède à tes photos pour illustrer l'état des lieux et tes annonces.",
+        "NSCameraUsageDescription": "AryTrano utilise la caméra pour photographier l'état des lieux et tes annonces.",
+        "CFBundleAllowMixedLocalizations": true,
+        "CFBundleLocalizations": ["fr", "mg"]
+      }
     },
     "android": {
+      "versionCode": 1,
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#191970"
       },
       "package": "mg.arytrano.app",
+      "permissions": [
+        "android.permission.CAMERA",
+        "android.permission.READ_MEDIA_IMAGES"
+      ],
       "intentFilters": [
         {
           "action": "VIEW",
@@ -53,6 +67,19 @@
           "color": "#191970",
           "defaultChannel": "default"
         }
+      ],
+      [
+        "expo-build-properties",
+        {
+          "ios": {
+            "deploymentTarget": "15.1"
+          },
+          "android": {
+            "compileSdkVersion": 35,
+            "targetSdkVersion": 35,
+            "minSdkVersion": 24
+          }
+        }
       ]
     ],
     "experiments": {
@@ -61,7 +88,13 @@
     "extra": {
       "router": {
         "origin": false
+      },
+      "eas": {
+        "projectId": "REPLACE_WITH_EAS_PROJECT_ID"
       }
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
     }
   }
 }

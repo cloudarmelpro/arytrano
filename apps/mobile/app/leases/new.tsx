@@ -106,7 +106,7 @@ export default function NewLeaseScreen() {
           retape « Créer un bail ».
         </Text>
         <View style={{ marginTop: 16 }}>
-          <Button onPress={() => router.back()} label="Retour" />
+          <Button onPress={() => router.back()} title="Retour" />
         </View>
       </SafeAreaView>
     )
@@ -213,7 +213,7 @@ export default function NewLeaseScreen() {
         <View style={{ marginTop: 8, gap: 12 }}>
           <Button
             onPress={() => mutation.mutate()}
-            label={mutation.isPending ? 'Création…' : 'Créer le bail'}
+            title={mutation.isPending ? 'Création…' : 'Créer le bail'}
             disabled={mutation.isPending}
           />
           <Pressable onPress={() => router.back()} disabled={mutation.isPending}>

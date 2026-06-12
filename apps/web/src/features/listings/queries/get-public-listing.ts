@@ -52,6 +52,11 @@ export type PublicListingDetail = {
     nameMg: string
   }
   owner: {
+    /** Stable CUID — exposed to the mobile client so the owner viewing
+     *  their own listing flips the CTA bar to "Créer un bail" instead
+     *  of the visitor contact buttons. CUIDs are not enumerable so the
+     *  privacy footprint of this is essentially zero. */
+    id: string
     /** First name only — privacy: never expose full name or email publicly. */
     displayName: string
     /** Cloudinary URL or null when the owner hasn't uploaded one. */
@@ -111,6 +116,7 @@ export async function getPublicListing(
       },
       owner: {
         select: {
+          id: true,
           name: true,
           image: true,
           phone: true,
@@ -141,6 +147,7 @@ export async function getPublicListing(
   // Privacy: owner name is exposed but trimmed to the first token (first name).
   // If the owner left it null (OAuth signup may not have populated it),
   // fall back to a neutral label.
+  const ownerId = row.owner.id
   const fullName = row.owner.name?.trim() ?? ''
   const displayName = fullName ? fullName.split(/\s+/)[0]! : 'Propriétaire'
 
@@ -176,6 +183,7 @@ export async function getPublicListing(
       nameMg: row.neighborhood.nameMg,
     },
     owner: {
+      id: ownerId,
       displayName,
       image: row.owner.image,
       hasPhone: Boolean(row.owner.phone?.trim()),
@@ -226,6 +234,7 @@ export async function getPublicListingById(
       },
       owner: {
         select: {
+          id: true,
           name: true,
           image: true,
           phone: true,
@@ -251,6 +260,7 @@ export async function getPublicListingById(
 
   const lat = row.lat ?? row.neighborhood.lat ?? row.city.lat
   const lng = row.lng ?? row.neighborhood.lng ?? row.city.lng
+  const ownerId = row.owner.id
   const fullName = row.owner.name?.trim() ?? ''
   const displayName = fullName ? fullName.split(/\s+/)[0]! : 'Propriétaire'
 
@@ -286,6 +296,7 @@ export async function getPublicListingById(
       nameMg: row.neighborhood.nameMg,
     },
     owner: {
+      id: ownerId,
       displayName,
       image: row.owner.image,
       hasPhone: Boolean(row.owner.phone?.trim()),

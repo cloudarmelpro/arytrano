@@ -129,6 +129,7 @@ export const publicListingDetailSchema = z.object({
     nameMg: z.string(),
   }),
   owner: z.object({
+    id: z.string(),
     displayName: z.string(),
     image: z.string().url().nullable(),
     hasPhone: z.boolean(),

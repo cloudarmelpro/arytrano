@@ -15,6 +15,9 @@ web-build/
 *.mobileprovision
 *.orig.*
 
+# EAS submit credentials — Google Play service account key
+play-store-service-account.json
+
 # secrets
 .env
 .env.local
