@@ -2,6 +2,7 @@ import 'server-only'
 import { unstable_cache } from 'next/cache'
 import { prisma } from '@/lib/db'
 import type { PublicListingCardData } from '@/features/listings'
+import { getRatingsForListings } from '@/features/listings/queries/get-ratings-for-listings'
 
 const TOP_LISTINGS_LIMIT = 8
 
@@ -114,6 +115,8 @@ function buildGetCityLandingData() {
         }),
       ])
 
+    const ratings = await getRatingsForListings(topRows.map((l) => l.id))
+
     return {
       city: {
         id: city.id,
@@ -131,19 +134,24 @@ function buildGetCityLandingData() {
         lng: Number(n.lng),
         listingCount: n._count.listings,
       })),
-      topListings: topRows.map((l) => ({
-        id: l.id,
-        slug: l.slug,
-        title: l.title,
-        type: l.type,
-        priceMonthlyMGA: l.priceMonthlyMGA,
-        cautionMonths: l.cautionMonths,
-        publishedAt: l.publishedAt,
-        verifiedAt: l.verifiedAt,
-        city: l.city,
-        neighborhood: l.neighborhood,
-        photo: l.photos[0] ?? null,
-      })),
+      topListings: topRows.map((l) => {
+        const rating = ratings.get(l.id) ?? { avg: null, count: 0 }
+        return {
+          id: l.id,
+          slug: l.slug,
+          title: l.title,
+          type: l.type,
+          priceMonthlyMGA: l.priceMonthlyMGA,
+          cautionMonths: l.cautionMonths,
+          publishedAt: l.publishedAt,
+          verifiedAt: l.verifiedAt,
+          avgRating: rating.avg,
+          reviewCount: rating.count,
+          city: l.city,
+          neighborhood: l.neighborhood,
+          photo: l.photos[0] ?? null,
+        }
+      }),
       stats: {
         totalListings,
         verifiedOwners,

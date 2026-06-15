@@ -30,6 +30,11 @@ export const publicListingCardSchema = z.object({
   priceMonthlyMGA: z.number().int().nonnegative(),
   publishedAt: z.string().datetime().nullable(),
   verifiedAt: z.string().datetime().nullable(),
+  // Aggregated review rating (2026-06-15). Both fields are tolerated
+  // as missing for backwards-compat with older API revisions —
+  // mobile clients on the previous contract still parse fine.
+  avgRating: z.number().min(0).max(5).nullable().optional(),
+  reviewCount: z.number().int().nonnegative().optional(),
   city: z.object({
     slug: z.string(),
     nameFr: z.string(),

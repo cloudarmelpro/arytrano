@@ -5,6 +5,7 @@ import { prisma } from '@/lib/db'
 import { escapeLike } from '@/lib/db/like-escape'
 import { cloudinaryCardThumb } from '@/lib/images/cloudinary-transform'
 import { amenitySchema } from '../schemas/create-listing'
+import { getRatingsForListings } from './get-ratings-for-listings'
 
 /**
  * Public listing list — `/annonces` (T-012).
@@ -119,6 +120,10 @@ export type PublicListingCard = {
   publishedAt: Date | null
   /** Truthy when an admin has marked the listing as verified (T-033). */
   verifiedAt: Date | null
+  /** Average rating over PUBLISHED reviews. Null when there are 0. */
+  avgRating: number | null
+  /** Number of PUBLISHED reviews (used to show "(12 avis)"). */
+  reviewCount: number
   city: { slug: string; nameFr: string; nameMg: string }
   neighborhood: { slug: string; nameFr: string; nameMg: string }
   photo: {
@@ -248,6 +253,11 @@ export async function listPublicListings(
   const lastItem = items[items.length - 1]
   const nextCursor = hasMore && lastItem ? lastItem.id : null
 
+  // 2026-06-15 — one extra round-trip to aggregate review ratings for
+  // the current page. Shared helper, used by every query that builds
+  // PublicListingCard so the rating appears consistently.
+  const ratingsByListing = await getRatingsForListings(items.map((i) => i.id))
+
   return {
     items: items.map((r) => {
       // Performance audit H-2 (2026-05-29) — rewrite the upload URL to
@@ -259,6 +269,7 @@ export async function listPublicListings(
       const photo = rawPhoto
         ? { ...rawPhoto, url: cloudinaryCardThumb(rawPhoto.url) }
         : null
+      const rating = ratingsByListing.get(r.id) ?? { avg: null, count: 0 }
       return {
         id: r.id,
         slug: r.slug,
@@ -268,6 +279,8 @@ export async function listPublicListings(
         cautionMonths: r.cautionMonths,
         publishedAt: r.publishedAt,
         verifiedAt: r.verifiedAt,
+        avgRating: rating.avg,
+        reviewCount: rating.count,
         city: r.city,
         neighborhood: r.neighborhood,
         photo,

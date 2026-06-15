@@ -2,6 +2,7 @@ import 'server-only'
 import { prisma } from '@/lib/db'
 import { cloudinaryCardThumb } from '@/lib/images/cloudinary-transform'
 import type { PublicListingCard } from './list-public-listings'
+import { getRatingsForListings } from './get-ratings-for-listings'
 
 /**
  * Related listings shown at the bottom of a detail page.
@@ -63,6 +64,8 @@ export async function listRelatedListings(input: {
     },
   })
 
+  const ratings = await getRatingsForListings(rows.map((r) => r.id))
+
   return rows.map((r) => {
     // Performance audit H-2 round 2 (2026-06-08) — apply the same
     // 800×600 WebP q_75 transform that `list-public-listings` uses
@@ -73,6 +76,7 @@ export async function listRelatedListings(input: {
     const photo = rawPhoto
       ? { ...rawPhoto, url: cloudinaryCardThumb(rawPhoto.url) }
       : null
+    const rating = ratings.get(r.id) ?? { avg: null, count: 0 }
     return {
       id: r.id,
       slug: r.slug,
@@ -82,6 +86,8 @@ export async function listRelatedListings(input: {
       cautionMonths: r.cautionMonths,
       publishedAt: r.publishedAt,
       verifiedAt: r.verifiedAt,
+      avgRating: rating.avg,
+      reviewCount: rating.count,
       city: r.city,
       neighborhood: r.neighborhood,
       photo,

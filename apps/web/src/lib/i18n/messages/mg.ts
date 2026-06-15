@@ -536,6 +536,8 @@ export const mg: Record<MessageKey, string> = {
   'card.caution': 'Antoka : {count} volana ({amount})',
   'card.caution.half': 'Antoka : antsasaky ny volana ({amount})',
   'card.noPhoto': 'Tsy misy sary',
+  'card.new': 'Vaovao',
+  'card.rating.aria': 'Naoty {rating} amin\'ny 5 ({count} hevitra)',
 
   // Detail page
   'detail.breadcrumb.listings': 'Trano hofaina',

@@ -1,6 +1,7 @@
 import 'server-only'
 import { prisma } from '@/lib/db'
 import type { PublicListingCardData } from '@/features/listings'
+import { getRatingsForListings } from '@/features/listings/queries/get-ratings-for-listings'
 
 const PAGE_SIZE = 20
 
@@ -73,20 +74,27 @@ export async function listUserFavorites(
   const lastRow = sliced[sliced.length - 1]
   const nextCursor = hasMore && lastRow ? lastRow.listingId : null
 
+  const ratings = await getRatingsForListings(sliced.map((r) => r.listing.id))
+
   return {
-    items: sliced.map((r) => ({
-      id: r.listing.id,
-      slug: r.listing.slug,
-      title: r.listing.title,
-      type: r.listing.type,
-      priceMonthlyMGA: r.listing.priceMonthlyMGA,
-      cautionMonths: r.listing.cautionMonths,
-      publishedAt: r.listing.publishedAt,
-      verifiedAt: r.listing.verifiedAt,
-      city: r.listing.city,
-      neighborhood: r.listing.neighborhood,
-      photo: r.listing.photos[0] ?? null,
-    })),
+    items: sliced.map((r) => {
+      const rating = ratings.get(r.listing.id) ?? { avg: null, count: 0 }
+      return {
+        id: r.listing.id,
+        slug: r.listing.slug,
+        title: r.listing.title,
+        type: r.listing.type,
+        priceMonthlyMGA: r.listing.priceMonthlyMGA,
+        cautionMonths: r.listing.cautionMonths,
+        publishedAt: r.listing.publishedAt,
+        verifiedAt: r.listing.verifiedAt,
+        avgRating: rating.avg,
+        reviewCount: rating.count,
+        city: r.listing.city,
+        neighborhood: r.listing.neighborhood,
+        photo: r.listing.photos[0] ?? null,
+      }
+    }),
     nextCursor,
     hasMore,
   }

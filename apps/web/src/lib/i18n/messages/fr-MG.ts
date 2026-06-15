@@ -534,6 +534,8 @@ export const frMG = {
   'card.caution': 'Caution : {count} mois ({amount})',
   'card.caution.half': 'Caution : ½ mois ({amount})',
   'card.noPhoto': 'Pas de photo',
+  'card.new': 'Nouveau',
+  'card.rating.aria': 'Noté {rating} sur 5 ({count} avis)',
 
   // Detail page
   'detail.breadcrumb.listings': 'Annonces',
@@ -767,7 +769,7 @@ export const frMG = {
   'landing.neighborhoods.title': 'Quartiers de Fianarantsoa',
   'landing.neighborhoods.lead':
     'Du centre animé aux hauteurs calmes — 8 quartiers couverts.',
-  'landing.neighborhoods.viewAll': 'Voir toutes les annonces →',
+  'landing.neighborhoods.viewAll': 'Voir toutes les annonces',
   'landing.neighborhoods.count.one': '{count} annonce',
   'landing.neighborhoods.count.other': '{count} annonces',
   'landing.neighborhoods.soon': 'Bientôt',
