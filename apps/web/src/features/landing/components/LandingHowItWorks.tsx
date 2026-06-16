@@ -15,16 +15,16 @@ const STEPS: Array<{
 export function LandingHowItWorks({ locale }: { locale: Locale }) {
   const t = getT(locale)
   return (
-    <section className="bg-[oklch(0.16_0.025_281)] py-20 text-white lg:py-24">
+    <section className="bg-white py-20 text-foreground lg:py-24">
       <div className="mx-auto grid max-w-[1280px] items-start gap-16 px-6 lg:grid-cols-[1fr_2fr] lg:px-10 max-lg:gap-10">
         <div>
-          <span className="text-[12px] font-semibold uppercase tracking-[0.14em] text-[oklch(0.85_0.06_277)]">
+          <span className="text-[12px] font-semibold uppercase tracking-[0.14em] text-primary">
             {t('landing.how.eyebrow' as MessageKey)}
           </span>
-          <h2 className="mt-3.5 mb-4 font-serif text-[clamp(32px,3.4vw,44px)] font-normal leading-[1.05] tracking-[-0.025em]">
+          <h2 className="mt-3.5 mb-4 text-[clamp(32px,3.4vw,44px)] font-normal leading-[1.05] tracking-[-0.025em] text-foreground">
             {t('landing.how.title')}
           </h2>
-          <p className="max-w-[360px] text-[15.5px] leading-[1.55] text-[oklch(0.78_0.015_277)]">
+          <p className="max-w-[360px] text-[15.5px] leading-[1.55] text-foreground/65">
             {t('landing.how.lead')}
           </p>
         </div>
@@ -32,16 +32,16 @@ export function LandingHowItWorks({ locale }: { locale: Locale }) {
           {STEPS.map((s) => (
             <li
               key={s.n}
-              className="grid grid-cols-[64px_1fr] gap-6 border-t border-[oklch(0.28_0.02_277)] py-6 first:border-t-0 first:pt-0 max-sm:grid-cols-[44px_1fr] max-sm:gap-4"
+              className="grid grid-cols-[64px_1fr] gap-6 border-t border-border/70 py-6 first:border-t-0 first:pt-0 max-sm:grid-cols-[44px_1fr] max-sm:gap-4"
             >
-              <div className="pt-1 font-mono text-[14px] font-semibold tracking-[0.04em] text-[oklch(0.85_0.06_277)]">
+              <div className="pt-1 font-mono text-[14px] font-semibold tracking-[0.04em] text-primary/80">
                 {s.n}
               </div>
               <div>
-                <h3 className="text-[22px] font-bold tracking-[-0.015em] text-white">
+                <h3 className="text-[22px] font-bold tracking-[-0.015em] text-foreground">
                   {t(s.title)}
                 </h3>
-                <p className="mt-1.5 max-w-[540px] text-[14.5px] leading-[1.55] text-[oklch(0.78_0.015_277)]">
+                <p className="mt-1.5 max-w-[540px] text-[14.5px] leading-[1.55] text-foreground/65">
                   {t(s.body)}
                 </p>
               </div>
