@@ -7,7 +7,6 @@ import {
   LandingHowItWorks,
   LandingNeighborhoods,
   LandingFeatured,
-  LandingStudents,
   LandingFaq,
   LandingFinalCta,
   type CityOption,
@@ -106,7 +105,6 @@ export default async function HomePage() {
       <div id="how-it-works">
         <LandingHowItWorks locale={locale} />
       </div>
-      <LandingStudents locale={locale} />
       <div id="faq">
         <LandingFaq locale={locale} />
       </div>

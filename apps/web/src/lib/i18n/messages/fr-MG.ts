@@ -910,35 +910,6 @@ export const frMG = {
   // Landing v3 (design-driven additions)
   'landing.neighborhoods.eyebrow': 'Quartiers',
   'landing.how.eyebrow': 'Comment ça marche',
-  'landing.students.eyebrow': 'Pour les étudiants',
-  'landing.students.title': 'Pensé pour ta réalité, pas une banque européenne.',
-  'landing.students.lead':
-    'Pas de conversion EUR→Ar bidon. Pas de friction 5G-only. Pas d’app de 60 Mo à télécharger. AryTrano est conçu à Fianarantsoa, pour Fianarantsoa.',
-  'landing.students.s1.stat': '< 200',
-  'landing.students.s1.statSub': 'ko / page',
-  'landing.students.s1.title': 'Léger comme une plume',
-  'landing.students.s1.desc':
-    'Pages compressées, photos optimisées, vraiment utilisable même sur réseau lent.',
-  'landing.students.s1.highlight': 'Marche même en 3G',
-  'landing.students.s2.stat': '100%',
-  'landing.students.s2.statSub': 'en Ariary',
-  'landing.students.s2.title': 'Tout en Ariary',
-  'landing.students.s2.desc':
-    'Prix nets, sans conversion fantaisiste. Tu lis le montant, tu paies le montant.',
-  'landing.students.s2.highlight': 'Pas de conversion bidon',
-  'landing.students.s3.stat': '0',
-  'landing.students.s3.statSub': 'app à installer',
-  'landing.students.s3.title': 'WhatsApp natif',
-  'landing.students.s3.desc':
-    'Contact propriétaire d’un clic. Pas de chat propriétaire à installer.',
-  'landing.students.s3.highlight': 'Direct sur ton WhatsApp',
-  'landing.students.s4.stat': 'FR·MG',
-  'landing.students.s4.statSub': 'bilingue natif',
-  'landing.students.s4.title': 'Français · Malagasy',
-  'landing.students.s4.desc':
-    'Bascule le site en français ou en malagasy en 1 clic. Aucune perte de contexte.',
-  'landing.students.s4.highlight': 'Au choix, à tout moment',
-
   'landing.faq.eyebrow': 'Questions fréquentes',
   'landing.faq.contact.title': 'Pose ta question',
   'landing.faq.contact.sub': 'Réponse en moins de 24h',

@@ -910,36 +910,6 @@ export const mg: Record<MessageKey, string> = {
   // Landing v3
   'landing.neighborhoods.eyebrow': 'Faritra',
   'landing.how.eyebrow': 'Ahoana ny fomba',
-  'landing.students.eyebrow': 'Ho an’ny mpianatra',
-  'landing.students.title':
-    'Natao ho an’ny zava-misy aminao, tsy ho an’ny banky eorôpeanina.',
-  'landing.students.lead':
-    'Tsy misy fanovàna EUR→Ar. Tsy mila 5G. Tsy mila application 60 Mo. AryTrano namboarina any Fianarantsoa, ho an’i Fianarantsoa.',
-  'landing.students.s1.stat': '< 200',
-  'landing.students.s1.statSub': 'ko / pejy',
-  'landing.students.s1.title': 'Malaky sy maivana',
-  'landing.students.s1.desc':
-    'Pejy voakomprema, sary nohatsaraina, mety hampiasaina amin’ny tambajotra malemy.',
-  'landing.students.s1.highlight': 'Mandeha amin’ny 3G',
-  'landing.students.s2.stat': '100%',
-  'landing.students.s2.statSub': 'amin’ny Ariary',
-  'landing.students.s2.title': 'Daholo amin’ny Ariary',
-  'landing.students.s2.desc':
-    'Vidiny mazava, tsy misy fanovàna. Vakianao ny totaly, aloanao ny totaly.',
-  'landing.students.s2.highlight': 'Tsy misy fanovàna',
-  'landing.students.s3.stat': '0',
-  'landing.students.s3.statSub': 'app hapetraka',
-  'landing.students.s3.title': 'WhatsApp mivantana',
-  'landing.students.s3.desc':
-    'Mifandray amin’ny tompon-trano amin’ny tsindrina iray. Tsy misy chat hapetraka.',
-  'landing.students.s3.highlight': 'Mivantana amin’ny WhatsApp',
-  'landing.students.s4.stat': 'FR·MG',
-  'landing.students.s4.statSub': 'roa fiteny voajanahary',
-  'landing.students.s4.title': 'Frantsay · Malagasy',
-  'landing.students.s4.desc':
-    'Hovay ny fiteny amin’ny tsindrina iray. Tsy very hevitra.',
-  'landing.students.s4.highlight': 'Safidio, na oviana na oviana',
-
   'landing.faq.eyebrow': 'Fanontaniana mahazatra',
   'landing.faq.contact.title': 'Apetraho ny fanontanianao',
   'landing.faq.contact.sub': 'Valiny latsaky ny 24h',
