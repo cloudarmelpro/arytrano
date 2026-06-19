@@ -176,7 +176,11 @@ export default async function PublicListingDetailPage({
         dangerouslySetInnerHTML={{ __html: safeJsonLd(breadcrumbLd) }}
       />
 
-      <div className="mx-auto max-w-6xl px-4 py-6 sm:py-8">
+      {/* Aligned with the landing sections + global Footer
+          (max-w-[1280px] px-6 lg:px-10) so the content edge stays
+          stable when a visitor scrolls between the listing detail,
+          home, and footer. */}
+      <div className="mx-auto max-w-[1280px] px-6 py-6 lg:px-10 sm:py-8">
         {/* Breadcrumb — every step except the current page is a link
             so visitors can climb back up to the city or quartier
             landing pages (E-T11 internal linking). */}
@@ -413,7 +417,7 @@ export default async function PublicListingDetailPage({
 
           {/* Sticky price + contact aside */}
           <aside className="lg:sticky lg:top-6 lg:self-start">
-            <div className="flex flex-col gap-5 rounded-xl border border-border bg-card p-6">
+            <div className="flex flex-col gap-2 rounded-xl border border-border bg-card p-6">
               <div>
                 <p className="font-mono text-3xl font-semibold text-foreground">
                   {formatAriary(listing.priceMonthlyMGA)}
