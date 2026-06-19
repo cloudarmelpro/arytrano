@@ -22,10 +22,6 @@ export {
   type QuartierSampleListing,
 } from './queries/get-quartiers-data'
 export {
-  getFeaturedOwnerTestimonial,
-  type FeaturedTestimonial,
-} from './queries/get-featured-owner-testimonial'
-export {
   listCitiesWithCounts,
   type CityWithCount,
 } from './queries/list-cities-with-counts'

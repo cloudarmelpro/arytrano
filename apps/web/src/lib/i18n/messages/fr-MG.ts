@@ -824,18 +824,6 @@ export const frMG = {
   'landing.how.step3.body':
     'Tu visites en personne, tu négocies direct, tu signes ton contrat. Aucune commission AryTrano.',
 
-  // Owner block — 4 bullets, 2 CTAs
-  'landing.ownerBlock.eyebrow': 'Tu es propriétaire ?',
-  'landing.ownerBlock.title':
-    'Loue plus vite. Sans frais. Sans faux locataires.',
-  'landing.ownerBlock.lead':
-    'Publie ton annonce en 5 minutes, reçois des demandes d’étudiants vérifiés, gère tes messages WhatsApp depuis ton dashboard.',
-  'landing.ownerBlock.bullet1': 'Annonce 100% gratuite, à vie',
-  'landing.ownerBlock.bullet2': 'Vérification d’identité étudiante incluse',
-  'landing.ownerBlock.bullet3': 'Réponds en WhatsApp depuis le dashboard',
-  'landing.ownerBlock.bullet4': 'Stats de vues et favoris en temps réel',
-  'landing.ownerBlock.cta': 'Publier une annonce',
-  'landing.ownerBlock.ctaSecondary': 'Voir un exemple',
 
   // Testimonials (placeholder data — to replace once we ship real ones)
   'landing.testimonials.title': 'Ils nous font confiance',
@@ -950,31 +938,6 @@ export const frMG = {
   'landing.students.s4.desc':
     'Bascule le site en français ou en malagasy en 1 clic. Aucune perte de contexte.',
   'landing.students.s4.highlight': 'Au choix, à tout moment',
-
-  'landing.ownerBlock.stat1.n': '0',
-  'landing.ownerBlock.stat1.sub': 'Ar commission',
-  'landing.ownerBlock.stat2.n': '5',
-  'landing.ownerBlock.stat2.sub': 'min pour publier',
-  'landing.ownerBlock.stat3.n': '24-48h',
-  'landing.ownerBlock.stat3.sub': 'validation',
-  'landing.ownerBlock.stat4.sub': 'proprios vérifiés',
-  'landing.ownerBlock.dashboard.previewBadge': 'Aperçu',
-  'landing.ownerBlock.dashboard.notif.title': 'Nouveau message WhatsApp',
-  'landing.ownerBlock.dashboard.notif.sub': 'de Hery · il y a 3 min',
-  'landing.ownerBlock.dashboard.author': 'Mme Rasoa',
-  'landing.ownerBlock.dashboard.role': 'Dashboard propriétaire',
-  'landing.ownerBlock.dashboard.verified': 'Vérifiée',
-  'landing.ownerBlock.dashboard.thisWeek': 'Cette semaine',
-  'landing.ownerBlock.dashboard.views': 'vues',
-  'landing.ownerBlock.dashboard.contacts': 'contacts',
-  'landing.ownerBlock.dashboard.favorites': 'favoris',
-  'landing.ownerBlock.dashboard.active': 'Active',
-  'landing.ownerBlock.dashboard.l1.title': 'Studio meublé · Andrainjato',
-  'landing.ownerBlock.dashboard.l1.price': '220k Ar',
-  'landing.ownerBlock.dashboard.l2.title': 'Chambre · Antarandolo',
-  'landing.ownerBlock.dashboard.l2.price': '140k Ar',
-  'landing.ownerBlock.dashboard.l3.title': 'T1 · Anjoma',
-  'landing.ownerBlock.dashboard.l3.price': '320k Ar',
 
   'landing.faq.eyebrow': 'Questions fréquentes',
   'landing.faq.contact.title': 'Pose ta question',

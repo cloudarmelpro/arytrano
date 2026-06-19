@@ -822,21 +822,6 @@ export const mg: Record<MessageKey, string> = {
   'landing.how.step3.body':
     'Tsidiho mivantana, ifampiraharaha, manao sonia ny fifanarahana. Tsy misy commission AryTrano.',
 
-  // Owner block
-  'landing.ownerBlock.eyebrow': 'Tompon-trano ve ianao?',
-  'landing.ownerBlock.title':
-    'Lavo haingana kokoa. Tsy misy sarany. Tsy misy mpanofa sandoka.',
-  'landing.ownerBlock.lead':
-    'Apetraho ny dokanao anatin\'ny 5 minitra, mahaza fangatahana avy amin\'ny mpianatra voamarina, tantano ny WhatsApp avy amin\'ny dashboard.',
-  'landing.ownerBlock.bullet1': 'Doka maimaim-poana 100%, mandritra ny fotoana',
-  'landing.ownerBlock.bullet2':
-    'Fanamarinana maha-mpianatra tafiditra ao',
-  'landing.ownerBlock.bullet3':
-    'Mamaly amin\'ny WhatsApp avy amin\'ny dashboard',
-  'landing.ownerBlock.bullet4':
-    'Stats fijerena sy tiana amin\'ny fotoana hahitanao',
-  'landing.ownerBlock.cta': 'Hapetraka doka',
-  'landing.ownerBlock.ctaSecondary': 'Hijery ohatra',
 
   // Testimonials
   'landing.testimonials.title': 'Manantena anay izy ireo',
@@ -954,31 +939,6 @@ export const mg: Record<MessageKey, string> = {
   'landing.students.s4.desc':
     'Hovay ny fiteny amin’ny tsindrina iray. Tsy very hevitra.',
   'landing.students.s4.highlight': 'Safidio, na oviana na oviana',
-
-  'landing.ownerBlock.stat1.n': '0',
-  'landing.ownerBlock.stat1.sub': 'Ar saran-jadona',
-  'landing.ownerBlock.stat2.n': '5',
-  'landing.ownerBlock.stat2.sub': 'mn hampoizina',
-  'landing.ownerBlock.stat3.n': '24-48h',
-  'landing.ownerBlock.stat3.sub': 'fanamarinana',
-  'landing.ownerBlock.stat4.sub': 'tompon-trano voamarina',
-  'landing.ownerBlock.dashboard.previewBadge': 'Sary an-tsaina',
-  'landing.ownerBlock.dashboard.notif.title': 'Hafatra WhatsApp vaovao',
-  'landing.ownerBlock.dashboard.notif.sub': 'avy amin’i Hery · 3 mn lasa',
-  'landing.ownerBlock.dashboard.author': 'Rmme Rasoa',
-  'landing.ownerBlock.dashboard.role': 'Dashboard tompon-trano',
-  'landing.ownerBlock.dashboard.verified': 'Voamarina',
-  'landing.ownerBlock.dashboard.thisWeek': 'Amin’ity herinandro ity',
-  'landing.ownerBlock.dashboard.views': 'fijery',
-  'landing.ownerBlock.dashboard.contacts': 'fifandraisana',
-  'landing.ownerBlock.dashboard.favorites': 'tiana',
-  'landing.ownerBlock.dashboard.active': 'Mavitrika',
-  'landing.ownerBlock.dashboard.l1.title': 'Studio · Andrainjato',
-  'landing.ownerBlock.dashboard.l1.price': '220k Ar',
-  'landing.ownerBlock.dashboard.l2.title': 'Efitra · Antarandolo',
-  'landing.ownerBlock.dashboard.l2.price': '140k Ar',
-  'landing.ownerBlock.dashboard.l3.title': 'T1 · Anjoma',
-  'landing.ownerBlock.dashboard.l3.price': '320k Ar',
 
   'landing.faq.eyebrow': 'Fanontaniana mahazatra',
   'landing.faq.contact.title': 'Apetraho ny fanontanianao',

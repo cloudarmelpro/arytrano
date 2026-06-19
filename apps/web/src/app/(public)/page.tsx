@@ -8,7 +8,6 @@ import {
   LandingNeighborhoods,
   LandingFeatured,
   LandingStudents,
-  LandingOwnerBlock,
   LandingFaq,
   LandingFinalCta,
   type CityOption,
@@ -16,7 +15,6 @@ import {
 import {
   getLandingStats,
   listNeighborhoodsWithCounts,
-  getFeaturedOwnerTestimonial,
 } from '@/features/landing/server'
 import { listPublicListings } from '@/features/listings/server'
 import { getFavoritedListingIds } from '@/features/favorites/server'
@@ -50,7 +48,6 @@ export default async function HomePage() {
     stats,
     neighborhoodsRows,
     featured,
-    ownerTestimonial,
   ] = await Promise.all([
     auth(),
     getLocale(),
@@ -61,7 +58,6 @@ export default async function HomePage() {
     // PUBLISHED-only. We just cap at 6 for the landing's "Featured"
     // rail; pagination is irrelevant here.
     listPublicListings({}),
-    getFeaturedOwnerTestimonial(),
   ])
 
   const featuredItems = featured.items.slice(0, FEATURED_LIMIT)
@@ -111,14 +107,6 @@ export default async function HomePage() {
         <LandingHowItWorks locale={locale} />
       </div>
       <LandingStudents locale={locale} />
-      <div id="owner">
-        <LandingOwnerBlock
-          locale={locale}
-          role={session?.user?.role ?? null}
-          verifiedOwners={stats.verifiedOwners}
-          testimonial={ownerTestimonial}
-        />
-      </div>
       <div id="faq">
         <LandingFaq locale={locale} />
       </div>

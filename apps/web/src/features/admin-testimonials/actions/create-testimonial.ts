@@ -17,8 +17,8 @@ type ActionResult = {
  * Admin-only Server Action that creates a Testimonial.
  *
  * Auth path : `requireAdmin()` re-reads role from DB (no JWT trust).
- * On success : revalidate the admin list page + the landing-testimonials
- * tag so `getFeaturedOwnerTestimonial` picks up new published rows.
+ * On success : revalidate the admin list page + the `landing-testimonials`
+ * cache tag (kept for any future surface that consumes it).
  * Then redirect to `/admin/testimonials` so the admin sees the result.
  */
 export async function createTestimonialAction(
