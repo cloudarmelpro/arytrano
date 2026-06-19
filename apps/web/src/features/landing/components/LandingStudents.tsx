@@ -80,39 +80,44 @@ export function LandingStudents({ locale }: { locale: Locale }) {
           {CARDS.map((c) => (
             <li
               key={c.title}
-              className="group relative flex flex-col rounded-2xl border border-border bg-background p-5 transition-all duration-200 hover:border-primary/40 hover:shadow-[0_8px_24px_-12px_rgba(25,25,112,0.22)]"
+              className="group relative flex flex-col overflow-hidden rounded-2xl border border-border bg-background p-6 pl-7 transition-all duration-200 hover:border-primary/40 hover:shadow-[0_10px_28px_-14px_rgba(25,25,112,0.25)]"
             >
-              {/* Stat block — number anchors the eye, icon balances */}
-              <div className="mb-6 flex items-start justify-between gap-3">
-                <div className="flex min-w-0 flex-col">
-                  <span className="font-mono text-[38px] font-bold leading-none tabular-nums tracking-[-0.035em] text-primary">
-                    {t(c.stat)}
-                  </span>
-                  <span className="mt-1.5 text-[11.5px] font-semibold uppercase tracking-[0.08em] text-foreground/55">
-                    {t(c.statSub)}
-                  </span>
-                </div>
-                <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary ring-1 ring-primary/15 transition-colors duration-200 group-hover:bg-primary/15">
+              {/* Vertical primary accent — editorial signal, gives the
+                  card a clear "feature highlight" identity without
+                  needing a heavy colored background. */}
+              <span
+                aria-hidden
+                className="absolute left-0 top-6 bottom-6 w-[3px] rounded-r-full bg-primary/70 transition-all duration-200 group-hover:bg-primary group-hover:top-4 group-hover:bottom-4"
+              />
+
+              {/* Top row : icon chip (left) + highlight feature pill (right) */}
+              <div className="mb-5 flex items-start justify-between gap-3">
+                <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/8 text-primary ring-1 ring-primary/15 transition-colors duration-200 group-hover:bg-primary group-hover:text-primary-foreground group-hover:ring-primary">
                   <Icon name={c.icon} size={20} />
                 </span>
+                <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-1 text-[10.5px] font-semibold uppercase tracking-[0.06em] text-emerald-700 ring-1 ring-emerald-200">
+                  <Icon name="check" size={10} />
+                  <span className="line-clamp-1">{t(c.highlight)}</span>
+                </span>
               </div>
 
-              <h3 className="m-0 text-[17.5px] font-bold leading-[1.3] tracking-[-0.01em] text-foreground">
+              {/* Stat as eyebrow metric : compact 28px instead of 38px so
+                  the title becomes the primary reading anchor. */}
+              <div className="mb-3 flex items-baseline gap-1.5">
+                <span className="font-mono text-[28px] font-bold leading-none tabular-nums tracking-[-0.025em] text-foreground">
+                  {t(c.stat)}
+                </span>
+                <span className="text-[11.5px] font-semibold uppercase tracking-[0.08em] text-foreground/55">
+                  {t(c.statSub)}
+                </span>
+              </div>
+
+              <h3 className="text-[18px] font-bold leading-[1.3] tracking-[-0.015em] text-foreground">
                 {t(c.title)}
               </h3>
-              <p className="mb-4 mt-2 flex-1 text-[13.5px] leading-[1.55] text-foreground/65">
+              <p className="mt-2 text-[13.5px] leading-[1.6] text-foreground/65">
                 {t(c.desc)}
               </p>
-
-              {/* Highlight strip — separator + check + brand-tone text */}
-              <div className="flex items-center gap-2 border-t border-border/70 pt-3.5 text-[12px] font-semibold text-foreground">
-                <span className="inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-emerald-700">
-                  <Icon name="check" size={11} />
-                </span>
-                <span className="line-clamp-2 text-foreground/75">
-                  {t(c.highlight)}
-                </span>
-              </div>
             </li>
           ))}
         </ul>
