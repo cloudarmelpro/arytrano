@@ -76,50 +76,68 @@ export function LandingStudents({ locale }: { locale: Locale }) {
           </p>
         </header>
 
-        <ul className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          {CARDS.map((c) => (
-            <li
-              key={c.title}
-              className="group relative flex flex-col overflow-hidden rounded-2xl border border-border bg-background p-6 pl-7 transition-all duration-200 hover:border-primary/40 hover:shadow-[0_10px_28px_-14px_rgba(25,25,112,0.25)]"
-            >
-              {/* Vertical primary accent — editorial signal, gives the
-                  card a clear "feature highlight" identity without
-                  needing a heavy colored background. */}
-              <span
-                aria-hidden
-                className="absolute left-0 top-6 bottom-6 w-[3px] rounded-r-full bg-primary/70 transition-all duration-200 group-hover:bg-primary group-hover:top-4 group-hover:bottom-4"
-              />
+        <ul className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
+          {CARDS.map((c, idx) => {
+            const num = String(idx + 1).padStart(2, '0')
+            return (
+              <li
+                key={c.title}
+                className="group relative isolate flex flex-col overflow-hidden rounded-2xl bg-background p-6 shadow-[0_1px_2px_rgba(16,18,40,0.04),0_8px_28px_-16px_rgba(16,18,40,0.12)] ring-1 ring-border/60 transition-all duration-300 hover:shadow-[0_2px_4px_rgba(16,18,40,0.05),0_18px_40px_-18px_rgba(25,25,112,0.28)] hover:ring-primary/30"
+              >
+                {/* Ghost monogram numéro 01..04 — éditorial, donne un
+                    rythme visuel à travers les 4 cartes. Très subtil
+                    (text-primary/8) pour ne pas dominer le contenu. */}
+                <span
+                  aria-hidden
+                  className="pointer-events-none absolute -right-2 -top-3 select-none font-mono text-[88px] font-black leading-none tracking-[-0.06em] text-primary/[0.06] transition-colors duration-300 group-hover:text-primary/[0.1]"
+                >
+                  {num}
+                </span>
 
-              {/* Top row : icon chip (left) + highlight feature pill (right) */}
-              <div className="mb-5 flex items-start justify-between gap-3">
-                <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/8 text-primary ring-1 ring-primary/15 transition-colors duration-200 group-hover:bg-primary group-hover:text-primary-foreground group-hover:ring-primary">
-                  <Icon name={c.icon} size={20} />
+                {/* Icon chip : devient plein sur hover (moment de
+                    personnalité). pas de scale → pas de layout shift. */}
+                <span className="relative z-10 mb-7 inline-flex h-11 w-11 items-center justify-center rounded-xl bg-primary/[0.08] text-primary ring-1 ring-primary/15 transition-colors duration-300 group-hover:bg-primary group-hover:text-primary-foreground group-hover:ring-primary">
+                  <Icon name={c.icon} size={22} />
                 </span>
-                <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-1 text-[10.5px] font-semibold uppercase tracking-[0.06em] text-emerald-700 ring-1 ring-emerald-200">
-                  <Icon name="check" size={10} />
-                  <span className="line-clamp-1">{t(c.highlight)}</span>
-                </span>
-              </div>
 
-              {/* Stat as eyebrow metric : compact 28px instead of 38px so
-                  the title becomes the primary reading anchor. */}
-              <div className="mb-3 flex items-baseline gap-1.5">
-                <span className="font-mono text-[28px] font-bold leading-none tabular-nums tracking-[-0.025em] text-foreground">
-                  {t(c.stat)}
-                </span>
-                <span className="text-[11.5px] font-semibold uppercase tracking-[0.08em] text-foreground/55">
-                  {t(c.statSub)}
-                </span>
-              </div>
+                {/* Stat metric — gros chiffre mono qui ancre l'œil.
+                    Souligné par une fine barre primary qui s'élargit
+                    sur hover (cue d'interactivité sans déplacement). */}
+                <div className="relative z-10">
+                  <div className="flex items-baseline gap-2">
+                    <span className="font-mono text-[34px] font-bold leading-none tabular-nums tracking-[-0.03em] text-foreground">
+                      {t(c.stat)}
+                    </span>
+                  </div>
+                  <span className="mt-1.5 inline-block text-[11px] font-semibold uppercase tracking-[0.1em] text-foreground/55">
+                    {t(c.statSub)}
+                  </span>
+                  <span
+                    aria-hidden
+                    className="mt-3 block h-px w-8 bg-primary/40 transition-all duration-300 group-hover:w-16 group-hover:bg-primary"
+                  />
+                </div>
 
-              <h3 className="text-[18px] font-bold leading-[1.3] tracking-[-0.015em] text-foreground">
-                {t(c.title)}
-              </h3>
-              <p className="mt-2 text-[13.5px] leading-[1.6] text-foreground/65">
-                {t(c.desc)}
-              </p>
-            </li>
-          ))}
+                {/* Titre + description — lecture principale */}
+                <h3 className="relative z-10 mt-5 text-[17.5px] font-bold leading-[1.3] tracking-[-0.012em] text-foreground">
+                  {t(c.title)}
+                </h3>
+                <p className="relative z-10 mt-2 mb-5 flex-1 text-[13.5px] leading-[1.6] text-foreground/65">
+                  {t(c.desc)}
+                </p>
+
+                {/* Highlight comme un footer minimal — check + texte
+                    aligné, sans bordure top (le rythme est porté par
+                    l'espace, pas par une ligne). */}
+                <div className="relative z-10 flex items-center gap-2 text-[12.5px] font-semibold">
+                  <span className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-emerald-50 text-emerald-600 ring-1 ring-emerald-100">
+                    <Icon name="check" size={12} />
+                  </span>
+                  <span className="text-foreground/80">{t(c.highlight)}</span>
+                </div>
+              </li>
+            )
+          })}
         </ul>
       </div>
     </section>
