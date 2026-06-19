@@ -48,7 +48,10 @@ export function LandingFaq({ locale }: { locale: Locale }) {
 
   return (
     <section className="bg-white py-20 lg:py-24">
-      <div className="mx-auto grid max-w-[1280px] gap-12 px-6 lg:grid-cols-[1fr_1.5fr] lg:px-10 max-lg:gap-8">
+      {/* Aligned with the listing detail page container
+          (`max-w-6xl px-4`) so a visitor scrolling from a detail
+          page into the home doesn't see the content width jump. */}
+      <div className="mx-auto grid max-w-6xl gap-12 px-4 sm:px-6 lg:grid-cols-[1fr_1.5fr] lg:px-8 max-lg:gap-8">
         <aside className="lg:sticky lg:top-24 lg:self-start">
           <span className="text-[12px] font-semibold uppercase tracking-[0.14em] text-primary">
             {t('landing.faq.eyebrow' as MessageKey)}
