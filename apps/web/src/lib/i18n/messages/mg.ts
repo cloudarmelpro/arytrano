@@ -687,6 +687,8 @@ export const mg: Record<MessageKey, string> = {
   'gallery.next': 'Sary manaraka',
   'gallery.close': 'Hidio ny tahirin-tsary',
   'gallery.showAll': 'Jereo ny sary {n}',
+  'gallery.video.badge': 'Horonan-tsary',
+  'gallery.video.cta': 'Fitsidihana horonan-tsary',
 
   // Share
   'share.label': 'Zarao',

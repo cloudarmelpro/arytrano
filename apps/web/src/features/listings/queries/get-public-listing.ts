@@ -75,6 +75,13 @@ export type PublicListingDetail = {
     altFr: string | null
     altMg: string | null
   }>
+  /** T-059 — walkthrough video, null when the owner hasn't uploaded one. */
+  video: {
+    url: string
+    posterUrl: string
+    posterBlurhash: string | null
+    durationSec: number
+  } | null
 }
 
 export async function getPublicListing(
@@ -135,6 +142,14 @@ export async function getPublicListing(
           altMg: true,
         },
       },
+      video: {
+        select: {
+          url: true,
+          posterUrl: true,
+          posterBlurhash: true,
+          durationSec: true,
+        },
+      },
     },
   })
 
@@ -190,6 +205,7 @@ export async function getPublicListing(
       verifiedAt: row.owner.ownerProfile?.verifiedAt ?? null,
     },
     photos: row.photos,
+    video: row.video,
   }
 }
 
@@ -253,6 +269,14 @@ export async function getPublicListingById(
           altMg: true,
         },
       },
+      video: {
+        select: {
+          url: true,
+          posterUrl: true,
+          posterBlurhash: true,
+          durationSec: true,
+        },
+      },
     },
   })
 
@@ -303,5 +327,6 @@ export async function getPublicListingById(
       verifiedAt: row.owner.ownerProfile?.verifiedAt ?? null,
     },
     photos: row.photos,
+    video: row.video,
   }
 }

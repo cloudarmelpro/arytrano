@@ -35,6 +35,13 @@ export type OwnerListingDetail = {
     position: number
     altFr: string | null
   }>
+  /** T-059 — walkthrough video, null when none uploaded yet. */
+  video: {
+    url: string
+    posterUrl: string
+    durationSec: number
+    bytes: number
+  } | null
 }
 
 /**
@@ -81,6 +88,14 @@ export async function getOwnerListing(
           height: true,
           position: true,
           altFr: true,
+        },
+      },
+      video: {
+        select: {
+          url: true,
+          posterUrl: true,
+          durationSec: true,
+          bytes: true,
         },
       },
     },

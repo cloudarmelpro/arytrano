@@ -281,8 +281,13 @@ export default async function PublicListingDetailPage({
           </div>
         </header>
 
-        {/* Photo gallery (Airbnb-style asymmetric grid) */}
-        <PhotoGallery photos={listing.photos} altFallback={altFallback} />
+        {/* Photo gallery (Airbnb-style asymmetric grid) +
+            T-059 click-to-play walkthrough video overlay. */}
+        <PhotoGallery
+          photos={listing.photos}
+          altFallback={altFallback}
+          video={listing.video}
+        />
 
         {/* Two-column content */}
         <div className="grid gap-10 lg:grid-cols-[1fr_22rem] lg:gap-12">
@@ -549,7 +554,7 @@ function FeatureItem({
 }) {
   return (
     <div className="flex items-start gap-3">
-      <span className="mt-0.5 inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-muted text-foreground">
+      <span className="mt-0.5 inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-muted text-foreground">
         {icon}
       </span>
       <div className="flex flex-col gap-0.5">

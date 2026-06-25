@@ -14,7 +14,22 @@ const PhotoLightbox = dynamic(
   { ssr: false },
 )
 
+// T-059 — same lazy strategy for the video modal. Reuses Base UI
+// Dialog ; only loaded if the visitor actually clicks the "Visite
+// vidéo" CTA (critical on 3G — most visitors won't open it).
+const VideoPlayer = dynamic(
+  () => import('./ListingVideoPlayer').then((m) => m.ListingVideoPlayer),
+  { ssr: false },
+)
+
 type GalleryPhoto = LightboxPhoto
+
+type GalleryVideo = {
+  url: string
+  posterUrl: string
+  posterBlurhash: string | null
+  durationSec: number
+}
 
 /**
  * Photo gallery for the public listing detail page (T-017).
@@ -22,16 +37,24 @@ type GalleryPhoto = LightboxPhoto
  * Renders the hero photo + thumbnail grid (both clickable). The
  * lightbox itself (Base UI Dialog + keyboard nav) lives in a sibling
  * `PhotoLightbox` chunk that's only fetched once the user clicks.
+ *
+ * T-059 — when a walkthrough video is attached, a "Visite vidéo"
+ * play button overlays the hero photo. Click-to-play opens a modal
+ * with the native HTML5 player. The video stream is NEVER loaded
+ * on first paint (preload="none") — critical for 3G visitors.
  */
 export function PhotoGallery({
   photos,
   altFallback,
+  video = null,
 }: {
   photos: GalleryPhoto[]
   altFallback: string
+  video?: GalleryVideo | null
 }) {
   const t = useT()
   const [openIndex, setOpenIndex] = useState<number | null>(null)
+  const [videoOpen, setVideoOpen] = useState(false)
   const count = photos.length
 
   const close = useCallback(() => setOpenIndex(null), [])
@@ -70,6 +93,17 @@ export function PhotoGallery({
               placeholder={heroPhoto.blurhash ? 'blur' : 'empty'}
               blurDataURL={heroPhoto.blurhash ?? undefined}
             />
+            {video ? (
+              <span
+                className="pointer-events-none absolute left-4 top-4 inline-flex items-center gap-1.5 rounded-full bg-foreground/85 px-3 py-1 text-[11.5px] font-bold uppercase tracking-[0.08em] text-background backdrop-blur-sm"
+                aria-hidden
+              >
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M8 5v14l11-7z" />
+                </svg>
+                {t('gallery.video.badge')}
+              </span>
+            ) : null}
           </button>
 
           {sidePhotos.length > 0 && (
@@ -108,21 +142,35 @@ export function PhotoGallery({
           )}
         </div>
 
-        {photos.length > 1 && (
-          <button
-            type="button"
-            onClick={() => setOpenIndex(0)}
-            className="absolute bottom-3 right-3 inline-flex items-center gap-1.5 rounded-md border border-border bg-card px-3 py-1.5 text-xs font-medium text-foreground shadow-sm transition hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-          >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-              <rect x="3" y="3" width="7" height="7" />
-              <rect x="14" y="3" width="7" height="7" />
-              <rect x="3" y="14" width="7" height="7" />
-              <rect x="14" y="14" width="7" height="7" />
-            </svg>
-            {t('gallery.showAll', { n: photos.length })}
-          </button>
-        )}
+        <div className="absolute bottom-3 right-3 flex items-center gap-2">
+          {video ? (
+            <button
+              type="button"
+              onClick={() => setVideoOpen(true)}
+              className="inline-flex items-center gap-1.5 rounded-md bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground shadow-[0_2px_4px_rgba(16,18,40,0.15)] transition hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+                <path d="M8 5v14l11-7z" />
+              </svg>
+              {t('gallery.video.cta')}
+            </button>
+          ) : null}
+          {photos.length > 1 && (
+            <button
+              type="button"
+              onClick={() => setOpenIndex(0)}
+              className="inline-flex items-center gap-1.5 rounded-md border border-border bg-card px-3 py-1.5 text-xs font-medium text-foreground cursor-pointer transition hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <rect x="3" y="3" width="7" height="7" />
+                <rect x="14" y="3" width="7" height="7" />
+                <rect x="3" y="14" width="7" height="7" />
+                <rect x="14" y="14" width="7" height="7" />
+              </svg>
+              {t('gallery.showAll', { n: photos.length })}
+            </button>
+          )}
+        </div>
       </div>
 
       {openIndex !== null && (
@@ -135,6 +183,10 @@ export function PhotoGallery({
           onNext={goNext}
         />
       )}
+
+      {video && videoOpen ? (
+        <VideoPlayer video={video} onClose={() => setVideoOpen(false)} />
+      ) : null}
     </>
   )
 }

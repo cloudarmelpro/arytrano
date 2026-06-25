@@ -470,6 +470,9 @@ model Listing {
   // T-058 — listing-view tracking for owner analytics (2026-06-25).
   // One row per unique visitor per 30 min window (dedup app-side).
   views         ListingView[]
+  // T-059 — single optional walkthrough video. Surfaced as a click-
+  // to-play overlay on the photo gallery.
+  video         ListingVideo?
 
   // Slug is unique PER neighborhood (matches the URL path
   // /[city]/[neighborhood]/[slug]) so the same slug can recur across
@@ -556,6 +559,35 @@ model ListingPhoto {
 
   @@unique([listingId, position])
   @@index([listingId])
+}
+
+// T-059 — Listing visit walkthrough video (2026-06-25)
+//
+// One short walkthrough video per listing (v1 — single video). The
+// owner uploads from the listing edit page ; the detail page shows a
+// click-to-play poster overlay on the photo gallery so the heavy
+// stream NEVER auto-loads on 3G.
+//
+// Cloudinary handles transcoding (HLS + MP4) + an auto-generated
+// poster JPG via the `so_2` derivation (frame at 2s). We store the
+// delivery URL + posterUrl so the player gets a thumbnail with
+// blurhash before the metadata fetches.
+model ListingVideo {
+  id            String   @id @default(cuid())
+  listingId     String   @unique // 1 video per listing in v1
+  url           String // Cloudinary delivery URL (.mp4 or HLS .m3u8)
+  cloudinaryId  String // public_id for deletion + transforms
+  posterUrl     String // auto-generated JPG poster (so_2)
+  posterBlurhash String?
+  // Duration in seconds — capped to 120s at upload time to keep
+  // bandwidth bounded ("brief walkthrough" not "full tour").
+  durationSec   Int
+  // Bytes of the original upload — drives the dashboard's quota
+  // display.
+  bytes         Int
+  createdAt     DateTime @default(now())
+
+  listing Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
 }
 
 // T-058 — Listing visit tracking (2026-06-25)

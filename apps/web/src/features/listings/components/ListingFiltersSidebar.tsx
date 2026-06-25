@@ -139,8 +139,8 @@ export function ListingFiltersSidebar() {
 
   return (
     <aside aria-busy={pending}>
-      <div className="overflow-hidden rounded-xl border bg-background shadow-none">
-        <header className="flex items-center justify-between px-3 py-3">
+      <div className="overflow-hidden bg-background shadow-none">
+        <header className="flex items-center justify-between gap-2 py-1.5">
           <h2 className="text-[15px] font-bold tracking-[-0.01em] text-foreground">
             {t('filters.sidebar.title')}
           </h2>
@@ -151,18 +151,16 @@ export function ListingFiltersSidebar() {
               size="sm"
               onClick={reset}
               disabled={pending}
-              className="h-7 px-2 text-[12px] font-medium text-primary hover:bg-primary/5 hover:text-primary"
+              className="h-7 px-2 text-[12px] cursor-pointer font-medium text-primary hover:bg-primary/5 hover:text-primary"
             >
               {t('filters.reset')}
             </Button>
           )}
         </header>
 
-        <Separator />
-
         {/* Price slider */}
-        <section className="flex flex-col gap-2 px-3 py-3">
-          <div className="flex items-baseline justify-between gap-2">
+        <section className="flex flex-col gap-2 py-1.5">
+          <div className="flex items-baselinejustify-between gap-2">
             <p className="text-[12px] font-semibold uppercase tracking-[0.08em] text-foreground/70">
               {t('filters.price.label')}
             </p>
@@ -172,7 +170,6 @@ export function ListingFiltersSidebar() {
           </div>
           <div className="flex items-baseline justify-between font-mono text-[13.5px] font-semibold tabular-nums text-foreground">
             <span>{formatAriary(priceDraft[0])}</span>
-            <span className="text-foreground/40">→</span>
             <span>
               {formatAriary(priceDraft[1])}
             </span>
@@ -207,12 +204,10 @@ export function ListingFiltersSidebar() {
           </Slider.Root>
         </section>
 
-        <Separator />
-
         {/* Type de logement (2026-06-09) — checkbox list, single-select
             semantics : cocher un autre type décoche le précédent.
             Visuellement aligné sur la section Équipements ci-dessous. */}
-        <section className="flex flex-col gap-2 px-3 py-3">
+        <section className="flex flex-col gap-2 py-1.5">
           <p className="text-[12px] font-semibold uppercase tracking-[0.08em] text-foreground/70">
             {t('filters.type.label')}
           </p>
@@ -240,10 +235,8 @@ export function ListingFiltersSidebar() {
           </ul>
         </section>
 
-        <Separator />
-
         {/* Chambres (2026-06-09) — "≥ N" semantics */}
-        <section className="flex flex-col gap-2 px-3 py-3">
+        <section className="flex flex-col gap-2 py-1.5">
           <p className="text-[12px] font-semibold uppercase tracking-[0.08em] text-foreground/70">
             {t('filters.bedrooms.label')}
           </p>
@@ -271,10 +264,8 @@ export function ListingFiltersSidebar() {
           </ul>
         </section>
 
-        <Separator />
-
         {/* Salles de bain (2026-06-09) — "≥ N" semantics */}
-        <section className="flex flex-col gap-2 px-3 py-3">
+        <section className="flex flex-col gap-2 py-1.5">
           <p className="text-[12px] font-semibold uppercase tracking-[0.08em] text-foreground/70">
             {t('filters.bathrooms.label')}
           </p>
@@ -302,10 +293,8 @@ export function ListingFiltersSidebar() {
           </ul>
         </section>
 
-        <Separator />
-
         {/* Meublé (2026-06-09) */}
-        <section className="flex flex-col gap-2 px-3 py-3">
+        <section className="flex flex-col gap-2 py-1.5">
           <p className="text-[12px] font-semibold uppercase tracking-[0.08em] text-foreground/70">
             {t('filters.furnished.label')}
           </p>
@@ -334,10 +323,8 @@ export function ListingFiltersSidebar() {
           </ul>
         </section>
 
-        <Separator />
-
         {/* Amenities */}
-        <section className="flex flex-col gap-2 px-3 py-3">
+        <section className="flex flex-col gap-2 py-1.5">
           <p className="text-[12px] font-semibold uppercase tracking-[0.08em] text-foreground/70">
             {t('filters.amenities.label')}
           </p>

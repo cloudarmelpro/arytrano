@@ -686,6 +686,8 @@ export const frMG = {
   'gallery.next': 'Photo suivante',
   'gallery.close': 'Fermer la galerie',
   'gallery.showAll': 'Voir les {n} photos',
+  'gallery.video.badge': 'Vidéo',
+  'gallery.video.cta': 'Visite vidéo',
 
   // Share
   'share.label': 'Partager',

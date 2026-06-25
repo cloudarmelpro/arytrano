@@ -66,7 +66,7 @@ export function PublicListingCard({
   return (
     <li className="contents">
       <article className="group relative flex flex-col">
-        <div className="relative aspect-[4/3] overflow-hidden rounded-2xl bg-muted ring-1 ring-border/60 transition duration-300 group-hover:ring-primary/30 group-hover:shadow-[0_8px_24px_-12px_rgba(25,25,112,0.25)]">
+        <div className="relative aspect-[4/3] overflow-hidden rounded-2xl bg-muted ring-1 ring-border/60 transition duration-300">
           {/* Heart sits ABOVE the stretched anchor (z-10 on the heart
              elements). It's outside the <a> in DOM order, so the link
              stays semantically and structurally valid. */}

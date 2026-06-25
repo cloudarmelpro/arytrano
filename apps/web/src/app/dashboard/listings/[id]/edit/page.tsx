@@ -9,6 +9,7 @@ import {
   ListingActions,
   PhotoManager,
 } from '@/features/listings'
+import { ListingVideoManager } from '@/features/listings/components/ListingVideoManager'
 import { getOwnerListing } from '@/features/listings/server'
 import { listListingReportsForOwner } from '@/features/reports/server'
 import { ApiError } from '@/lib/api/errors'
@@ -71,6 +72,17 @@ export default async function EditListingPage({
           </p>
         </header>
         <PhotoManager listingId={listing.id} initialPhotos={listing.photos} />
+
+        {/* T-059 — walkthrough video uploader, sits right below the
+            photo manager so the owner edits the visual block top-to-
+            bottom. Optional ; ListingVideoManager renders an empty
+            dropzone when there's no existing video. */}
+        <div className="mt-6">
+          <ListingVideoManager
+            listingId={listing.id}
+            existing={listing.video}
+          />
+        </div>
       </section>
 
       <section className="border-t border-border pt-8">

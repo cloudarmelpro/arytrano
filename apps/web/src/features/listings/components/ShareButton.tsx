@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { useT } from '@/lib/i18n/client'
+import { LucideSquareArrowOutUpRight } from 'lucide-react'
 
 /**
  * Share button — uses the Web Share API on mobile (native share sheet:
@@ -45,13 +46,9 @@ export function ShareButton({ title }: { title: string }) {
       onClick={onClick}
       disabled={busy}
       aria-label={t('share.aria')}
-      className="inline-flex h-9 items-center gap-1.5 rounded-md px-3 text-sm font-medium text-foreground underline-offset-4 transition hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-60"
-    >
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-        <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" />
-        <polyline points="16 6 12 2 8 6" />
-        <line x1="12" y1="2" x2="12" y2="15" />
-      </svg>
+      className="inline-flex h-9 items-center gap-1.5 rounded-md text-sm font-medium text-foreground underline-offset-4 transition cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-60"
+    > 
+      <LucideSquareArrowOutUpRight className="h-4 w-4" />
       <span>{t('share.label')}</span>
     </button>
   )
