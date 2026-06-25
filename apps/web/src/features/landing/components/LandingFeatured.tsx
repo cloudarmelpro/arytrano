@@ -33,17 +33,17 @@ export function LandingFeatured({
 
   if (listings.length < MIN_LISTINGS_FOR_SECTION) return null
 
-  const viewAllKey =
-    totalPublished <= 1
-      ? 'landing.featured.viewAll.one'
-      : 'landing.featured.viewAll.other'
+  // const viewAllKey =
+  //   totalPublished <= 1
+  //     ? 'landing.featured.viewAll.one'
+  //     : 'landing.featured.viewAll.other'
 
   return (
-    <section className="border-b border-border bg-background py-16 lg:py-20">
+    <section className="bg-background py-16 lg:py-20">
       <div className="mx-auto flex max-w-[1280px] flex-col gap-6 px-6 lg:px-10">
         <header className="flex flex-wrap items-end justify-between gap-3">
           <div className="flex flex-col gap-1">
-            <h2 className="font-serif text-[clamp(28px,3vw,40px)] font-normal leading-[1.1] tracking-[-0.018em] text-foreground">
+            <h2 className="text-[clamp(28px,3vw,40px)] font-normal leading-[1.1] tracking-[-0.018em] text-foreground">
               {t('landing.featured.title')}
             </h2>
             <p className="text-sm text-muted-foreground sm:text-base">
@@ -73,8 +73,8 @@ export function LandingFeatured({
                 aria-controls="featured-panel"
                 onClick={() => setTab(tabKey)}
                 className={`inline-flex h-8 cursor-pointer items-center rounded-xl px-4 text-xs font-medium transition ${isActive
-                  ? 'bg-[oklch(0.16_0.025_281)] text-background'
-                  : 'text-foreground'
+                  ? 'border border-primary text-primary'
+                  : 'text-foreground/70 hover:bg-muted/40 hover:text-foreground'
                   }`}
               >
                 {t(labelKey)}

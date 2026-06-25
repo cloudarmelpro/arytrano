@@ -26,7 +26,7 @@ export function LandingHero({
         className="pointer-events-none absolute -right-[12%] -top-[10%] -z-10 h-[720px] w-[720px] rounded-full bg-[radial-gradient(circle_at_center,oklch(0.62_0.22_290_/_0.5)_0%,transparent_60%)]"
       />
       <div className="relative z-10 mx-auto max-w-[1280px] px-6 lg:px-10">
-        <h1 className="m-0 max-w-[1040px] font-serif text-[clamp(36px,5.4vw,76px)] font-normal leading-[1.05] tracking-[-0.015em] text-balance">
+        <h1 className="m-0 max-w-[1040px] font-normal text-[clamp(36px,5.4vw,70px)] leading-[1.05] tracking-[-0.015em] text-balance">
           {t('landing.hero.title')}
         </h1>
         <p className="mt-5 mb-9 max-w-[720px] text-[clamp(17px,1.6vw,20px)] font-medium leading-[1.4] text-white/85">

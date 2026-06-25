@@ -34,7 +34,7 @@ export function LandingTrustStrip({ locale }: { locale: Locale }) {
             <span className="text-[12px] font-semibold uppercase tracking-[0.14em] text-primary">
               {t('landing.trust.eyebrow')}
             </span>
-            <h2 className="mt-3.5 font-serif text-[clamp(28px,3.4vw,40px)] font-normal leading-[1.05] tracking-[-0.018em] text-foreground">
+            <h2 className="mt-3.5 text-[clamp(28px,3.4vw,40px)] font-normal leading-[1.05] tracking-[-0.018em] text-foreground">
               {t('landing.trust.heading')}
             </h2>
           </div>
@@ -51,7 +51,7 @@ export function LandingTrustStrip({ locale }: { locale: Locale }) {
                 key={it.title}
                 className="flex flex-col gap-5 border-t border-border py-8 first:border-t-0 first:pt-0 lg:border-t-0 lg:border-l lg:px-7 lg:py-2 lg:first:border-l-0 lg:first:pl-0 lg:last:pr-0"
               >
-                <span className="font-serif text-[clamp(48px,5vw,68px)] font-light leading-none tracking-[-0.025em] text-primary">
+                <span className="text-[clamp(48px,5vw,68px)] font-light leading-none tracking-[-0.025em] text-primary">
                   {n}
                 </span>
                 <div className="flex flex-col gap-3">

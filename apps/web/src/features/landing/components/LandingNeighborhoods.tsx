@@ -42,16 +42,16 @@ export function LandingNeighborhoods({
             <span className="text-[12px] font-semibold uppercase tracking-[0.14em] text-primary">
               {t('landing.neighborhoods.eyebrow' as MessageKey)}
             </span>
-            <h2 className="mt-3 max-w-[620px] font-serif text-[clamp(32px,3.4vw,44px)] font-normal leading-[1.05] tracking-[-0.018em] text-foreground">
+            <h2 className="mt-3 max-w-[620px] text-[clamp(32px,3.4vw,44px)] font-normal leading-[1.05] tracking-[-0.018em] text-foreground">
               {t('landing.neighborhoods.title')}
             </h2>
-            <p className="mt-3 max-w-[540px] text-[14.5px] text-foreground/70">
+            <p className="max-w-[540px] mt-3 text-[14.5px] text-foreground/70">
               {t('landing.neighborhoods.lead')}
             </p>
           </div>
           <Link
             href="/quartiers"
-            className="inline-flex h-11 items-center rounded-xl border border-border bg-background px-6 text-[14px] font-medium text-foreground transition hover:bg-muted"
+            className="inline-flex items-center text-[13px] font-medium text-foreground transition hover:text-primary mt-3"
           >
             {t('landing.neighborhoods.viewAll')}
           </Link>

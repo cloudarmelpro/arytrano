@@ -51,7 +51,7 @@ export function LandingFaqAccordion({ items }: { items: FaqItem[] }) {
                 className={`inline-flex h-8 shrink-0 items-center justify-center rounded-lg px-2.5 font-mono text-[11.5px] font-bold tracking-[0.04em] ring-1 transition-colors duration-300 ${
                   isOpen
                     ? 'bg-primary text-primary-foreground ring-primary'
-                    : 'bg-primary/[0.08] text-primary ring-primary/15'
+                    : 'bg-primary/[0.08] text-primary ring-primary/0'
                 }`}
               >
                 Q{String(i + 1).padStart(2, '0')}
