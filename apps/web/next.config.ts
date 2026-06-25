@@ -18,9 +18,21 @@ const nextConfig: NextConfig = {
   reactCompiler: true,
   experimental: {
     serverActions: {
-      // Allow profile photos and listing photos up to ~6MB after multipart overhead.
-      // Service-side validation still caps individual files at 5MB.
-      bodySizeLimit: '8mb',
+      // 55MB = listing-video cap (50MB) + multipart envelope headroom.
+      // The video stream still passes through the Vercel function and
+      // counts against the function payload limit (Hobby 4.5MB, Pro
+      // 32MB, Enterprise raisable). For Vercel Hobby this WILL fail
+      // even with this bumped value — production needs Pro or higher
+      // until we cut over to a client-direct upload.
+      //
+      // 2026-06-25 — stop-gap fix for the 8MB rejection on legit
+      // walkthrough videos. Long-term roadmap : switch to a
+      // client-direct upload (signed Cloudinary URL today, S3
+      // pre-signed PUT after the asset migration to AWS) so the
+      // file bypasses the function entirely.
+      //
+      // Photo + avatar uploads stay under this cap with room to spare.
+      bodySizeLimit: '55mb',
       // CSRF defence — explicit allowlist for production domain. Next.js
       // already enforces same-origin by default, so dev (localhost) and the
       // bare apex are safe out of the box; this entry makes sure any

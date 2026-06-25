@@ -55,6 +55,18 @@ export function ListingVideoManager({
   function onChange(e: React.ChangeEvent<HTMLInputElement>) {
     const f = e.target.files?.[0]
     if (!f) return
+    // Client-side cap so the visitor doesn't spend 30s uploading a
+    // 100MB file only to hit the Next.js body-size limit. Server
+    // re-validates via parseListingVideoFile.
+    if (f.size > MAX_LISTING_VIDEO_BYTES) {
+      toast.error(
+        `Vidéo trop lourde (${Math.round(f.size / 1024 / 1024)} Mo). ${Math.round(
+          MAX_LISTING_VIDEO_BYTES / 1024 / 1024,
+        )} Mo maximum.`,
+      )
+      e.target.value = ''
+      return
+    }
     setPreviewName(f.name)
     const fd = new FormData()
     fd.set('listingId', listingId)
