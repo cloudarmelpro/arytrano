@@ -1,5 +1,6 @@
 import 'server-only'
 import { prisma } from '@/lib/db'
+import { getListingViewStats, type ListingViewStats } from './get-listing-view-stats'
 
 export type ListingStatsRecentContact = {
   id: string
@@ -30,6 +31,8 @@ export type ListingStats = {
     /** Reviews are slow-flow — show 30d window for symmetry, even if usually 0. */
     reviews: number
   }
+  /** T-058 — public visit analytics (7d + 30d totals + 7d sparkline). */
+  views: ListingViewStats
   recentContacts: ListingStatsRecentContact[]
 }
 
@@ -77,6 +80,7 @@ export async function getListingStats(
     reviewsAgg,
     reviews30d,
     recentContacts,
+    views,
   ] = await Promise.all([
     prisma.contactEvent.count({ where: { listingId: listing.id } }),
     prisma.contactEvent.groupBy({
@@ -103,6 +107,7 @@ export async function getListingStats(
         viewerId: true,
       },
     }),
+    getListingViewStats(listing.id),
   ])
 
   const contactsByChannel: { WHATSAPP: number; PHONE: number } = {
@@ -135,6 +140,7 @@ export async function getListingStats(
       contactsByChannel,
       reviews: reviews30d,
     },
+    views,
     recentContacts: recentContacts.map((c) => ({
       id: c.id,
       channel: c.channel,

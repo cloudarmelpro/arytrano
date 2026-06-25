@@ -1703,6 +1703,7 @@ export const mg: Record<MessageKey, string> = {
   'dashboard.listingStats.title': 'Antontan-tarehimarika filazana',
   'dashboard.listingStats.back': 'Hiverina amin\'ny tranoko',
   'dashboard.listingStats.viewPublic': 'Hijery ny filazana navoaka',
+  'dashboard.listingStats.kpi.views7d': 'Fijery · 7 andro',
   'dashboard.listingStats.kpi.contactsTotal': 'Fifandraisana totaly',
   'dashboard.listingStats.kpi.contactsTotal.help':
     'Isan\'ny tsindrim-paneva « Mifandray » nanomboka tamin\'ny voalohany.',

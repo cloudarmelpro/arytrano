@@ -1690,6 +1690,7 @@ export const frMG = {
   'dashboard.listingStats.title': 'Statistiques de l\'annonce',
   'dashboard.listingStats.back': 'Retour à mes annonces',
   'dashboard.listingStats.viewPublic': 'Voir l\'annonce publiée',
+  'dashboard.listingStats.kpi.views7d': 'Vues · 7 jours',
   'dashboard.listingStats.kpi.contactsTotal': 'Contacts au total',
   'dashboard.listingStats.kpi.contactsTotal.help':
     'Nombre cumulé de clics « Contacter » depuis la création.',

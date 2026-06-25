@@ -467,6 +467,9 @@ model Listing {
   // E-T28 — concierge lead queue. Multiple concurrent leads allowed per
   // listing by design (operator arbitrates which one converts).
   leadRequests  LeadRequest[]
+  // T-058 — listing-view tracking for owner analytics (2026-06-25).
+  // One row per unique visitor per 30 min window (dedup app-side).
+  views         ListingView[]
 
   // Slug is unique PER neighborhood (matches the URL path
   // /[city]/[neighborhood]/[slug]) so the same slug can recur across
@@ -553,6 +556,49 @@ model ListingPhoto {
 
   @@unique([listingId, position])
   @@index([listingId])
+}
+
+// T-058 — Listing visit tracking (2026-06-25)
+//
+// One row per listing detail page view, written via `after()` from
+// the public detail RSC so the response isn't blocked. Used by the
+// owner dashboard "Stats" widget to surface views over time + the
+// admin moderation queue to spot abuse spikes.
+//
+// PRIVACY : viewerHash is SHA-256(ipHash + AUTH_SECRET), so neither
+// the raw IP nor any cookie value is stored. Same anonymisation
+// pattern as ContactEvent / LoginEvent.
+//
+// DEDUP : the service drops a write if the same viewerHash hit the
+// same listing within 30 minutes — implemented in `recordListingView`
+// via a `findFirst` before insert. This keeps the table from inflating
+// on bot scrapes + tab refreshes.
+model ListingView {
+  id          String   @id @default(cuid())
+  listingId   String
+  // Hashed visitor identifier (IP + pepper). Null when the request
+  // arrived without a routable IP (CF cold edge, internal cron, etc.).
+  viewerHash  String?
+  // Hashed session id (cookie or `Auth.js` session id) — collapses
+  // multiple IPs from the same logged-in user into one row over the
+  // 30-min dedup window.
+  sessionHash String?
+  // Coarse source classification : 'direct' (no referer), 'internal'
+  // (referer matches AUTH_URL host), 'search' (Google etc.),
+  // 'social' (wa.me, facebook…), 'other'.
+  source      String
+  // Authenticated viewer userId — null for anonymous traffic. Used so
+  // the dashboard can show "X of your views were from signed-in users".
+  viewerUserId String?
+  createdAt   DateTime @default(now())
+
+  listing Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+
+  // Hot path : owner dashboard `WHERE listingId=? AND createdAt > now()-7d`.
+  // Covers cron sweeps and the per-listing "last 30d" trend.
+  @@index([listingId, createdAt(sort: Desc)])
+  // Anti-abuse : "this hash hit N listings in the last hour".
+  @@index([viewerHash, createdAt])
 }
 
 // ============================================================

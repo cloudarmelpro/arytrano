@@ -92,10 +92,13 @@ export default async function ListingStatsPage({
       </header>
 
       <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard
-          label={t('dashboard.listingStats.kpi.contactsTotal')}
-          value={stats.totals.contacts}
-          help={t('dashboard.listingStats.kpi.contactsTotal.help')}
+        {/* T-058 — view stats up front : "people are LOOKING" is the
+            top-of-funnel signal an owner needs to retain. */}
+        <ViewsCard
+          views7d={stats.views.views7d}
+          views30d={stats.views.views30d}
+          series={stats.views.series7d}
+          label={t('dashboard.listingStats.kpi.views7d')}
         />
         <StatCard
           label={t('dashboard.listingStats.kpi.contacts30d')}
@@ -177,6 +180,74 @@ function StatCard({
       </p>
       <p className="mt-1 text-[12.5px] leading-[1.5] text-foreground/70">
         {help}
+      </p>
+    </div>
+  )
+}
+
+/**
+ * T-058 — views over 7 days with a tiny inline SVG sparkline. The
+ * sparkline is pure SVG (no recharts) so it stays in the server
+ * bundle and ships zero client JS for this widget.
+ */
+function ViewsCard({
+  views7d,
+  views30d,
+  series,
+  label,
+}: {
+  views7d: number
+  views30d: number
+  series: ListingStats['views']['series7d']
+  label: string
+}) {
+  const W = 160
+  const H = 36
+  const max = Math.max(1, ...series.map((p) => p.count))
+  const step = series.length > 1 ? W / (series.length - 1) : W
+  const points = series.map((p, i) => {
+    const x = i * step
+    const y = H - (p.count / max) * H
+    return `${x.toFixed(1)},${y.toFixed(1)}`
+  })
+  const pathD = `M ${points.join(' L ')}`
+  const lastX = (series.length - 1) * step
+  const lastY = H - ((series.at(-1)?.count ?? 0) / max) * H
+
+  return (
+    <div className="flex flex-col gap-2 rounded-2xl bg-primary/[0.06] p-5 ring-1 ring-primary/15">
+      <p className="text-[12px] font-semibold uppercase tracking-[0.1em] text-primary">
+        {label}
+      </p>
+      <div className="flex items-end justify-between gap-3">
+        <p className="font-mono text-[28px] font-semibold leading-none text-foreground">
+          {views7d}
+        </p>
+        <svg
+          viewBox={`0 0 ${W} ${H}`}
+          width={W}
+          height={H}
+          aria-hidden
+          className="text-primary"
+        >
+          <path
+            d={`${pathD} L ${W},${H} L 0,${H} Z`}
+            fill="currentColor"
+            opacity={0.12}
+          />
+          <path
+            d={pathD}
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={1.5}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+          <circle cx={lastX} cy={lastY} r={2.5} fill="currentColor" />
+        </svg>
+      </div>
+      <p className="text-[12.5px] leading-[1.5] text-foreground/70">
+        {views30d} sur les 30 derniers jours
       </p>
     </div>
   )

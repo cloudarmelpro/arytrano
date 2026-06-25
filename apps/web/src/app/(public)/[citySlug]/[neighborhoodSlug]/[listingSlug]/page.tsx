@@ -1,8 +1,14 @@
 import type { Metadata } from 'next'
+import { after } from 'next/server'
 import Link from 'next/link'
 import { headers } from 'next/headers'
 import { notFound, permanentRedirect } from 'next/navigation'
 import { env } from '@/lib/env'
+import { extractRequestInfo } from '@/lib/auth/request-info'
+import {
+  recordListingView,
+  classifyViewSource,
+} from '@/features/listings/services/record-listing-view'
 import { formatAriary } from '@/lib/format/currency'
 import { getLocale } from '@/lib/i18n/get-locale'
 import { getT } from '@/lib/i18n/translate'
@@ -157,6 +163,37 @@ export default async function PublicListingDetailPage({
   // duplicate reviewer. We fall back to a friendly message in each case.
   const canSubmitReview = Boolean(userId) && !isOwner && !userAlreadyReviewed
 
+  // T-058 — record the visit via `after()` so the response isn't
+  // blocked by the DB write. Owner himself doesn't count (would inflate
+  // his own dashboard). Bot heuristic : skip when User-Agent looks
+  // like a known crawler — they generate noise without ever converting.
+  if (!isOwner) {
+    const h = await headers()
+    const { ipHash, userAgent } = extractRequestInfo(h)
+    const ua = userAgent?.toLowerCase() ?? ''
+    const isBot =
+      ua.includes('bot') ||
+      ua.includes('crawler') ||
+      ua.includes('spider') ||
+      ua.includes('headless') ||
+      ua.includes('preview') // Slackbot, WhatsApp, Twitter preview fetchers
+    if (!isBot) {
+      const referer = h.get('referer')
+      const ownHost = new URL(baseUrl()).hostname
+      const source = classifyViewSource(referer, ownHost)
+      const listingId = listing.id
+      after(() =>
+        recordListingView({
+          listingId,
+          viewerHash: ipHash,
+          sessionHash: userId,
+          source,
+          viewerUserId: userId,
+        }),
+      )
+    }
+  }
+
   // Schema.org JSON-LD. We MUST use `safeJsonLd` because JSON.stringify
   // does NOT escape `<` — a malicious owner title containing `</script>`
   // would break out of the script tag (stored XSS). See lib/seo/safe-json-ld.ts.
@@ -234,7 +271,7 @@ export default async function PublicListingDetailPage({
               <span>{listing.neighborhood.nameFr}, {listing.city.nameFr}</span>
             </p>
           </div>
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-4">
             <ShareButton title={listing.title} />
             <FavoriteButton
               listingId={listing.id}
