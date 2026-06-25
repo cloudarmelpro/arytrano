@@ -132,6 +132,7 @@ export const messages = {
     'listing.detail.amenities': 'Équipements',
     'listing.detail.contact.whatsapp': 'WhatsApp',
     'listing.detail.contact.phone': 'Appeler',
+    'listing.detail.video.cta': 'Visite vidéo',
     'listing.detail.contact.errorTitle': 'Erreur',
     'listing.detail.contact.errorBody':
       'Impossible de récupérer le contact.',
@@ -351,6 +352,7 @@ export const messages = {
     'listing.detail.amenities': 'Fitaovana',
     'listing.detail.contact.whatsapp': 'WhatsApp',
     'listing.detail.contact.phone': 'Antso',
+    'listing.detail.video.cta': 'Horonan-tsary',
     'listing.detail.contact.errorTitle': 'Hadisoana',
     'listing.detail.contact.errorBody': 'Tsy nahazo ny kontaka.',
     'listing.detail.contact.whatsappMissing':

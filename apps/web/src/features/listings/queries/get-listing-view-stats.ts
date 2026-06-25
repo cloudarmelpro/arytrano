@@ -17,6 +17,16 @@ export type ListingViewStats = {
   // Per-day view counts, oldest first, 7 entries. Days with 0 views
   // are filled to keep the sparkline width constant.
   series7d: Array<{ day: string; count: number }>
+  // 30d breakdown by traffic source. Owners use this to understand
+  // whether the listing is being found via Google, shared on WhatsApp,
+  // typed directly, etc. — and where to invest effort.
+  bySource30d: {
+    direct: number
+    internal: number
+    search: number
+    social: number
+    other: number
+  }
 }
 
 const DAY_MS = 24 * 60 * 60 * 1000
@@ -34,14 +44,25 @@ export async function getListingViewStats(
 
   const rows = await prisma.listingView.findMany({
     where: { listingId, createdAt: { gte: start30d } },
-    select: { createdAt: true },
+    select: { createdAt: true, source: true },
   })
 
   let views30d = 0
   let views7d = 0
   const perDay = new Map<string, number>()
+  const bySource30d: ListingViewStats['bySource30d'] = {
+    direct: 0,
+    internal: 0,
+    search: 0,
+    social: 0,
+    other: 0,
+  }
   for (const r of rows) {
     views30d += 1
+    // Source classification — unknown keys fall through to 'other'.
+    const key = r.source as keyof typeof bySource30d
+    if (key in bySource30d) bySource30d[key] += 1
+    else bySource30d.other += 1
     if (r.createdAt >= start7d) {
       views7d += 1
       const k = dayKey(r.createdAt)
@@ -58,5 +79,5 @@ export async function getListingViewStats(
     series7d.push({ day: k, count: perDay.get(k) ?? 0 })
   }
 
-  return { views7d, views30d, series7d }
+  return { views7d, views30d, series7d, bySource30d }
 }

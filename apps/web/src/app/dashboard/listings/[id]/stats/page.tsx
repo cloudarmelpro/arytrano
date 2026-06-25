@@ -126,6 +126,11 @@ export default async function ListingStatsPage({
         />
       </section>
 
+      {/* T-058 follow-up — top sources : where are the views coming
+          from ? Owners use this to know whether to invest in WhatsApp
+          shares, Google SEO, or internal cross-links. */}
+      <SourceBreakdown bySource={stats.views.bySource30d} total={stats.views.views30d} />
+
       <section className="flex flex-col gap-4">
         <h2 className="text-lg font-semibold text-foreground">
           {t('dashboard.listingStats.recentContacts.title')}
@@ -250,6 +255,69 @@ function ViewsCard({
         {views30d} sur les 30 derniers jours
       </p>
     </div>
+  )
+}
+
+/**
+ * T-058 follow-up — sources card. Pure HTML bar chart (no recharts
+ * dep), one row per source ordered by count desc. Renders nothing
+ * when there are 0 views on the period.
+ */
+function SourceBreakdown({
+  bySource,
+  total,
+}: {
+  bySource: ListingStats['views']['bySource30d']
+  total: number
+}) {
+  if (total === 0) return null
+  const rows: Array<{ key: keyof typeof bySource; label: string; color: string }> = [
+    { key: 'search', label: 'Recherche (Google, etc.)', color: 'bg-amber-500' },
+    { key: 'social', label: 'Réseaux (WhatsApp, FB…)', color: 'bg-emerald-500' },
+    { key: 'direct', label: 'Direct (URL ou favori)', color: 'bg-primary' },
+    { key: 'internal', label: 'Navigation AryTrano', color: 'bg-violet-500' },
+    { key: 'other', label: 'Autres', color: 'bg-slate-400' },
+  ]
+  const ordered = rows
+    .map((r) => ({ ...r, count: bySource[r.key] }))
+    .sort((a, b) => b.count - a.count)
+  return (
+    <section className="flex flex-col gap-4 rounded-2xl bg-muted/40 p-5">
+      <header>
+        <h2 className="text-[15px] font-bold tracking-[-0.005em] text-foreground">
+          Sources des visites (30 j)
+        </h2>
+        <p className="mt-1 text-[12.5px] text-foreground/65">
+          D’où viennent les visiteurs de cette annonce.
+        </p>
+      </header>
+      <ul className="flex flex-col gap-2.5">
+        {ordered.map((row) => {
+          const pct = total > 0 ? Math.round((row.count / total) * 100) : 0
+          return (
+            <li key={row.key} className="flex flex-col gap-1">
+              <div className="flex items-baseline justify-between gap-3 text-[13px]">
+                <span className="font-medium text-foreground/85">
+                  {row.label}
+                </span>
+                <span className="font-mono text-foreground/70">
+                  {row.count}{' '}
+                  <span className="text-[11px] text-foreground/55">
+                    · {pct}%
+                  </span>
+                </span>
+              </div>
+              <div className="h-1.5 w-full overflow-hidden rounded-full bg-background ring-1 ring-border/60">
+                <div
+                  className={`h-full ${row.color} transition-all duration-500`}
+                  style={{ width: `${pct}%` }}
+                />
+              </div>
+            </li>
+          )
+        })}
+      </ul>
+    </section>
   )
 }
 

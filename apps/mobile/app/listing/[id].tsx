@@ -194,6 +194,23 @@ export default function ListingDetail() {
               </Text>
             </View>
           ) : null}
+          {/* T-059 mobile — walkthrough video CTA. We hand the URL to
+              the OS via Linking so the native player handles streaming
+              (avoids bundling a heavy RN-video dependency just for one
+              optional asset). 3G-safe : the stream only starts when
+              the user taps Play in the native player. */}
+          {data.video ? (
+            <Pressable
+              onPress={() => Linking.openURL(data.video!.url)}
+              accessibilityRole="button"
+              accessibilityLabel={t('listing.detail.video.cta')}
+              className="absolute bottom-4 right-4 flex-row items-center gap-1.5 rounded-full bg-primary px-3.5 py-2 shadow"
+            >
+              <Text className="text-xs font-bold text-primary-foreground">
+                ▶ {t('listing.detail.video.cta')}
+              </Text>
+            </Pressable>
+          ) : null}
         </View>
 
         {/* Title block */}

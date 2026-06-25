@@ -151,6 +151,18 @@ export const publicListingDetailSchema = z.object({
       altMg: z.string().nullable(),
     }),
   ),
+  // T-059 — optional walkthrough video, null when none uploaded.
+  // Older API revisions don't return this key at all, so the field
+  // is `optional + nullable` for backwards-compat.
+  video: z
+    .object({
+      url: z.string().url(),
+      posterUrl: z.string().url(),
+      posterBlurhash: z.string().nullable(),
+      durationSec: z.number().int().nonnegative(),
+    })
+    .nullable()
+    .optional(),
 })
 
 export type PublicListingDetail = z.infer<typeof publicListingDetailSchema>

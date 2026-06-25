@@ -1,5 +1,11 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "installCommand": "npm install && npm install --no-save --force lightningcss-linux-x64-gnu@1.32.0 @tailwindcss/oxide-linux-x64-gnu@4.3.0 @img/sharp-linux-x64@0.34.5 @img/sharp-libvips-linux-x64@1.2.4",
-  "outputDirectory": "apps/web/.next"
+  "outputDirectory": "apps/web/.next",
+  "crons": [
+    {
+      "path": "/api/cron/sweep-orphan-video-assets",
+      "schedule": "0 3 * * *"
+    }
+  ]
 }
