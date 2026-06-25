@@ -102,7 +102,7 @@ function buildGetCityLandingData() {
                 altFr: true,
               },
             },
-            video: { select: { url: true } },
+            video: { where: { status: 'PUBLISHED' }, select: { url: true } },
           },
         }),
         prisma.listing.count({

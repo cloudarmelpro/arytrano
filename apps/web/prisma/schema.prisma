@@ -120,6 +120,8 @@ model User {
   disputesClaimed     Dispute[]        @relation("DisputesClaimed")
   disputesResolved    Dispute[]        @relation("DisputesResolved")
   disputeMessages     DisputeMessage[] @relation("DisputeMessages")
+  // T-059 admin moderation — videos this admin hid.
+  videosHidden        ListingVideo[]   @relation("ListingVideosHidden")
 
   @@index([status, role])
 }
@@ -573,8 +575,8 @@ model ListingPhoto {
 // delivery URL + posterUrl so the player gets a thumbnail with
 // blurhash before the metadata fetches.
 model ListingVideo {
-  id            String   @id @default(cuid())
-  listingId     String   @unique // 1 video per listing in v1
+  id            String              @id @default(cuid())
+  listingId     String              @unique // 1 video per listing in v1
   url           String // Cloudinary delivery URL (.mp4 or HLS .m3u8)
   cloudinaryId  String // public_id for deletion + transforms
   posterUrl     String // auto-generated JPG poster (so_2)
@@ -585,9 +587,27 @@ model ListingVideo {
   // Bytes of the original upload — drives the dashboard's quota
   // display.
   bytes         Int
-  createdAt     DateTime @default(now())
+  // T-059 moderation (2026-06-25) — admin can flip to HIDDEN_BY_ADMIN
+  // to suppress public surfacing without dropping the asset (so the
+  // owner can be notified + appeal). Public queries filter on this.
+  status        ListingVideoStatus  @default(PUBLISHED)
+  // Admin who hid the video + when + why. NULL when PUBLISHED.
+  hiddenById    String?
+  hiddenAt      DateTime?
+  hiddenReason  String?
+  createdAt     DateTime            @default(now())
 
-  listing Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  listing  Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  hiddenBy User?   @relation("ListingVideosHidden", fields: [hiddenById], references: [id], onDelete: SetNull)
+
+  // Hot path : public queries filter `status=PUBLISHED` ; admin queue
+  // wants the moderation oldest-first.
+  @@index([status, createdAt])
+}
+
+enum ListingVideoStatus {
+  PUBLISHED
+  HIDDEN_BY_ADMIN
 }
 
 // T-058 — Listing visit tracking (2026-06-25)

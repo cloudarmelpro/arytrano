@@ -188,11 +188,11 @@ export async function listPublicListings(
   if (input.furnished !== undefined) {
     where.furnished = input.furnished
   }
-  // T-059 — "Avec vidéo" filter. ListingVideo.@unique listingId
-  // means the existence check is enough — `is: {}` matches "row
-  // exists for this listing".
+  // T-059 — "Avec vidéo" filter. We require a PUBLISHED video so a
+  // hidden one doesn't trip the filter. `is: { status }` narrows the
+  // optional relation to status=PUBLISHED rows.
   if (input.hasVideo === true) {
-    where.video = { is: {} }
+    where.video = { is: { status: 'PUBLISHED' } }
   }
   // Amenities: AND semantics — every selected amenity must be present
   // on the listing. `hasEvery` does the array-contains-all check.
@@ -260,10 +260,12 @@ export async function listPublicListings(
           altFr: true,
         },
       },
-      // T-059 — one column to drive the card's "Vidéo" badge.
-      // `_count` would also work but selecting the related row's id
-      // is cheaper since ListingVideo has @unique listingId.
-      video: { select: { url: true } },
+      // T-059 — one column to drive the card's "Vidéo" badge. Filtered
+      // on status=PUBLISHED so a hidden video stops showing the pill.
+      video: {
+        where: { status: 'PUBLISHED' },
+        select: { url: true },
+      },
     },
   })
 

@@ -45,6 +45,8 @@ export type AdminListingRow = {
   publishedAt: Date | null
   /** When set, drives the "Annonce vérifiée" badge + admin toggle. */
   verifiedAt: Date | null
+  /** T-059 moderation — null when no video, 'PUBLISHED' / 'HIDDEN_BY_ADMIN' otherwise. */
+  videoStatus: 'PUBLISHED' | 'HIDDEN_BY_ADMIN' | null
   createdAt: Date
   updatedAt: Date
 }
@@ -89,6 +91,7 @@ export async function listAdminListings(
       neighborhood: { select: { nameFr: true, slug: true } },
       owner: { select: { id: true, name: true, email: true } },
       photos: { take: 1, orderBy: { position: 'asc' }, select: { url: true } },
+      video: { select: { status: true } },
       _count: { select: { reports: { where: { status: 'OPEN' } } } },
     },
   })
@@ -113,6 +116,7 @@ export async function listAdminListings(
       reportCount: r._count.reports,
       publishedAt: r.publishedAt,
       verifiedAt: r.verifiedAt,
+      videoStatus: r.video?.status ?? null,
       createdAt: r.createdAt,
       updatedAt: r.updatedAt,
     })),

@@ -61,7 +61,7 @@ export async function listRelatedListings(input: {
           altFr: true,
         },
       },
-      video: { select: { url: true } },
+      video: { where: { status: 'PUBLISHED' }, select: { url: true } },
     },
   })
 

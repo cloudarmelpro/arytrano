@@ -41,6 +41,9 @@ export type OwnerListingDetail = {
     posterUrl: string
     durationSec: number
     bytes: number
+    /** Moderation status — owners see "Masquée par AryTrano" when HIDDEN_BY_ADMIN. */
+    status: 'PUBLISHED' | 'HIDDEN_BY_ADMIN'
+    hiddenReason: string | null
   } | null
 }
 
@@ -96,6 +99,8 @@ export async function getOwnerListing(
           posterUrl: true,
           durationSec: true,
           bytes: true,
+          status: true,
+          hiddenReason: true,
         },
       },
     },

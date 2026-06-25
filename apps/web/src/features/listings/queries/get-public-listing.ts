@@ -143,6 +143,9 @@ export async function getPublicListing(
         },
       },
       video: {
+        // T-059 moderation : never surface a hidden video on the public
+        // detail page even if the row exists.
+        where: { status: 'PUBLISHED' },
         select: {
           url: true,
           posterUrl: true,
@@ -270,6 +273,9 @@ export async function getPublicListingById(
         },
       },
       video: {
+        // T-059 moderation : never surface a hidden video on the public
+        // detail page even if the row exists.
+        where: { status: 'PUBLISHED' },
         select: {
           url: true,
           posterUrl: true,

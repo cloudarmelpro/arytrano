@@ -64,7 +64,7 @@ export async function listUserFavorites(
               altFr: true,
             },
           },
-          video: { select: { url: true } },
+          video: { where: { status: 'PUBLISHED' }, select: { url: true } },
         },
       },
     },

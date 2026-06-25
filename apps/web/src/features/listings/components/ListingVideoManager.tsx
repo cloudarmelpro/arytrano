@@ -19,6 +19,8 @@ type ExistingVideo = {
   posterUrl: string
   durationSec: number
   bytes: number
+  status?: 'PUBLISHED' | 'HIDDEN_BY_ADMIN'
+  hiddenReason?: string | null
 }
 
 /**
@@ -108,6 +110,26 @@ export function ListingVideoManager({
 
       {current ? (
         <div className="flex flex-col gap-3 rounded-xl bg-muted/30 p-3">
+          {/* T-059 admin moderation — surface the hidden state to the
+              owner so they understand why their video isn't visible
+              publicly. Optionally show the admin's reason. */}
+          {current.status === 'HIDDEN_BY_ADMIN' ? (
+            <div className="rounded-md border border-amber-300 bg-amber-50 p-3 text-[12.5px] text-amber-900">
+              <p className="font-semibold">
+                Vidéo masquée par l’équipe AryTrano
+              </p>
+              {current.hiddenReason ? (
+                <p className="mt-1 leading-[1.55]">
+                  Raison : {current.hiddenReason}
+                </p>
+              ) : (
+                <p className="mt-1 leading-[1.55]">
+                  Contacte le support si tu penses qu’il s’agit d’une
+                  erreur.
+                </p>
+              )}
+            </div>
+          ) : null}
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={current.posterUrl}

@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
 import { SuspendListingButton, VerifyListingButton } from '@/features/admin'
+import { ModerateVideoButton } from '@/features/listings/components/ModerateVideoButton'
 import {
   listAdminListings,
   listAdminListingsQuerySchema,
@@ -209,6 +210,12 @@ function AdminListingCard({
                 listingId={listing.id}
                 verifiedAt={listing.verifiedAt}
               />
+              {listing.videoStatus ? (
+                <ModerateVideoButton
+                  listingId={listing.id}
+                  currentStatus={listing.videoStatus}
+                />
+              ) : null}
               <div className="ml-auto">
                 <SuspendListingButton
                   listingId={listing.id}
