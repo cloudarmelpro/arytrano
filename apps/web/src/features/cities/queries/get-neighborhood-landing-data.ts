@@ -94,6 +94,7 @@ function buildGetNeighborhoodLandingData() {
               altFr: true,
             },
           },
+          video: { select: { url: true } },
         },
       }),
       prisma.listing.count({
@@ -166,6 +167,7 @@ function buildGetNeighborhoodLandingData() {
           verifiedAt: l.verifiedAt,
           avgRating: rating.avg,
           reviewCount: rating.count,
+          hasVideo: l.video !== null,
           city: l.city,
           neighborhood: l.neighborhood,
           photo: l.photos[0] ?? null,

@@ -66,7 +66,7 @@ export function PublicListingCard({
   return (
     <li className="contents">
       <article className="group relative flex flex-col">
-        <div className="relative aspect-[4/3] overflow-hidden rounded-2xl bg-muted ring-1 ring-border/60 transition duration-300">
+        <div className="relative aspect-[5/4] overflow-hidden rounded-2xl bg-muted ring-1 ring-border/60 transition duration-300">
           {/* Heart sits ABOVE the stretched anchor (z-10 on the heart
              elements). It's outside the <a> in DOM order, so the link
              stays semantically and structurally valid. */}
@@ -109,6 +109,28 @@ export function PublicListingCard({
               ) : null}
             </div>
           )}
+
+          {/* T-059 — "Vidéo" pill bottom-left to drive owner uploads
+              + help visitors spot listings with a walkthrough at a
+              glance. Bottom-left so it doesn't clash with the favorite
+              heart top-right. */}
+          {listing.hasVideo ? (
+            <span
+              className="absolute bottom-3 left-3 z-10 inline-flex items-center gap-1 rounded-full bg-foreground/85 px-2.5 py-1 text-[10.5px] font-bold uppercase tracking-[0.08em] text-background shadow-sm backdrop-blur-sm"
+              aria-label={t('card.videoBadge.aria')}
+            >
+              <svg
+                width="9"
+                height="9"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                aria-hidden
+              >
+                <path d="M8 5v14l11-7z" />
+              </svg>
+              {t('card.videoBadge')}
+            </span>
+          ) : null}
         </div>
 
         <div className="mt-3.5 flex flex-col gap-1.5 px-0.5">

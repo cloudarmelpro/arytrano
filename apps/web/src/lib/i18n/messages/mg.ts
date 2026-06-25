@@ -537,6 +537,10 @@ export const mg: Record<MessageKey, string> = {
   'card.caution.half': 'Antoka : antsasaky ny volana ({amount})',
   'card.noPhoto': 'Tsy misy sary',
   'card.new': 'Vaovao',
+  'card.videoBadge': 'Horonan-tsary',
+  'card.videoBadge.aria': 'Misy fitsidihana horonan-tsary ity filazana ity',
+  'filters.hasVideo.label': 'Fitsidihana horonan-tsary',
+  'filters.hasVideo.option': 'Misy horonan-tsary',
   'card.rating.aria': 'Naoty {rating} amin\'ny 5 ({count} hevitra)',
 
   // Detail page

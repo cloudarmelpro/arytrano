@@ -535,6 +535,10 @@ export const frMG = {
   'card.caution.half': 'Caution : ½ mois ({amount})',
   'card.noPhoto': 'Pas de photo',
   'card.new': 'Nouveau',
+  'card.videoBadge': 'Vidéo',
+  'card.videoBadge.aria': 'Cette annonce inclut une visite vidéo',
+  'filters.hasVideo.label': 'Visite vidéo',
+  'filters.hasVideo.option': 'Avec une vidéo',
   'card.rating.aria': 'Noté {rating} sur 5 ({count} avis)',
 
   // Detail page

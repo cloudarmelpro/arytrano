@@ -78,6 +78,7 @@ export function ListingFiltersSidebar() {
     const v = params.get('furnished')
     return v === 'true' ? true : v === 'false' ? false : null
   })()
+  const currentHasVideo = params.get('hasVideo') === '1'
 
   // Local draft of the price slider — committed to URL only on pointerup.
   const [priceDraft, setPriceDraft] = useState<[number, number]>([
@@ -105,7 +106,8 @@ export function ListingFiltersSidebar() {
     currentType !== null ||
     currentBedrooms !== null ||
     currentBathrooms !== null ||
-    currentFurnished !== null
+    currentFurnished !== null ||
+    currentHasVideo
 
   function commitPrice([min, max]: [number, number]) {
     updateMultiple({
@@ -136,6 +138,9 @@ export function ListingFiltersSidebar() {
   function pickFurnished(v: boolean | null) {
     updateParam('furnished', v === null ? null : v ? 'true' : 'false')
   }
+  function toggleHasVideo() {
+    updateParam('hasVideo', currentHasVideo ? null : '1')
+  }
 
   return (
     <aside aria-busy={pending}>
@@ -159,7 +164,7 @@ export function ListingFiltersSidebar() {
         </header>
 
         {/* Price slider */}
-        <section className="flex flex-col gap-2 py-1.5">
+        {/* <section className="flex flex-col gap-2 py-1.5">
           <div className="flex items-baselinejustify-between gap-2">
             <p className="text-[12px] font-semibold uppercase tracking-[0.08em] text-foreground/70">
               {t('filters.price.label')}
@@ -202,11 +207,11 @@ export function ListingFiltersSidebar() {
               <Slider.Thumb />
             </Slider.Control>
           </Slider.Root>
-        </section>
+        </section> */}
 
         {/* Type de logement (2026-06-09) — checkbox list, single-select
-            semantics : cocher un autre type décoche le précédent.
-            Visuellement aligné sur la section Équipements ci-dessous. */}
+          semantics : cocher un autre type décoche le précédent.
+          Visuellement aligné sur la section Équipements ci-dessous. */}
         <section className="flex flex-col gap-2 py-1.5">
           <p className="text-[12px] font-semibold uppercase tracking-[0.08em] text-foreground/70">
             {t('filters.type.label')}
@@ -290,6 +295,30 @@ export function ListingFiltersSidebar() {
                 </li>
               )
             })}
+          </ul>
+        </section>
+
+        {/* T-059 — "Avec visite vidéo" filter */}
+        <section className="flex flex-col gap-2 py-1.5">
+          <p className="text-[12px] font-semibold uppercase tracking-[0.08em] text-foreground/70">
+            {t('filters.hasVideo.label')}
+          </p>
+          <ul className="flex flex-col gap-0.5">
+            <li>
+              <Label
+                className="cursor-pointer rounded-md py-1.5 font-normal transition data-[checked=true]:text-foreground"
+                data-checked={currentHasVideo}
+              >
+                <Checkbox
+                  checked={currentHasVideo}
+                  onCheckedChange={toggleHasVideo}
+                  disabled={pending}
+                />
+                <span className="leading-tight">
+                  {t('filters.hasVideo.option')}
+                </span>
+              </Label>
+            </li>
           </ul>
         </section>
 

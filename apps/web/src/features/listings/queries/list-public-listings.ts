@@ -92,6 +92,11 @@ export const listPublicListingsQuerySchema = z
     bedrooms: minCountSchema,
     bathrooms: minCountSchema,
     furnished: furnishedSchema,
+    // T-059 — "Avec vidéo" filter, query param ?video=1.
+    hasVideo: z
+      .union([z.literal('1'), z.literal('0'), z.literal('true'), z.literal('false')])
+      .transform((v) => v === '1' || v === 'true')
+      .optional(),
     sort: z.enum(LISTING_SORT_VALUES).optional(),
     amenities: amenitiesFromUrl,
     // E-T14 full-text search. Bounded to 120 chars to keep the
@@ -124,6 +129,10 @@ export type PublicListingCard = {
   avgRating: number | null
   /** Number of PUBLISHED reviews (used to show "(12 avis)"). */
   reviewCount: number
+  /** T-059 — true when the listing has a walkthrough video. The card
+   *  shows a "Vidéo" pill so visitors can spot listings with a
+   *  walkthrough at a glance. */
+  hasVideo: boolean
   city: { slug: string; nameFr: string; nameMg: string }
   neighborhood: { slug: string; nameFr: string; nameMg: string }
   photo: {
@@ -178,6 +187,12 @@ export async function listPublicListings(
   }
   if (input.furnished !== undefined) {
     where.furnished = input.furnished
+  }
+  // T-059 — "Avec vidéo" filter. ListingVideo.@unique listingId
+  // means the existence check is enough — `is: {}` matches "row
+  // exists for this listing".
+  if (input.hasVideo === true) {
+    where.video = { is: {} }
   }
   // Amenities: AND semantics — every selected amenity must be present
   // on the listing. `hasEvery` does the array-contains-all check.
@@ -245,6 +260,10 @@ export async function listPublicListings(
           altFr: true,
         },
       },
+      // T-059 — one column to drive the card's "Vidéo" badge.
+      // `_count` would also work but selecting the related row's id
+      // is cheaper since ListingVideo has @unique listingId.
+      video: { select: { url: true } },
     },
   })
 
@@ -281,6 +300,7 @@ export async function listPublicListings(
         verifiedAt: r.verifiedAt,
         avgRating: rating.avg,
         reviewCount: rating.count,
+        hasVideo: r.video !== null,
         city: r.city,
         neighborhood: r.neighborhood,
         photo,

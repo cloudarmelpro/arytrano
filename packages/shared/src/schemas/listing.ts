@@ -35,6 +35,10 @@ export const publicListingCardSchema = z.object({
   // mobile clients on the previous contract still parse fine.
   avgRating: z.number().min(0).max(5).nullable().optional(),
   reviewCount: z.number().int().nonnegative().optional(),
+  // T-059 — true when the listing has a walkthrough video. Older
+  // mobile builds parse a missing field as undefined → treated as
+  // false at the UI layer, no breakage.
+  hasVideo: z.boolean().optional(),
   city: z.object({
     slug: z.string(),
     nameFr: z.string(),

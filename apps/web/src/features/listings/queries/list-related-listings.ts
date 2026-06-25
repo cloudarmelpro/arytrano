@@ -61,6 +61,7 @@ export async function listRelatedListings(input: {
           altFr: true,
         },
       },
+      video: { select: { url: true } },
     },
   })
 
@@ -88,6 +89,7 @@ export async function listRelatedListings(input: {
       verifiedAt: r.verifiedAt,
       avgRating: rating.avg,
       reviewCount: rating.count,
+      hasVideo: r.video !== null,
       city: r.city,
       neighborhood: r.neighborhood,
       photo,
