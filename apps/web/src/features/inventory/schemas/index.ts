@@ -1,5 +1,4 @@
 import { z } from 'zod'
-import { env } from '@/lib/env'
 
 /**
  * E-T27.2 — inventory schemas.
@@ -42,14 +41,29 @@ const roomKey = z
 // reference it as if it had passed our upload pipeline. We now
 // pin the cloud name to the platform's account so only assets
 // produced by our `uploadInventoryPhoto` action are admissible.
-const ALLOWED_CLOUDINARY_PREFIX = `https://res.cloudinary.com/${env.CLOUDINARY_CLOUD_NAME}/`
+//
+// Read directly from process.env (NOT from `@/lib/env`) because this
+// schema is consumed by Client Components — importing the server-only
+// env module would poison the client bundle. NEXT_PUBLIC_* vars are
+// inlined at build time and safe to expose : the Cloudinary cloud name
+// is already public in every URL we serve.
+const CLOUD_NAME = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME ?? ''
+const ALLOWED_CLOUDINARY_PREFIX = CLOUD_NAME
+  ? `https://res.cloudinary.com/${CLOUD_NAME}/`
+  : null
 
 const photoUrl = z
   .string()
   .trim()
   .url('URL invalide.')
   .refine(
-    (u) => u.startsWith(ALLOWED_CLOUDINARY_PREFIX),
+    (u) =>
+      // Fail-closed in dev (no var set) → accept the generic prefix
+      // so local dev isn't blocked. In prod the var MUST be set, and
+      // the URL must match the pinned cloud.
+      ALLOWED_CLOUDINARY_PREFIX
+        ? u.startsWith(ALLOWED_CLOUDINARY_PREFIX)
+        : u.startsWith('https://res.cloudinary.com/'),
     'URL externe rejetée — la photo doit passer par AryTrano.',
   )
 

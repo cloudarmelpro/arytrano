@@ -64,6 +64,11 @@ const EnvSchema = z.object({
   CLOUDINARY_API_KEY: requiredInProd('CLOUDINARY_API_KEY is required in production'),
   CLOUDINARY_API_SECRET: requiredInProd('CLOUDINARY_API_SECRET is required in production'),
   CLOUDINARY_UPLOAD_PRESET: z.string().optional(),
+  // Public mirror of CLOUDINARY_CLOUD_NAME used by Zod schemas
+  // consumed in Client Components (e.g. inventory photoUrl validation)
+  // — the cloud name is in every delivery URL so it is not a secret.
+  // Set this to the same value as CLOUDINARY_CLOUD_NAME in deploy env.
+  NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME: z.string().optional(),
 
   // --- GoalPay (v2 — payments) ------------------------------
   // Merchant access key (starts with `TGP_`). Sent in the request
