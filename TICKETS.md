@@ -4254,12 +4254,39 @@ Sans cette feature : un tenant qui ne répond pas → lease bloqué `PENDING_TEN
 
 ## 📋 Roadmap exhaustive priorisée (2026-06-27)
 
-> Backlog complet par thème, **WEB d'abord puis MOBILE**, ordre de priorité interne à chaque thème.
-> Priorités : **P0** = sprint suivant · **P1** = trimestre courant · **P2** = 6 mois · **P3** = backlog idée
+> Backlog complet par thème, **WEB d'abord puis MOBILE**, séquencé en 4 phases temporelles.
+> Phases : **🔴 Pre-launch** (NEXT 4-6 sem) · **🟠 Launch+30j** · **🟡 Q1 post-launch** · **🟢 Q2+**
 > Estimates : **XS** ≤2h · **S** ≤1j · **M** 1-3j · **L** 1-2 sem · **XL** >2 sem
 
 ### Légende statut
 - ⬜ todo · 🚧 en cours · ✅ done · ❄️ on hold
+
+### Logique de priorisation (lecture en diagonale)
+
+J'ai séquencé selon ce raisonnement :
+
+1. **🔴 PRE-LAUNCH** = ce qui DOIT être en place avant d'ouvrir au public.
+   - Légal (avocat MG) — sinon AryTrano est exposé.
+   - Sécurité baseline (2FA admin, OTP owner) — pour pas se faire défoncer le jour 1.
+   - Admin operability — sinon on est aveugles.
+   - Anti-scam de base — la première annonce frauduleuse tue la confiance.
+   - UX showstoppers (CGU footer, drafts auto-save).
+
+2. **🟠 LAUNCH+30j** = les 30 premiers jours d'usage public.
+   - Onboarding owner (sinon 80% des inscrits abandonnent).
+   - Notif infra (sinon owners ratent les contacts).
+   - Stats portfolio owner (rétention).
+   - Content seed (SEO démarre lent).
+
+3. **🟡 Q1 POST-LAUNCH** = le gros levier de croissance.
+   - **Auto-publication FB/IG/Telegram** = unique moat AryTrano à MG.
+   - Vérification d'identité finale (TRU-02).
+   - Tenant comparateur + recherche par université.
+   - WhatsApp Business broadcast (saved searches).
+
+4. **🟢 Q2+ POST-LAUNCH** = monétisation + mobile + features avancées.
+
+Cette séquence respecte la règle : **safe → growable → monetizable → expandable**.
 
 ---
 
@@ -4267,31 +4294,37 @@ Sans cette feature : un tenant qui ne répond pas → lease bloqué `PENDING_TEN
 
 **Croissance et rétention des propriétaires.**
 
-| ID | Titre | Priorité | Estimate | Statut | Notes |
-|---|---|---|---|---|---|
-| OWN-01 | Auto-publication Facebook quand annonce PUBLISHED + verified | **P0** | M | ⬜ | Graph API FB Marketplace + page wall, opt-in via toggle dashboard |
-| OWN-02 | Auto-publication Instagram (story + post) | P1 | M | ⬜ | Dépendance OWN-01 (même Graph API) |
-| OWN-03 | Auto-share WhatsApp Business catalog | P1 | L | ⬜ | WhatsApp Business API + catalog sync hebdo |
-| OWN-04 | Email digest hebdomadaire (stats + nouveaux contacts) | P0 | S | ⬜ | Cron lundi 8h, template react-email |
-| OWN-05 | Bulk edit annonces (changer prix, status, dispo en masse) | P1 | M | ⬜ | Multi-select sur `/dashboard/listings` |
-| OWN-06 | Clone annonce (créer brouillon depuis annonce existante) | P1 | S | ⬜ | Bouton "Dupliquer" → /dashboard/listings/new?cloneFrom=X |
-| OWN-07 | Templates de description (chambre étudiante / studio / etc.) | P2 | S | ⬜ | 5-6 templates seed dans BD + sélecteur dans ListingForm |
-| OWN-08 | Auto-reply WhatsApp "Je vous recontacte sous 24h" | P2 | M | ⬜ | Owner active toggle + texte custom, WA Business required |
-| OWN-09 | Inbox owner (centraliser messages au lieu de WhatsApp direct) | P3 | XL | ❄️ | Frozen — voir Frozen, à rediscuter |
-| OWN-10 | Multi-photo drag-to-reorder avec preview live | P2 | S | ⬜ | DnD natif HTML5, déjà 90% en place |
-| OWN-11 | Calendrier de visite "Je suis disponible…" | P2 | M | ⬜ | Cal.com integration OR home-grown calendar |
-| OWN-12 | Notification push (web push) sur nouveau contact | P1 | M | ⬜ | Service Worker + VAPID + dashboard toggle |
-| OWN-13 | Stats portfolio overview (`/dashboard` home) | **P0** | M | ⬜ | KPI banner + top 3 listings + sources agg |
-| OWN-14 | "Boost listing" — promouvoir en haut /annonces (payant) | P1 | M | ⬜ | Dépendance Payments + monétisation |
-| OWN-15 | Refer-a-owner program (parrainage + crédit boost) | P2 | M | ⬜ | Tokens uniques + tracking conversion |
-| OWN-16 | Document vault — owner upload contrat type, CIN, etc. | P2 | S | ⬜ | Cloudinary raw + listing protégé |
-| OWN-17 | Export CSV de toutes mes annonces + stats | P2 | XS | ⬜ | Server Action streaming CSV |
-| OWN-18 | Onboarding tour interactif (1ère annonce) | P1 | S | ⬜ | Driver.js + 6 étapes |
-| OWN-19 | Notification email "Ton annonce expire dans 7j" | ✅ T-049 | — | ✅ | Déjà shippé |
-| OWN-20 | "Marquer comme loué" + raison (avoid abandon) | P1 | S | ⬜ | UNAVAILABLE + reason enum |
-| OWN-21 | Re-publish ancien listing en 1 clic | P2 | XS | ⬜ | "Republier" sur les TERMINATED |
-| OWN-22 | Owner verified badge (CIN + selfie) | 🚧 T-040 | M | 🚧 | Démarré, à terminer |
-| OWN-23 | Owner public profile page `/proprio/[slug]` | P2 | M | ⬜ | SEO bonus + trust |
+| Ordre | ID | Titre | Phase | Estimate | Statut | Notes |
+|---|---|---|---|---|---|---|
+| 1 | OWN-18 | Onboarding tour interactif (1ère annonce) | 🟠 Launch+30j | S | ⬜ | Driver.js + 6 étapes — réduit churn first-time owner |
+| 2 | OWN-04 | Email digest hebdomadaire (stats + nouveaux contacts) | 🟠 Launch+30j | S | ⬜ | Cron lundi 8h, template react-email — rétention key |
+| 3 | OWN-13 | Stats portfolio overview (`/dashboard` home) | 🟠 Launch+30j | M | ⬜ | KPI banner + top 3 listings + sources agg |
+| 4 | OWN-20 | "Marquer comme loué" + raison (avoid abandon) | 🟠 Launch+30j | S | ⬜ | UNAVAILABLE + reason enum — réduit pollution |
+| 5 | OWN-12 | Notification push (web push) sur nouveau contact | 🟠 Launch+30j | M | ⬜ | Service Worker + VAPID + dashboard toggle |
+| 6 | **OWN-01** | **Auto-publication Facebook page wall** | 🟡 Q1 | M | ⬜ | **MOAT** Graph API + opt-in toggle. Gros levier MG |
+| 7 | OWN-02 | Auto-publication Instagram (post + reel pour vidéos) | 🟡 Q1 | M | ⬜ | Same Graph API token — combine avec OWN-01 |
+| 8 | OWN-03 | Auto-share Telegram canal régional | 🟡 Q1 | S | ⬜ | Bot API simple, beaucoup d'étudiants MG sur Telegram |
+| 9 | OWN-22 | Owner verified badge (CIN + selfie) — finaliser | 🟡 Q1 | M | 🚧 | dup TRU-02 — démarré, à terminer |
+| 10 | OWN-08 | Auto-reply WhatsApp "Je vous recontacte sous 24h" | 🟡 Q1 | M | ⬜ | Owner active toggle + texte custom |
+| 11 | OWN-06 | Clone annonce (créer brouillon depuis annonce existante) | 🟡 Q1 | S | ⬜ | Bouton "Dupliquer" → form pré-rempli |
+| 12 | OWN-10 | Multi-photo drag-to-reorder avec preview live | 🟡 Q1 | S | ⬜ | DnD natif HTML5, déjà 90% en place |
+| 13 | OWN-05 | Bulk edit annonces (prix, status, dispo) | 🟡 Q1 | M | ⬜ | Multi-select sur `/dashboard/listings` |
+| 14 | OWN-11 | Calendrier de visite "Je suis disponible…" | 🟡 Q1 | M | ⬜ | Cal.com integration OR home-grown |
+| 15 | OWN-23 | Owner public profile page `/proprio/[slug]` | 🟡 Q1 | M | ⬜ | SEO bonus + trust |
+| 16 | **OWN-14** | **"Boost listing" — placement payant en haut /annonces** | 🟢 Q2+ | M | ⬜ | Dépend Payments — premier produit monétisable |
+| 17 | OWN-15 | Refer-a-owner program (parrainage + crédit boost) | 🟢 Q2+ | M | ⬜ | Dépend OWN-14 |
+| 18 | OWN-24 | **Renewal flow** — bail expire J-30, owner relance tenant | 🟢 Q2+ | M | ⬜ | **NEW** Auto-renewal proposal + tenant accept/decline |
+| 19 | OWN-25 | **Late rent rescheduling** — owner propose étalement | 🟢 Q2+ | M | ⬜ | **NEW** Owner workflow before going to dispute |
+| 20 | OWN-26 | **Building-level grouping** — owners avec multiple appts | 🟢 Q2+ | L | ⬜ | **NEW** Model Building + aggrégation stats par bâtiment |
+| 21 | OWN-27 | **Bulk import CSV** — gros owners (50+ annonces) | 🟢 Q2+ | M | ⬜ | **NEW** Importer / validator / preview avant commit |
+| 22 | OWN-28 | **Banking auto-collect** — virer le loyer vers IBAN owner | 🟢 Q2+ | XL | ⬜ | **NEW** Dépend banking partners MG |
+| 23 | OWN-07 | Templates de description (chambre / studio / appart) | 🟢 Q2+ | S | ⬜ | 5-6 templates seed |
+| 24 | OWN-16 | Document vault — owner upload contrat type, CIN, etc. | 🟢 Q2+ | S | ⬜ | Cloudinary raw + listing protégé |
+| 25 | OWN-17 | Export CSV de toutes mes annonces + stats | 🟢 Q2+ | XS | ⬜ | Server Action streaming CSV |
+| 26 | OWN-21 | Re-publish ancien listing en 1 clic | 🟢 Q2+ | XS | ⬜ | "Republier" sur les TERMINATED |
+| 27 | OWN-29 | **Tax certificate generator** (revenus locatifs MG) | 🟢 Q2+ | M | ⬜ | **NEW** Aide annuelle owner pour décla |
+| — | OWN-19 | Notification email "Ton annonce expire dans 7j" | ✅ T-049 | — | ✅ | Déjà shippé |
+| — | OWN-09 | Inbox owner (centraliser messages vs WhatsApp direct) | ❄️ Frozen | XL | ❄️ | Pas convaincu de la valeur — voir frozen |
 
 ---
 
@@ -4299,28 +4332,34 @@ Sans cette feature : un tenant qui ne répond pas → lease bloqué `PENDING_TEN
 
 **Trouve, compare, contacte, signe.**
 
-| ID | Titre | Priorité | Estimate | Statut | Notes |
-|---|---|---|---|---|---|
-| TEN-01 | Comparateur 2-3 annonces côte à côte | **P0** | M | ⬜ | Bouton "Ajouter au comparateur" sur card |
-| TEN-02 | Wish list multiple (favoris organisés en collections) | P1 | M | ⬜ | "Pour septembre", "Avec ma sœur", etc. |
-| TEN-03 | Saved search alerts via WhatsApp (en plus email) | P0 | M | ⬜ | WhatsApp Business API + opt-in OTP |
-| TEN-04 | Application form (au lieu de just contact) | P1 | L | ⬜ | Form + soumission au owner via Inbox |
-| TEN-05 | Visit booking calendar | P1 | L | ⬜ | Sync owner calendar OWN-11 |
-| TEN-06 | "Similar listings" intelligent (pas juste neighborhood) | P1 | M | ⬜ | Embedding-based recommendation |
-| TEN-07 | Compare prix au m² + ranking quartier | P2 | M | ⬜ | Sur la card et detail |
-| TEN-08 | Roommate finder (étudiants cherchant colocs) | P2 | XL | ⬜ | Nouveau model + matching |
-| TEN-09 | Sauvegarder un brouillon de visite/intéressé | P2 | S | ⬜ | LocalStorage + auto-restore |
-| TEN-10 | Map filters live (price slider sync avec map) | P1 | M | ⬜ | Synchroniser viewport + sidebar |
-| TEN-11 | Recherche par université ("près de l'IPNT") | **P0** | M | ⬜ | Geocoding + 10 unis seeded |
-| TEN-12 | Move-in checklist (caution, contrat, photos) | P2 | S | ⬜ | Static page éditoriale + dl PDF |
-| TEN-13 | "Disponible depuis quand" filter | P1 | XS | ⬜ | Filtre publishedAt + UI |
-| TEN-14 | Push notifications saved search (web push) | P1 | M | ⬜ | Dépend OWN-12 infra |
-| TEN-15 | Filter "Proche transport" (taxi-be lignes) | P2 | L | ⬜ | Nouvelle table TransportLine + proximity |
-| TEN-16 | Sort by distance from a point custom | P2 | M | ⬜ | Geocoding endpoint + sort |
-| TEN-17 | Streetview integration | P3 | M | ❄️ | Google Maps API coût |
-| TEN-18 | Avis sur quartiers (pas annonces) | P2 | M | ⬜ | New model NeighborhoodReview |
-| TEN-19 | "Itinéraire jusqu'à la fac" calc | P2 | M | ⬜ | OSRM ou Mapbox Directions |
-| TEN-20 | Mode anonyme : voir sans compte (cookies opt-in) | P3 | XS | ⬜ | Reduce conversion friction |
+| Ordre | ID | Titre | Phase | Estimate | Statut | Notes |
+|---|---|---|---|---|---|---|
+| 1 | TEN-11 | **Recherche par université** ("près de l'IPNT", "près de l'INSCAE") | 🔴 Pre-launch | M | ⬜ | **CORE FEATURE** Geocoding + 10 unis seeded — sans ça, pas de PMF |
+| 2 | TEN-13 | "Disponible depuis quand" filter | 🟠 Launch+30j | XS | ⬜ | Filtre publishedAt + UI quick win |
+| 3 | TEN-01 | **Comparateur 2-3 annonces côte à côte** | 🟠 Launch+30j | M | ⬜ | Bouton "Ajouter au comparateur" sur card |
+| 4 | TEN-10 | Map filters live (price slider sync avec map) | 🟠 Launch+30j | M | ⬜ | Synchroniser viewport + sidebar |
+| 5 | TEN-06 | "Similar listings" intelligent (pas juste neighborhood) | 🟡 Q1 | M | ⬜ | Embedding-based recommendation |
+| 6 | **TEN-03** | **Saved search alerts via WhatsApp** | 🟡 Q1 | M | ⬜ | **MOAT** WhatsApp Business API + opt-in OTP |
+| 7 | TEN-14 | Push notifications saved search (web push) | 🟡 Q1 | M | ⬜ | Dépend OWN-12 infra |
+| 8 | TEN-04 | Application form (au lieu de just contact) | 🟡 Q1 | L | ⬜ | Form + soumission au owner |
+| 9 | TEN-05 | Visit booking calendar | 🟡 Q1 | L | ⬜ | Sync owner calendar OWN-11 |
+| 10 | TEN-02 | Wish list multiple (favoris en collections) | 🟡 Q1 | M | ⬜ | "Pour septembre", "Avec ma sœur" |
+| 11 | TEN-21 | **Quartier filter "proche fac X"** | 🟡 Q1 | S | ⬜ | **NEW** Plus simple que geocoding par point, marque quartiers par fac |
+| 12 | TEN-07 | Compare prix au m² + ranking quartier | 🟢 Q2+ | M | ⬜ | Sur la card et detail |
+| 13 | TEN-09 | Sauvegarder un brouillon de visite/intéressé | 🟢 Q2+ | S | ⬜ | LocalStorage + auto-restore |
+| 14 | TEN-12 | Move-in checklist (caution, contrat, photos) | 🟢 Q2+ | S | ⬜ | Static page éditoriale + dl PDF |
+| 15 | TEN-15 | Filter "Proche transport" (taxi-be lignes) | 🟢 Q2+ | L | ⬜ | Nouvelle table TransportLine + proximity |
+| 16 | TEN-16 | Sort by distance from a point custom | 🟢 Q2+ | M | ⬜ | Geocoding endpoint + sort |
+| 17 | TEN-18 | Avis sur quartiers (pas annonces) | 🟢 Q2+ | M | ⬜ | New model NeighborhoodReview |
+| 18 | TEN-19 | "Itinéraire jusqu'à la fac" calc | 🟢 Q2+ | M | ⬜ | OSRM ou Mapbox Directions |
+| 19 | TEN-22 | **Family / couple filter** (chambres pour couples étudiants) | 🟢 Q2+ | S | ⬜ | **NEW** Niche mais demande réelle |
+| 20 | TEN-23 | **Pet-friendly filter** | 🟢 Q2+ | XS | ⬜ | **NEW** Quick win |
+| 21 | TEN-24 | **Wheelchair-accessible filter** (a11y tenants) | 🟢 Q2+ | XS | ⬜ | **NEW** Inclusion + signal qualité |
+| 22 | TEN-25 | **Tax form helper** (loyer déductible pour stagiaires) | 🟢 Q2+ | M | ⬜ | **NEW** Bonus retention |
+| 23 | TEN-26 | **Internet quality info par quartier** | 🟢 Q2+ | M | ⬜ | **NEW** Crowdsourced + critique pour étudiants |
+| 24 | TEN-08 | Roommate finder (étudiants cherchant colocs) | 🟢 Q2+ | XL | ⬜ | Nouveau model + matching |
+| 25 | TEN-20 | Mode anonyme : voir sans compte (cookies opt-in) | 🟢 Q2+ | XS | ⬜ | Reduce conversion friction |
+| — | TEN-17 | Streetview integration | ❄️ | M | ❄️ | Google Maps API coût trop élevé MG |
 
 ---
 
@@ -4328,26 +4367,30 @@ Sans cette feature : un tenant qui ne répond pas → lease bloqué `PENDING_TEN
 
 **Lutter contre les scams, photos volées, doublons.**
 
-| ID | Titre | Priorité | Estimate | Statut | Notes |
-|---|---|---|---|---|---|
-| TRU-01 | Phone OTP pour owners aussi (déjà tenants T-002) | **P0** | S | ⬜ | Réutiliser feature/phone-otp |
-| TRU-02 | ID verification owner (CIN + selfie + admin review) | 🚧 T-040 | L | 🚧 | À finir + auto-OCR optionnel |
-| TRU-03 | Detect stolen photos (Cloudinary AI similarity) | P1 | M | ⬜ | API moderation similarité |
-| TRU-04 | Anti-scam keyword detection sur description | **P0** | S | ⬜ | Regex + ML classifier optionnel |
-| TRU-05 | Rate-limit owner créations (max 3/jour/owner) | **P0** | XS | ⬜ | Upstash limiter |
-| TRU-06 | "Vérifier l'identité" mandatory avant publish | P1 | M | ⬜ | Block PUBLISHED si CIN non vérifiée |
-| TRU-07 | Duplicate listing detection (titre + photos) | P1 | M | ⬜ | Cron + admin queue |
-| TRU-08 | Report listing avec raison + auto-flag si >3 | ✅ T-024 | — | ✅ | Déjà shippé |
-| TRU-09 | Audit log viewer pour admin (actions owner critiques) | P1 | M | ⬜ | Read-only `/admin/audit` |
-| TRU-10 | Honeypot anti-bot sur formulaire contact | P1 | XS | ⬜ | Hidden field + delay check |
-| TRU-11 | Bloquer IP / device / téléphone par admin | P1 | M | ⬜ | Table BlocklistEntry + middleware |
-| TRU-12 | "Annonce vérifiée" via visite physique (operator badge) | P2 | L | ⬜ | Operator workflow + photo verif |
-| TRU-13 | Caution escrow (AryTrano détient pendant le bail) | P2 | XL | ⬜ | Gros chantier financier + légal |
-| TRU-14 | Anti-typo dans téléphone owner (E.164 strict) | ✅ | — | ✅ | Déjà fait |
-| TRU-15 | Anomaly detection : owner avec 0 contact en 30j → admin flag | P2 | M | ⬜ | Cron + dashboard |
-| TRU-16 | Alerte owner si quelqu'un tente OTP avec son tel | P2 | S | ⬜ | Email "Activité suspecte" |
-| TRU-17 | reCAPTCHA v3 sur sign-up + lead form | P1 | S | ⬜ | Score-based, fallback challenge |
-| TRU-18 | Phone reputation lookup (twilio lookup API) | P2 | S | ⬜ | Score + block voip si >X |
+| Ordre | ID | Titre | Phase | Estimate | Statut | Notes |
+|---|---|---|---|---|---|---|
+| 1 | **TRU-04** | **Anti-scam keyword detection sur description + titre** | 🔴 Pre-launch | S | ⬜ | Regex + ML classifier optionnel — bloque les scams obvious |
+| 2 | **TRU-05** | **Rate-limit owner créations** (max 3/jour/owner) | 🔴 Pre-launch | XS | ⬜ | Upstash limiter — anti-flood |
+| 3 | **TRU-01** | **Phone OTP pour owners** | 🔴 Pre-launch | S | ⬜ | Réutiliser feature/phone-otp — pas de faux comptes |
+| 4 | TRU-10 | Honeypot anti-bot sur formulaire contact | 🔴 Pre-launch | XS | ⬜ | Hidden field + delay check |
+| 5 | TRU-17 | reCAPTCHA v3 sur sign-up + lead form | 🔴 Pre-launch | S | ⬜ | Score-based, fallback challenge |
+| 6 | TRU-09 | Audit log viewer pour admin (actions critiques) | 🔴 Pre-launch | M | ⬜ | Read-only `/admin/audit` — sinon aveugles |
+| 7 | TRU-02 | **ID verification owner (CIN + selfie)** — finaliser | 🟠 Launch+30j | L | 🚧 | dup OWN-22 — démarré, à terminer |
+| 8 | TRU-06 | "Vérifier l'identité" mandatory avant publish | 🟠 Launch+30j | M | ⬜ | Block PUBLISHED si CIN non vérifiée |
+| 9 | TRU-11 | Bloquer IP / device / téléphone par admin | 🟠 Launch+30j | M | ⬜ | Table BlocklistEntry + middleware |
+| 10 | TRU-16 | Alerte owner si quelqu'un tente OTP avec son tel | 🟠 Launch+30j | S | ⬜ | Email "Activité suspecte" |
+| 11 | TRU-19 | **Disable account flow + audit retention** | 🟠 Launch+30j | M | ⬜ | **NEW** Self-service close + 30j soft-delete |
+| 12 | TRU-03 | Detect stolen photos (Cloudinary AI similarity) | 🟡 Q1 | M | ⬜ | API moderation similarité |
+| 13 | TRU-07 | Duplicate listing detection (titre + photos) | 🟡 Q1 | M | ⬜ | Cron + admin queue |
+| 14 | TRU-15 | Anomaly detection : owner avec 0 contact en 30j | 🟡 Q1 | M | ⬜ | Cron + dashboard |
+| 15 | TRU-18 | Phone reputation lookup (Twilio Lookup API) | 🟡 Q1 | S | ⬜ | Score + block voip si >X |
+| 16 | TRU-20 | **Anti-typosquatting** — alertes sur slugs proches d'annonces existantes | 🟡 Q1 | S | ⬜ | **NEW** Levenshtein sur slug |
+| 17 | TRU-12 | "Annonce vérifiée" via visite physique (operator badge) | 🟢 Q2+ | L | ⬜ | Operator workflow + photo verif |
+| 18 | TRU-13 | Caution escrow (AryTrano détient pendant le bail) | 🟢 Q2+ | XL | ⬜ | Gros chantier financier + légal |
+| 19 | TRU-21 | **Tenant credit rating** (post-historical) | 🟢 Q2+ | XL | ⬜ | **NEW** Score basé bails antérieurs + paiements |
+| 20 | TRU-22 | **Disaster preparedness alerts** (cyclones MG) | 🟢 Q2+ | M | ⬜ | **NEW** Intégration BNGRC + push annonces zones risque |
+| — | TRU-08 | Report listing avec raison + auto-flag si >3 | ✅ T-024 | — | ✅ | Déjà shippé |
+| — | TRU-14 | Anti-typo dans téléphone owner (E.164 strict) | ✅ | — | ✅ | Déjà fait |
 
 ---
 
@@ -4355,24 +4398,27 @@ Sans cette feature : un tenant qui ne répond pas → lease bloqué `PENDING_TEN
 
 **Distribuer chaque annonce hors-site.**
 
-| ID | Titre | Priorité | Estimate | Statut | Notes |
-|---|---|---|---|---|---|
-| MKT-01 | Auto-post **Facebook** Marketplace + page wall (sur PUBLISHED+VERIFIED) | **P0** | M | ⬜ | OAuth FB + Graph API + queue |
-| MKT-02 | Auto-post **Instagram** post + reel (vidéo) | P0 | M | ⬜ | Same Graph API token |
-| MKT-03 | Auto-post **Telegram** channel régional | P1 | S | ⬜ | Bot API simple |
-| MKT-04 | Auto-post **TikTok** pour annonces avec vidéo | P1 | L | ⬜ | TikTok Marketing API |
-| MKT-05 | **Twitter/X** auto-card | P2 | S | ⬜ | API v2 tweet endpoint |
-| MKT-06 | **Pinterest** pin pour annonces avec belles photos | P3 | S | ⬜ | Niche audience |
-| MKT-07 | Email digest hebdo aux étudiants saved-searcher | P0 | S | ⬜ | Existant pour saved-search, étendre |
-| MKT-08 | Newsletter mensuelle "Top quartiers Fianarantsoa" | P1 | M | ⬜ | Content marketing + emails |
-| MKT-09 | UTM tracking sur tous les liens externes auto-postés | **P0** | XS | ⬜ | Dans la même PR que MKT-01 |
-| MKT-10 | Dashboard "Reach" : combien d'impressions par canal | P1 | M | ⬜ | Aggrégation par UTM source |
-| MKT-11 | A/B test sur la copie d'auto-post (template variants) | P2 | M | ⬜ | Feature flag + variant tracking |
-| MKT-12 | Programme ambassadeur étudiant (referral code) | P2 | M | ⬜ | Code unique + crédit boost |
-| MKT-13 | Affiliate program (creators) | P3 | M | ⬜ | Tracking + commission |
-| MKT-14 | Auto-share via WhatsApp groups étudiants (semi-manuel) | P1 | S | ⬜ | Templates copy-paste + tracking |
-| MKT-15 | Press release auto-distribution (kit + emails ciblés) | P3 | M | ⬜ | One-shot + future éditions |
-| MKT-16 | LinkedIn owner branding ("Vérifié AryTrano") | P3 | M | ⬜ | Personal branding kit |
+| Ordre | ID | Titre | Phase | Estimate | Statut | Notes |
+|---|---|---|---|---|---|---|
+| 1 | MKT-07 | Email digest hebdo aux étudiants saved-searcher | 🟠 Launch+30j | S | ⬜ | Existant pour saved-search, étendre |
+| 2 | MKT-09 | **UTM tracking sur tous les liens externes** | 🟠 Launch+30j | XS | ⬜ | **Pré-requis MKT-01..04** — sans ça pas d'attribution |
+| 3 | MKT-14 | Auto-share via WhatsApp groups étudiants (semi-manuel) | 🟠 Launch+30j | S | ⬜ | Templates copy-paste + tracking — démarre channel |
+| 4 | **MKT-01** | **🚀 Auto-post Facebook page wall** (sur PUBLISHED+VERIFIED) | 🟡 Q1 | M | ⬜ | **THE MOAT** OAuth FB + Graph API + queue + retry |
+| 5 | MKT-02 | Auto-post **Instagram** post + reel (vidéo) | 🟡 Q1 | M | ⬜ | Same Graph API token |
+| 6 | MKT-03 | Auto-post **Telegram** channel régional | 🟡 Q1 | S | ⬜ | Bot API simple — beaucoup étudiants MG |
+| 7 | MKT-10 | Dashboard "Reach" : impressions par canal | 🟡 Q1 | M | ⬜ | Aggrégation par UTM source |
+| 8 | MKT-08 | Newsletter mensuelle "Top quartiers Fianarantsoa" | 🟡 Q1 | M | ⬜ | Content marketing + emails |
+| 9 | MKT-17 | **Universités partnership** — page co-brandée | 🟡 Q1 | M | ⬜ | **NEW** "logements officiels pour IPNT" co-marketing |
+| 10 | MKT-04 | Auto-post **TikTok** pour annonces avec vidéo | 🟢 Q2+ | L | ⬜ | TikTok Marketing API — gros si vidéo prend |
+| 11 | MKT-11 | A/B test sur la copie d'auto-post | 🟢 Q2+ | M | ⬜ | Feature flag + variant tracking |
+| 12 | MKT-12 | Programme ambassadeur étudiant (referral code) | 🟢 Q2+ | M | ⬜ | Code unique + crédit boost |
+| 13 | MKT-05 | **Twitter/X** auto-card | 🟢 Q2+ | S | ⬜ | API v2 tweet endpoint — petit ROI MG |
+| 14 | MKT-13 | Affiliate program (creators) | 🟢 Q2+ | M | ⬜ | Tracking + commission |
+| 15 | MKT-15 | Press release auto-distribution | 🟢 Q2+ | M | ⬜ | One-shot + future éditions |
+| 16 | MKT-16 | LinkedIn owner branding ("Vérifié AryTrano") | 🟢 Q2+ | M | ⬜ | Personal branding kit |
+| 17 | MKT-18 | **Influencer partnerships** (top student YouTubers MG) | 🟢 Q2+ | M | ⬜ | **NEW** Sponsoring 5-10 créateurs MG |
+| 18 | MKT-19 | **Email re-engagement** (étudiants inactifs 60j) | 🟢 Q2+ | S | ⬜ | **NEW** "Tes saved searches ont 12 nouvelles annonces" |
+| 19 | MKT-06 | **Pinterest** pin pour annonces avec belles photos | ❄️ | S | ❄️ | Niche audience — pas adapté MG |
 
 ---
 
@@ -4380,21 +4426,24 @@ Sans cette feature : un tenant qui ne répond pas → lease bloqué `PENDING_TEN
 
 **Comment AryTrano génère du revenu.**
 
-| ID | Titre | Priorité | Estimate | Statut | Notes |
-|---|---|---|---|---|---|
-| PAY-01 | GoalPay loyer + signature 8% commission | ✅ T-058 (audité) | — | ✅ | Déjà shippé E-T15 |
-| PAY-02 | Orange Money intégration native (sans GoalPay middleman) | P1 | L | ⬜ | Réduire frais intermédiaire |
-| PAY-03 | Airtel Money native | P1 | L | ⬜ | Idem |
-| PAY-04 | MVola native | P1 | L | ⬜ | Idem |
-| PAY-05 | Carte bancaire (Stripe / Adyen MG) | P2 | XL | ⬜ | Pour étudiants étrangers |
-| PAY-06 | Promote/Boost listing (paid placement) | P1 | M | ⬜ | Dépend OWN-14 |
-| PAY-07 | Subscription owner "Pro" (X annonces inclus, stats avancées) | P2 | L | ⬜ | Subscription model |
-| PAY-08 | Caution escrow service (AryTrano holds) | P2 | XL | ⬜ | Légal MG + KYC |
-| PAY-09 | Refund flow automatisé (déjà en place partiel) | P1 | M | ⬜ | E-T26 audit notes |
-| PAY-10 | Receipts PDF auto-générés post-paiement | ✅ T-058 inclus | — | ✅ | déjà en place |
-| PAY-11 | Multi-currency display (EUR / USD pour étudiants étrangers) | P3 | S | ⬜ | Affichage uniquement, paiement reste MGA |
-| PAY-12 | Invoice owner pour les commissions (transparency) | P2 | M | ⬜ | Comptabilité owner |
-| PAY-13 | Tax calculator MG pour owners | P3 | M | ⬜ | Aide à la décla |
+| Ordre | ID | Titre | Phase | Estimate | Statut | Notes |
+|---|---|---|---|---|---|---|
+| 1 | PAY-09 | **Refund flow automatisé** — finaliser le partial existant | 🔴 Pre-launch | M | ⬜ | E-T26 audit notes — bug critique si refus |
+| 2 | PAY-14 | **Webhook idempotency renforcée** (replays GoalPay) | 🔴 Pre-launch | S | ⬜ | **NEW** Audit secu suggested dedup window |
+| 3 | PAY-15 | **Failed payment retry policy** documenté + automatisé | 🟠 Launch+30j | M | ⬜ | **NEW** 3 retries × 30min, then notify owner+tenant |
+| 4 | PAY-06 | **Promote/Boost listing** (paid placement) | 🟡 Q1 | M | ⬜ | Dépend OWN-14 — **first monetization product** |
+| 5 | PAY-07 | Subscription owner "Pro" (X annonces inclus + stats) | 🟡 Q1 | L | ⬜ | Subscription model + recurring billing |
+| 6 | PAY-12 | Invoice owner pour les commissions (transparency) | 🟡 Q1 | M | ⬜ | Comptabilité owner — utile pour rétention |
+| 7 | PAY-02 | Orange Money native (sans GoalPay middleman) | 🟢 Q2+ | L | ⬜ | Réduire frais intermédiaire |
+| 8 | PAY-03 | Airtel Money native | 🟢 Q2+ | L | ⬜ | Idem |
+| 9 | PAY-04 | MVola native | 🟢 Q2+ | L | ⬜ | Idem |
+| 10 | PAY-08 | **Caution escrow service** (AryTrano holds) | 🟢 Q2+ | XL | ⬜ | Légal MG + KYC — gros chantier |
+| 11 | PAY-16 | **Annual contract discount** (-10% si owner paie 12 mois) | 🟢 Q2+ | S | ⬜ | **NEW** Cash flow upfront |
+| 12 | PAY-13 | Tax calculator MG pour owners | 🟢 Q2+ | M | ⬜ | dup OWN-29 |
+| 13 | PAY-05 | Carte bancaire (Stripe / Adyen MG) | 🟢 Q2+ | XL | ⬜ | Pour étudiants étrangers |
+| 14 | PAY-11 | Multi-currency display (EUR / USD pour étudiants étrangers) | 🟢 Q2+ | S | ⬜ | Affichage uniquement, paiement reste MGA |
+| — | PAY-01 | GoalPay loyer + signature 8% commission | ✅ E-T15 | — | ✅ | Déjà shippé |
+| — | PAY-10 | Receipts PDF auto-générés post-paiement | ✅ | — | ✅ | Déjà en place |
 
 ---
 
@@ -4402,23 +4451,25 @@ Sans cette feature : un tenant qui ne répond pas → lease bloqué `PENDING_TEN
 
 **Modération, audit, business ops.**
 
-| ID | Titre | Priorité | Estimate | Statut | Notes |
-|---|---|---|---|---|---|
-| ADM-01 | Admin dashboard avec KPI plateforme (DAU, MAU, revenue) | **P0** | M | ⬜ | `/admin/overview` page |
-| ADM-02 | Bulk moderation (sélection multiple + action) | P1 | M | ⬜ | Sur `/admin/listings`, `/admin/reports` |
-| ADM-03 | User suspension flow (block + email + raison) | P1 | M | ⬜ | Status SUSPENDED user |
-| ADM-04 | IP / device blocklist | P1 | M | ⬜ | Dépend TRU-11 |
-| ADM-05 | Audit log viewer complet | P0 | M | ⬜ | Dépend TRU-09 |
-| ADM-06 | Permission groups (MODERATOR vs SUPPORT vs SUPER_ADMIN) | P1 | M | ⬜ | RBAC fin |
-| ADM-07 | Customer support ticket inbox | P1 | L | ⬜ | Simple Zendesk-light ou intégration |
-| ADM-08 | Admin notes sur users / listings (libres) | P1 | S | ⬜ | Internal markdown |
-| ADM-09 | Stats export CSV / PDF mensuel | P2 | S | ⬜ | Reporting investisseur |
-| ADM-10 | Mass-email aux owners avec filtre (city, status) | P1 | M | ⬜ | Comms tool |
-| ADM-11 | Bulk listing republish (post-saison) | P2 | S | ⬜ | Helper saisonnier |
-| ADM-12 | Admin can edit any listing (modération directe) | P1 | M | ⬜ | Gated par audit log |
-| ADM-13 | Crash reports / Sentry dashboard intégré | P2 | XS | ⬜ | Embed Sentry iframe |
-| ADM-14 | Revenue dashboard avec cohort analysis | P2 | L | ⬜ | Business intel |
-| ADM-15 | Feature flag manager (admin UI sur GrowthBook) | P2 | M | ⬜ | Dépend feature-flags infra |
+| Ordre | ID | Titre | Phase | Estimate | Statut | Notes |
+|---|---|---|---|---|---|---|
+| 1 | **ADM-01** | **Admin dashboard avec KPI plateforme** (DAU, MAU, signups, listings) | 🔴 Pre-launch | M | ⬜ | `/admin/overview` — sans ça on est aveugles |
+| 2 | ADM-05 | **Audit log viewer complet** | 🔴 Pre-launch | M | ⬜ | dup TRU-09 — pré-requis pour ADM-03 |
+| 3 | ADM-08 | Admin notes sur users / listings (libres) | 🔴 Pre-launch | S | ⬜ | Internal markdown — utile dès le 1er incident |
+| 4 | ADM-13 | Crash reports / Sentry dashboard intégré | 🔴 Pre-launch | XS | ⬜ | Embed Sentry iframe — visibilité erreurs |
+| 5 | ADM-03 | User suspension flow (block + email + raison) | 🟠 Launch+30j | M | ⬜ | Status SUSPENDED user |
+| 6 | ADM-02 | Bulk moderation (sélection multiple + action) | 🟠 Launch+30j | M | ⬜ | Sur `/admin/listings`, `/admin/reports` |
+| 7 | ADM-04 | IP / device blocklist | 🟠 Launch+30j | M | ⬜ | Dépend TRU-11 |
+| 8 | ADM-12 | Admin can edit any listing (modération directe) | 🟠 Launch+30j | M | ⬜ | Gated par audit log |
+| 9 | ADM-16 | **Bulk admin email push aux owners** (avant launch officiel) | 🟠 Launch+30j | S | ⬜ | **NEW** dup ADM-10 mais immédiat |
+| 10 | ADM-06 | Permission groups (MODERATOR vs SUPPORT vs SUPER_ADMIN) | 🟡 Q1 | M | ⬜ | RBAC fin — quand on a >5 admins |
+| 11 | ADM-07 | Customer support ticket inbox | 🟡 Q1 | L | ⬜ | Simple Zendesk-light ou intégration |
+| 12 | ADM-10 | Mass-email aux owners avec filtre (city, status) | 🟡 Q1 | M | ⬜ | Comms tool — pour campagnes ciblées |
+| 13 | ADM-09 | Stats export CSV / PDF mensuel | 🟡 Q1 | S | ⬜ | Reporting investisseur |
+| 14 | ADM-14 | Revenue dashboard avec cohort analysis | 🟢 Q2+ | L | ⬜ | Business intel — quand on a des revenus |
+| 15 | ADM-15 | Feature flag manager (admin UI sur GrowthBook) | 🟢 Q2+ | M | ⬜ | Dépend feature-flags infra |
+| 16 | ADM-11 | Bulk listing republish (post-saison) | 🟢 Q2+ | S | ⬜ | Helper saisonnier |
+| 17 | ADM-17 | **Investor reporting auto** (MRR, cohorts → PDF mensuel) | 🟢 Q2+ | M | ⬜ | **NEW** Si fund-raising en cours |
 
 ---
 
@@ -4426,20 +4477,21 @@ Sans cette feature : un tenant qui ne répond pas → lease bloqué `PENDING_TEN
 
 **Notifs, emails, SMS, push.**
 
-| ID | Titre | Priorité | Estimate | Statut | Notes |
-|---|---|---|---|---|---|
-| COM-01 | In-app notifications inbox (bell icon) | P1 | M | ⬜ | Persistent + read/unread |
-| COM-02 | Web push (Service Worker + VAPID) | P1 | M | ⬜ | Saved search alerts COM-04 |
-| COM-03 | Email digest owner hebdo | P0 | S | ⬜ | dup OWN-04 |
-| COM-04 | Push notification mobile (Expo) saved search match | P1 | M | ⬜ | E-T22 push token déjà fait |
-| COM-05 | SMS reminders pour visites confirmées | P2 | S | ⬜ | Twilio existant |
-| COM-06 | WhatsApp Business API broadcast (saved search) | P1 | L | ⬜ | Dépend AUD-009 |
-| COM-07 | i18n des templates emails (déjà fait FR-MG/MG) | ✅ | — | ✅ | Continue d'auditer |
-| COM-08 | Notif preferences page (`/dashboard/notifications`) | P1 | S | ⬜ | Opt-in/out par catégorie |
-| COM-09 | "Quiet hours" pour les notifs (pas de SMS la nuit) | P2 | XS | ⬜ | Server-side check |
-| COM-10 | Transactional email tracking (delivered, opened) | P2 | M | ⬜ | Mailgun/Postmark webhook |
-| COM-11 | Owner reply-by-email (commentaire sur annonce) | P2 | M | ⬜ | Inbound email parsing |
-| COM-12 | Bounce handling + re-engagement campagne | P2 | M | ⬜ | Auto-disable email after N bounces |
+| Ordre | ID | Titre | Phase | Estimate | Statut | Notes |
+|---|---|---|---|---|---|---|
+| 1 | COM-08 | Notif preferences page (`/dashboard/notifications`) | 🔴 Pre-launch | S | ⬜ | Opt-in/out par catégorie — LEG-04 compliance |
+| 2 | COM-12 | Bounce handling + re-engagement campagne | 🔴 Pre-launch | M | ⬜ | Auto-disable email after N bounces — sinon reputation IP |
+| 3 | COM-03 | Email digest owner hebdo | 🟠 Launch+30j | S | ⬜ | dup OWN-04 |
+| 4 | COM-02 | Web push (Service Worker + VAPID) | 🟠 Launch+30j | M | ⬜ | Saved search alerts COM-04 |
+| 5 | COM-04 | Push notification mobile (Expo) saved search match | 🟠 Launch+30j | M | ⬜ | E-T22 push token déjà fait |
+| 6 | COM-01 | In-app notifications inbox (bell icon) | 🟡 Q1 | M | ⬜ | Persistent + read/unread |
+| 7 | COM-06 | **WhatsApp Business API broadcast** (saved search) | 🟡 Q1 | L | ⬜ | dup TEN-03 — gros canal MG |
+| 8 | COM-05 | SMS reminders pour visites confirmées | 🟡 Q1 | S | ⬜ | Twilio existant |
+| 9 | COM-10 | Transactional email tracking (delivered, opened) | 🟡 Q1 | M | ⬜ | Mailgun/Postmark webhook |
+| 10 | COM-13 | **Voice notes tenant → owner** (mini-vocal sur lead) | 🟢 Q2+ | M | ⬜ | **NEW** Format MG-natif (vocal WA très répandu) |
+| 11 | COM-09 | "Quiet hours" pour les notifs (pas de SMS la nuit) | 🟢 Q2+ | XS | ⬜ | Server-side check |
+| 12 | COM-11 | Owner reply-by-email (commentaire sur annonce) | 🟢 Q2+ | M | ⬜ | Inbound email parsing |
+| — | COM-07 | i18n des templates emails (FR-MG/MG) | ✅ | — | ✅ | Continue d'auditer |
 
 ---
 
@@ -4447,27 +4499,29 @@ Sans cette feature : un tenant qui ne répond pas → lease bloqué `PENDING_TEN
 
 **Améliorer l'existant.**
 
-| ID | Titre | Priorité | Estimate | Statut | Notes |
-|---|---|---|---|---|---|
-| EDT-01 | Save & exit drafts (auto-save toutes les 30s) | **P0** | S | ⬜ | LocalStorage + server sync |
-| EDT-02 | Photo zoom amélioré (deepzoom Cloudinary) | P1 | S | ⬜ | Multi-niveau zoom |
-| EDT-03 | Inline edit du titre depuis dashboard listings | P2 | S | ⬜ | Click → modal mini-form |
-| EDT-04 | Validation form en temps réel (Zod + react-hook-form) | P1 | M | ⬜ | Migration progressive |
-| EDT-05 | Onboarding owner — wizard 5 étapes | P1 | M | ⬜ | dup OWN-18 |
-| EDT-06 | Mobile-first ListingForm (steps verticales) | P1 | M | ⬜ | UX responsive deeper |
-| EDT-07 | Polish ListingFiltersSidebar (sticky, accordion) | P2 | S | ⬜ | Visual refinement |
-| EDT-08 | Améliorer cartes annonces (skeleton loading, smooth) | P2 | S | ⬜ | Suspense + skeleton |
-| EDT-09 | Améliorer hover/active states partout | P2 | S | ⬜ | Audit visuel |
-| EDT-10 | Polish detail page (sticky CTA mobile) | P1 | S | ⬜ | UX conversion |
-| EDT-11 | Empty states partout (favorites vide, search vide) | P2 | S | ⬜ | Illustrations + CTA |
-| EDT-12 | Error boundary par section (pas page entière) | P2 | M | ⬜ | Granular errors |
-| EDT-13 | Skeleton screens partout (LCP friendly) | P2 | S | ⬜ | Audit perf |
-| EDT-14 | Dark mode (toggle dans header) | P3 | M | ⬜ | Tokens déjà prêts oklch |
-| EDT-15 | Localisation poussée (date FR, mois "juin" pas "Jun") | P2 | XS | ⬜ | Intl.DateTimeFormat partout |
-| EDT-16 | Accessibility audit complet (WCAG AA pass) | P1 | L | ⬜ | Suivi des audits précédents |
-| EDT-17 | "Conditions générales" footer link prominent | P0 | XS | ⬜ | Légal |
-| EDT-18 | Cookies banner (RGPD-style si analytics étendu) | P1 | S | ⬜ | One-trust ou home-grown |
-| EDT-19 | Polish PhotoGallery (swipe mobile, pinch zoom) | P1 | M | ⬜ | UX visite |
+| Ordre | ID | Titre | Phase | Estimate | Statut | Notes |
+|---|---|---|---|---|---|---|
+| 1 | **EDT-17** | "Conditions générales" footer link prominent | 🔴 Pre-launch | XS | ⬜ | **LÉGAL** — pas négociable |
+| 2 | EDT-18 | Cookies banner (RGPD-style) | 🔴 Pre-launch | S | ⬜ | One-trust ou home-grown — LEG-06 dep |
+| 3 | EDT-01 | Save & exit drafts (auto-save toutes les 30s) | 🔴 Pre-launch | S | ⬜ | LocalStorage + server sync — réduit abandon |
+| 4 | EDT-10 | Polish detail page (sticky CTA mobile) | 🔴 Pre-launch | S | ⬜ | UX conversion — bottom CTA on mobile |
+| 5 | EDT-11 | Empty states partout (favorites vide, search vide) | 🔴 Pre-launch | S | ⬜ | Illustrations + CTA — first impression |
+| 6 | EDT-12 | Error boundary par section | 🔴 Pre-launch | M | ⬜ | Granular errors — pas tuer la page |
+| 7 | EDT-04 | Validation form en temps réel (Zod + react-hook-form) | 🟠 Launch+30j | M | ⬜ | Migration progressive |
+| 8 | EDT-06 | Mobile-first ListingForm (steps verticales) | 🟠 Launch+30j | M | ⬜ | UX responsive deeper |
+| 9 | EDT-19 | Polish PhotoGallery (swipe mobile, pinch zoom) | 🟠 Launch+30j | M | ⬜ | UX visite |
+| 10 | EDT-05 | Onboarding owner — wizard 5 étapes | 🟠 Launch+30j | M | ⬜ | dup OWN-18 |
+| 11 | EDT-13 | Skeleton screens partout (LCP friendly) | 🟠 Launch+30j | S | ⬜ | Audit perf |
+| 12 | EDT-08 | Améliorer cartes annonces (skeleton + smooth) | 🟠 Launch+30j | S | ⬜ | Suspense + skeleton |
+| 13 | EDT-16 | **Accessibility audit complet (WCAG AA pass)** | 🟡 Q1 | L | ⬜ | Suivi des audits précédents |
+| 14 | EDT-02 | Photo zoom amélioré (deepzoom Cloudinary) | 🟡 Q1 | S | ⬜ | Multi-niveau zoom |
+| 15 | EDT-15 | Localisation poussée (date FR, mois "juin" pas "Jun") | 🟡 Q1 | XS | ⬜ | Intl.DateTimeFormat partout |
+| 16 | EDT-09 | Améliorer hover/active states partout | 🟡 Q1 | S | ⬜ | Audit visuel |
+| 17 | EDT-07 | Polish ListingFiltersSidebar (sticky, accordion) | 🟡 Q1 | S | ⬜ | Visual refinement |
+| 18 | EDT-03 | Inline edit du titre depuis dashboard listings | 🟢 Q2+ | S | ⬜ | Click → modal mini-form |
+| 19 | EDT-14 | Dark mode (toggle dans header) | 🟢 Q2+ | M | ⬜ | Tokens déjà prêts oklch |
+| 20 | EDT-20 | **Print-friendly stylesheet** sur detail (étudiants impriment) | 🟢 Q2+ | XS | ⬜ | **NEW** Quick win MG-cultural |
+| 21 | EDT-21 | **Right-to-left ready** (préparation EN→AR future) | 🟢 Q2+ | M | ⬜ | **NEW** Si Maghreb expansion |
 
 ---
 
@@ -4475,30 +4529,33 @@ Sans cette feature : un tenant qui ne répond pas → lease bloqué `PENDING_TEN
 
 **Au-delà de l'audit qu'on a déjà fait.**
 
-| ID | Titre | Priorité | Estimate | Statut | Notes |
-|---|---|---|---|---|---|
-| SEC-01 | 2FA pour owners (TOTP via auth app) | **P0** | M | ⬜ | OWASP recommandé |
-| SEC-02 | 2FA pour admins (mandatory) | **P0** | S | ⬜ | Avant audit pré-launch |
-| SEC-03 | Hardware security keys (WebAuthn) | P2 | M | ⬜ | Optionnel mais bon signal |
-| SEC-04 | Anomaly detection login (nouvelle géo, nouvel UA) | P1 | M | ⬜ | Email alert + force re-auth |
-| SEC-05 | Bug bounty program (HackerOne ou similaire) | P2 | M | ⬜ | Setup + budget |
-| SEC-06 | Penetration test externe (cabinet local + global) | P1 | XL | ⬜ | Avant launch officiel |
-| SEC-07 | SOC2 readiness (logging, retention, etc.) | P3 | XL | ⬜ | Pour clients corporate futurs |
-| SEC-08 | CSRF token rotation par session | P1 | S | ⬜ | Au-delà de Next default |
-| SEC-09 | Rate limit global agressif (anti-DDoS) | P1 | M | ⬜ | Cloudflare WAF rules |
-| SEC-10 | Encryption-at-rest pour PII sensitive (phone, email) | P1 | M | ⬜ | Postgres pgcrypto |
-| SEC-11 | Backup chiffré + restore drill mensuel | **P0** | M | ⬜ | Doc + automation |
-| SEC-12 | Security headers complets (CSP strict, HSTS preload) | ✅ partial | S | 🚧 | HSTS preload missing |
-| SEC-13 | Audit Sentry pour PII leakage | P1 | S | ⬜ | scrub config audit |
-| SEC-14 | Anti-CSRF sur Server Actions (déjà géré Next) | ✅ | — | ✅ | Allowlist domains in config |
-| SEC-15 | Session timeout configurable | P2 | XS | ⬜ | Avant infra/PCI nécessaire |
-| SEC-16 | Email enumeration prevention sur reset password | P1 | XS | ⬜ | Toujours "email envoyé" |
-| SEC-17 | Audit dependencies (Snyk / Dependabot configuré) | ✅ | — | ✅ | Dependabot actif |
-| SEC-18 | API key rotation (Cloudinary, Twilio, GoalPay) — runbook | P1 | S | ⬜ | Documenté + tested |
-| SEC-19 | DDoS mitigation testing (Cloudflare attacks mode) | P2 | S | ⬜ | Drill |
-| SEC-20 | Bug report security@arytrano.com (PGP key) | P1 | XS | ⬜ | Responsible disclosure |
-| SEC-21 | Audit RBAC actuel (Role enum) — vérifier privilege escalation | P1 | M | ⬜ | Bien noter qui peut quoi |
-| SEC-22 | Logging structuré + retention 90j (compliance) | P1 | M | ⬜ | Logflare / Axiom |
+| Ordre | ID | Titre | Phase | Estimate | Statut | Notes |
+|---|---|---|---|---|---|---|
+| 1 | **SEC-02** | **2FA admins (mandatory)** | 🔴 Pre-launch | S | ⬜ | **CRITICAL** Avant audit pré-launch |
+| 2 | SEC-11 | **Backup chiffré + restore drill mensuel** | 🔴 Pre-launch | M | ⬜ | **CRITICAL** Doc + automation |
+| 3 | SEC-12 | Security headers complets (HSTS preload) | 🔴 Pre-launch | S | 🚧 | HSTS preload manquant |
+| 4 | SEC-13 | Audit Sentry pour PII leakage | 🔴 Pre-launch | S | ⬜ | Scrub config audit |
+| 5 | SEC-20 | security@arytrano.com (PGP key) — responsible disclosure | 🔴 Pre-launch | XS | ⬜ | Avant que les hackers trouvent l'app |
+| 6 | SEC-16 | Email enumeration prevention sur reset password | 🔴 Pre-launch | XS | ⬜ | Toujours "email envoyé" |
+| 7 | SEC-21 | **Audit RBAC actuel** (Role enum) — privilege escalation | 🔴 Pre-launch | M | ⬜ | Bien noter qui peut quoi |
+| 8 | SEC-23 | **Disaster recovery runbook** + RTO/RPO documentés | 🔴 Pre-launch | M | ⬜ | **NEW** Doc opérationnelle key |
+| 9 | SEC-01 | 2FA owners (TOTP via auth app) | 🟠 Launch+30j | M | ⬜ | OWASP recommandé |
+| 10 | SEC-04 | Anomaly detection login (nouvelle géo, nouvel UA) | 🟠 Launch+30j | M | ⬜ | Email alert + force re-auth |
+| 11 | SEC-08 | CSRF token rotation par session | 🟠 Launch+30j | S | ⬜ | Au-delà de Next default |
+| 12 | SEC-09 | Rate limit global agressif (anti-DDoS) | 🟠 Launch+30j | M | ⬜ | Cloudflare WAF rules |
+| 13 | SEC-18 | API key rotation runbook (Cloudinary, Twilio, GoalPay) | 🟠 Launch+30j | S | ⬜ | Documenté + tested |
+| 14 | SEC-22 | Logging structuré + retention 90j (compliance) | 🟠 Launch+30j | M | ⬜ | Logflare / Axiom |
+| 15 | SEC-06 | **Penetration test externe** | 🟡 Q1 | XL | ⬜ | Cabinet local + global — avant launch officiel |
+| 16 | SEC-10 | Encryption-at-rest pour PII sensitive (phone, email) | 🟡 Q1 | M | ⬜ | Postgres pgcrypto |
+| 17 | SEC-19 | DDoS mitigation testing (Cloudflare attacks mode) | 🟡 Q1 | S | ⬜ | Drill |
+| 18 | SEC-15 | Session timeout configurable | 🟡 Q1 | XS | ⬜ | Avant infra/PCI nécessaire |
+| 19 | SEC-24 | **GDPR data processor agreements** avec partners | 🟡 Q1 | S | ⬜ | **NEW** Cloudinary, Twilio, Sentry, Mailgun |
+| 20 | SEC-25 | **Audit log immutable** (append-only signing chain) | 🟢 Q2+ | L | ⬜ | **NEW** Pour conformité forte |
+| 21 | SEC-03 | Hardware security keys (WebAuthn) | 🟢 Q2+ | M | ⬜ | Optionnel mais bon signal |
+| 22 | SEC-05 | Bug bounty program (HackerOne) | 🟢 Q2+ | M | ⬜ | Setup + budget |
+| 23 | SEC-07 | SOC2 readiness | 🟢 Q2+ | XL | ⬜ | Pour clients corporate futurs |
+| — | SEC-14 | Anti-CSRF sur Server Actions (déjà Next) | ✅ | — | ✅ | Allowlist domains in config |
+| — | SEC-17 | Audit dependencies (Dependabot) | ✅ | — | ✅ | Dependabot actif |
 
 ---
 
@@ -4506,28 +4563,30 @@ Sans cette feature : un tenant qui ne répond pas → lease bloqué `PENDING_TEN
 
 **Après que le web soit solide.**
 
-| ID | Titre | Priorité | Estimate | Statut | Notes |
-|---|---|---|---|---|---|
-| MOB-01 | Owner video upload depuis Expo (camera + galerie) | P1 | M | ⬜ | Pattern signed direct Cloudinary |
-| MOB-02 | Owner photo upload depuis mobile | P1 | M | ⬜ | Idem |
-| MOB-03 | Push notifications natives (token déjà en place) | P0 | M | ⬜ | Expo push receipt cron |
-| MOB-04 | Offline browsing (last viewed + favorites) | P1 | M | ⬜ | React Query persistence |
-| MOB-05 | Mobile map natif (react-native-maps) | P1 | L | ⬜ | Better que webview |
-| MOB-06 | Lease PDF download + open natif | P1 | S | ⬜ | expo-file-system + sharing |
-| MOB-07 | Biometric auth (TouchID / FaceID) | P2 | M | ⬜ | expo-local-authentication |
-| MOB-08 | Deep linking listing detail | ✅ | — | ✅ | Schema déjà setup |
-| MOB-09 | Apple Wallet + Google Wallet pour caution receipt | P3 | M | ⬜ | Niche |
-| MOB-10 | Widgets iOS / Android (annonces top) | P3 | M | ⬜ | Visibility passive |
-| MOB-11 | Camera roll picker + image edit basic | P1 | M | ⬜ | Pour upload photos |
-| MOB-12 | In-app browser pour links externes | P2 | XS | ⬜ | expo-web-browser |
-| MOB-13 | Onboarding mobile (3 cards swipe) | P1 | S | ⬜ | UX premier launch |
-| MOB-14 | TestFlight + Play Store internal track | ✅ | — | ✅ | EAS Build déjà setup |
-| MOB-15 | Production submit (App Store + Play) | P1 | M | ⬜ | Setup compliance + assets |
-| MOB-16 | Mobile owner edit listing (full form) | P2 | L | ⬜ | Beaucoup de form fields |
-| MOB-17 | Mobile owner stats screen (port dashboard) | P1 | M | ⬜ | View counter + sparkline |
-| MOB-18 | Mobile admin moderation (light tools) | P3 | M | ⬜ | Modération en mobilité |
-| MOB-19 | Pull-to-refresh partout | P1 | XS | ⬜ | Standard |
-| MOB-20 | Mobile-first map clustering | P2 | M | ⬜ | Stadia tile + supercluster |
+| Ordre | ID | Titre | Phase | Estimate | Statut | Notes |
+|---|---|---|---|---|---|---|
+| 1 | MOB-13 | Onboarding mobile (3 cards swipe) | 🟢 Q2+ | S | ⬜ | UX premier launch |
+| 2 | MOB-19 | Pull-to-refresh partout | 🟢 Q2+ | XS | ⬜ | Standard |
+| 3 | MOB-03 | **Push notifications natives** (token déjà en place) | 🟢 Q2+ | M | ⬜ | Expo push receipt cron — UI inbox + handlers |
+| 4 | MOB-01 | **Owner video upload depuis Expo** (camera + galerie) | 🟢 Q2+ | M | ⬜ | Pattern signed direct Cloudinary |
+| 5 | MOB-02 | Owner photo upload depuis mobile | 🟢 Q2+ | M | ⬜ | Idem |
+| 6 | MOB-11 | Camera roll picker + image edit basic | 🟢 Q2+ | M | ⬜ | Pour upload photos |
+| 7 | MOB-17 | Mobile owner stats screen (port dashboard) | 🟢 Q2+ | M | ⬜ | View counter + sparkline |
+| 8 | MOB-04 | Offline browsing (last viewed + favorites) | 🟢 Q2+ | M | ⬜ | React Query persistence |
+| 9 | MOB-05 | Mobile map natif (react-native-maps) | 🟢 Q2+ | L | ⬜ | Better que webview |
+| 10 | MOB-06 | Lease PDF download + open natif | 🟢 Q2+ | S | ⬜ | expo-file-system + sharing |
+| 11 | MOB-15 | **Production submit (App Store + Play)** | 🟢 Q2+ | M | ⬜ | Setup compliance + assets |
+| 12 | MOB-07 | Biometric auth (TouchID / FaceID) | 🟢 Q2+ | M | ⬜ | expo-local-authentication |
+| 13 | MOB-12 | In-app browser pour links externes | 🟢 Q2+ | XS | ⬜ | expo-web-browser |
+| 14 | MOB-16 | Mobile owner edit listing (full form) | 🟢 Q2+ | L | ⬜ | Beaucoup de form fields |
+| 15 | MOB-20 | Mobile-first map clustering | 🟢 Q2+ | M | ⬜ | Stadia tile + supercluster |
+| 16 | MOB-21 | **Offline lease download for tenants** (signed bail PDF) | 🟢 Q2+ | M | ⬜ | **NEW** Important MG (réseau peu fiable) |
+| 17 | MOB-22 | **Vidéo recording in-app** (au lieu de juste picker) | 🟢 Q2+ | M | ⬜ | **NEW** UX directe sans galerie |
+| 18 | MOB-18 | Mobile admin moderation (light tools) | 🟢 Q2+ | M | ⬜ | Modération en mobilité |
+| 19 | MOB-10 | Widgets iOS / Android (annonces top) | 🟢 Q2+ | M | ⬜ | Visibility passive |
+| 20 | MOB-09 | Apple Wallet + Google Wallet pour caution receipt | 🟢 Q2+ | M | ⬜ | Niche |
+| — | MOB-08 | Deep linking listing detail | ✅ | — | ✅ | Schema déjà setup |
+| — | MOB-14 | TestFlight + Play Store internal track | ✅ | — | ✅ | EAS Build déjà setup |
 
 ---
 
@@ -4535,23 +4594,25 @@ Sans cette feature : un tenant qui ne répond pas → lease bloqué `PENDING_TEN
 
 **Comprendre l'usage et l'optimiser.**
 
-| ID | Titre | Priorité | Estimate | Statut | Notes |
-|---|---|---|---|---|---|
-| ANA-01 | Listing visit tracking + dashboard | ✅ T-058 | — | ✅ | Shippé 2026-06-25 |
-| ANA-02 | Top sources widget per listing | ✅ | — | ✅ | Shippé 2026-06-25 |
-| ANA-03 | Portfolio overview (owner multi-listing) | P0 | M | ⬜ | dup OWN-13 |
-| ANA-04 | Conversion funnel admin (view → contact → lease) | P1 | M | ⬜ | Cohort analysis |
-| ANA-05 | A/B test framework (GrowthBook ou home) | P1 | M | ⬜ | Optim copy + UX |
-| ANA-06 | "Heatmap" listing detail page (scroll depth) | P2 | M | ⬜ | Microsoft Clarity ou home |
-| ANA-07 | Cohort retention par city / quartier | P2 | M | ⬜ | BI tool |
-| ANA-08 | Revenue dashboard avec MRR / ARR | P1 | M | ⬜ | Dép Payments + subs |
-| ANA-09 | Search analytics (top queries non-trouvées) | P1 | S | ⬜ | Insight produit |
-| ANA-10 | Drop-off analysis sur sign-up / lead form | P1 | M | ⬜ | UX insight |
-| ANA-11 | Owner activation cohorts ("a publié 1 annonce en 7j") | P1 | M | ⬜ | Onboarding insight |
-| ANA-12 | Video view metrics (per listing) | P1 | S | ⬜ | Player onPlay event |
-| ANA-13 | Saved-search engagement (clicks, time-to-action) | P2 | S | ⬜ | Insight discovery |
-| ANA-14 | Public stats page "AryTrano en chiffres" | P2 | S | ⬜ | Marketing trust |
-| ANA-15 | Daily DAU/MAU email report admin | P1 | XS | ⬜ | Cron + email |
+| Ordre | ID | Titre | Phase | Estimate | Statut | Notes |
+|---|---|---|---|---|---|---|
+| 1 | ANA-15 | Daily DAU/MAU email report admin | 🔴 Pre-launch | XS | ⬜ | Cron + email — savoir si ça vit |
+| 2 | ANA-03 | Portfolio overview owner (multi-listing) | 🟠 Launch+30j | M | ⬜ | dup OWN-13 |
+| 3 | ANA-09 | Search analytics (top queries non-trouvées) | 🟠 Launch+30j | S | ⬜ | Insight produit — drive content/seeding |
+| 4 | ANA-10 | Drop-off analysis sur sign-up / lead form | 🟠 Launch+30j | M | ⬜ | UX insight — fix funnel leaks |
+| 5 | ANA-12 | Video view metrics (per listing) | 🟠 Launch+30j | S | ⬜ | Player onPlay event |
+| 6 | ANA-04 | Conversion funnel admin (view → contact → lease) | 🟡 Q1 | M | ⬜ | Cohort analysis |
+| 7 | ANA-11 | Owner activation cohorts ("a publié 1 annonce en 7j") | 🟡 Q1 | M | ⬜ | Onboarding insight |
+| 8 | ANA-13 | Saved-search engagement (clicks, time-to-action) | 🟡 Q1 | S | ⬜ | Insight discovery |
+| 9 | ANA-08 | Revenue dashboard avec MRR / ARR | 🟡 Q1 | M | ⬜ | Dép Payments + subs |
+| 10 | ANA-05 | A/B test framework (GrowthBook ou home) | 🟢 Q2+ | M | ⬜ | Optim copy + UX |
+| 11 | ANA-06 | "Heatmap" listing detail (scroll depth) | 🟢 Q2+ | M | ⬜ | Microsoft Clarity ou home |
+| 12 | ANA-07 | Cohort retention par city / quartier | 🟢 Q2+ | M | ⬜ | BI tool |
+| 13 | ANA-14 | Public stats page "AryTrano en chiffres" | 🟢 Q2+ | S | ⬜ | Marketing trust |
+| 14 | ANA-16 | **Owner referral attribution** (qui amène qui ?) | 🟢 Q2+ | S | ⬜ | **NEW** Pour MKT-12 ROI |
+| 15 | ANA-17 | **WhatsApp click-through tracking** | 🟢 Q2+ | M | ⬜ | **NEW** Mesurer le canal direct |
+| — | ANA-01 | Listing visit tracking + dashboard | ✅ T-058 | — | ✅ | Shippé 2026-06-25 |
+| — | ANA-02 | Top sources widget per listing | ✅ | — | ✅ | Shippé 2026-06-25 |
 
 ---
 
@@ -4559,26 +4620,30 @@ Sans cette feature : un tenant qui ne répond pas → lease bloqué `PENDING_TEN
 
 **Ranker, éduquer, retenir.**
 
-| ID | Titre | Priorité | Estimate | Statut | Notes |
-|---|---|---|---|---|---|
-| CON-01 | Blog `/blog` avec articles éditoriaux | **P0** | L | ⬜ | MDX + tag system |
-| CON-02 | City guides ("Vivre à Fianarantsoa étudiant") | P0 | L | ⬜ | Long-form SEO |
-| CON-03 | Quartier guides (Andrainjato, Anjoma, etc.) | P0 | L | ⬜ | Existant mais à enrichir |
-| CON-04 | "Comment chercher un logement" guide pas-à-pas | P1 | M | ⬜ | Top funnel |
-| CON-05 | Owner success stories (testimonials longues) | P1 | M | ⬜ | Social proof |
-| CON-06 | Schema.org enrichment (FAQ, HowTo, Article) | P1 | S | ⬜ | Rich results plus de pages |
-| CON-07 | Sitemap segments dynamiques (par city, par quartier) | ✅ | — | ✅ | Existant |
-| CON-08 | hreflang complet (FR-MG, MG, EN future) | ✅ partial | S | 🚧 | Déjà FR/MG |
-| CON-09 | International SEO (Maurice, Réunion, Comores) | P3 | XL | ❄️ | Hors-MG plus tard |
-| CON-10 | Press kit page `/press` avec brand assets | P1 | S | ⬜ | Pour journalistes |
-| CON-11 | Investor deck / data room | P2 | M | ⬜ | Pour future levée |
-| CON-12 | Community page (étudiants AryTrano forum) | P3 | XL | ❄️ | Discord léger plutôt |
-| CON-13 | Newsletter signup partout (pop-up smart) | P2 | S | ⬜ | Email list growth |
-| CON-14 | Linkbuilding manuel (10 sites éducation MG) | P1 | M | ⬜ | SEO off-page |
-| CON-15 | Open Graph images dynamiques par page (next-og) | ✅ partial | — | ✅ | Déjà fait T-058 |
-| CON-16 | "Roommate finder" content marketing | P2 | M | ⬜ | Pre-launch TEN-08 |
-| CON-17 | Vidéo testimonial owner sur landing | P2 | M | ⬜ | Marketing rich |
-| CON-18 | TikTok content strategy (mini-tours d'annonces) | P2 | L | ⬜ | Réutilise vidéos owner |
+| Ordre | ID | Titre | Phase | Estimate | Statut | Notes |
+|---|---|---|---|---|---|---|
+| 1 | CON-03 | **Quartier guides** (Andrainjato, Anjoma, etc.) — enrichir | 🔴 Pre-launch | L | ⬜ | Existant — booster pour SEO long-tail |
+| 2 | CON-10 | Press kit page `/press` avec brand assets | 🔴 Pre-launch | S | ⬜ | Pour journalistes — anticiper coverage |
+| 3 | **CON-01** | **Blog `/blog` avec articles éditoriaux** | 🟠 Launch+30j | L | ⬜ | MDX + tag system — SEO compound interest |
+| 4 | CON-02 | City guides ("Vivre à Fianarantsoa étudiant") | 🟠 Launch+30j | L | ⬜ | Long-form SEO |
+| 5 | CON-04 | "Comment chercher un logement" guide pas-à-pas | 🟠 Launch+30j | M | ⬜ | Top funnel |
+| 6 | CON-06 | Schema.org enrichment (FAQ, HowTo, Article) | 🟠 Launch+30j | S | ⬜ | Rich results plus de pages |
+| 7 | CON-08 | hreflang complet (FR-MG, MG, EN future) | 🟠 Launch+30j | S | 🚧 | Déjà FR/MG |
+| 8 | CON-14 | Linkbuilding manuel (10 sites éducation MG) | 🟠 Launch+30j | M | ⬜ | SEO off-page |
+| 9 | CON-05 | Owner success stories (testimonials longues) | 🟡 Q1 | M | ⬜ | Social proof |
+| 10 | CON-17 | Vidéo testimonial owner sur landing | 🟡 Q1 | M | ⬜ | Marketing rich |
+| 11 | CON-13 | Newsletter signup partout (pop-up smart) | 🟡 Q1 | S | ⬜ | Email list growth |
+| 12 | CON-18 | TikTok content strategy (mini-tours d'annonces) | 🟡 Q1 | L | ⬜ | Réutilise vidéos owner |
+| 13 | CON-19 | **Étudiant testimonials** (vidéo + photo) | 🟡 Q1 | M | ⬜ | **NEW** Authenticité MG locale |
+| 14 | CON-20 | **University-specific landing pages** ("/uni/ipnt") | 🟡 Q1 | M | ⬜ | **NEW** SEO niche + co-branding MKT-17 |
+| 15 | CON-11 | Investor deck / data room | 🟢 Q2+ | M | ⬜ | Pour future levée |
+| 16 | CON-16 | "Roommate finder" content marketing | 🟢 Q2+ | M | ⬜ | Pre-launch TEN-08 |
+| 17 | CON-21 | **Blog en malagasy** (équiv. CON-01 mais MG) | 🟢 Q2+ | L | ⬜ | **NEW** SEO MG natif unique |
+| 18 | CON-22 | **YouTube channel** (visite virtuelle quartiers) | 🟢 Q2+ | L | ⬜ | **NEW** Long-form vidéo, traffic compound |
+| — | CON-07 | Sitemap segments dynamiques (par city, par quartier) | ✅ | — | ✅ | Existant |
+| — | CON-15 | Open Graph images dynamiques par page | ✅ | — | ✅ | Déjà fait T-058 |
+| — | CON-09 | International SEO (Maurice, Réunion, Comores) | ❄️ | XL | ❄️ | Hors-MG plus tard |
+| — | CON-12 | Community page (étudiants AryTrano forum) | ❄️ | XL | ❄️ | Discord léger plutôt |
 
 ---
 
@@ -4586,68 +4651,220 @@ Sans cette feature : un tenant qui ne répond pas → lease bloqué `PENDING_TEN
 
 **Madagascar + RGPD-style même si non-EU.**
 
-| ID | Titre | Priorité | Estimate | Statut | Notes |
-|---|---|---|---|---|---|
-| LEG-01 | CGU + CGV à jour (avocat MG review) | **P0** | M | ⬜ | Avant launch |
-| LEG-02 | Politique de confidentialité détaillée | **P0** | S | ⬜ | Existant à enrichir |
-| LEG-03 | Mentions légales complètes | P0 | XS | ⬜ | Footer link |
-| LEG-04 | RGPD-style data export user | P1 | M | ⬜ | "Télécharge tes données" |
-| LEG-05 | Right to be forgotten flow | P1 | M | ⬜ | Suppression complète + anonymisation |
-| LEG-06 | Cookie consent banner (si analytics étendu) | P1 | S | ⬜ | dup EDT-18 |
-| LEG-07 | Owner agreement spécifique (relation contractuelle) | P0 | M | ⬜ | Term of service spécifique |
-| LEG-08 | DMCA-style takedown (photos volées) | P1 | M | ⬜ | Form + workflow |
-| LEG-09 | Tax tooling owner MG (déclaration revenus locatifs) | P2 | M | ⬜ | Helpful but optional |
-| LEG-10 | Compliance enregistrement CNIL MG (si existe) | P0 | M | ⬜ | Investigate |
-| LEG-11 | Insurance recommendations owner (assurance habitation) | P2 | S | ⬜ | Partnership futur |
-| LEG-12 | "Standard de bail AryTrano" approuvé par avocat | P0 | M | ⬜ | E-T27.1 PDF check légal |
-| LEG-13 | Litige process documenté (E-T27.3 déjà DB-side) | ✅ | — | ✅ | À doc côté légal |
+| Ordre | ID | Titre | Phase | Estimate | Statut | Notes |
+|---|---|---|---|---|---|---|
+| 1 | **LEG-01** | **CGU + CGV à jour (avocat MG review)** | 🔴 Pre-launch | M | ⬜ | **MANDATORY** — sans ça pas de launch |
+| 2 | **LEG-02** | **Politique de confidentialité détaillée** | 🔴 Pre-launch | S | ⬜ | **MANDATORY** Existant à enrichir |
+| 3 | **LEG-03** | **Mentions légales complètes** | 🔴 Pre-launch | XS | ⬜ | **MANDATORY** Footer link |
+| 4 | **LEG-07** | **Owner agreement spécifique** (relation contractuelle) | 🔴 Pre-launch | M | ⬜ | **MANDATORY** Term of service spécifique |
+| 5 | **LEG-10** | **Compliance enregistrement CNIL MG** (si applicable) | 🔴 Pre-launch | M | ⬜ | **MANDATORY** Investigate avec avocat |
+| 6 | **LEG-12** | **Standard de bail AryTrano** approuvé par avocat | 🔴 Pre-launch | M | ⬜ | **MANDATORY** E-T27.1 PDF check légal |
+| 7 | LEG-06 | Cookie consent banner | 🔴 Pre-launch | S | ⬜ | dup EDT-18 |
+| 8 | LEG-14 | **Disclaimer "AryTrano = intermédiaire"** sur chaque annonce | 🔴 Pre-launch | XS | ⬜ | **NEW** Position juridique clarifiée |
+| 9 | LEG-04 | RGPD-style data export user | 🟠 Launch+30j | M | ⬜ | "Télécharge tes données" |
+| 10 | LEG-05 | Right to be forgotten flow | 🟠 Launch+30j | M | ⬜ | Suppression complète + anonymisation |
+| 11 | LEG-08 | DMCA-style takedown (photos volées) | 🟠 Launch+30j | M | ⬜ | Form + workflow |
+| 12 | LEG-15 | **Mediation clause** dans owner agreement | 🟠 Launch+30j | S | ⬜ | **NEW** Réduit litiges à l'amiable |
+| 13 | LEG-09 | Tax tooling owner MG (déclaration revenus locatifs) | 🟢 Q2+ | M | ⬜ | dup OWN-29 |
+| 14 | LEG-11 | Insurance recommendations owner | 🟢 Q2+ | S | ⬜ | Partnership futur |
+| 15 | LEG-16 | **Terms-of-service per-version archive** + diff viewer | 🟢 Q2+ | S | ⬜ | **NEW** Historique pour litiges |
+| 16 | LEG-17 | **Compliance internationale** (si expansion Maurice/Réunion) | 🟢 Q2+ | M | ⬜ | **NEW** Dep CON-09 |
+| — | LEG-13 | Litige process documenté (E-T27.3 déjà DB-side) | ✅ | — | ✅ | À doc côté légal |
 
 ---
 
-### 🎯 Sprint priority — Top 10 immédiat (après cette session)
+### 🔴 PHASE 1 — PRE-LAUNCH (sprint immédiat, 4-6 semaines)
 
-1. **OWN-13** Stats portfolio overview owner (P0, M)
-2. **OWN-01** Auto-publication FB Marketplace (P0, M) — feature-killer
-3. **MKT-09** UTM tracking sur tous les liens auto-post (P0, XS)
-4. **TEN-01** Comparateur 2-3 annonces (P0, M)
-5. **TRU-01** Phone OTP pour owners (P0, S)
-6. **TRU-04** Anti-scam keyword detection (P0, S)
-7. **TRU-05** Rate-limit owner créations (P0, XS)
-8. **EDT-01** Save & exit drafts (P0, S)
-9. **SEC-01** 2FA owners (P0, M)
-10. **SEC-02** 2FA admins mandatory (P0, S)
+> Ce qui DOIT être en place avant d'ouvrir au public. Pas négociable.
 
-### Sprint priority — Top 10 trimestre
+**Légal (pack avocat MG)** — 6 tickets, ~1 semaine d'avocat + 2j dev
+- LEG-01 CGU/CGV · LEG-02 Confidentialité · LEG-03 Mentions légales
+- LEG-07 Owner agreement · LEG-10 CNIL compliance · LEG-12 Bail légal
+- LEG-14 Disclaimer intermédiaire
 
-1. **CON-01** Blog (P0, L) — SEO compound interest
-2. **OWN-04** Email digest hebdo (P0, S)
-3. **OWN-18** Onboarding tour (P1, S)
-4. **TEN-03** Saved search WhatsApp (P0, M)
-5. **TEN-11** Recherche par université (P0, M)
-6. **MKT-02** Auto-post Instagram (P0, M)
-7. **ADM-01** Admin dashboard KPI (P0, M)
-8. **MOB-01** Mobile owner video upload (P1, M)
-9. **TRU-02** ID verification CIN finalisée (P1, L)
-10. **LEG-01..03** Pack légal pré-launch (P0)
+**Sécurité baseline** — 8 tickets, ~2 semaines
+- SEC-02 2FA admins mandatory · SEC-11 Backup + drill · SEC-23 DR runbook
+- SEC-12 HSTS preload · SEC-13 Sentry PII audit · SEC-20 security@
+- SEC-16 Email enum prevention · SEC-21 Audit RBAC
 
-### Dépendances majeures à débloquer
+**Trust & safety baseline** — 6 tickets, ~1 semaine
+- TRU-01 OTP owner · TRU-04 Anti-scam keyword · TRU-05 Rate-limit owner
+- TRU-10 Honeypot · TRU-17 reCAPTCHA · TRU-09 Audit log viewer
 
-- **WhatsApp Business API** → débloque OWN-03, OWN-08, TEN-03, COM-06
-- **Facebook Graph API** (OAuth + page selected) → débloque MKT-01, MKT-02
-- **Avocat MG** (pré-launch) → débloque LEG-01, LEG-07, LEG-12
-- **2FA infrastructure** → débloque SEC-01, SEC-02 (mutuels)
-- **Push web infra (VAPID)** → débloque OWN-12, COM-02, TEN-14
-- **Subscriptions billing infra** → débloque OWN-14, PAY-06, PAY-07
-- **Cloudinary AI** → débloque TRU-03 (stolen photo detection)
-- **Vidéo migration vers signed direct upload** ✅ déjà fait (`692416f`)
+**Admin operability** — 4 tickets, ~3 jours
+- ADM-01 Dashboard KPI · ADM-05 Audit log · ADM-08 Admin notes · ADM-13 Sentry embed
 
-### Notes méta
+**UX critiques** — 6 tickets, ~3 jours
+- EDT-17 CGU footer · EDT-18 Cookie banner · EDT-01 Save & exit drafts
+- EDT-10 Sticky CTA mobile · EDT-11 Empty states · EDT-12 Error boundaries
 
-- On finit **WEB** à fond avant d'attaquer **MOBILE Phase 2** (sauf push qui dépend de l'infra web).
-- **Marketing automation (MKT-01..)** = le plus gros levier de croissance — prioriser.
-- **Trust & Safety (TRU-01..)** = pré-requis MVP officiel — pas négociable.
-- **Legal (LEG-)** doit être réglé avant launch officiel (pas avant beta).
-- Re-prioriser ce backlog tous les 2 sprints (mardi de sprint planning).
+**Content seed** — 2 tickets, ~3 jours
+- CON-03 Quartier guides enrichis · CON-10 Press kit
+
+**Paiements** — 2 tickets, ~3 jours
+- PAY-09 Refund flow · PAY-14 Webhook idempotency
+
+**Communications** — 2 tickets, ~2 jours
+- COM-08 Notif prefs · COM-12 Bounce handling
+
+**Analytics minimum** — 1 ticket, ~2 heures
+- ANA-15 Daily DAU/MAU email
+
+**Tenant absolute baseline** — 1 ticket, ~2 jours
+- TEN-11 Recherche par université (sans ça pas de PMF)
+
+➡️ **Total Phase 1 : ~38 tickets, ~5 semaines avec un dev temps plein**
+
+---
+
+### 🟠 PHASE 2 — LAUNCH+30j (premier mois d'usage public)
+
+> Faire en sorte que les premiers users restent.
+
+**Owner onboarding & retention** — OWN-18 tour, OWN-04 digest, OWN-13 portfolio, OWN-20 marquer loué, OWN-12 push
+**ID verification finale** — TRU-02 (= OWN-22), TRU-06 mandatory
+**Notif infra** — COM-03 digest, COM-02 web push, COM-04 mobile push
+**UX déeper** — EDT-04, EDT-06, EDT-19, EDT-05, EDT-13, EDT-08
+**Admin ops** — ADM-03 suspension, ADM-02 bulk mod, ADM-04 blocklist, ADM-12 admin edit, ADM-16 owner mass-email
+**Sécurité** — SEC-01 2FA owners, SEC-04 anomaly login, SEC-08, SEC-09, SEC-18, SEC-22
+**Trust** — TRU-11 blocklist, TRU-16 OTP alert, TRU-19 disable account
+**Marketing soft** — MKT-07 student digest, MKT-09 UTM, MKT-14 WA semi-manuel
+**Content** — CON-01 blog, CON-02 city guides, CON-04 how-to, CON-06 schema, CON-08, CON-14
+**Legal** — LEG-04 data export, LEG-05 RTBF, LEG-08 DMCA, LEG-15 mediation clause
+**Tenant** — TEN-13 dispo filter, TEN-01 comparateur, TEN-10 map sync
+**Paiements** — PAY-15 retry policy
+**Analytics** — ANA-03 portfolio, ANA-09 search, ANA-10 drop-off, ANA-12 video views
+
+➡️ **Total Phase 2 : ~55 tickets, ~3 mois avec un dev**
+
+---
+
+### 🟡 PHASE 3 — Q1 POST-LAUNCH (le levier de croissance)
+
+> Bets gros impact + premier revenu.
+
+**🚀 LE GROS PARI** : Marketing automation
+- **MKT-01** Auto-FB · **MKT-02** Auto-IG · **MKT-03** Auto-Telegram · MKT-10 Reach dashboard · MKT-08 Newsletter mensuelle · MKT-17 University partnership
+
+**Tenant growth**
+- TEN-06 Similar listings · **TEN-03** Saved search WA · TEN-14 Push saved · TEN-04 Application form · TEN-05 Visit booking · TEN-02 Wish lists multi · TEN-21 Filter "proche fac"
+
+**Owner growth**
+- OWN-06 Clone · OWN-10 DnD photos · OWN-05 Bulk edit · OWN-11 Calendar · OWN-23 Owner public profile · OWN-08 Auto-reply WA
+
+**Monétisation v1**
+- **OWN-14 / PAY-06** Boost listing · PAY-07 Subscription Pro · PAY-12 Invoice owner
+- ANA-08 MRR/ARR dashboard
+
+**Trust & confiance avancée**
+- TRU-03 Stolen photos AI · TRU-07 Duplicate detection · TRU-15 Anomaly owner · TRU-18 Phone reputation · TRU-20 Anti-typosquatting
+
+**Sécurité avancée**
+- SEC-06 Pentest externe · SEC-10 Encryption-at-rest · SEC-19 DDoS drill · SEC-15, SEC-24
+
+**Admin advanced**
+- ADM-06 RBAC fin · ADM-07 Support inbox · ADM-09 Stats export · ADM-10 Mass-email
+
+**Communications**
+- COM-01 In-app inbox · **COM-06** WA Business broadcast · COM-05 SMS reminders · COM-10 Email tracking
+
+**Content**
+- CON-05 Owner stories · CON-17 Vidéo testimonial · CON-13 Newsletter signup · CON-18 TikTok · CON-19 Étudiant testimonials · CON-20 University pages
+
+**UX/A11y**
+- EDT-16 WCAG audit complet · EDT-02 Photo deepzoom · EDT-15 Localisation poussée · EDT-09 Hover/active
+
+**Analytics business**
+- ANA-04 Conversion funnel · ANA-11 Owner activation cohorts · ANA-13 Saved-search engagement
+
+➡️ **Total Phase 3 : ~55 tickets, ~3-4 mois**
+
+---
+
+### 🟢 PHASE 4 — Q2+ POST-LAUNCH (expansion + features avancées)
+
+> Mobile, monétisation poussée, features niche.
+
+**Mobile Phase 2 (l'objectif principal de Q2)**
+- MOB-03 Push native · MOB-01 Owner video upload · MOB-02 Owner photo upload
+- MOB-13 Onboarding · MOB-19 Pull-to-refresh · MOB-04 Offline · MOB-05 Native map
+- MOB-17 Owner stats · **MOB-15** Production submit App Store + Play
+- MOB-11 Camera picker · MOB-07 Biometric · MOB-21 Offline lease · MOB-22 Video recording
+- Le reste mobile (admin, widgets, wallet) selon traction
+
+**Monétisation poussée**
+- PAY-02 Orange Money native · PAY-03 Airtel native · PAY-04 MVola native
+- PAY-08 Caution escrow (gros chantier) · PAY-16 Annual discount · PAY-05 Cards
+
+**Features tenants avancées**
+- TEN-22 Family filter · TEN-23 Pet-friendly · TEN-24 Wheelchair · TEN-25 Tax helper · TEN-26 Internet quality · TEN-08 Roommate finder
+
+**Owner features avancées**
+- OWN-24 Renewal flow · OWN-25 Late rent rescheduling · OWN-26 Building grouping
+- OWN-27 Bulk CSV import · OWN-28 Banking auto-collect · OWN-29 Tax certificate
+
+**Trust avancée**
+- TRU-12 Visite physique badge · TRU-13 Caution escrow · TRU-21 Tenant credit · TRU-22 Disaster alerts
+
+**Marketing scale**
+- MKT-04 TikTok · MKT-11 A/B test framework · MKT-12 Referral étudiant · MKT-18 Influencers
+- MKT-19 Re-engagement · MKT-05 Twitter · MKT-13 Affiliate
+
+**Admin BI**
+- ADM-14 Revenue dashboard · ADM-15 Feature flags · ADM-17 Investor reporting
+
+**Sécurité top-tier**
+- SEC-03 WebAuthn · SEC-05 Bug bounty · SEC-07 SOC2 · SEC-25 Audit log immutable
+
+**Content scale**
+- CON-11 Investor deck · CON-21 Blog malagasy · CON-22 YouTube channel
+- CON-16 Roommate content
+
+**Analytics avancée**
+- ANA-05 A/B framework · ANA-06 Heatmap · ANA-07 Cohort retention · ANA-14 Public stats
+- ANA-16 Referral attribution · ANA-17 WA tracking
+
+**Legal expansion**
+- LEG-16 ToS archive · LEG-17 Compliance internationale
+
+**UX premium**
+- EDT-14 Dark mode · EDT-03 Inline edit · EDT-20 Print-friendly · EDT-21 RTL ready
+
+**Communications natives MG**
+- COM-13 Voice notes
+
+➡️ **Total Phase 4 : ~80 tickets, 6+ mois selon team size**
+
+---
+
+### 🔓 Dépendances bloquantes critiques
+
+| Dépendance | Débloque | Effort obtention | Quand |
+|---|---|---|---|
+| **Avocat MG** | LEG-01, LEG-02, LEG-07, LEG-10, LEG-12, LEG-14 | 1-2 sem honoraires | PRE-LAUNCH |
+| **Facebook Graph API token** (OAuth + page selected) | MKT-01, MKT-02 | ~3 jours setup | Q1 |
+| **WhatsApp Business API** (Meta approval) | OWN-03, OWN-08, TEN-03, COM-06 | 1-2 mois approval + setup | Q1 |
+| **Telegram Bot API** | MKT-03 | ~1h gratuit | Q1 |
+| **2FA infrastructure (TOTP lib)** | SEC-01, SEC-02 | ~3 jours dev | PRE-LAUNCH |
+| **Push VAPID keys** | OWN-12, COM-02, TEN-14 | ~1h gratuit | Launch+30j |
+| **Cloudinary AI moderation** | TRU-03 | Plan Pro + API setup | Q1 |
+| **Pentest cabinet** | SEC-06 | 2-3 mois lead time | Q1 |
+| **Subscription billing infra** | OWN-14, PAY-06, PAY-07 | ~1 mois dev | Q1 |
+| **TikTok Marketing API** | MKT-04 | 2-3 mois approval business | Q2+ |
+| **Banking partner MG** | OWN-28, PAY-08 | 3-6 mois négo | Q2+ |
+| **Vidéo migration vers signed direct upload** | déjà débloqué | — | ✅ Done `692416f` |
+
+---
+
+### 📌 Notes méta
+
+- **Logique séquentielle** : sécuriser la base → faire grandir → monétiser → étendre. Toute compression de cette séquence augmente le risque.
+- **MARKETING AUTOMATION (MKT-01..03)** est le moat unique d'AryTrano sur le marché MG. Aucune autre plateforme ne push automatiquement. **C'est le seul ticket Q1 vraiment incontournable côté growth.**
+- **TRUST & SAFETY** au pré-launch n'est pas négociable — un scam viral le jour 1 = la plateforme est morte sur le marché MG (small market = forte propagation négative).
+- **LEGAL** doit être pris en main par un avocat MG **dès maintenant** (mois 0 du cycle launch). Ne pas attendre.
+- **WEB d'abord, MOBILE après**. Q1 web doit être solide avant d'investir Mobile Phase 2.
+- **Re-prioriser tous les 2 sprints** (mardi de sprint planning) : ce backlog est un snapshot, pas une vérité gravée.
+- **NEW tickets ajoutés cette itération** : OWN-24..29, TEN-21..26, TRU-19..22, MKT-17..19, ADM-16..17, COM-13, EDT-20..21, SEC-23..25, ANA-16..17, CON-19..22, LEG-14..17, MOB-21..22, PAY-14..16. Total = **~36 tickets ajoutés** dans cette passe.
 
 ---
 
