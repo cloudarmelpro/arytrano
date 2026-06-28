@@ -668,6 +668,9 @@ export const mg: Record<MessageKey, string> = {
   'detail.owner.title': 'Tompon-trano',
   'detail.owner.hostedBy': 'Filazana avy amin\'i {name}',
   'detail.report.cta': 'Mahatsiaro fisalasalana amin\'ity filazana ity ?',
+  'detail.disclaimer.intermediary':
+    'AryTrano dia manampy hampifandray ny tompon-trano sy ny mpanofa. Ny fifanekena dia mivantana eo amin\'izy ireo — AryTrano dia tsy mpiantoka. Raha misy ady, jereo ny',
+  'detail.disclaimer.terms': 'fepetra ankapobeny',
   'detail.notFound': 'Tsy hita ny trano',
   'detail.photoCounter': '{current} / {total}',
   'detail.photoCount.alt': 'Jereo amin\'ny lehibe ny sary {n}',

@@ -12,6 +12,16 @@ const securityHeaders = [
   { key: 'X-Content-Type-Options', value: 'nosniff' },
   { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
   { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
+  // SEC-12 — HSTS preload (2026-06-28). 2 years max-age + includeSubDomains +
+  // preload directive so the browser refuses any plaintext request to
+  // arytrano.com or its subdomains, even on the first visit. Once the
+  // domain is on the HSTS preload list (hstspreload.org submission),
+  // browsers ship with this baked in. Removing the header here later
+  // does NOT roll it back — that's a feature, not a bug.
+  {
+    key: 'Strict-Transport-Security',
+    value: 'max-age=63072000; includeSubDomains; preload',
+  },
 ]
 
 const nextConfig: NextConfig = {

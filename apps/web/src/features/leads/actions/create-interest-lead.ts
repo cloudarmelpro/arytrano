@@ -30,6 +30,14 @@ export async function createInterestLeadAction(
   _prev: CreateInterestLeadActionState,
   formData: FormData,
 ): Promise<CreateInterestLeadActionState> {
+  // TRU-10 honeypot — bots fill every field they see ; legitimate
+  // visitors don't see this one. We return a fake success so the bot
+  // doesn't probe again, but we don't actually create the lead.
+  const honeypot = formData.get('website')
+  if (typeof honeypot === 'string' && honeypot.trim().length > 0) {
+    return { ok: true, leadId: 'silent-drop' }
+  }
+
   let input: CreateInterestLeadInput
   try {
     input = createInterestLeadSchema.parse({

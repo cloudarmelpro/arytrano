@@ -222,6 +222,17 @@ function LeadForm({
 
   return (
     <form action={handleSubmit} aria-describedby="lead-form-context">
+      {/* TRU-10 honeypot — bots fill every input they see ; humans don't
+          see this one. Server Action returns a silent fake-success
+          when populated. `tabIndex=-1` so keyboard users skip it. */}
+      <input
+        type="text"
+        name="website"
+        autoComplete="off"
+        tabIndex={-1}
+        aria-hidden="true"
+        className="absolute -left-[10000px] top-auto h-px w-px overflow-hidden"
+      />
       <Dialog.Title className="text-[18px] font-bold leading-tight tracking-tight">
         {t('lead.dialog.title')}
       </Dialog.Title>

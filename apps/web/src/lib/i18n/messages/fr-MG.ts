@@ -666,6 +666,9 @@ export const frMG = {
   'detail.owner.title': 'Propriétaire',
   'detail.owner.hostedBy': 'Annonce de {name}',
   'detail.report.cta': 'Cette annonce vous semble suspecte ?',
+  'detail.disclaimer.intermediary':
+    'AryTrano facilite la mise en relation entre propriétaires et locataires. Le bail se conclut directement entre les deux parties — AryTrano n’est pas partie au contrat. En cas de litige, voir nos',
+  'detail.disclaimer.terms': 'conditions générales',
   'detail.notFound': 'Annonce introuvable',
   'detail.photoCounter': '{current} / {total}',
   'detail.photoCount.alt': 'Voir la photo {n} en grand',

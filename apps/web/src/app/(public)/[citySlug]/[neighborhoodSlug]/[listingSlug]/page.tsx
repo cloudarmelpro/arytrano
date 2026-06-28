@@ -494,6 +494,18 @@ export default async function PublicListingDetailPage({
                 <span className="text-muted-foreground">{t('detail.report.cta')}</span>
                 <ReportButton listingId={listing.id} />
               </div>
+
+              {/* LEG-14 — clarify AryTrano's legal position. We are
+                  an introducer between propriétaires and tenants,
+                  not a party to the bail. The disclaimer also points
+                  to the dispute flow (E-T27.3) for litigation. */}
+              <p className="-mx-6 border-t border-border px-6 pt-4 text-[11.5px] leading-[1.5] text-foreground/55">
+                {t('detail.disclaimer.intermediary')}{' '}
+                <Link href="/legal/terms" className="underline-offset-2 hover:underline">
+                  {t('detail.disclaimer.terms')}
+                </Link>
+                .
+              </p>
             </div>
           </aside>
         </div>
