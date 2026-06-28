@@ -5,6 +5,7 @@ import { errors } from '@/lib/api/errors'
 import { buildSlug } from '@/lib/format/slug'
 import { ownerTermsAcceptedFor } from '@/features/auth/server'
 import type { UpdateListingInput } from '../schemas'
+import { autoFlagListingIfNeeded } from './auto-flag-listing'
 
 /**
  * Update a listing owned by `ownerId`. Only the owner can edit; we 404 to
@@ -64,8 +65,21 @@ export async function updateListing(
     data.slug = buildSlug(input.title, existing.id)
   }
 
-  return prisma.listing.update({
+  const updated = await prisma.listing.update({
     where: { id: existing.id },
     data,
   })
+
+  // TRU-04 — re-scan on update so an owner can't slip scam text past
+  // the first creation by editing later. Dedup window in the service
+  // prevents noise when an owner just tweaks the price.
+  if (input.title !== undefined || input.description !== undefined) {
+    void autoFlagListingIfNeeded({
+      listingId: updated.id,
+      title: updated.title,
+      description: updated.description,
+    })
+  }
+
+  return updated
 }

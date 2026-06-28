@@ -5,6 +5,7 @@ import { errors } from '@/lib/api/errors'
 import { buildSlug } from '@/lib/format/slug'
 import { ownerTermsAcceptedFor } from '@/features/auth/server'
 import type { CreateListingInput } from '../schemas'
+import { autoFlagListingIfNeeded } from './auto-flag-listing'
 
 /**
  * Create a listing in DRAFT status owned by the given user.
@@ -33,7 +34,7 @@ export async function createListing(
     throw errors.validation('Quartier introuvable ou ne correspond pas à la ville sélectionnée')
   }
 
-  return prisma.$transaction(async (tx) => {
+  const listing = await prisma.$transaction(async (tx) => {
     // First create with placeholder slug, then update with the real one
     // (slug needs the row id to stay stable across title edits).
     const draft = await tx.listing.create({
@@ -74,4 +75,14 @@ export async function createListing(
       data: { slug: buildSlug(input.title, draft.id) },
     })
   })
+
+  // TRU-04 — fire-and-forget anti-scam auto-flag outside the tx. We
+  // don't block the create on the moderation write.
+  void autoFlagListingIfNeeded({
+    listingId: listing.id,
+    title: listing.title,
+    description: listing.description,
+  })
+
+  return listing
 }
