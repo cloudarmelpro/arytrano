@@ -40,6 +40,20 @@ export async function publishListing(ownerId: string, listingId: string): Promis
     )
   }
 
+  // TRU-01 — phone-verification gate. Owner can keep DRAFTS without
+  // a verified number, but going PUBLISHED requires a successful OTP
+  // round on the SAME phone currently on the User row. Editing the
+  // phone clears phoneVerifiedAt elsewhere — we re-check here.
+  const owner = await prisma.user.findUnique({
+    where: { id: ownerId },
+    select: { phone: true, phoneVerifiedAt: true },
+  })
+  if (!owner?.phone?.trim() || !owner.phoneVerifiedAt) {
+    throw errors.conflict(
+      'Vérifie ton téléphone avant de publier ton annonce. Va dans Mon profil → Téléphone.',
+    )
+  }
+
   const listing = await prisma.listing.findFirst({
     where: { id: listingId, ownerId, status: { not: 'DELETED' } },
     select: {

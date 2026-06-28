@@ -79,6 +79,15 @@ export async function verifyPhoneOtp(
     where: { id: row.id },
     data: { verifiedAt: now },
   })
+
+  // TRU-01 — when the verified phone matches a signed-in User.phone,
+  // stamp User.phoneVerifiedAt. The publishListing gate reads this.
+  // No-op for anonymous tenants (the lead flow's normal path).
+  await prisma.user.updateMany({
+    where: { phone: input.phoneE164 },
+    data: { phoneVerifiedAt: now },
+  })
+
   return { kind: 'ok', verifiedAt: now }
 }
 

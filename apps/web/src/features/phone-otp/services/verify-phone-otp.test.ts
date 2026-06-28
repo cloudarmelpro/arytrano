@@ -8,6 +8,9 @@ vi.mock('@/lib/env', () => ({
 vi.mock('@/lib/db', () => ({
   prisma: {
     phoneOtp: { findFirst: vi.fn(), update: vi.fn() },
+    // TRU-01 — verify-phone-otp also stamps User.phoneVerifiedAt
+    // via updateMany. Mock returns 0 changed rows in the test.
+    user: { updateMany: vi.fn() },
   },
 }))
 
@@ -17,6 +20,7 @@ import { prisma } from '@/lib/db'
 beforeEach(() => {
   vi.clearAllMocks()
   vi.mocked(prisma.phoneOtp.update).mockResolvedValue({} as never)
+  vi.mocked(prisma.user.updateMany).mockResolvedValue({ count: 0 } as never)
 })
 
 describe('verifyPhoneOtp', () => {

@@ -28,8 +28,14 @@ model User {
   emailVerified DateTime?
   name          String?
   image         String?
-  phone         String? // E.164, e.g. +261341234567
-  passwordHash  String? // credentials provider; null for OAuth-only users
+  phone           String? // E.164, e.g. +261341234567
+  // TRU-01 (2026-06-29) — owner SMS-verification gate. Set to the
+  // verification timestamp when the User completes a successful OTP
+  // round on this exact phone. The publishListing service refuses to
+  // flip status to PUBLISHED unless this is non-null AND matches the
+  // current `phone` (a phone edit clears it).
+  phoneVerifiedAt DateTime?
+  passwordHash    String? // credentials provider; null for OAuth-only users
   role          UserRole   @default(STUDENT)
   locale        Locale     @default(FR_MG)
   status        UserStatus @default(ACTIVE)
