@@ -202,6 +202,12 @@ const EnvSchema = z.object({
   // Madagascar destinations work best with a US/EU long-code that
   // doesn't get blocked by sender-id restrictions.
   TWILIO_FROM_NUMBER: z.string().optional(),
+
+  // --- Admin notifications (ANA-15) ------------------------
+  // Comma-separated list of internal recipients for daily DAU/MAU
+  // digest + future ops notifications. Optional in dev. Examples :
+  //   ADMIN_NOTIFICATIONS_EMAIL=ops@arytrano.com,founder@arytrano.com
+  ADMIN_NOTIFICATIONS_EMAIL: z.string().optional(),
 })
 
 export type Env = z.infer<typeof EnvSchema>

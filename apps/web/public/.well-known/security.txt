@@ -1,0 +1,8 @@
+# AryTrano — Responsible disclosure (RFC 9116)
+# https://www.rfc-editor.org/rfc/rfc9116
+
+Contact: mailto:security@arytrano.com
+Expires: 2027-06-28T00:00:00.000Z
+Preferred-Languages: fr, en, mg
+Policy: https://arytrano.com/security
+Canonical: https://arytrano.com/.well-known/security.txt

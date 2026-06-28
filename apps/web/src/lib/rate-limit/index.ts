@@ -58,8 +58,12 @@ const forgotPasswordByIp = makeLimiter('forgot-ip', { requests: 10, window: '1 h
 // Registration: 5 accounts per IP per hour
 const registerLimiter = makeLimiter('register', { requests: 5, window: '1 h' })
 
-// Listings — owner creates a DRAFT: 10 / 1h / user
-const createListingLimiter = makeLimiter('listing-create', { requests: 10, window: '1 h' })
+// Listings — owner creates a DRAFT.
+// TRU-05 audit fix (2026-06-28) — was 10/1h alone which let an
+// attacker burst 240 listings/day. Two-layer cap : tight burst on
+// the hour + a daily ceiling that catches slow-drip flooding.
+const createListingByUserHour = makeLimiter('listing-create-hour', { requests: 3, window: '1 h' })
+const createListingByUserDay = makeLimiter('listing-create-day', { requests: 8, window: '24 h' })
 
 // Photo upload — 30 / 1h / user (account-wide), 25 / 1min / listing (burst).
 // 2026-06-10 — per-listing burst bumped 8 → 25 in lock-step with
@@ -271,8 +275,18 @@ export const rateLimiters = {
   /** Registration — 5 / 1h / IP */
   register: (ipHash: string) => check(registerLimiter, ipHash),
 
-  /** Create listing (DRAFT) — 10 / 1h / userId */
-  createListing: (userId: string) => check(createListingLimiter, userId),
+  /**
+   * Create listing (DRAFT) — two-layer cap.
+   *  - 3 / 1h / userId (burst)
+   *  - 8 / 24h / userId (daily ceiling)
+   * Both must pass. Returns the first failure verbatim so the UI
+   * can show the appropriate retry-after window.
+   */
+  createListing: async (userId: string): Promise<RateLimitResult> => {
+    const hour = await check(createListingByUserHour, userId)
+    if (!hour.success) return hour
+    return check(createListingByUserDay, userId)
+  },
 
   /** Initiate lease (E-T26) — 5/h/userId. Bearer-keyed via userId. */
   initiateLease: (userId: string) => check(initiateLeaseLimiter, userId),
