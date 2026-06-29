@@ -16,6 +16,12 @@
 #
 # Required env:
 #   BACKUP_S3_BUCKET, BACKUP_S3_REMOTE  (cf backup-db.sh)
+#   BACKUP_AGE_IDENTITY                  SEC-11: path to the age private key
+#                                        file. Required when restoring a
+#                                        `.age` backup (auto-detected by
+#                                        the file suffix). Store offline —
+#                                        the operator brings it to the
+#                                        restore session.
 #
 # Exit codes:
 #   0  = restore completed
@@ -81,10 +87,33 @@ fi
 log "Downloaded $(stat -c%s "$TMP_DUMP" | numfmt --to=iec) of compressed dump"
 
 # --- 2. Restore -------------------------------------------------------
+# SEC-11 — auto-detect age-encrypted dumps by the `.age` suffix. The
+# operator must have the matching identity file at $BACKUP_AGE_IDENTITY
+# (offline-stored — bring it to the restore session, do NOT commit it).
 log "Restoring into target DB"
-if ! gunzip -c "$TMP_DUMP" | psql "$TARGET_URL" --quiet --set ON_ERROR_STOP=on; then
-  echo "⛔ psql restore failed. Dump left at ${TMP_DUMP} for inspection."
-  exit 2
+if [[ "$BACKUP_NAME" == *.age ]]; then
+  if ! command -v age >/dev/null 2>&1; then
+    echo "⛔ Backup is age-encrypted but \`age\` is not on PATH."
+    echo "   Install via \`apt install age\` or from filippo.io/age."
+    exit 2
+  fi
+  if [ -z "${BACKUP_AGE_IDENTITY:-}" ] || [ ! -f "$BACKUP_AGE_IDENTITY" ]; then
+    echo "⛔ Backup is age-encrypted but BACKUP_AGE_IDENTITY is not a file."
+    echo "   Point it at the offline-stored age private key, e.g."
+    echo "     BACKUP_AGE_IDENTITY=/root/.config/age/arytrano.key $0 …"
+    exit 2
+  fi
+  if ! age -d -i "$BACKUP_AGE_IDENTITY" "$TMP_DUMP" \
+    | gunzip -c \
+    | psql "$TARGET_URL" --quiet --set ON_ERROR_STOP=on; then
+    echo "⛔ age → gunzip → psql pipeline failed. Dump at ${TMP_DUMP} for inspection."
+    exit 2
+  fi
+else
+  if ! gunzip -c "$TMP_DUMP" | psql "$TARGET_URL" --quiet --set ON_ERROR_STOP=on; then
+    echo "⛔ psql restore failed. Dump left at ${TMP_DUMP} for inspection."
+    exit 2
+  fi
 fi
 
 # --- 3. Cleanup -------------------------------------------------------

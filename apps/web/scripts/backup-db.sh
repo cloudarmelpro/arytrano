@@ -21,6 +21,15 @@
 #                              Default: /var/lib/arytrano/last-backup.txt
 #   BACKUP_RETENTION_DAYS     Daily backup retention (default 30)
 #   BACKUP_ALERT_WEBHOOK      Optional Slack/Discord webhook URL for failures
+#   BACKUP_AGE_RECIPIENT      SEC-11: age public key (e.g. age1xyz…). When
+#                              set, the dump is encrypted client-side with
+#                              `age -r $BACKUP_AGE_RECIPIENT` BEFORE upload
+#                              and gets a `.age` suffix. The matching
+#                              private identity file is stored offline and
+#                              loaded by restore-db.sh via $BACKUP_AGE_IDENTITY.
+#                              When unset, the dump is uploaded as plain
+#                              gzipped SQL (transitional only — production
+#                              MUST set this).
 #
 # Schedule (systemd timer or crontab):
 #   0 2 * * *  /opt/arytrano/scripts/backup-db.sh
@@ -34,9 +43,19 @@ set -euo pipefail
 FRESHNESS_FILE="${BACKUP_FRESHNESS_FILE:-/var/lib/arytrano/last-backup.txt}"
 RETENTION_DAYS="${BACKUP_RETENTION_DAYS:-30}"
 ALERT_WEBHOOK="${BACKUP_ALERT_WEBHOOK:-}"
+AGE_RECIPIENT="${BACKUP_AGE_RECIPIENT:-}"
 
 TIMESTAMP="$(date -u +%Y%m%d-%H%M%S)"
-DUMP_NAME="arytrano-${TIMESTAMP}.sql.gz"
+# SEC-11 — when an age recipient is configured the file is encrypted
+# client-side before upload, so it gets a `.age` extension. R2 also
+# encrypts at rest, but server-side encryption alone is undone by
+# any R2-credential leak; client-side encryption keeps the dump
+# unreadable even with full bucket access.
+if [ -n "$AGE_RECIPIENT" ]; then
+  DUMP_NAME="arytrano-${TIMESTAMP}.sql.gz.age"
+else
+  DUMP_NAME="arytrano-${TIMESTAMP}.sql.gz"
+fi
 TMP_DUMP="/tmp/${DUMP_NAME}"
 
 # --- Logging helpers --------------------------------------------------
@@ -54,11 +73,29 @@ alert_failure() {
 
 # --- 1. pg_dump -------------------------------------------------------
 log "Starting pg_dump → ${TMP_DUMP}"
-if ! pg_dump --no-owner --no-acl --clean --if-exists "$DATABASE_URL" \
-  | gzip --best > "$TMP_DUMP"; then
-  alert_failure "pg_dump failed"
-  rm -f "$TMP_DUMP"
-  exit 1
+if [ -n "$AGE_RECIPIENT" ]; then
+  # pg_dump → gzip → age (encrypt). The `age` binary must be on PATH;
+  # install via `apt install age` or download from filippo.io/age.
+  if ! command -v age >/dev/null 2>&1; then
+    alert_failure "BACKUP_AGE_RECIPIENT is set but \`age\` is not on PATH"
+    exit 3
+  fi
+  if ! pg_dump --no-owner --no-acl --clean --if-exists "$DATABASE_URL" \
+    | gzip --best \
+    | age -r "$AGE_RECIPIENT" > "$TMP_DUMP"; then
+    alert_failure "pg_dump | gzip | age failed"
+    rm -f "$TMP_DUMP"
+    exit 1
+  fi
+  log "Dump encrypted with age recipient ${AGE_RECIPIENT:0:16}…"
+else
+  log "⚠️  No BACKUP_AGE_RECIPIENT — uploading PLAINTEXT gzipped dump (dev only)"
+  if ! pg_dump --no-owner --no-acl --clean --if-exists "$DATABASE_URL" \
+    | gzip --best > "$TMP_DUMP"; then
+    alert_failure "pg_dump failed"
+    rm -f "$TMP_DUMP"
+    exit 1
+  fi
 fi
 SIZE_BYTES=$(stat -c%s "$TMP_DUMP")
 log "Dump size: $(numfmt --to=iec "$SIZE_BYTES")"
@@ -75,7 +112,12 @@ fi
 # Also write a monthly archive (first day of each month) — long-term retention.
 DAY_OF_MONTH=$(date -u +%d)
 if [ "$DAY_OF_MONTH" = "01" ]; then
-  MONTHLY_PATH="${BACKUP_S3_REMOTE}:${BACKUP_S3_BUCKET}/monthly/arytrano-$(date -u +%Y%m).sql.gz"
+  if [ -n "$AGE_RECIPIENT" ]; then
+    MONTHLY_NAME="arytrano-$(date -u +%Y%m).sql.gz.age"
+  else
+    MONTHLY_NAME="arytrano-$(date -u +%Y%m).sql.gz"
+  fi
+  MONTHLY_PATH="${BACKUP_S3_REMOTE}:${BACKUP_S3_BUCKET}/monthly/${MONTHLY_NAME}"
   log "Writing monthly archive: ${MONTHLY_PATH}"
   rclone copyto "$TMP_DUMP" "$MONTHLY_PATH" --s3-no-check-bucket || \
     log "WARNING: monthly archive upload failed (non-fatal)"

@@ -2,7 +2,26 @@
 
 > When the production Postgres is corrupted, deleted, or you need to recover data from a past state.
 >
-> **Last reviewed** : 2026-05-22 · **Owner** : Backend lead
+> **Last reviewed** : 2026-06-29 · **Owner** : Backend lead
+
+## SEC-11 — Backups are encrypted (age)
+
+Since SEC-11 production backups are encrypted **client-side** with
+[age](https://age-encryption.org) before upload to R2 — the encrypted
+files have a `.age` suffix (e.g. `arytrano-20260629-020000.sql.gz.age`).
+
+- **Public recipient** (used by `backup-db.sh`) lives in the systemd
+  EnvFile as `BACKUP_AGE_RECIPIENT=age1…`. Anyone with read access
+  to the VPS can encrypt new backups — that is fine, the public key
+  is not a secret.
+- **Private identity** (`age private key`, starts with `AGE-SECRET-KEY-1…`)
+  is stored **offline** — printed on paper in the safe + on a YubiKey.
+  It MUST NOT live on the production VPS, in any repo, or in any cloud
+  storage. The operator brings it to the restore session.
+
+For a restore, point `BACKUP_AGE_IDENTITY` at the key file before
+running `restore-db.sh`. The script auto-detects the `.age` suffix and
+pipes `age -d` between the download and `psql`.
 
 ---
 
@@ -18,9 +37,10 @@ rclone lsf r2:arytrano-backups/daily/ | tail -10
 # 3. Stop the app to prevent writes during restore
 systemctl stop arytrano
 
-# 4. Restore (REPLACE the database)
+# 4. Restore (REPLACE the database) — SEC-11: bring the age identity
+export BACKUP_AGE_IDENTITY=/root/.config/age/arytrano.key
 /opt/arytrano/scripts/restore-db.sh \
-  arytrano-20260520-020000.sql.gz \
+  arytrano-20260520-020000.sql.gz.age \
   "$DATABASE_URL" \
   --allow-prod
 
@@ -173,7 +193,8 @@ sudo -u postgres createdb arytrano_restore_test
 Run the restore against it (no `--allow-prod` needed since target name doesn't match prod pattern):
 ```bash
 TEST_URL="postgresql://arytrano:dev@localhost:5432/arytrano_restore_test"
-/opt/arytrano/scripts/restore-db.sh arytrano-20260520-020000.sql.gz "$TEST_URL"
+export BACKUP_AGE_IDENTITY=/root/.config/age/arytrano.key
+/opt/arytrano/scripts/restore-db.sh arytrano-20260520-020000.sql.gz.age "$TEST_URL"
 ```
 
 Verify:
@@ -186,7 +207,8 @@ Drop it after the test:
 sudo -u postgres dropdb arytrano_restore_test
 ```
 
-Log the result + date in `public/docs/runbooks/test-restore-log.md`.
+Log the result + date in `public/docs/runbooks/restore-drill-log.md`
+(SEC-11). The drill MUST pass before any quarterly release.
 
 ---
 
