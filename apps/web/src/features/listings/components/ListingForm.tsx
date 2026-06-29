@@ -1,10 +1,11 @@
 'use client'
 
-import { useMemo, useState, useTransition } from 'react'
+import { useEffect, useMemo, useState, useTransition } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { toast } from 'sonner'
 import { z } from 'zod'
+import { useListingDraftAutosave } from './use-listing-draft-autosave'
 import { Input } from '@/components/ui/input'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Label } from '@/components/ui/label'
@@ -96,6 +97,25 @@ export function ListingForm(props: ListingFormProps) {
     return city?.neighborhoods ?? []
   }, [cityId, props.cities])
 
+  // EDT-01 — auto-save the create-listing draft to localStorage every 30s.
+  // Only in create mode: editing a published listing should write straight
+  // to the DB via updateListingAction, not flow through this cache.
+  const autosave = useListingDraftAutosave({
+    form,
+    storageKey: 'arytrano-listing-draft-v1',
+    enabled: props.mode === 'create',
+  })
+
+  // Surface a one-shot toast when we restored a draft on mount.
+  useEffect(() => {
+    if (autosave.restored) {
+      toast.info('Brouillon récupéré', {
+        description:
+          'On a restauré ta dernière saisie. Tu peux continuer ou tout effacer.',
+      })
+    }
+  }, [autosave.restored])
+
   function onSubmit(values: FormValues) {
     startTransition(async () => {
       const fd = new FormData()
@@ -123,6 +143,10 @@ export function ListingForm(props: ListingFormProps) {
           : await updateListingAction(props.listingId, { ok: false }, fd)
 
       if (result.ok) {
+        // EDT-01 — the draft is now persisted server-side, wipe the
+        // localStorage cache so a reload doesn't re-populate stale
+        // values over the real DB row.
+        autosave.clear()
         toast.success(result.message ?? t('listingForm.toast.saved'))
         return
       }
@@ -531,7 +555,7 @@ export function ListingForm(props: ListingFormProps) {
           )}
         />
 
-        <div className="flex gap-2 pt-2">
+        <div className="flex flex-wrap items-center gap-3 pt-2">
           <Button
             type="submit"
             variant="default"
@@ -547,6 +571,29 @@ export function ListingForm(props: ListingFormProps) {
                 ? t('listingForm.submit.create')
                 : t('listingForm.submit.update')}
           </Button>
+          {/* EDT-01 — autosave status + clear. Only meaningful in create mode. */}
+          {props.mode === 'create' && autosave.lastSavedAt && (
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+              <span>
+                Sauvegarde locale ·{' '}
+                {new Intl.DateTimeFormat('fr-FR', {
+                  hour: '2-digit',
+                  minute: '2-digit',
+                }).format(new Date(autosave.lastSavedAt))}
+              </span>
+              <button
+                type="button"
+                onClick={() => {
+                  autosave.clear()
+                  form.reset()
+                  toast.success('Brouillon local effacé.')
+                }}
+                className="text-destructive underline-offset-2 hover:underline"
+              >
+                Effacer
+              </button>
+            </div>
+          )}
         </div>
       </FieldGroup>
       </fieldset>
