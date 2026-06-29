@@ -30,3 +30,4 @@ export {
 // T-049 Owner Terms gate helper — used by listing + lease services
 // to enforce CGU acceptance server-side. Audit Archi H-2 (2026-05-29).
 export { ownerTermsAcceptedFor } from './services/require-owner-terms-accepted'
+export { getNotifPrefs, type NotifPrefs } from './services/notif-prefs'

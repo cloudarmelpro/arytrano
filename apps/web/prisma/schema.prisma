@@ -66,6 +66,14 @@ model User {
   // one place.
   contactNotificationsEnabled Boolean @default(true)
 
+  // COM-08 — granular email preferences. All default to true so
+  // existing users keep their current behaviour; the
+  // /dashboard/notifications page lets them opt out per category.
+  // Each flag is consulted by the sender at fan-out time.
+  savedSearchAlertsEnabled       Boolean @default(true)
+  listingExpirationAlertsEnabled Boolean @default(true)
+  leaseUpdatesEnabled            Boolean @default(true)
+
   // E-T07 — multi-city v1. Captured at sign-up or first listing
   // creation. Soft FK : SetNull on city delete so account survives
   // even if a city is later removed (admin tooling can't drop a

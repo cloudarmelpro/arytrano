@@ -25,3 +25,8 @@ export { AuthBroadcastListener } from './components/AuthBroadcastListener'
 export { broadcastAuthChange } from './lib/broadcast'
 export { TwoFactorSection } from './components/TwoFactorSection'
 export { CinUploadForm } from './components/CinUploadForm'
+export {
+  updateNotifPrefsAction,
+  type UpdateNotifPrefsActionState,
+} from './actions/update-notif-prefs'
+export { NotifPrefToggle } from './components/NotifPrefToggle'
