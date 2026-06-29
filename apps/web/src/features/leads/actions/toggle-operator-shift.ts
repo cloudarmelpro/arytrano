@@ -1,7 +1,7 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
-import { auth } from '@/features/auth'
+import { requireAdmin } from '@/features/admin/server'
 import { startOperatorShift } from '../services/start-operator-shift'
 import { endOperatorShift } from '../services/end-operator-shift'
 
@@ -24,8 +24,11 @@ export async function toggleOperatorShiftAction(
   _prev: ToggleShiftActionState,
   formData: FormData,
 ): Promise<ToggleShiftActionState> {
-  const session = await auth()
-  if (!session?.user?.id || session.user.role !== 'ADMIN') {
+  // SEC-21 — DB-fresh admin gate (was JWT session.user.role, stale).
+  let userId: string
+  try {
+    ;({ userId } = await requireAdmin())
+  } catch {
     return { ok: false, message: 'Accès refusé.' }
   }
 
@@ -35,7 +38,7 @@ export async function toggleOperatorShiftAction(
   }
 
   if (action === 'start') {
-    const result = await startOperatorShift(session.user.id)
+    const result = await startOperatorShift(userId)
     revalidatePath('/admin/leads')
     if (result.kind === 'already_active') {
       return {
@@ -47,7 +50,7 @@ export async function toggleOperatorShiftAction(
     return { ok: true, outcome: 'started', shiftId: result.shiftId }
   }
 
-  const result = await endOperatorShift(session.user.id)
+  const result = await endOperatorShift(userId)
   revalidatePath('/admin/leads')
   if (result.kind === 'no_active_shift') {
     return { ok: true, outcome: 'no_active_shift' }

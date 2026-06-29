@@ -2,7 +2,7 @@
 
 import { revalidatePath } from 'next/cache'
 import { ZodError } from 'zod'
-import { auth } from '@/features/auth'
+import { requireAdmin } from '@/features/admin/server'
 import {
   transitionLeadStatusSchema,
   type TransitionLeadStatusInput,
@@ -23,8 +23,11 @@ export async function transitionLeadStatusAction(
   _prev: TransitionLeadActionState,
   formData: FormData,
 ): Promise<TransitionLeadActionState> {
-  const session = await auth()
-  if (!session?.user?.id || session.user.role !== 'ADMIN') {
+  // SEC-21 — DB-fresh admin gate (was JWT session.user.role, stale).
+  let userId: string
+  try {
+    ;({ userId } = await requireAdmin())
+  } catch {
     return { ok: false, message: 'Accès refusé.' }
   }
 
@@ -49,7 +52,7 @@ export async function transitionLeadStatusAction(
     throw err
   }
 
-  const outcome = await transitionLeadStatus(input, session.user.id)
+  const outcome = await transitionLeadStatus(input, userId)
 
   switch (outcome.kind) {
     case 'ok':

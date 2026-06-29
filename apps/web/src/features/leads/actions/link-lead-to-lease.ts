@@ -1,7 +1,7 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
-import { auth } from '@/features/auth'
+import { requireAdmin } from '@/features/admin/server'
 import { linkLeadToLease } from '../services/link-lead-to-lease'
 
 export type LinkLeadActionState = {
@@ -21,12 +21,15 @@ export async function linkLeadToLeaseAction(
   leadId: string,
   leaseId: string,
 ): Promise<LinkLeadActionState> {
-  const session = await auth()
-  if (!session?.user?.id || session.user.role !== 'ADMIN') {
+  // SEC-21 — DB-fresh admin gate (was JWT session.user.role, stale).
+  let userId: string
+  try {
+    ;({ userId } = await requireAdmin())
+  } catch {
     return { ok: false, message: 'Accès refusé.' }
   }
 
-  const outcome = await linkLeadToLease({ leadId, leaseId }, session.user.id)
+  const outcome = await linkLeadToLease({ leadId, leaseId }, userId)
 
   switch (outcome.kind) {
     case 'ok':

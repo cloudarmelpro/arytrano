@@ -1,7 +1,7 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
-import { auth } from '@/features/auth'
+import { requireAdmin } from '@/features/admin/server'
 import {
   hideListingVideo,
   unhideListingVideo,
@@ -23,8 +23,11 @@ export async function moderateListingVideoAction(
   _prev: ModerateListingVideoState,
   formData: FormData,
 ): Promise<ModerateListingVideoState> {
-  const session = await auth()
-  if (!session?.user?.id || session.user.role !== 'ADMIN') {
+  // SEC-21 — DB-fresh admin gate (was JWT session.user.role, stale).
+  let userId: string
+  try {
+    ;({ userId } = await requireAdmin())
+  } catch {
     return { ok: false, message: 'Accès refusé.' }
   }
 
@@ -38,7 +41,7 @@ export async function moderateListingVideoAction(
   const outcome =
     action === 'unhide'
       ? await unhideListingVideo(listingId)
-      : await hideListingVideo(listingId, session.user.id, reason)
+      : await hideListingVideo(listingId, userId, reason)
 
   if (outcome.kind === 'no_video') {
     return { ok: false, message: 'Aucune vidéo sur cette annonce.' }

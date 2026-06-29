@@ -2,7 +2,7 @@
 
 import { revalidatePath } from 'next/cache'
 import { ZodError } from 'zod'
-import { auth } from '@/features/auth'
+import { requireAdmin } from '@/features/admin/server'
 import {
   claimDisputeSchema,
   resolveDisputeSchema,
@@ -18,8 +18,11 @@ export type ClaimDisputeActionState = {
 export async function claimDisputeAction(
   disputeId: string,
 ): Promise<ClaimDisputeActionState> {
-  const session = await auth()
-  if (!session?.user?.id || session.user.role !== 'ADMIN') {
+  // SEC-21 — DB-fresh admin gate (was JWT session.user.role, stale).
+  let userId: string
+  try {
+    ;({ userId } = await requireAdmin())
+  } catch {
     return { ok: false, message: 'Accès refusé.' }
   }
   try {
@@ -27,7 +30,7 @@ export async function claimDisputeAction(
   } catch {
     return { ok: false, message: 'Identifiant invalide.' }
   }
-  const outcome = await claimDispute(disputeId, session.user.id)
+  const outcome = await claimDispute(disputeId, userId)
   switch (outcome.kind) {
     case 'ok':
       revalidatePath(`/admin/disputes/${disputeId}`)
@@ -57,8 +60,11 @@ export async function resolveDisputeAction(
   _prev: ResolveDisputeActionState,
   formData: FormData,
 ): Promise<ResolveDisputeActionState> {
-  const session = await auth()
-  if (!session?.user?.id || session.user.role !== 'ADMIN') {
+  // SEC-21 — DB-fresh admin gate (was JWT session.user.role, stale).
+  let userId: string
+  try {
+    ;({ userId } = await requireAdmin())
+  } catch {
     return { ok: false, message: 'Accès refusé.' }
   }
 
@@ -76,7 +82,7 @@ export async function resolveDisputeAction(
     throw err
   }
 
-  const outcome = await resolveDispute(input, session.user.id)
+  const outcome = await resolveDispute(input, userId)
   switch (outcome.kind) {
     case 'ok':
       revalidatePath(`/admin/disputes/${input.disputeId}`)

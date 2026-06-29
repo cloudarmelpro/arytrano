@@ -46,7 +46,17 @@ export async function getLeaseContractPdfUrlAction(
 
   const isParty =
     lease.ownerId === session.user.id || lease.tenantId === session.user.id
-  const isAdmin = session.user.role === 'ADMIN'
+  // SEC-21 — read role from DB, not JWT, so a freshly demoted admin
+  // can no longer sign download URLs for arbitrary lease PDFs.
+  let isAdmin = false
+  if (!isParty) {
+    const dbUser = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: { role: true, status: true },
+    })
+    isAdmin =
+      dbUser?.role === 'ADMIN' && dbUser.status === 'ACTIVE'
+  }
   if (!isParty && !isAdmin) {
     return { ok: false, message: 'Accès refusé.' }
   }

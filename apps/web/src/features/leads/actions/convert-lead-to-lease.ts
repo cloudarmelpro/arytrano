@@ -1,7 +1,7 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
-import { auth } from '@/features/auth'
+import { requireAdmin } from '@/features/admin/server'
 import { convertLeadToLease } from '../services/convert-lead-to-lease'
 
 export type ConvertLeadActionState = {
@@ -21,8 +21,11 @@ export async function convertLeadToLeaseAction(
   _prev: ConvertLeadActionState,
   formData: FormData,
 ): Promise<ConvertLeadActionState> {
-  const session = await auth()
-  if (!session?.user?.id || session.user.role !== 'ADMIN') {
+  // SEC-21 — DB-fresh admin gate (was JWT session.user.role, stale).
+  let userId: string
+  try {
+    ;({ userId } = await requireAdmin())
+  } catch {
     return { ok: false, message: 'Accès refusé.' }
   }
 
@@ -33,7 +36,7 @@ export async function convertLeadToLeaseAction(
       startDate: formData.get('startDate'),
       durationMonths: Number(formData.get('durationMonths')),
     },
-    session.user.id,
+    userId,
   )
 
   switch (outcome.kind) {
