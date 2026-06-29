@@ -31,6 +31,14 @@ export function scrubPii<T extends Event | ErrorEvent>(event: T): T {
   // 2. Request body — may contain passwords, payment data, etc.
   if (event.request) {
     delete event.request.data
+    // SEC-13 — strip the query_string field entirely, then re-scan
+    // request.url for any PII still embedded in the path or remaining
+    // params. The SDK populates these by default; magic-link callbacks,
+    // OAuth redirects, and search URLs are all PII leak vectors.
+    delete event.request.query_string
+    if (typeof event.request.url === 'string') {
+      event.request.url = maskPii(stripQueryString(event.request.url))
+    }
   }
 
   // 3. User identity — keep `id` only
@@ -91,6 +99,16 @@ export function maskPii(input: string): string {
     .replace(EMAIL_RE, '<email>')
     .replace(PHONE_RE, '<phone>')
     .replace(CIN_RE, '<cin>')
+}
+
+// SEC-13 — drop the query portion of a URL but keep path + hash. We
+// can't selectively mask params because Auth.js callback URLs nest
+// the entire OAuth state inside `?callbackUrl=…`, which itself can
+// embed an email or magic-link token. Easier: redact the lot.
+function stripQueryString(url: string): string {
+  const qIndex = url.indexOf('?')
+  if (qIndex === -1) return url
+  return `${url.slice(0, qIndex)}?<scrubbed>`
 }
 
 function maskPiiInObject(obj: Record<string, unknown>) {

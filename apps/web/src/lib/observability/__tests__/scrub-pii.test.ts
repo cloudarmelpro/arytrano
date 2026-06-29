@@ -109,4 +109,26 @@ describe('scrubPii', () => {
     const out = scrubPii(event)
     expect(out).toBe(event)
   })
+
+  it('SEC-13 — drops request.query_string and scrubs request.url', () => {
+    const event: Event = {
+      request: {
+        url: 'https://arytrano.com/sign-in?callbackUrl=%2Fdashboard&email=a%40b.mg',
+        query_string: 'callbackUrl=%2Fdashboard&email=a%40b.mg',
+      } as Event['request'],
+    }
+    const out = scrubPii(event)
+    expect((out.request as Record<string, unknown>).query_string).toBeUndefined()
+    expect(out.request!.url).toBe('https://arytrano.com/sign-in?<scrubbed>')
+  })
+
+  it('SEC-13 — masks PII embedded in the URL path', () => {
+    const event: Event = {
+      request: {
+        url: 'https://arytrano.com/admin/users/a@b.mg',
+      } as Event['request'],
+    }
+    const out = scrubPii(event)
+    expect(out.request!.url).toBe('https://arytrano.com/admin/users/<email>')
+  })
 })
