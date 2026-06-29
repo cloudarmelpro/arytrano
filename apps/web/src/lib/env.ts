@@ -129,6 +129,13 @@ const EnvSchema = z.object({
   // source maps to Sentry for unminified stack traces. Never exposed to
   // the client.
   SENTRY_AUTH_TOKEN: z.string().optional(),
+  // ADM-13 — Sentry org + project slugs used to deep-link the admin
+  // monitoring page directly to the right Issues/Performance views.
+  // Optional: when unset the /admin/monitoring page just hides the
+  // deep-link card and falls back to a generic "configure Sentry" hint.
+  // Examples: SENTRY_ORG_SLUG=arytrano, SENTRY_PROJECT_SLUG=web
+  SENTRY_ORG_SLUG: z.string().optional(),
+  SENTRY_PROJECT_SLUG: z.string().optional(),
   SENTRY_ORG: z.string().optional(),
   SENTRY_PROJECT: z.string().optional(),
   // Environment tag for grouping errors in Sentry UI (production /

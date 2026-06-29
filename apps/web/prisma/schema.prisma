@@ -130,6 +130,8 @@ model User {
   videosHidden        ListingVideo[]   @relation("ListingVideosHidden")
   // TRU-09 — admin audit trail rows authored by this user.
   auditLogs           AuditLog[]       @relation("AdminAuditLogs")
+  // ADM-08 — admin notes authored by this admin.
+  adminNotes          AdminNote[]      @relation("AdminNotesAuthored")
 
   @@index([status, role])
 }
@@ -1476,6 +1478,27 @@ model WhatsAppAlert {
 // reason, ipHash). Keep it small (< 1KB) — no full bodies, no PII.
 // `adminId` is nullable so a deleted admin user doesn't cascade and
 // wipe the trail.
+// ADM-08 — Free-form admin notes on users / listings.
+//
+// Generic by (targetType, targetId) so we can attach the same model to
+// future entities (Lead, Lease, Dispute…) without a schema bump. Notes
+// are visible only to admins; the author may edit/delete their own,
+// other admins can view but not mutate.
+model AdminNote {
+  id         String   @id @default(cuid())
+  authorId   String
+  author     User     @relation("AdminNotesAuthored", fields: [authorId], references: [id], onDelete: Cascade)
+  targetType String
+  targetId   String
+  /// Markdown-ish plain text; rendered as <pre>-wrapped on the panel.
+  body       String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([targetType, targetId, createdAt])
+  @@index([authorId, createdAt])
+}
+
 model AuditLog {
   id         String   @id @default(cuid())
   adminId    String?

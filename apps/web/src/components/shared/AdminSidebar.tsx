@@ -256,6 +256,12 @@ const buildSections = (openReports: number): Section[] => [
         labelKey: 'admin.nav.audit',
         icon: <IconAudit />,
       },
+      // ADM-13 — Sentry deep-links + healthcheck.
+      {
+        href: '/admin/monitoring',
+        labelKey: 'admin.nav.monitoring',
+        icon: <IconBarChart />,
+      },
     ],
   },
 ]

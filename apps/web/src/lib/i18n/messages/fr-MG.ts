@@ -2122,6 +2122,7 @@ export const frMG = {
   'admin.nav.quizAnalytics': 'Quiz analytics',
   'admin.nav.revenue': 'Revenus',
   'admin.nav.audit': 'Journal d\'audit',
+  'admin.nav.monitoring': 'Monitoring',
 
   // PWA offline fallback (E-T13)
   'offline.title': 'Tu sembles hors ligne',
