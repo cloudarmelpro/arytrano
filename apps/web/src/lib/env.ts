@@ -208,6 +208,23 @@ const EnvSchema = z.object({
   // digest + future ops notifications. Optional in dev. Examples :
   //   ADMIN_NOTIFICATIONS_EMAIL=ops@arytrano.com,founder@arytrano.com
   ADMIN_NOTIFICATIONS_EMAIL: z.string().optional(),
+
+  // --- reCAPTCHA v3 (TRU-17) -------------------------------
+  // Score-based bot protection on sign-up + lead forms. Both vars
+  // optional: when either is missing the verifier short-circuits
+  // to "ok" so dev / preview / forgotten-keys never block real
+  // users. Production deploy expects BOTH set.
+  //   - NEXT_PUBLIC_RECAPTCHA_SITE_KEY = the public site key the
+  //     <script> tag uses to generate tokens
+  //   - RECAPTCHA_SECRET_KEY = the secret used server-side to call
+  //     siteverify; never expose to the browser
+  NEXT_PUBLIC_RECAPTCHA_SITE_KEY: z.string().optional(),
+  RECAPTCHA_SECRET_KEY: z.string().optional(),
+  // Minimum score (0 = bot, 1 = human). Google recommends 0.5 as the
+  // baseline. Lowering it admits more bots; raising it rejects more
+  // humans. We err on usability and let TRU-04 + TRU-10 catch the
+  // residue.
+  RECAPTCHA_MIN_SCORE: z.coerce.number().min(0).max(1).default(0.5),
 })
 
 export type Env = z.infer<typeof EnvSchema>

@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation'
 import { ZodError } from 'zod'
 import { ApiError } from '@/lib/api/errors'
 import { zodIssuesToFields } from '@/lib/forms/zod-fields'
+import { verifyRecaptchaToken } from '@/lib/security/recaptcha'
 import { registerUser } from '../services/register-user'
 import { sendVerificationEmail } from '../services/send-verification-email'
 import { signUpSchema } from '../schemas'
@@ -46,6 +47,22 @@ export async function signUpAction(
       return { ok: false, message: 'Champs invalides', fields: zodIssuesToFields(err) }
     }
     throw err
+  }
+
+  // TRU-17 — score-based bot gate. Short-circuits to ok when env keys
+  // are unset (dev / preview). Use a non-generic message on rejection
+  // so we can spot real bot traffic vs unrelated network failures.
+  const recaptchaToken = formData.get('recaptchaToken')
+  const recaptcha = await verifyRecaptchaToken(
+    typeof recaptchaToken === 'string' ? recaptchaToken : null,
+    'sign_up',
+  )
+  if (!recaptcha.ok) {
+    return {
+      ok: false,
+      message:
+        'Vérification anti-robot échouée — rafraîchis la page et réessaie.',
+    }
   }
 
   try {

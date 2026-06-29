@@ -4,6 +4,7 @@ import { headers } from 'next/headers'
 import { ZodError } from 'zod'
 import { auth } from '@/features/auth'
 import { extractRequestInfo } from '@/lib/auth/request-info'
+import { verifyRecaptchaToken } from '@/lib/security/recaptcha'
 import { createInterestLeadSchema, type CreateInterestLeadInput } from '../schemas'
 import { createInterestLead } from '../services/create-interest-lead'
 
@@ -35,6 +36,22 @@ export async function createInterestLeadAction(
   // doesn't probe again, but we don't actually create the lead.
   const honeypot = formData.get('website')
   if (typeof honeypot === 'string' && honeypot.trim().length > 0) {
+    return { ok: true, leadId: 'silent-drop' }
+  }
+
+  // TRU-17 — reCAPTCHA v3 score-gate. Layered on top of TRU-10 honeypot
+  // + service-level phone/IP rate limit. Short-circuits to ok when env
+  // keys are unset.
+  const recaptchaToken = formData.get('recaptchaToken')
+  const recaptcha = await verifyRecaptchaToken(
+    typeof recaptchaToken === 'string' ? recaptchaToken : null,
+    'interest_lead',
+  )
+  if (!recaptcha.ok) {
+    // Mirror the honeypot's silent-drop pattern so failed bots don't
+    // get a useful signal back. Legitimate users won't hit this — the
+    // mint short-circuits to null on network/blocker errors, which the
+    // server treats as ok.
     return { ok: true, leadId: 'silent-drop' }
   }
 

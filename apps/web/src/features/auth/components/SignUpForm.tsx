@@ -17,6 +17,10 @@ import {
 import { z } from 'zod'
 import { applyServerErrors } from '@/lib/forms/apply-server-errors'
 import { useT } from '@/lib/i18n/client'
+import {
+  RecaptchaScript,
+  useRecaptchaToken,
+} from '@/lib/security/recaptcha-client'
 import { PasswordStrengthMeter } from './PasswordStrengthMeter'
 import { signUpAction } from '../actions/sign-up'
 import { signUpSchema } from '../schemas'
@@ -34,6 +38,7 @@ export function SignUpForm({
   const t = useT()
   const [pending, startTransition] = useTransition()
   const [showPassword, setShowPassword] = useState(false)
+  const mintRecaptcha = useRecaptchaToken('sign_up')
 
   useEffect(() => {
     onPendingChange?.(pending)
@@ -50,6 +55,9 @@ export function SignUpForm({
 
   function onSubmit(values: SignUpFormValues) {
     startTransition(async () => {
+      // TRU-17 — mint reCAPTCHA token before submit. When the key is
+      // unset the mint returns null and the server short-circuits ok.
+      const recaptchaToken = await mintRecaptcha()
       const formData = new FormData()
       formData.append('email', values.email)
       formData.append('password', values.password)
@@ -57,6 +65,7 @@ export function SignUpForm({
       // Role comes from the parent SignUpClient — single source of truth so
       // the OAuth path and the credentials path share the same selection.
       formData.append('role', role)
+      if (recaptchaToken) formData.append('recaptchaToken', recaptchaToken)
       const result = await signUpAction({ ok: false }, formData)
       if (result.ok) return // redirect handled by Server Action
       const { message } = applyServerErrors(form, result)
@@ -66,6 +75,7 @@ export function SignUpForm({
 
   return (
     <form onSubmit={form.handleSubmit(onSubmit)}>
+      <RecaptchaScript siteKey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY} />
       <FieldGroup>
         <Controller
           name="name"

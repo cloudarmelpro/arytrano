@@ -27,6 +27,10 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { useT } from '@/lib/i18n/client'
+import {
+  RecaptchaScript,
+  useRecaptchaToken,
+} from '@/lib/security/recaptcha-client'
 import { createInterestLeadAction } from '@/features/leads'
 import {
   requestPhoneOtpAction,
@@ -85,6 +89,9 @@ export function InterestLeadCta({
     createInterestLeadAction,
     LEAD_INITIAL,
   )
+  // Same action label as the first submit — the server expects
+  // 'interest_lead' on both passes.
+  const mintRecaptchaResubmit = useRecaptchaToken('interest_lead')
 
   // Flip to OTP step when the server flags otp_required, to success
   // when leadId arrives. The `react-hooks/set-state-in-effect` rule
@@ -142,7 +149,7 @@ export function InterestLeadCta({
               listingTitle={listingTitle}
               smsConsoleMock={smsConsoleMock}
               onBack={() => setStep('form')}
-              onVerified={() => {
+              onVerified={async () => {
                 // Re-submit the lead via the same form action — the
                 // service will now see hasRecentlyVerifiedPhone === true.
                 if (!draft) return
@@ -152,6 +159,11 @@ export function InterestLeadCta({
                 fd.set('tenantPhone', draft.tenantPhone)
                 fd.set('moveInWindow', draft.moveInWindow)
                 fd.set('budgetConfirmed', String(draft.budgetConfirmed))
+                // TRU-17 — mint a fresh reCAPTCHA token; the OTP step
+                // happened on a separate dialog view so the first
+                // token has likely expired.
+                const token = await mintRecaptchaResubmit()
+                if (token) fd.set('recaptchaToken', token)
                 // React 19 : dispatcher must run inside startTransition
                 // when not bound to a form action.
                 startTransition(() => leadAction(fd))
@@ -207,7 +219,9 @@ function LeadForm({
   const error = (key: string): string | undefined =>
     fieldErrors?.[key]?.[0] ?? undefined
 
-  function handleSubmit(formData: FormData) {
+  const mintRecaptcha = useRecaptchaToken('interest_lead')
+
+  async function handleSubmit(formData: FormData) {
     // Capture the draft BEFORE the form action runs so the OTP step
     // can re-submit silently with the same values.
     onDraftCaptured({
@@ -217,11 +231,16 @@ function LeadForm({
       moveInWindow: String(formData.get('moveInWindow') ?? 'NEXT_MONTH'),
       budgetConfirmed: formData.get('budgetConfirmed') === 'true',
     })
+    // TRU-17 — attach reCAPTCHA token. Null when keys are unset; the
+    // server short-circuits to ok in that case.
+    const token = await mintRecaptcha()
+    if (token) formData.set('recaptchaToken', token)
     formAction(formData)
   }
 
   return (
     <form action={handleSubmit} aria-describedby="lead-form-context">
+      <RecaptchaScript siteKey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY} />
       {/* TRU-10 honeypot — bots fill every input they see ; humans don't
           see this one. Server Action returns a silent fake-success
           when populated. `tabIndex=-1` so keyboard users skip it. */}
