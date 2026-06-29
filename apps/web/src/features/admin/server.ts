@@ -4,6 +4,10 @@
  */
 export { getAdminStats, type AdminStats } from './queries/get-admin-stats'
 export {
+  computeDailyAdminStats,
+  type DailyAdminStats,
+} from './queries/compute-daily-admin-stats'
+export {
   getAdminContext,
   type AdminContext,
 } from './queries/get-admin-context'
