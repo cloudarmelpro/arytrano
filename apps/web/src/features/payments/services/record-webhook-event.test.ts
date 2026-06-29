@@ -13,6 +13,8 @@ vi.mock('@/lib/db', () => ({
     },
     paymentEvent: {
       create: vi.fn(),
+      // PAY-14 — pre-check for replays before any other work.
+      findUnique: vi.fn(),
     },
     $transaction: vi.fn(),
   },
@@ -33,6 +35,10 @@ const baseEvent: WebhookEvent = {
 
 beforeEach(() => {
   vi.clearAllMocks()
+  // PAY-14 — default: no prior replay row, so recordWebhookEvent falls
+  // through to the real state machine. Tests that exercise the replay
+  // path override this in-test.
+  vi.mocked(prisma.paymentEvent.findUnique).mockResolvedValue(null as never)
   // Support both shapes : array (legacy batch form, used by other
   // services) and async callback (interactive form, used here for the
   // race-safe conditional update). Default `updateMany.count = 1` so
@@ -257,5 +263,24 @@ describe('recordWebhookEvent', () => {
     if (outcome.kind === 'noop') {
       expect(outcome.existingStatus).toBe('REFUNDED')
     }
+  })
+
+  it('PAY-14: short-circuits on exact-replay via PaymentEvent.dedupKey', async () => {
+    // A prior event with the same dedupKey already exists.
+    vi.mocked(prisma.paymentEvent.findUnique).mockResolvedValue({
+      paymentId: 'pay_1',
+      payment: { status: 'CONFIRMED' },
+    } as never)
+
+    const outcome = await recordWebhookEvent(baseEvent)
+    expect(outcome.kind).toBe('noop')
+    if (outcome.kind === 'noop') {
+      expect(outcome.paymentId).toBe('pay_1')
+      expect(outcome.existingStatus).toBe('CONFIRMED')
+    }
+    // We skip ALL downstream work — no Payment lookup, no insert.
+    expect(prisma.payment.findUnique).not.toHaveBeenCalled()
+    expect(prisma.paymentEvent.create).not.toHaveBeenCalled()
+    expect(prisma.payment.updateMany).not.toHaveBeenCalled()
   })
 })

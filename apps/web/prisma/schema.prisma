@@ -899,6 +899,11 @@ model PaymentEvent {
   paymentId  String
   status     PaymentStatus
   rawPayload Json // raw provider response (kept for disputes)
+  /// PAY-14 — sha256 over the canonical event tuple (reference + event
+  /// type + orderReference + amountMGA). Unique so a GoalPay retry
+  /// storm of the SAME event collapses to one row instead of bloating
+  /// the audit trail. Nullable so legacy rows (pre-PAY-14) stay valid.
+  dedupKey   String?       @unique
   occurredAt DateTime      @default(now())
 
   payment Payment @relation(fields: [paymentId], references: [id], onDelete: Cascade)

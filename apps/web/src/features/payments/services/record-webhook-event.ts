@@ -1,9 +1,27 @@
 import 'server-only'
+import { createHash } from 'node:crypto'
 import * as Sentry from '@sentry/nextjs'
+import { Prisma } from '@prisma/client'
 import { prisma } from '@/lib/db'
 import type { PaymentPurpose, PaymentStatus } from '@prisma/client'
 import type { WebhookEvent } from '@/lib/payments/types'
 import { stripC0FromJson } from '@/lib/format/strip-c0'
+
+/**
+ * PAY-14 — canonical dedup key for a webhook event. Computed over the
+ * tuple that defines event identity (NOT raw body — that varies by
+ * whitespace + key order). Two events with the same key are treated
+ * as the same event regardless of which retry the provider sent.
+ */
+function buildDedupKey(event: WebhookEvent): string {
+  const canonical = JSON.stringify({
+    r: event.reference,
+    e: event.event,
+    o: event.orderReference,
+    a: event.amountMGA,
+  })
+  return createHash('sha256').update(canonical).digest('hex')
+}
 
 /**
  * Idempotent state machine for recording an inbound GoalPay webhook.
@@ -58,6 +76,22 @@ export type RecordWebhookOutcome =
 export async function recordWebhookEvent(
   event: WebhookEvent,
 ): Promise<RecordWebhookOutcome> {
+  // PAY-14 — short-circuit on exact-replay before any further work.
+  // If the same event tuple was already recorded, return noop without
+  // re-running the transition or audit insert.
+  const dedupKey = buildDedupKey(event)
+  const priorReplay = await prisma.paymentEvent.findUnique({
+    where: { dedupKey },
+    select: { paymentId: true, payment: { select: { status: true } } },
+  })
+  if (priorReplay) {
+    return {
+      kind: 'noop',
+      paymentId: priorReplay.paymentId,
+      existingStatus: priorReplay.payment.status,
+    }
+  }
+
   const existing = await prisma.payment.findUnique({
     where: { idempotencyKey: event.reference },
     select: {
@@ -132,13 +166,26 @@ export async function recordWebhookEvent(
 
   // Idempotent path : already terminal → record audit only.
   if (TERMINAL_STATUSES.has(existing.status)) {
-    await prisma.paymentEvent.create({
-      data: {
-        paymentId: existing.id,
-        status: targetStatus,
-        rawPayload: safePayload,
-      },
-    })
+    // PAY-14 — catch race-with-replay on the unique dedupKey index. If
+    // two webhook handlers raced past the priorReplay check above, the
+    // second insert hits the unique violation; treat it as noop.
+    try {
+      await prisma.paymentEvent.create({
+        data: {
+          paymentId: existing.id,
+          status: targetStatus,
+          rawPayload: safePayload,
+          dedupKey,
+        },
+      })
+    } catch (err) {
+      if (
+        !(err instanceof Prisma.PrismaClientKnownRequestError) ||
+        err.code !== 'P2002'
+      ) {
+        throw err
+      }
+    }
     return {
       kind: 'noop',
       paymentId: existing.id,
@@ -156,33 +203,52 @@ export async function recordWebhookEvent(
   // (email tenant invite, lease activation). The `where.status` filter
   // means a row already flipped by a concurrent handler is silently
   // skipped, and `updated.count` tells us whether we won the race.
-  const txResult = await prisma.$transaction(async (tx) => {
-    const updated = await tx.payment.updateMany({
-      where: {
-        id: existing.id,
-        status: { in: ['INITIATED', 'PENDING'] },
-      },
-      data: {
-        status: targetStatus,
-        webhookReceivedAt: now,
-        providerTxId: event.orderReference,
-        ...(targetStatus === 'CONFIRMED' ? { completedAt: now } : {}),
-      },
+  let txResult: number
+  try {
+    txResult = await prisma.$transaction(async (tx) => {
+      const updated = await tx.payment.updateMany({
+        where: {
+          id: existing.id,
+          status: { in: ['INITIATED', 'PENDING'] },
+        },
+        data: {
+          status: targetStatus,
+          webhookReceivedAt: now,
+          providerTxId: event.orderReference,
+          ...(targetStatus === 'CONFIRMED' ? { completedAt: now } : {}),
+        },
+      })
+      // Always audit, even when we lost the race — the event arrived
+      // and belongs in the immutable trail. The audit row's `status`
+      // records what the event WOULD have transitioned to, not the
+      // post-flip Payment.status (which `updateMany.count === 0` proves
+      // was already terminal by another writer).
+      await tx.paymentEvent.create({
+        data: {
+          paymentId: existing.id,
+          status: targetStatus,
+          rawPayload: safePayload,
+          dedupKey,
+        },
+      })
+      return updated.count
     })
-    // Always audit, even when we lost the race — the event arrived
-    // and belongs in the immutable trail. The audit row's `status`
-    // records what the event WOULD have transitioned to, not the
-    // post-flip Payment.status (which `updateMany.count === 0` proves
-    // was already terminal by another writer).
-    await tx.paymentEvent.create({
-      data: {
+  } catch (err) {
+    // PAY-14 — concurrent replay of the SAME dedupKey lost the audit
+    // insert race. The other handler did the side effects; we report
+    // noop without re-dispatching.
+    if (
+      err instanceof Prisma.PrismaClientKnownRequestError &&
+      err.code === 'P2002'
+    ) {
+      return {
+        kind: 'noop',
         paymentId: existing.id,
-        status: targetStatus,
-        rawPayload: safePayload,
-      },
-    })
-    return updated.count
-  })
+        existingStatus: existing.status,
+      }
+    }
+    throw err
+  }
 
   if (txResult === 0) {
     // Race lost — a concurrent webhook handler flipped the row first.
