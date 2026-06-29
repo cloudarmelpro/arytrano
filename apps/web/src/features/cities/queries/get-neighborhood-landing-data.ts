@@ -6,6 +6,26 @@ import { getRatingsForListings } from '@/features/listings/queries/get-ratings-f
 
 const TOP_LISTINGS_LIMIT = 12
 
+/**
+ * CON-03 — shape of the per-locale editorial body stored on
+ * `Neighborhood.editorial`. Mirrors the seed-side helper; both keys
+ * are independent and either can be missing (in which case the UI
+ * falls back to the other locale's body).
+ */
+export type NeighborhoodEditorialBody = {
+  tagline?: string | null
+  landmark?: string | null
+  ambiance?: string | null
+  walk?: string | null
+  transport?: string | null
+  distance?: string | null
+}
+
+export type NeighborhoodEditorial = {
+  fr?: NeighborhoodEditorialBody | null
+  mg?: NeighborhoodEditorialBody | null
+}
+
 export type NeighborhoodLandingData = {
   city: {
     id: string
@@ -20,6 +40,8 @@ export type NeighborhoodLandingData = {
     nameMg: string
     lat: number
     lng: number
+    /** CON-03 — editorial body keyed by locale; see Neighborhood.editorial in schema. */
+    editorial: NeighborhoodEditorial | null
   }
   listings: PublicListingCardData[]
   stats: {
@@ -51,6 +73,7 @@ function buildGetNeighborhoodLandingData() {
         nameMg: true,
         lat: true,
         lng: true,
+        editorial: true,
         city: {
           select: { id: true, slug: true, nameFr: true, nameMg: true },
         },
@@ -153,6 +176,7 @@ function buildGetNeighborhoodLandingData() {
         nameMg: neighborhood.nameMg,
         lat: Number(neighborhood.lat),
         lng: Number(neighborhood.lng),
+        editorial: (neighborhood.editorial as NeighborhoodEditorial | null) ?? null,
       },
       listings: listingsRaw.map((l) => {
         const rating = ratings.get(l.id) ?? { avg: null, count: 0 }

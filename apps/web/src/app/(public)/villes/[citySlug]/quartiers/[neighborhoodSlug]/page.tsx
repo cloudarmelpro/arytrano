@@ -7,6 +7,7 @@ import {
   NeighborhoodMap,
   NeighborhoodListings,
   NeighborhoodReviews,
+  NeighborhoodEditorial,
 } from '@/features/cities'
 import { getNeighborhoodLandingData } from '@/features/cities/server'
 import { getFavoritedListingIds } from '@/features/favorites/server'
@@ -143,6 +144,15 @@ export default async function NeighborhoodLandingPage({
         citySlug={data.city.slug}
         quartierName={quartierName}
         stats={data.stats}
+      />
+      {/* CON-03 — editorial body for SEO long-tail. Renders nothing when
+          the Json column is empty, so existing untouched quartiers stay
+          unaffected. */}
+      <NeighborhoodEditorial
+        locale={locale}
+        editorial={data.neighborhood.editorial}
+        quartierName={quartierName}
+        cityName={cityName}
       />
       <NeighborhoodMap
         locale={locale}
