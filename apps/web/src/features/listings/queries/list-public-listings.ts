@@ -99,6 +99,11 @@ export const listPublicListingsQuerySchema = z
       .optional(),
     sort: z.enum(LISTING_SORT_VALUES).optional(),
     amenities: amenitiesFromUrl,
+    // TEN-11 — "près de l'université" filter. Slug of one of the seeded
+    // University rows; we convert to a ±0.027° lat / ±0.029° lng bounding
+    // box (~3km square at MG latitudes) and apply as a WHERE clause.
+    // Cheaper than haversine + works with the existing cursor pagination.
+    nearUniversity: slugSchema,
     // E-T14 full-text search. Bounded to 120 chars to keep the
     // ILIKE scan cheap until we promote to a tsvector GIN index.
     q: z
@@ -199,6 +204,31 @@ export async function listPublicListings(
   if (input.amenities && input.amenities.length > 0) {
     where.amenities = { hasEvery: input.amenities }
   }
+  // TEN-11 — near-university bounding box. Resolve the slug to coords
+  // once, then constrain the listing lat/lng to a ~3km square. The
+  // bounding box is generous on the longitude side to compensate for
+  // the latitude-dependent distortion (cos(-19°) ≈ 0.946).
+  if (input.nearUniversity) {
+    const uni = await prisma.university.findUnique({
+      where: { slug: input.nearUniversity },
+      select: { lat: true, lng: true },
+    })
+    if (uni) {
+      const lat = Number(uni.lat)
+      const lng = Number(uni.lng)
+      const DELTA_LAT = 0.027
+      const DELTA_LNG = 0.029
+      where.lat = {
+        gte: (lat - DELTA_LAT).toFixed(6),
+        lte: (lat + DELTA_LAT).toFixed(6),
+      }
+      where.lng = {
+        gte: (lng - DELTA_LNG).toFixed(6),
+        lte: (lng + DELTA_LNG).toFixed(6),
+      }
+    }
+  }
+
   // E-T14 full-text search.
   // Prisma's `contains` insensitive on title + description; Postgres
   // resolves the scan via the pg_trgm GIN indexes added in migration

@@ -16,6 +16,7 @@ import {
 } from '@/features/listings'
 import { SaveSearchButton } from '@/features/search'
 import { listCitiesWithNeighborhoods } from '@/features/geo/server'
+import { listUniversities } from '@/features/universities/server'
 import { listCitiesWithCounts } from '@/features/landing/server'
 import { getFavoritedListingIds } from '@/features/favorites/server'
 import { auth } from '@/features/auth'
@@ -35,6 +36,7 @@ type SearchParams = Promise<{
   amenities?: string
   q?: string
   view?: string
+  nearUniversity?: string
 }>
 
 function hasAnyFilter(sp: Awaited<SearchParams>) {
@@ -50,7 +52,8 @@ function hasAnyFilter(sp: Awaited<SearchParams>) {
       sp.sort ||
       sp.amenities ||
       sp.q ||
-      sp.view,
+      sp.view ||
+      sp.nearUniversity,
   )
 }
 
@@ -131,6 +134,7 @@ export default async function PublicListingsPage({
     sort: sp.sort || undefined,
     amenities: sp.amenities || undefined,
     q: sp.q || undefined,
+    nearUniversity: sp.nearUniversity || undefined,
   })
   const query = parsed.success ? parsed.data : {}
 
@@ -150,6 +154,7 @@ export default async function PublicListingsPage({
     mapItems,
     cities,
     cityCounts,
+    universities,
     session,
   ] = await Promise.all([
     listPublicListings(query),
@@ -160,6 +165,7 @@ export default async function PublicListingsPage({
     // count into it because that one is hit by the listing-form too
     // (no aggregate needed there).
     listCitiesWithCounts(),
+    listUniversities(),
     auth(),
   ])
 
@@ -231,21 +237,18 @@ export default async function PublicListingsPage({
   }
 
   return (
-    <div className="mx-auto max-w-[1280px] px-6 py-12 lg:px-10">
-      <header className="mb-6 flex flex-col gap-3">
+    <div className="mx-auto max-w-[1280px] px-6 pb-12 lg:px-10">
+      <header className="mb-6 flex flex-col gap-3 pt-6">
         <nav
           aria-label="Breadcrumb"
           className="flex items-center gap-2 text-[12px] font-medium text-muted-foreground"
         >
           <Link href="/" className="transition hover:text-foreground">
-            {t('common.appName')}
+            {t('common.home')}
           </Link>
-          <Icon name="arrow-right" size={11} />
+          /
           <span className="text-foreground">{pageTitle}</span>
         </nav>
-        <h1 className="font-serif text-[clamp(32px,3.8vw,52px)] font-normal leading-[1.05] tracking-[-0.025em] text-foreground">
-          {pageTitle}
-        </h1>
         {!filterActive && (
           <p className="max-w-2xl text-[14.5px] text-foreground/70">
             {t(items.length <= 1 ? 'annonces.count.one' : 'annonces.count.other', {
@@ -276,7 +279,7 @@ export default async function PublicListingsPage({
               aspectClassName="aspect-[16/10]"
             />
           ) : null}
-          <ListingFiltersSidebar />
+          <ListingFiltersSidebar universities={universities} />
         </div>
 
         <main className="flex min-w-0 flex-col gap-4">
@@ -338,7 +341,7 @@ export default async function PublicListingsPage({
             </div>
           ) : (
             <>
-              <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3">
+              <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3">
                 {items.map((l, i) => (
                   // Priority on the first card only (no cursor = page 1 = LCP candidate).
                   <PublicListingCard

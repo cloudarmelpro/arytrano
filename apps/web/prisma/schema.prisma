@@ -380,6 +380,7 @@ model City {
   neighborhoods   Neighborhood[]
   listings        Listing[]
   preferringUsers User[] // E-T07 inverse for User.preferredCity
+  universities    University[] // TEN-11
 }
 
 model Neighborhood {
@@ -412,6 +413,8 @@ model Neighborhood {
   @@unique([cityId, slug])
   @@index([cityId])
 }
+
+
 
 // ============================================================
 // LISTINGS — v0 (core)
@@ -1515,6 +1518,30 @@ model WhatsAppAlert {
 // future entities (Lead, Lease, Dispute…) without a schema bump. Notes
 // are visible only to admins; the author may edit/delete their own,
 // other admins can view but not mutate.
+// TEN-11 — universities geocoded so search can filter "near IPNT".
+// Lat/lng is the campus centroid (admin building). A listing is
+// considered "near" when the haversine distance is below the search
+// threshold (default 3km).
+model University {
+  id      String  @id @default(cuid())
+  cityId  String
+  city    City    @relation(fields: [cityId], references: [id], onDelete: Restrict)
+  slug    String // "ipnt", "ua-fianarantsoa"
+  /// Long form name shown in FR (default UI language).
+  nameFr  String
+  /// Short ticker shown on chips ("IPNT").
+  acronym String
+  lat     Decimal @db.Decimal(9, 6)
+  lng     Decimal @db.Decimal(9, 6)
+  /// Optional address line surfaced on hover / future university landing.
+  address String?
+
+  createdAt DateTime @default(now())
+
+  @@unique([slug])
+  @@index([cityId])
+}
+
 model AdminNote {
   id         String   @id @default(cuid())
   authorId   String

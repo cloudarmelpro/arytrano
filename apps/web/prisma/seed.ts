@@ -6,6 +6,7 @@ import {
   buildEditorialFor,
   buildQuizProfileFor,
 } from './seed-helpers/neighborhood-payload'
+import { UNIVERSITY_SEEDS } from './seed-helpers/universities'
 
 const connectionString = process.env.DATABASE_URL
 if (!connectionString) {
@@ -104,6 +105,38 @@ async function main() {
   console.log(
     `\n${CITY_SEEDS.length} cities · ${totalNeighborhoods} neighborhoods seeded`,
   )
+
+  // TEN-11 — universities. Upsert by slug so re-runs refresh coords.
+  let totalUniversities = 0
+  for (const uni of UNIVERSITY_SEEDS) {
+    const city = await prisma.city.findUnique({ where: { slug: uni.citySlug } })
+    if (!city) {
+      console.warn(`⚠️  Skipping university ${uni.slug}: city ${uni.citySlug} not found`)
+      continue
+    }
+    await prisma.university.upsert({
+      where: { slug: uni.slug },
+      create: {
+        slug: uni.slug,
+        cityId: city.id,
+        nameFr: uni.nameFr,
+        acronym: uni.acronym,
+        lat: uni.lat,
+        lng: uni.lng,
+        address: uni.address,
+      },
+      update: {
+        cityId: city.id,
+        nameFr: uni.nameFr,
+        acronym: uni.acronym,
+        lat: uni.lat,
+        lng: uni.lng,
+        address: uni.address,
+      },
+    })
+    totalUniversities += 1
+  }
+  console.log(`${totalUniversities} universities seeded`)
 }
 
 main()

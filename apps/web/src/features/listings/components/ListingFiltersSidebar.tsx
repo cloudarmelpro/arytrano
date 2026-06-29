@@ -42,9 +42,22 @@ const BATHROOM_OPTIONS = [1, 2, 3] as const
  * dragging is buttery; URL only updates on pointerup (`onValueCommitted`)
  * which avoids a router.replace per pixel of drag.
  */
-export function ListingFiltersSidebar() {
+export type UniversityFilterOption = {
+  slug: string
+  acronym: string
+  nameFr: string
+  citySlug: string
+  cityNameFr: string
+}
+
+export function ListingFiltersSidebar({
+  universities = [],
+}: {
+  universities?: UniversityFilterOption[]
+} = {}) {
   const { params, pending, updateMultiple, updateParam, reset } = useUrlFilters()
   const t = useT()
+  const currentNearUni = params.get('nearUniversity') ?? ''
 
   const currentNeighborhood = params.get('neighborhood') ?? ''
   const urlPriceMin = clamp(Number(params.get('priceMin')) || PRICE_MIN, PRICE_MIN, PRICE_MAX)
@@ -351,6 +364,35 @@ export function ListingFiltersSidebar() {
             })}
           </ul>
         </section>
+
+        {/* TEN-11 — Near university dropdown. Hidden when no universities
+            are seeded yet (server returns []). Picks emit `nearUniversity`
+            slug; selecting "" clears the filter. */}
+        {universities.length > 0 && (
+          <section className="flex flex-col gap-2 py-1.5">
+            <p className="text-[12px] font-semibold uppercase tracking-[0.08em] text-foreground/70">
+              Près de l’université
+            </p>
+            <select
+              value={currentNearUni}
+              onChange={(e) =>
+                updateParam('nearUniversity', e.target.value || null)
+              }
+              disabled={pending}
+              className="h-9 w-full rounded-md border border-border bg-background px-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+            >
+              <option value="">Toutes</option>
+              {universities.map((u) => (
+                <option key={u.slug} value={u.slug}>
+                  {u.acronym} — {u.cityNameFr}
+                </option>
+              ))}
+            </select>
+            <p className="text-[11px] text-muted-foreground">
+              Logements dans un rayon ≈ 3 km du campus.
+            </p>
+          </section>
+        )}
 
         {/* Amenities */}
         <section className="flex flex-col gap-2 py-1.5">
