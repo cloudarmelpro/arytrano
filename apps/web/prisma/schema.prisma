@@ -132,6 +132,8 @@ model User {
   auditLogs           AuditLog[]       @relation("AdminAuditLogs")
   // ADM-08 — admin notes authored by this admin.
   adminNotes          AdminNote[]      @relation("AdminNotesAuthored")
+  // PAY-09 — payments this admin has marked REFUNDED.
+  refundedPayments    Payment[]        @relation("PaymentRefundedBy")
 
   @@index([status, role])
 }
@@ -862,6 +864,14 @@ model Payment {
   webhookReceivedAt DateTime?
   // Set when status transitions to CONFIRMED (a successful payment).
   completedAt       DateTime?
+  // PAY-09 — finalisation of the manual refund flow. GoalPay has no
+  // refund API, so an admin pushes REFUND_PENDING → REFUNDED after
+  // confirming the off-platform transfer (proof / providerTxId of the
+  // refund leg pasted into refundNote).
+  refundedAt        DateTime?
+  refundedById      String?
+  refundedBy        User?               @relation("PaymentRefundedBy", fields: [refundedById], references: [id], onDelete: SetNull)
+  refundNote        String?
 
   user    User           @relation(fields: [userId], references: [id], onDelete: Restrict)
   listing Listing?       @relation(fields: [listingId], references: [id], onDelete: SetNull)

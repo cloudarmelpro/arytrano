@@ -28,3 +28,11 @@ export {
   resolveLeaseHrefForReturn,
   type ResolveLeaseHrefForReturnResult,
 } from './queries/resolve-lease-href-for-return'
+export {
+  markPaymentRefunded,
+  type MarkRefundedOutcome,
+} from './services/mark-payment-refunded'
+export {
+  listPendingRefunds,
+  type PendingRefundRow,
+} from './queries/list-pending-refunds'

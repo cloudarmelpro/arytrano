@@ -17,3 +17,8 @@ export {
   TransactionResult,
   type TransactionStatus,
 } from './components/TransactionResult'
+
+export {
+  markPaymentRefundedAction,
+  type MarkPaymentRefundedActionState,
+} from './actions/mark-payment-refunded'

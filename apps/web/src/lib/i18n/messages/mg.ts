@@ -2135,6 +2135,7 @@ export const mg: Record<MessageKey, string> = {
   'admin.nav.revenue': 'Vola miditra',
   'admin.nav.audit': 'Audit log',
   'admin.nav.monitoring': 'Fanaraha-maso',
+  'admin.nav.refunds': 'Famerenam-bola',
 
   // PWA offline fallback (E-T13)
   'offline.title': 'Toa tsy mifandray amin\'ny tambajotra ianao',

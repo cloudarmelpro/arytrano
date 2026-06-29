@@ -191,6 +191,12 @@ const buildSections = (openReports: number): Section[] => [
         labelKey: 'admin.nav.revenue',
         icon: <IconCash />,
       },
+      // PAY-09 — manual refund queue (REFUND_PENDING → REFUNDED).
+      {
+        href: '/admin/refunds',
+        labelKey: 'admin.nav.refunds',
+        icon: <IconCash />,
+      },
     ],
   },
   {
