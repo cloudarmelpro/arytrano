@@ -1,6 +1,7 @@
 import 'server-only'
 import { rateLimiters } from '@/lib/rate-limit'
 import { sendEmail } from './index'
+import { isEmailDisabled } from '@/features/email-bounce/server'
 
 export type TransactionalEventType =
   | 'listing-published'
@@ -42,6 +43,18 @@ export async function sendTransactionalEmail(opts: {
   html: string
   text: string
 }): Promise<void> {
+  // COM-12 — short-circuit when the recipient has been auto-disabled
+  // by the bounce policy. Protects sender reputation more effectively
+  // than rate-limiting alone.
+  if (await isEmailDisabled(opts.recipientEmail)) {
+    if (process.env.NODE_ENV !== 'production') {
+      console.warn(
+        `[email] skipped (${opts.eventType}): recipient disabled by bounce policy`,
+      )
+    }
+    return
+  }
+
   const rl = await rateLimiters.transactionalEmail(
     opts.recipientId,
     opts.eventType,

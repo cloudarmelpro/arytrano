@@ -74,6 +74,14 @@ model User {
   listingExpirationAlertsEnabled Boolean @default(true)
   leaseUpdatesEnabled            Boolean @default(true)
 
+  // COM-12 — hard-bounce tracking. After EMAIL_BOUNCE_HARD_THRESHOLD
+  // (default 3) hard bounces in a row, set emailDisabledAt to now.
+  // Senders gate on emailDisabledAt and skip the send to protect the
+  // domain's sender reputation. User can reactivate by updating their
+  // email (which resets the counter — see update-profile).
+  emailBouncesHard               Int       @default(0)
+  emailDisabledAt                DateTime?
+
   // E-T07 — multi-city v1. Captured at sign-up or first listing
   // creation. Soft FK : SetNull on city delete so account survives
   // even if a city is later removed (admin tooling can't drop a

@@ -216,6 +216,17 @@ const EnvSchema = z.object({
   //   ADMIN_NOTIFICATIONS_EMAIL=ops@arytrano.com,founder@arytrano.com
   ADMIN_NOTIFICATIONS_EMAIL: z.string().optional(),
 
+  // --- Email bounce webhook (COM-12) -----------------------
+  // Shared secret used to authenticate inbound bounce reports from the
+  // SMTP/ESP provider. The /api/webhooks/email-bounce route requires
+  // `Authorization: Bearer <secret>`. Optional in dev; when unset the
+  // route returns 503 so a misconfigured provider gets a hard signal.
+  EMAIL_BOUNCE_WEBHOOK_SECRET: z.string().optional(),
+  // Number of consecutive hard bounces before we disable email for a
+  // user. 3 is the SES / Postmark recommendation; lower if your domain
+  // is on a new IP with no warmed reputation.
+  EMAIL_BOUNCE_HARD_THRESHOLD: z.coerce.number().int().min(1).max(20).default(3),
+
   // --- reCAPTCHA v3 (TRU-17) -------------------------------
   // Score-based bot protection on sign-up + lead forms. Both vars
   // optional: when either is missing the verifier short-circuits
