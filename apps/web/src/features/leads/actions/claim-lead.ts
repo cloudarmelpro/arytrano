@@ -2,6 +2,7 @@
 
 import { revalidatePath } from 'next/cache'
 import { requireAdmin } from '@/features/admin/server'
+import { writeAuditLog } from '@/lib/audit/write-audit-log'
 import { claimLead } from '../services/claim-lead'
 
 export type ClaimLeadActionState = {
@@ -31,6 +32,12 @@ export async function claimLeadAction(
 
   switch (outcome.kind) {
     case 'ok':
+      void writeAuditLog({
+        adminId: userId,
+        action: 'lead.claim',
+        targetType: 'LeadRequest',
+        targetId: leadId,
+      })
       revalidatePath('/admin/leads')
       revalidatePath(`/admin/leads/${leadId}`)
       return { ok: true }

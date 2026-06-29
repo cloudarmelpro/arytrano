@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache'
 import { ZodError } from 'zod'
 import { ApiError } from '@/lib/api/errors'
 import { zodIssuesToFields } from '@/lib/forms/zod-fields'
+import { writeAuditLog } from '@/lib/audit/write-audit-log'
 import { suspendListing } from '../services/suspend-listing'
 import { suspendListingSchema } from '../schemas/suspend-listing'
 import { requireAdmin } from '../services/require-admin'
@@ -41,6 +42,13 @@ export async function suspendListingAction(
 
   try {
     await suspendListing(admin.userId, input)
+    void writeAuditLog({
+      adminId: admin.userId,
+      action: 'listing.suspend',
+      targetType: 'Listing',
+      targetId: input.listingId,
+      metadata: { reason: input.reason.slice(0, 200) },
+    })
     revalidatePath('/admin/listings')
     revalidatePath('/admin')
     return { ok: true, message: 'Annonce suspendue. Le propriétaire est notifié par email.' }

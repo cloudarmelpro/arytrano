@@ -2133,6 +2133,7 @@ export const mg: Record<MessageKey, string> = {
   'admin.nav.whatsappAlerts': 'Fanairana WhatsApp',
   'admin.nav.quizAnalytics': 'Antontan-tarehimarika quiz',
   'admin.nav.revenue': 'Vola miditra',
+  'admin.nav.audit': 'Audit log',
 
   // PWA offline fallback (E-T13)
   'offline.title': 'Toa tsy mifandray amin\'ny tambajotra ianao',

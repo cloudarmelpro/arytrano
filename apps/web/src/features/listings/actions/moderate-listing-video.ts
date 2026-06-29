@@ -2,6 +2,7 @@
 
 import { revalidatePath } from 'next/cache'
 import { requireAdmin } from '@/features/admin/server'
+import { writeAuditLog } from '@/lib/audit/write-audit-log'
 import {
   hideListingVideo,
   unhideListingVideo,
@@ -47,6 +48,13 @@ export async function moderateListingVideoAction(
     return { ok: false, message: 'Aucune vidéo sur cette annonce.' }
   }
 
+  void writeAuditLog({
+    adminId: userId,
+    action: action === 'unhide' ? 'video.unhide' : 'video.hide',
+    targetType: 'Listing',
+    targetId: listingId,
+    metadata: action === 'unhide' ? undefined : { reason: reason.slice(0, 200) },
+  })
   revalidatePath(`/admin/listings/${listingId}`)
   revalidatePath(`/dashboard/listings/${listingId}/edit`)
   return { ok: true, newStatus: outcome.status }

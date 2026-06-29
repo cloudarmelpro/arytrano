@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache'
 import { ZodError } from 'zod'
 import { requireAdmin } from '@/features/admin/server'
+import { writeAuditLog } from '@/lib/audit/write-audit-log'
 import {
   claimDisputeSchema,
   resolveDisputeSchema,
@@ -33,6 +34,12 @@ export async function claimDisputeAction(
   const outcome = await claimDispute(disputeId, userId)
   switch (outcome.kind) {
     case 'ok':
+      void writeAuditLog({
+        adminId: userId,
+        action: 'dispute.claim',
+        targetType: 'Dispute',
+        targetId: disputeId,
+      })
       revalidatePath(`/admin/disputes/${disputeId}`)
       revalidatePath('/admin/disputes')
       return { ok: true }
@@ -85,6 +92,13 @@ export async function resolveDisputeAction(
   const outcome = await resolveDispute(input, userId)
   switch (outcome.kind) {
     case 'ok':
+      void writeAuditLog({
+        adminId: userId,
+        action: 'dispute.resolve',
+        targetType: 'Dispute',
+        targetId: input.disputeId,
+        metadata: { verdict: input.verdict },
+      })
       revalidatePath(`/admin/disputes/${input.disputeId}`)
       revalidatePath('/admin/disputes')
       return { ok: true }

@@ -2,6 +2,7 @@
 
 import { revalidatePath } from 'next/cache'
 import { ApiError } from '@/lib/api/errors'
+import { writeAuditLog } from '@/lib/audit/write-audit-log'
 import { resolveReportSchema } from '../schemas/resolve-report'
 import { resolveReport } from '../services/resolve-report'
 import { requireAdmin } from '../services/require-admin'
@@ -36,6 +37,13 @@ export async function resolveReportAction(
 
   try {
     await resolveReport({ data: parsed.data, adminId: admin.userId })
+    void writeAuditLog({
+      adminId: admin.userId,
+      action: parsed.data.decision === 'RESOLVED' ? 'report.resolve' : 'report.dismiss',
+      targetType: 'Report',
+      targetId: parsed.data.reportId,
+      metadata: { adminNote: parsed.data.adminNote.slice(0, 200) },
+    })
     revalidatePath('/admin/reports')
     revalidatePath('/admin')
     return { ok: true }

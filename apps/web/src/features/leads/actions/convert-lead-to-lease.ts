@@ -2,6 +2,7 @@
 
 import { revalidatePath } from 'next/cache'
 import { requireAdmin } from '@/features/admin/server'
+import { writeAuditLog } from '@/lib/audit/write-audit-log'
 import { convertLeadToLease } from '../services/convert-lead-to-lease'
 
 export type ConvertLeadActionState = {
@@ -41,6 +42,13 @@ export async function convertLeadToLeaseAction(
 
   switch (outcome.kind) {
     case 'ok':
+      void writeAuditLog({
+        adminId: userId,
+        action: 'lead.convert',
+        targetType: 'LeadRequest',
+        targetId: String(formData.get('leadId') ?? ''),
+        metadata: { leaseId: outcome.leaseId },
+      })
       revalidatePath(`/admin/leads/${formData.get('leadId')}`)
       revalidatePath('/admin/leads')
       revalidatePath(`/dashboard/leases/${outcome.leaseId}`)

@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache'
 import { ZodError } from 'zod'
 import { requireAdmin } from '@/features/admin/server'
+import { writeAuditLog } from '@/lib/audit/write-audit-log'
 import {
   transitionLeadStatusSchema,
   type TransitionLeadStatusInput,
@@ -56,6 +57,13 @@ export async function transitionLeadStatusAction(
 
   switch (outcome.kind) {
     case 'ok':
+      void writeAuditLog({
+        adminId: userId,
+        action: 'lead.transition',
+        targetType: 'LeadRequest',
+        targetId: input.leadId,
+        metadata: { nextStatus: input.nextStatus },
+      })
       revalidatePath(`/admin/leads/${input.leadId}`)
       revalidatePath('/admin/leads')
       return { ok: true }

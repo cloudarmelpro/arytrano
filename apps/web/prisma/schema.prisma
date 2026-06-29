@@ -128,6 +128,8 @@ model User {
   disputeMessages     DisputeMessage[] @relation("DisputeMessages")
   // T-059 admin moderation — videos this admin hid.
   videosHidden        ListingVideo[]   @relation("ListingVideosHidden")
+  // TRU-09 — admin audit trail rows authored by this user.
+  auditLogs           AuditLog[]       @relation("AdminAuditLogs")
 
   @@index([status, role])
 }
@@ -1460,4 +1462,38 @@ model WhatsAppAlert {
   // Broadcast queries hit `WHERE unsubscribedAt IS NULL`; a partial
   // index on the live subset keeps the cron fast as the table grows.
   @@index([unsubscribedAt])
+}
+
+// TRU-09 / ADM-05 — Admin audit log.
+//
+// One row per privileged admin action (verify/suspend listings, review
+// CIN, resolve report/dispute, lead claim/transition/convert/link,
+// operator shift toggle, video moderation, etc.). Read-only viewer at
+// /admin/audit; rows are NEVER updated or deleted from the app — only
+// the quarterly retention cron may prune > 12-month rows once shipped.
+//
+// `metadata` carries scope-specific context (oldStatus → newStatus,
+// reason, ipHash). Keep it small (< 1KB) — no full bodies, no PII.
+// `adminId` is nullable so a deleted admin user doesn't cascade and
+// wipe the trail.
+model AuditLog {
+  id         String   @id @default(cuid())
+  adminId    String?
+  admin      User?    @relation("AdminAuditLogs", fields: [adminId], references: [id], onDelete: SetNull)
+  /// Short verb-style code, e.g. "listing.verify", "report.resolve",
+  /// "lead.transition", "dispute.resolve". Use dotted lowercase so the
+  /// viewer can group by domain.
+  action     String
+  /// What the action targets — "Listing", "User", "Report", "Lead",
+  /// "Dispute", etc. Helps the viewer filter to one entity type.
+  targetType String
+  targetId   String
+  metadata   Json?
+  ipHash     String?
+  createdAt  DateTime @default(now())
+
+  @@index([adminId, createdAt])
+  @@index([targetType, targetId])
+  @@index([action, createdAt])
+  @@index([createdAt])
 }

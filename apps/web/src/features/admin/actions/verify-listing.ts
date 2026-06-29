@@ -2,6 +2,7 @@
 
 import { revalidatePath } from 'next/cache'
 import { ApiError } from '@/lib/api/errors'
+import { writeAuditLog } from '@/lib/audit/write-audit-log'
 import { requireAdmin } from '../services/require-admin'
 import {
   verifyListing,
@@ -32,6 +33,13 @@ export async function toggleListingVerifiedAction(
       action === 'verify'
         ? await verifyListing(admin.userId, listingId)
         : await unverifyListing(admin.userId, listingId)
+    // TRU-09 — audit trail.
+    void writeAuditLog({
+      adminId: admin.userId,
+      action: action === 'verify' ? 'listing.verify' : 'listing.unverify',
+      targetType: 'Listing',
+      targetId: listingId,
+    })
     // The admin grid + public detail rely on this state for the badge.
     revalidatePath('/admin/listings')
     revalidatePath('/admin')

@@ -2,6 +2,7 @@
 
 import { revalidatePath } from 'next/cache'
 import { ApiError } from '@/lib/api/errors'
+import { writeAuditLog } from '@/lib/audit/write-audit-log'
 import { requireAdmin } from '../services/require-admin'
 import { verifyOwnerCin, rejectOwnerCin } from '../services/review-cin'
 
@@ -26,6 +27,12 @@ export async function approveOwnerCinAction(
 
   try {
     await verifyOwnerCin(admin.userId, ownerId)
+    void writeAuditLog({
+      adminId: admin.userId,
+      action: 'cin.approve',
+      targetType: 'User',
+      targetId: ownerId,
+    })
     revalidatePath('/admin/owner-verifications')
     revalidatePath('/admin')
     return { ok: true, message: 'CIN approuvée.' }
@@ -59,6 +66,13 @@ export async function rejectOwnerCinAction(
 
   try {
     await rejectOwnerCin(admin.userId, ownerId, reason)
+    void writeAuditLog({
+      adminId: admin.userId,
+      action: 'cin.reject',
+      targetType: 'User',
+      targetId: ownerId,
+      metadata: { reason: reason.slice(0, 200) },
+    })
     revalidatePath('/admin/owner-verifications')
     revalidatePath('/admin')
     return { ok: true, message: 'CIN rejetée. Le propriétaire est notifié.' }
