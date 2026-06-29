@@ -31,6 +31,7 @@ import {
 } from '@/features/listings'
 import { InterestLeadCta } from '@/features/listings/components/InterestLeadCta'
 import { MobileStickyContactBar } from '@/features/listings/components/MobileStickyContactBar'
+import { SectionErrorBoundary } from '@/components/shared/SectionErrorBoundary'
 import {
   getPublicListing,
   getListingStatusBySlug,
@@ -390,14 +391,16 @@ export default async function PublicListingDetailPage({
               <p className="text-sm text-muted-foreground">
                 {listing.neighborhood.nameFr}, {listing.city.nameFr}
               </p>
-              <ListingMapClient
-                lat={parseFloat(listing.lat)}
-                lng={parseFloat(listing.lng)}
-                ariaLabel={t('detail.location.mapAria', {
-                  neighborhood: listing.neighborhood.nameFr,
-                  city: listing.city.nameFr,
-                })}
-              />
+              <SectionErrorBoundary section="listing-detail.map">
+                <ListingMapClient
+                  lat={parseFloat(listing.lat)}
+                  lng={parseFloat(listing.lng)}
+                  ariaLabel={t('detail.location.mapAria', {
+                    neighborhood: listing.neighborhood.nameFr,
+                    city: listing.city.nameFr,
+                  })}
+                />
+              </SectionErrorBoundary>
               <p className="text-xs text-muted-foreground">
                 {t('detail.location.privacyHint')}
               </p>
@@ -474,15 +477,17 @@ export default async function PublicListingDetailPage({
                   Opens a Base UI Dialog form that creates a LeadRequest.
                   Below it, the legacy ContactButtons stays as the
                   "general question" path (concierge WhatsApp / phone). */}
-              <InterestLeadCta
-                listingId={listing.id}
-                listingTitle={listing.title}
-                smsConsoleMock={
-                  env.SMS_PROVIDER === 'console' ||
-                  (env.SMS_PROVIDER === undefined &&
-                    env.NODE_ENV !== 'production')
-                }
-              />
+              <SectionErrorBoundary section="listing-detail.lead-cta">
+                <InterestLeadCta
+                  listingId={listing.id}
+                  listingTitle={listing.title}
+                  smsConsoleMock={
+                    env.SMS_PROVIDER === 'console' ||
+                    (env.SMS_PROVIDER === undefined &&
+                      env.NODE_ENV !== 'production')
+                  }
+                />
+              </SectionErrorBoundary>
 
               <ContactButtons
                 listingId={listing.id}
