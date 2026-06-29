@@ -4,10 +4,14 @@ import { useActionState, useEffect, useState } from 'react'
 import { useFormStatus } from 'react-dom'
 import { toast } from 'sonner'
 import { Checkbox } from '@/components/ui/checkbox'
+// Direct import (not via the auth barrel) — the barrel re-exports
+// `auth`/`signIn`/`signOut` which depend on `next/headers` and would
+// poison this Client Component's bundle (memory rule
+// feedback_feature_index_client_safe).
 import {
   updateNotifPrefsAction,
   type UpdateNotifPrefsActionState,
-} from '@/features/auth'
+} from '../actions/update-notif-prefs'
 
 const INITIAL: UpdateNotifPrefsActionState = { ok: false }
 
