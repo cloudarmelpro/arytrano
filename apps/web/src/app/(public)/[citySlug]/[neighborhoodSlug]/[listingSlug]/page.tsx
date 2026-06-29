@@ -30,6 +30,7 @@ import {
   AmenityIcon,
 } from '@/features/listings'
 import { InterestLeadCta } from '@/features/listings/components/InterestLeadCta'
+import { MobileStickyContactBar } from '@/features/listings/components/MobileStickyContactBar'
 import {
   getPublicListing,
   getListingStatusBySlug,
@@ -519,6 +520,13 @@ export default async function PublicListingDetailPage({
           authenticated={Boolean(session?.user)}
         />
       </div>
+
+      {/* EDT-10 — sticky CTA on mobile. Delegates to the aside InterestLeadCta
+          dialog so we don't duplicate the dialog state. */}
+      <MobileStickyContactBar
+        priceLabel={formatAriary(listing.priceMonthlyMGA)}
+        ctaLabel={t('lead.cta.interested')}
+      />
     </>
   )
 }
