@@ -12,6 +12,7 @@ import { SkipToContent } from '@/components/shared/SkipToContent'
 // the Client Component file keeps the layout's import graph tight.
 import { AuthBroadcastListener } from '@/features/auth/components/AuthBroadcastListener'
 import { ServiceWorkerRegister } from '@/components/shared/ServiceWorkerRegister'
+import { CookieConsentBanner } from '@/components/shared/CookieConsentBanner'
 import './globals.css'
 
 const dmSans = DM_Sans({
@@ -98,6 +99,10 @@ export default async function RootLayout({
             without the user having to F5 each tab manually. */}
         <AuthBroadcastListener />
         <ServiceWorkerRegister />
+        {/* EDT-18 / LEG-06 — home-grown RGPD-style cookie consent.
+            Only mounts client-side once + checks localStorage; users
+            who already chose don't see flicker. */}
+        <CookieConsentBanner />
         {/*
           JSON-LD scripts are DATA, not executable code. CSP `script-src`
           does not apply to `type="application/ld+json"` so no nonce is
