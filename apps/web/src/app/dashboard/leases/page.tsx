@@ -4,6 +4,7 @@ import type { Metadata } from 'next'
 import { auth } from '@/features/auth'
 import { listUserLeases } from '@/features/leases/queries/list-user-leases'
 import { LeaseStatusBadge } from '@/features/leases/components/LeaseStatusBadge'
+import { EmptyState } from '@/components/shared/EmptyState'
 import { getLocale } from '@/lib/i18n/get-locale'
 import { getT } from '@/lib/i18n/translate'
 import { formatAriary } from '@/lib/format/currency'
@@ -36,14 +37,28 @@ export default async function LeasesListPage() {
       </header>
 
       {leases.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-border bg-background px-6 py-12 text-center">
-          <p className="text-[15px] font-semibold text-foreground">
-            {t('lease.list.empty.title')}
-          </p>
-          <p className="mt-2 text-[14px] text-foreground/65">
-            {t('lease.list.empty.body')}
-          </p>
-        </div>
+        <EmptyState
+          icon={
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+              <path d="M14 2v6h6" />
+              <path d="M16 13H8" />
+              <path d="M16 17H8" />
+            </svg>
+          }
+          title={t('lease.list.empty.title')}
+          description={t('lease.list.empty.body')}
+          cta={{ href: '/annonces', label: 'Explorer les annonces' }}
+        />
       ) : (
         <ul className="divide-y divide-border border-y border-border">
           {leases.map((lease) => {

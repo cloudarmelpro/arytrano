@@ -1,9 +1,9 @@
 import type { Metadata } from 'next'
-import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { auth } from '@/features/auth'
 import { listUserSavedSearches } from '@/features/search/server'
 import { SavedSearchRow } from '@/features/search'
+import { EmptyState } from '@/components/shared/EmptyState'
 import { getLocale } from '@/lib/i18n/get-locale'
 import { getT } from '@/lib/i18n/translate'
 
@@ -40,20 +40,26 @@ export default async function SavedSearchesPage() {
       </header>
 
       {searches.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-border bg-muted/30 p-10 text-center">
-          <p className="text-base font-semibold text-foreground">
-            {t('savedSearch.page.empty.title')}
-          </p>
-          <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
-            {t('savedSearch.page.empty.lead')}
-          </p>
-          <Link
-            href="/annonces"
-            className="mt-5 inline-flex h-11 items-center rounded-xl bg-primary px-5 text-[14px] font-semibold text-primary-foreground transition hover:opacity-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
-          >
-            {t('savedSearch.page.empty.cta')}
-          </Link>
-        </div>
+        <EmptyState
+          icon={
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <circle cx="11" cy="11" r="7" />
+              <path d="m21 21-4.3-4.3" />
+            </svg>
+          }
+          title={t('savedSearch.page.empty.title')}
+          description={t('savedSearch.page.empty.lead')}
+          cta={{ href: '/annonces', label: t('savedSearch.page.empty.cta') }}
+        />
       ) : (
         <ul className="flex flex-col gap-3">
           {searches.map((s) => (
