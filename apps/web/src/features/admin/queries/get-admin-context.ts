@@ -9,6 +9,8 @@ export type AdminContext = {
     name: string | null
     email: string
     image: string | null
+    /** SEC-02 — null = 2FA not set up. Layout redirects to /dashboard/security. */
+    totpEnabledAt: Date | null
   } | null
   openReports: number
 }
@@ -29,6 +31,7 @@ export async function getAdminContext(userId: string): Promise<AdminContext> {
         name: true,
         email: true,
         image: true,
+        totpEnabledAt: true,
       },
     }),
     prisma.report.count({ where: { status: 'OPEN' } }),

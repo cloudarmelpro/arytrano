@@ -34,6 +34,17 @@ export default async function AdminLayout({ children }: { children: ReactNode })
     redirect('/dashboard?reason=admin-revoked')
   }
 
+  // SEC-02 — 2FA is MANDATORY for admins. Block every /admin/* page
+  // until the admin enables TOTP. We send them to /dashboard/settings
+  // (where the TwoFactorSection lives) with a query so the page can
+  // surface a clear "tu dois activer la 2FA pour accéder à l'admin"
+  // banner. The credentials sign-in flow already enforces TOTP on
+  // every login once enabled, so this gate only fires for admins
+  // who haven't set it up yet.
+  if (!dbUser.totpEnabledAt) {
+    redirect('/dashboard/settings?reason=admin-2fa-required#two-factor')
+  }
+
   return (
     <>
       <Header />

@@ -27,10 +27,15 @@ export async function generateMetadata(): Promise<Metadata> {
   return { title: t('settings.metaTitle') }
 }
 
-export default async function SettingsPage() {
+export default async function SettingsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ reason?: string }>
+}) {
   const session = await auth()
   if (!session?.user) redirect('/sign-in')
 
+  const { reason } = await searchParams
   const userId = session.user.id
   const [connections, methods, loginEvents, locale, twofaEnabled, recoveryCount, userPrefs] =
     await Promise.all([
@@ -61,6 +66,20 @@ export default async function SettingsPage() {
         </h1>
         <p className="max-w-2xl text-sm text-muted-foreground">{t('settings.lead')}</p>
       </header>
+
+      {reason === 'admin-2fa-required' && !twofaEnabled ? (
+        <div
+          role="alert"
+          className="rounded-lg border border-destructive/30 bg-destructive/5 p-4 text-sm text-destructive"
+        >
+          <p className="font-semibold">
+            La double authentification (2FA) est obligatoire pour accéder à l’admin.
+          </p>
+          <p className="mt-1 text-destructive/85">
+            Active-la dans la section ci-dessous pour pouvoir revenir sur le panneau d’administration.
+          </p>
+        </div>
+      ) : null}
 
       <Section
         title={t('settings.section.password.title')}
