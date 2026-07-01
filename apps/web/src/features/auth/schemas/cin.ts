@@ -31,3 +31,30 @@ export type CinFileInput = z.infer<typeof cinFileSchema>
 export function parseCinFile(file: File): CinFileInput {
   return cinFileSchema.parse({ type: file.type, size: file.size })
 }
+
+// TRU-02 — selfie is stricter than CIN: image only (admin needs to
+// see a face), 3 MB max.
+export const SELFIE_MAX_BYTES = 3 * 1024 * 1024
+export const SELFIE_ACCEPTED_TYPES = [
+  'image/jpeg',
+  'image/png',
+  'image/webp',
+  'image/heic',
+] as const
+
+export const selfieFileSchema = z.object({
+  type: z.enum(SELFIE_ACCEPTED_TYPES, {
+    message: 'Type non supporté. Formats acceptés : JPG, PNG, WebP, HEIC',
+  }),
+  size: z
+    .number()
+    .int()
+    .positive('Fichier vide')
+    .max(SELFIE_MAX_BYTES, 'Fichier trop grand (max 3 Mo)'),
+})
+
+export type SelfieFileInput = z.infer<typeof selfieFileSchema>
+
+export function parseSelfieFile(file: File): SelfieFileInput {
+  return selfieFileSchema.parse({ type: file.type, size: file.size })
+}

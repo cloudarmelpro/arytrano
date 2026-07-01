@@ -4,10 +4,14 @@ import { prisma } from '@/lib/db'
 import { errors } from '@/lib/api/errors'
 import { encryptPii, PiiKeyMissingError } from '@/lib/auth/pii-encryption'
 import { sniffImage } from '@/lib/images/sniff'
-import { parseCinFile } from '../schemas/cin'
+import { parseCinFile, parseSelfieFile } from '../schemas/cin'
 
 export type CinSubmitResult = {
   /** True if a previous submission was overwritten (resubmission after reject). */
+  resubmitted: boolean
+}
+
+export type SelfieSubmitResult = {
   resubmitted: boolean
 }
 
@@ -122,7 +126,7 @@ export async function submitCinForVerification(
  */
 export type CinStatus =
   | { state: 'none' }
-  | { state: 'pending'; submittedAt: Date }
+  | { state: 'pending'; submittedAt: Date; selfieUploaded: boolean }
   | { state: 'verified'; verifiedAt: Date }
   | { state: 'rejected'; rejectedAt: Date; reason: string | null }
 
@@ -131,6 +135,7 @@ export async function getCinStatus(ownerId: string): Promise<CinStatus> {
     where: { userId: ownerId },
     select: {
       cinUploadedAt: true,
+      selfieUploadedAt: true,
       verifiedAt: true,
       cinRejectedAt: true,
       cinRejectionReason: true,
@@ -145,5 +150,82 @@ export async function getCinStatus(ownerId: string): Promise<CinStatus> {
       reason: row.cinRejectionReason,
     }
   }
-  return { state: 'pending', submittedAt: row.cinUploadedAt }
+  return {
+    state: 'pending',
+    submittedAt: row.cinUploadedAt,
+    selfieUploaded: Boolean(row.selfieUploadedAt),
+  }
+}
+
+/**
+ * TRU-02 — upload the selfie captured next to the CIN. Same encryption
+ * pipeline. Requires an existing OwnerProfile (an owner must upload
+ * their CIN first — the selfie is meaningless without one) and, on
+ * a fresh upload of the pair, resets the review outcome.
+ */
+export async function submitSelfieForVerification(
+  ownerId: string,
+  file: File,
+): Promise<SelfieSubmitResult> {
+  try {
+    parseSelfieFile(file)
+  } catch (err) {
+    if (err instanceof ZodError) {
+      throw errors.validation(err.issues[0]?.message ?? 'Selfie invalide')
+    }
+    throw err
+  }
+
+  const buffer = Buffer.from(await file.arrayBuffer())
+  const sniff = await sniffImage(buffer)
+  if (!sniff.ok) {
+    console.warn('[submit-selfie] magic-bytes rejected', { ownerId, reason: sniff.reason })
+    throw errors.validation('Fichier non reconnu comme image valide')
+  }
+
+  let encrypted
+  try {
+    encrypted = encryptPii(buffer)
+  } catch (err) {
+    if (err instanceof PiiKeyMissingError) {
+      console.error('[submit-selfie] PII_ENCRYPTION_KEY missing')
+      throw errors.internal(
+        "La vérification d'identité est temporairement indisponible. Réessaie plus tard.",
+      )
+    }
+    throw err
+  }
+
+  const existing = await prisma.ownerProfile.findUnique({
+    where: { userId: ownerId },
+    select: { cinUploadedAt: true, selfieUploadedAt: true },
+  })
+  if (!existing?.cinUploadedAt) {
+    throw errors.conflict('Ta pièce d’identité doit être uploadée avant le selfie.')
+  }
+  const resubmitted = Boolean(existing.selfieUploadedAt)
+
+  const ciphertextBytes = new Uint8Array(encrypted.ciphertext)
+  const ivBytes = new Uint8Array(encrypted.iv)
+  const authTagBytes = new Uint8Array(encrypted.authTag)
+
+  await prisma.ownerProfile.update({
+    where: { userId: ownerId },
+    data: {
+      selfieCiphertext: ciphertextBytes,
+      selfieIv: ivBytes,
+      selfieAuthTag: authTagBytes,
+      selfieKeyVersion: encrypted.keyVersion,
+      selfieMimeType: file.type,
+      selfieUploadedAt: new Date(),
+      // Any prior review outcome is stale once the identity pair changes.
+      verifiedAt: null,
+      verifiedBy: null,
+      cinRejectionReason: null,
+      cinRejectedAt: null,
+      cinRejectedBy: null,
+    },
+  })
+
+  return { resubmitted }
 }

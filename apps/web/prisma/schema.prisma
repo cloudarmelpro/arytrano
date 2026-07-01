@@ -354,6 +354,15 @@ model OwnerProfile {
   // right Content-Type when displaying the decrypted image.
   cinMimeType        String?
   cinUploadedAt      DateTime?
+  // TRU-02 — selfie captured alongside the CIN. Same AES-256-GCM
+  // encryption pipeline; same key version scheme so rotations cover
+  // both. Nullable so historical rows (CIN only) stay valid.
+  selfieCiphertext   Bytes?
+  selfieIv           Bytes?
+  selfieAuthTag      Bytes?
+  selfieKeyVersion   Int?
+  selfieMimeType     String?
+  selfieUploadedAt   DateTime?
   // Admin verification outcome (T-039). `verifiedAt` is set on approve;
   // `cinRejectionReason` is set on reject (user-facing message). The two
   // are mutually exclusive — an admin re-review clears the previous

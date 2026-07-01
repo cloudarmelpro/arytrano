@@ -25,7 +25,11 @@ export default async function VerifyOwnerPage() {
   // Serialize Date instances → ISO strings for the Client Component.
   const banner =
     status.state === 'pending'
-      ? { state: status.state, submittedAt: status.submittedAt.toISOString() }
+      ? {
+          state: status.state,
+          submittedAt: status.submittedAt.toISOString(),
+          selfieUploaded: status.selfieUploaded,
+        }
       : status.state === 'verified'
         ? { state: status.state, verifiedAt: status.verifiedAt.toISOString() }
         : status.state === 'rejected'

@@ -4,11 +4,11 @@ import { useActionState, useState } from 'react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { useT } from '@/lib/i18n/client'
-import { submitCinAction } from '../actions/submit-cin'
+import { submitCinAction, submitSelfieAction } from '../actions/submit-cin'
 
 type CinStatusBanner =
   | { state: 'none' }
-  | { state: 'pending'; submittedAt: string }
+  | { state: 'pending'; submittedAt: string; selfieUploaded?: boolean }
   | { state: 'verified'; verifiedAt: string }
   | { state: 'rejected'; rejectedAt: string; reason: string | null }
 
@@ -22,13 +22,22 @@ export function CinUploadForm({ status }: { status: CinStatusBanner }) {
   const [state, formAction, pending] = useActionState(submitCinAction, {
     ok: false,
   })
+  const [selfieState, selfieAction, selfiePending] = useActionState(
+    submitSelfieAction,
+    { ok: false },
+  )
   const [fileName, setFileName] = useState<string | null>(null)
+  const [selfieFileName, setSelfieFileName] = useState<string | null>(null)
+
+  const canUploadSelfie =
+    status.state === 'pending' || status.state === 'verified' || status.state === 'rejected'
 
   // Surface success / error toasts on each transition.
   if (state.ok && state.message && !pending) {
-    // Fire-and-forget — useActionState doesn't expose a "consumed" flag
-    // but the toast component dedups by content.
     toast.success(state.message)
+  }
+  if (selfieState.ok && selfieState.message && !selfiePending) {
+    toast.success(selfieState.message)
   }
 
   return (
@@ -76,6 +85,55 @@ export function CinUploadForm({ status }: { status: CinStatusBanner }) {
           </Button>
         </fieldset>
       </form>
+
+      {/* TRU-02 — selfie form appears once the CIN is on file so the pair
+          can be reviewed together. Same encryption pipeline server-side. */}
+      {canUploadSelfie && (
+        <form action={selfieAction} className="flex flex-col gap-3 rounded-xl border border-border bg-background p-4">
+          <fieldset disabled={selfiePending} className="contents">
+            <h3 className="text-sm font-semibold text-foreground">
+              Selfie de vérification
+            </h3>
+            <p className="text-xs text-muted-foreground">
+              Une photo de toi tenant ta CIN. Elle sera chiffrée et supprimée
+              après vérification. Formats : JPG / PNG / WebP / HEIC — 3 Mo max.
+            </p>
+            <label className="flex cursor-pointer flex-col gap-1 rounded-md border border-dashed border-border p-4 text-center text-sm transition hover:bg-muted/40">
+              <span className="font-medium text-foreground">
+                {selfieFileName ?? 'Choisir un selfie'}
+              </span>
+              <input
+                type="file"
+                name="selfie"
+                accept="image/jpeg,image/png,image/webp,image/heic"
+                capture="user"
+                required
+                onChange={(e) => setSelfieFileName(e.target.files?.[0]?.name ?? null)}
+                className="sr-only"
+              />
+            </label>
+            {selfieState.message && !selfieState.ok && (
+              <p role="alert" className="text-xs text-destructive">
+                {selfieState.message}
+              </p>
+            )}
+            <Button
+              type="submit"
+              variant="default"
+              size="sm"
+              disabled={selfiePending || !selfieFileName}
+              aria-busy={selfiePending}
+              className="self-start"
+            >
+              {selfiePending
+                ? 'Envoi…'
+                : status.state === 'pending' && status.selfieUploaded
+                  ? 'Remplacer le selfie'
+                  : 'Envoyer le selfie'}
+            </Button>
+          </fieldset>
+        </form>
+      )}
     </div>
   )
 }
