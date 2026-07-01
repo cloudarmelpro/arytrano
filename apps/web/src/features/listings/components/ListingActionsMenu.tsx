@@ -4,7 +4,7 @@ import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { Menu } from '@base-ui/react/menu'
 import { toast } from 'sonner'
-import type { ListingStatus } from '@prisma/client'
+import type { ListingStatus, UnavailableReason } from '@prisma/client'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { useT } from '@/lib/i18n/client'
@@ -19,6 +19,14 @@ type ActionFn = (
   prev: { ok: boolean },
   fd: FormData,
 ) => Promise<{ ok: boolean; message?: string }>
+
+// OWN-20 — closed set of reasons matching Prisma UnavailableReason enum.
+const REASON_OPTIONS: Array<{ value: UnavailableReason; label: string }> = [
+  { value: 'RENTED_VIA_ARYTRANO', label: 'Loué via AryTrano' },
+  { value: 'RENTED_OFF_PLATFORM', label: 'Loué en dehors d’AryTrano' },
+  { value: 'TAKING_A_BREAK', label: 'Pause temporaire' },
+  { value: 'OTHER', label: 'Autre' },
+]
 
 /**
  * Kebab-trigger dropdown used in the owner listings grid card. Wraps the
@@ -43,12 +51,20 @@ export function ListingActionsMenu({
   const [activeAction, setActiveAction] = useState<ActionName | null>(null)
   const [deleting, setDeleting] = useState(false)
   const [confirm, setConfirm] = useState('')
+  // OWN-20 — inline reason picker before the PUBLISHED → UNAVAILABLE flip.
+  const [pickingReason, setPickingReason] = useState(false)
+  const [reason, setReason] = useState<UnavailableReason>('RENTED_VIA_ARYTRANO')
 
-  function callAction(name: ActionName, action: ActionFn) {
+  function callAction(
+    name: ActionName,
+    action: ActionFn,
+    extras: Record<string, string> = {},
+  ) {
     setActiveAction(name)
     startTransition(async () => {
       const fd = new FormData()
       fd.append('listingId', listingId)
+      for (const [k, v] of Object.entries(extras)) fd.append(k, v)
       const result = await action({ ok: false }, fd)
       if (result.ok) {
         toast.success(result.message ?? t('listingActions.toast.ok'))
@@ -56,6 +72,7 @@ export function ListingActionsMenu({
           setDeleting(false)
           setConfirm('')
         }
+        if (name === 'toggle') setPickingReason(false)
         router.refresh()
       } else {
         toast.error(result.message ?? t('listingActions.toast.error'))
@@ -66,6 +83,59 @@ export function ListingActionsMenu({
 
   const canPublish = status === 'DRAFT'
   const canToggle = status === 'PUBLISHED' || status === 'UNAVAILABLE'
+
+  // OWN-20 — inline reason picker (only when going PUBLISHED → UNAVAILABLE).
+  if (pickingReason) {
+    return (
+      <div className="flex flex-col gap-2 rounded-md bg-muted/40 p-3 text-xs">
+        <p className="font-medium text-foreground">
+          Pourquoi cette annonce n’est plus disponible ?
+        </p>
+        <div role="radiogroup" className="flex flex-col gap-1">
+          {REASON_OPTIONS.map((opt) => (
+            <label
+              key={opt.value}
+              className="flex cursor-pointer items-center gap-2 rounded px-1.5 py-1 hover:bg-background"
+            >
+              <input
+                type="radio"
+                name="unavailable-reason"
+                value={opt.value}
+                checked={reason === opt.value}
+                onChange={() => setReason(opt.value)}
+                disabled={pending}
+              />
+              <span>{opt.label}</span>
+            </label>
+          ))}
+        </div>
+        <div className="flex gap-2 pt-1">
+          <Button
+            type="button"
+            size="sm"
+            disabled={pending}
+            aria-busy={activeAction === 'toggle'}
+            onClick={() =>
+              callAction('toggle', toggleAvailabilityAction, { reason })
+            }
+          >
+            {activeAction === 'toggle'
+              ? t('listingActions.updating')
+              : 'Confirmer'}
+          </Button>
+          <Button
+            type="button"
+            size="sm"
+            variant="outline"
+            disabled={pending}
+            onClick={() => setPickingReason(false)}
+          >
+            {t('listingActions.cancel')}
+          </Button>
+        </div>
+      </div>
+    )
+  }
 
   if (deleting) {
     return (
@@ -159,7 +229,15 @@ export function ListingActionsMenu({
             {canToggle && (
               <Menu.Item
                 disabled={pending}
-                onClick={() => callAction('toggle', toggleAvailabilityAction)}
+                onClick={() => {
+                  // OWN-20 — going PUBLISHED → UNAVAILABLE opens the reason
+                  // picker. Reverse path fires immediately (no capture).
+                  if (status === 'PUBLISHED') {
+                    setPickingReason(true)
+                    return
+                  }
+                  callAction('toggle', toggleAvailabilityAction)
+                }}
                 className="group/item flex cursor-pointer items-center gap-2.5 rounded-md px-3 py-2.5 text-foreground outline-none transition data-disabled:cursor-not-allowed data-disabled:opacity-50 data-highlighted:bg-primary/10 data-highlighted:text-foreground"
               >
                 <span className="flex h-4 w-4 items-center justify-center text-muted-foreground transition group-data-highlighted/item:text-primary">

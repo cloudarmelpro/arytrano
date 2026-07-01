@@ -465,6 +465,13 @@ model Listing {
   suspendedAt     DateTime?
   suspendedBy     String?
 
+  // OWN-20 — reason captured when the owner flips PUBLISHED → UNAVAILABLE.
+  // Nullable so historical UNAVAILABLE rows stay valid. Cleared when the
+  // owner re-publishes (UNAVAILABLE → PUBLISHED) so the next churn has
+  // a fresh reason to capture.
+  unavailableReason   UnavailableReason?
+  unavailableReasonAt DateTime?
+
   // admin trust marker — set by an admin via verifyListing(). Powers the
   // "Annonce vérifiée" badge on the public card + detail. Cleared by
   // unverifyListing(). `verifiedBy` is a soft FK (admin user id) kept
@@ -573,6 +580,16 @@ enum ListingStatus {
   SUSPENDED
   DELETED
   RENTED // E-T26 — bail actif sur la plateforme, masqué de la grille publique
+}
+
+// OWN-20 — reason surfaced when the owner marks a listing UNAVAILABLE.
+// Kept short + closed so the ops team can slice metrics ("how many
+// PUBLISHED listings actually converted vs churned off-platform").
+enum UnavailableReason {
+  RENTED_VIA_ARYTRANO // Loué via une demande AryTrano
+  RENTED_OFF_PLATFORM // Loué en dehors d'AryTrano
+  TAKING_A_BREAK // Pause temporaire (chantier, vacances…)
+  OTHER
 }
 
 model ListingPhoto {

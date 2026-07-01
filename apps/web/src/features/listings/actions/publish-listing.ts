@@ -1,12 +1,20 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
+import type { UnavailableReason } from '@prisma/client'
 import { ApiError } from '@/lib/api/errors'
 import { auth } from '@/features/auth'
 import { publishListing } from '../services/publish-listing'
 import { toggleListingAvailability } from '../services/toggle-availability'
 import { deleteListing } from '../services/delete-listing'
 import { listingIdSchema } from '../schemas'
+
+const UNAVAILABLE_REASONS: ReadonlySet<UnavailableReason> = new Set([
+  'RENTED_VIA_ARYTRANO',
+  'RENTED_OFF_PLATFORM',
+  'TAKING_A_BREAK',
+  'OTHER',
+])
 
 type ListingActionState = { ok: boolean; message?: string }
 
@@ -63,8 +71,18 @@ export async function toggleAvailabilityAction(
     return { ok: false, message: 'ID listing invalide' }
   }
 
+  // OWN-20 — reason is required on the PUBLISHED → UNAVAILABLE path.
+  // We still accept a missing value on the reverse path (going back to
+  // PUBLISHED) so the same action can drive both directions.
+  const rawReason = formData.get('reason')
+  const reason =
+    typeof rawReason === 'string' &&
+    UNAVAILABLE_REASONS.has(rawReason as UnavailableReason)
+      ? (rawReason as UnavailableReason)
+      : undefined
+
   try {
-    const listing = await toggleListingAvailability(guard.userId, listingId)
+    const listing = await toggleListingAvailability(guard.userId, listingId, reason)
     revalidatePath('/dashboard/listings')
     revalidatePath(`/dashboard/listings/${listingId}/edit`)
     return {
