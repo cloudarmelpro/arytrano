@@ -4,6 +4,11 @@ import Link from 'next/link'
 import { SuspendListingButton, VerifyListingButton } from '@/features/admin'
 import { ModerateVideoButton } from '@/features/listings/components/ModerateVideoButton'
 import {
+  BulkModerationProvider,
+  BulkModerationBar,
+  SelectListingCheckbox,
+} from '@/features/admin/components/BulkModerationBar'
+import {
   listAdminListings,
   listAdminListingsQuerySchema,
   type AdminListingRow,
@@ -55,6 +60,7 @@ export default async function AdminListingsPage({
   }
 
   return (
+    <BulkModerationProvider>
     <div className="flex flex-col gap-8">
       <header className="flex flex-col gap-2">
         <h1 className="text-3xl font-semibold leading-tight text-foreground sm:text-4xl">
@@ -112,7 +118,9 @@ export default async function AdminListingsPage({
           )}
         </>
       )}
+      <BulkModerationBar />
     </div>
+    </BulkModerationProvider>
   )
 }
 
@@ -150,6 +158,8 @@ function AdminListingCard({
         <div className="absolute left-3 top-3">
           <ListingStatusBadge status={listing.status} />
         </div>
+
+        <SelectListingCheckbox listingId={listing.id} />
 
         {listing.reportCount > 0 && (
           <span
