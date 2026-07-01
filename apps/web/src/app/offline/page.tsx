@@ -50,7 +50,7 @@ export default async function OfflinePage() {
         </svg>
       </div>
       <div className="flex flex-col gap-2">
-        <h1 className="font-serif text-[clamp(28px,3.4vw,40px)] font-normal leading-[1.1] tracking-[-0.02em] text-foreground">
+        <h1 className="text-[clamp(28px,3.4vw,40px)] font-normal leading-[1.1] tracking-[-0.02em] text-foreground">
           {t('offline.title')}
         </h1>
         <p className="max-w-md text-[15px] leading-[1.6] text-foreground/65">

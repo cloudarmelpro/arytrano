@@ -50,7 +50,7 @@ export default async function VillesHubPage() {
           <span className="text-[12px] font-semibold uppercase tracking-[0.14em] text-white/70">
             {t('villesHub.eyebrow')}
           </span>
-          <h1 className="mt-3 font-serif text-[clamp(36px,5vw,68px)] font-normal leading-[1.04] tracking-[-0.02em] text-white">
+          <h1 className="mt-3 text-[clamp(36px,5vw,68px)] font-normal leading-[1.04] tracking-[-0.02em] text-white">
             {t('villesHub.title')}
           </h1>
           <p className="mt-4 max-w-[640px] text-[17px] leading-[1.55] text-white/85">
@@ -74,7 +74,7 @@ export default async function VillesHubPage() {
                     className="group flex h-full flex-col gap-3 rounded-2xl bg-muted/40 p-6 transition hover:bg-muted/70"
                   >
                     <div className="flex items-baseline justify-between gap-3">
-                      <h2 className="font-serif text-[clamp(22px,2.6vw,30px)] font-normal leading-[1.1] tracking-[-0.02em] text-foreground">
+                      <h2 className="text-[clamp(22px,2.6vw,30px)] font-normal leading-[1.1] tracking-[-0.02em] text-foreground">
                         {name}
                       </h2>
                       <span

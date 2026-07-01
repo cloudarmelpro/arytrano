@@ -54,7 +54,7 @@ export default function PressPage() {
         <span className="text-[12px] font-semibold uppercase tracking-[0.14em] text-primary">
           Press kit
         </span>
-        <h1 className="font-serif text-[clamp(36px,4.4vw,56px)] font-normal leading-[1.05] tracking-[-0.022em] text-foreground">
+        <h1 className="text-[clamp(36px,4.4vw,56px)] font-normal leading-[1.05] tracking-[-0.022em] text-foreground">
           Parlez d’AryTrano
         </h1>
         <p className="max-w-2xl text-[16px] leading-[1.6] text-foreground/75">

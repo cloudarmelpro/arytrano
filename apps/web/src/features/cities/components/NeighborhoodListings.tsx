@@ -42,7 +42,7 @@ export function NeighborhoodListings({
             <span className="text-[12px] font-semibold uppercase tracking-[0.14em] text-primary">
               {t('neighborhoodLanding.listings.eyebrow')}
             </span>
-            <h2 className="mt-2 font-serif text-[clamp(26px,3.2vw,40px)] font-normal leading-[1.1] tracking-[-0.02em] text-foreground">
+            <h2 className="mt-2 text-[clamp(26px,3.2vw,40px)] font-normal leading-[1.1] tracking-[-0.02em] text-foreground">
               {t('neighborhoodLanding.listings.title', {
                 count: total,
                 quartier: quartierName,

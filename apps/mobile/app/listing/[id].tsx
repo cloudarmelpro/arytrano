@@ -215,7 +215,7 @@ export default function ListingDetail() {
 
         {/* Title block */}
         <View className="px-5 pt-5">
-          <Text className="font-serif text-3xl leading-tight text-foreground">
+          <Text className="text-3xl leading-tight text-foreground">
             {data.title}
           </Text>
           <Text className="mt-2 text-sm text-muted-foreground">

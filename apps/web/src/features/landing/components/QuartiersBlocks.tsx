@@ -158,7 +158,7 @@ function QuartierBlock({
 
       <div className="flex flex-col gap-6">
         <div>
-          <h2 className="m-0 font-serif text-[clamp(28px,3vw,40px)] font-normal leading-[1.05] tracking-[-0.018em] text-foreground">
+          <h2 className="m-0 text-[clamp(28px,3vw,40px)] font-normal leading-[1.05] tracking-[-0.018em] text-foreground">
             <Link
               // Detail landing lives under the city hub (E-T11) — has
               // reviews, favorites awareness, Place schema, etc.

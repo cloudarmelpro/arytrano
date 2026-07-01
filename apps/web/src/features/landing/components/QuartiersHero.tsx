@@ -33,7 +33,7 @@ export function QuartiersHero({
           <span className="text-[12px] font-semibold uppercase tracking-[0.14em] text-primary">
             {t('quartiers.eyebrow')}
           </span>
-          <h1 className="mt-3.5 font-serif text-[clamp(36px,4.2vw,56px)] font-normal leading-[1.05] tracking-[-0.02em] text-foreground">
+          <h1 className="mt-3.5 text-[clamp(36px,4.2vw,56px)] font-normal leading-[1.05] tracking-[-0.02em] text-foreground">
             {isEmpty
               ? t('quartiers.h1.empty', { city: cityName })
               : t('quartiers.h1', { count: quartiersCount, city: cityName })}

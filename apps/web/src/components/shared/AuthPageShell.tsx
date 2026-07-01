@@ -54,7 +54,7 @@ export async function AuthPageShell({
         <span className="text-[12px] font-semibold uppercase tracking-[0.18em] text-primary">
           {t(copy.eyebrow)}
         </span>
-        <h1 className="mt-4 font-serif text-[clamp(32px,3.8vw,48px)] font-normal leading-[1.05] tracking-[-0.02em] text-foreground text-balance">
+        <h1 className="mt-4 text-[clamp(32px,3.8vw,48px)] font-normal leading-[1.05] tracking-[-0.02em] text-foreground text-balance">
           {t(copy.h1)}
         </h1>
         <p className="mt-4 max-w-[420px] text-[15.5px] leading-[1.55] text-foreground/70">

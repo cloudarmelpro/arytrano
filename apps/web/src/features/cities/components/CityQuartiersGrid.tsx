@@ -40,7 +40,7 @@ export function CityQuartiersGrid({
           <span className="text-[12px] font-semibold uppercase tracking-[0.14em] text-primary">
             {t('cityLanding.quartiers.eyebrow')}
           </span>
-          <h2 className="mt-2 font-serif text-[clamp(28px,3.4vw,42px)] font-normal leading-[1.1] tracking-[-0.02em] text-foreground">
+          <h2 className="mt-2 text-[clamp(28px,3.4vw,42px)] font-normal leading-[1.1] tracking-[-0.02em] text-foreground">
             {t('cityLanding.quartiers.title', { city: cityName })}
           </h2>
           <p className="mt-2 max-w-[560px] text-[14.5px] text-foreground/70">

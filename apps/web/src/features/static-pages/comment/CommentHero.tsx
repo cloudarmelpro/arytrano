@@ -15,9 +15,9 @@ export function CommentHero({ locale }: { locale: Locale }) {
         <span className="text-[12px] font-semibold uppercase tracking-[0.14em] text-primary">
           {t('comment.eyebrow')}
         </span>
-        <h1 className="mt-3.5 mb-5 font-serif text-[clamp(36px,4.6vw,64px)] font-normal leading-[1.05] tracking-[-0.025em] text-foreground">
+        <h1 className="mt-3.5 mb-5 text-[clamp(36px,4.6vw,64px)] font-normal leading-[1.05] tracking-[-0.025em] text-foreground">
           {t('comment.h1.lead')}{' '}
-          <em className="font-serif italic text-primary">
+          <em className="italic text-primary">
             {t('comment.h1.accent')}
           </em>
         </h1>

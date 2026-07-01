@@ -114,7 +114,7 @@ export default function Onboarding() {
                   {item.emoji}
                 </Text>
               </View>
-              <Text className="text-center font-serif text-3xl text-foreground">
+              <Text className="text-center text-3xl text-foreground">
                 {t(item.titleKey)}
               </Text>
               <Text className="mt-3 text-center text-base text-foreground/70">

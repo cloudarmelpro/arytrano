@@ -94,7 +94,7 @@ export default function SignUp() {
             </Text>
           </Pressable>
 
-          <Text className="font-serif text-3xl text-foreground">
+          <Text className="text-3xl text-foreground">
             {t('signUp.title')}
           </Text>
           <Text className="mt-2 text-base text-muted-foreground">

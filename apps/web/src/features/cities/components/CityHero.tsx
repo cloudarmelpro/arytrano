@@ -36,7 +36,7 @@ export function CityHero({
         <span className="text-[12px] font-semibold uppercase tracking-[0.14em] text-white/70">
           {t('cityLanding.eyebrow')}
         </span>
-        <h1 className="mt-3 font-serif text-[clamp(36px,5vw,68px)] font-normal leading-[1.04] tracking-[-0.02em] text-white">
+        <h1 className="mt-3 text-[clamp(36px,5vw,68px)] font-normal leading-[1.04] tracking-[-0.02em] text-white">
           {t('cityLanding.title', { city: cityName })}
         </h1>
         <p className="mt-4 max-w-[640px] text-[17px] leading-[1.55] text-white/85">

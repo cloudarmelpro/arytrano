@@ -41,7 +41,7 @@ export function NeighborhoodHero({
         >
           ← {cityName}
         </Link>
-        <h1 className="mt-4 font-serif text-[clamp(36px,5vw,68px)] font-normal leading-[1.04] tracking-[-0.02em] text-foreground">
+        <h1 className="mt-4 text-[clamp(36px,5vw,68px)] font-normal leading-[1.04] tracking-[-0.02em] text-foreground">
           {t('neighborhoodLanding.title', {
             quartier: quartierName,
             city: cityName,

@@ -27,7 +27,7 @@ export function NeighborhoodMap({
         <span className="text-[12px] font-semibold uppercase tracking-[0.14em] text-primary">
           {t('neighborhoodLanding.map.eyebrow')}
         </span>
-        <h2 className="mt-2 mb-6 font-serif text-[clamp(24px,3vw,36px)] font-normal leading-[1.1] tracking-[-0.02em] text-foreground">
+        <h2 className="mt-2 mb-6 text-[clamp(24px,3vw,36px)] font-normal leading-[1.1] tracking-[-0.02em] text-foreground">
           {t('neighborhoodLanding.map.title')}
         </h2>
         <NeighborhoodMapClient lat={lat} lng={lng} label={label} />

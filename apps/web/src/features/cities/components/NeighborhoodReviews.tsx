@@ -56,7 +56,7 @@ export function NeighborhoodReviews({
             <span className="text-[12px] font-semibold uppercase tracking-[0.14em] text-primary">
               {t('neighborhoodLanding.reviews.eyebrow')}
             </span>
-            <h2 className="mt-2 font-serif text-[clamp(22px,2.6vw,32px)] font-normal leading-[1.15] tracking-[-0.02em] text-foreground">
+            <h2 className="mt-2 text-[clamp(22px,2.6vw,32px)] font-normal leading-[1.15] tracking-[-0.02em] text-foreground">
               {t('neighborhoodLanding.reviews.title', { quartier: quartierName })}
             </h2>
             <p className="mt-2 text-[14px] leading-[1.55] text-foreground/70">

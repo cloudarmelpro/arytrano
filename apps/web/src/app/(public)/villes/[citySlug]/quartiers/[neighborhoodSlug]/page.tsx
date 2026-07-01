@@ -180,7 +180,7 @@ export default async function NeighborhoodLandingPage({
       {data.siblings.length > 0 && (
         <section className="bg-background py-12">
           <div className="mx-auto max-w-[1280px] px-6 lg:px-10">
-            <h2 className="mb-4 font-serif text-[clamp(20px,2.4vw,28px)] font-normal leading-[1.1] tracking-[-0.02em] text-foreground">
+            <h2 className="mb-4 text-[clamp(20px,2.4vw,28px)] font-normal leading-[1.1] tracking-[-0.02em] text-foreground">
               {t('neighborhoodLanding.siblings.title', { city: cityName })}
             </h2>
             <ul className="flex flex-wrap gap-2">

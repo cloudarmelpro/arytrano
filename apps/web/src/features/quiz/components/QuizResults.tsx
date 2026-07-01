@@ -57,7 +57,7 @@ export function QuizResults({
           <span className="text-[12px] font-semibold uppercase tracking-[0.14em] text-primary">
             {t('quiz.results.eyebrow')}
           </span>
-          <h1 className="mt-3 font-serif text-[clamp(30px,3.6vw,46px)] font-normal leading-[1.05] tracking-[-0.02em] text-foreground">
+          <h1 className="mt-3 text-[clamp(30px,3.6vw,46px)] font-normal leading-[1.05] tracking-[-0.02em] text-foreground">
             {t('quiz.results.title')}
           </h1>
           <p className="mt-3 max-w-[560px] text-[16px] leading-[1.55] text-foreground/70">
@@ -144,7 +144,7 @@ function TopMatchCard({
 
       <div className="flex flex-col gap-6 p-7 lg:p-10">
         <div>
-          <h2 className="font-serif text-[clamp(28px,3vw,42px)] font-normal leading-[1.05] tracking-[-0.018em] text-foreground">
+          <h2 className="text-[clamp(28px,3vw,42px)] font-normal leading-[1.05] tracking-[-0.018em] text-foreground">
             {name}
           </h2>
           {quartier.avgPriceMGA || quartier.publishedListings > 0 ? (
@@ -233,7 +233,7 @@ function SecondaryCard({
         )}
       </div>
       <div className="mt-3.5 flex flex-col gap-2.5 px-0.5">
-        <h4 className="font-serif text-[20px] font-normal leading-[1.1] tracking-[-0.015em] text-foreground transition group-hover:text-primary">
+        <h4 className="text-[20px] font-normal leading-[1.1] tracking-[-0.015em] text-foreground transition group-hover:text-primary">
           <Link
             href={listingsHref}
             className="outline-none after:absolute after:inset-0 after:rounded-xl focus-visible:after:ring-2 focus-visible:after:ring-ring focus-visible:after:ring-offset-2"
@@ -341,7 +341,7 @@ function EmailCaptureCard({
       <span className="text-[12px] font-semibold uppercase tracking-[0.12em] text-primary">
         {t('quiz.results.emailEyebrow')}
       </span>
-      <h3 className="mt-2 font-serif text-[22px] font-normal leading-[1.15] tracking-[-0.015em] text-foreground">
+      <h3 className="mt-2 text-[22px] font-normal leading-[1.15] tracking-[-0.015em] text-foreground">
         {t('quiz.results.emailTitle')}
       </h3>
       <p className="mt-2 text-[14.5px] leading-[1.5] text-foreground/70">

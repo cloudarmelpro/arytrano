@@ -53,7 +53,7 @@ export default async function UnsubscribePage({
               <polyline points="20 6 9 17 4 12" />
             </svg>
           </span>
-          <h1 className="mt-5 font-serif text-[clamp(26px,3vw,36px)] font-normal leading-[1.1] tracking-[-0.02em] text-foreground">
+          <h1 className="mt-5 text-[clamp(26px,3vw,36px)] font-normal leading-[1.1] tracking-[-0.02em] text-foreground">
             {result.alreadyUnsubscribed
               ? t('unsubscribe.alreadyDone.title')
               : t('unsubscribe.success.title')}
@@ -85,7 +85,7 @@ export default async function UnsubscribePage({
               <line x1="12" y1="16" x2="12.01" y2="16" />
             </svg>
           </span>
-          <h1 className="mt-5 font-serif text-[clamp(26px,3vw,36px)] font-normal leading-[1.1] tracking-[-0.02em] text-foreground">
+          <h1 className="mt-5 text-[clamp(26px,3vw,36px)] font-normal leading-[1.1] tracking-[-0.02em] text-foreground">
             {t('unsubscribe.invalid.title')}
           </h1>
           <p className="mt-3 max-w-[440px] text-[15px] leading-[1.6] text-foreground/70">

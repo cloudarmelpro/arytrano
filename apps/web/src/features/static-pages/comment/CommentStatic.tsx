@@ -44,7 +44,7 @@ export function CommentWhy({ locale }: { locale: Locale }) {
           <span className="text-[12px] font-semibold uppercase tracking-[0.14em] text-primary">
             {t('comment.why.eyebrow')}
           </span>
-          <h2 className="mt-3.5 mb-4 font-serif text-[clamp(32px,3.6vw,44px)] font-normal leading-[1.05] tracking-[-0.025em] text-foreground">
+          <h2 className="mt-3.5 mb-4 text-[clamp(32px,3.6vw,44px)] font-normal leading-[1.05] tracking-[-0.025em] text-foreground">
             {t('comment.why.title')}
           </h2>
           <p className="max-w-[460px] text-[15.5px] leading-[1.6] text-foreground/70">
@@ -86,7 +86,7 @@ export function CommentVerif({ locale }: { locale: Locale }) {
           <span className="text-[12px] font-semibold uppercase tracking-[0.14em] text-primary">
             {t('comment.verif.eyebrow')}
           </span>
-          <h2 className="mt-3.5 mb-4 font-serif text-[clamp(32px,3.4vw,44px)] font-normal leading-[1.05] tracking-[-0.025em] text-foreground">
+          <h2 className="mt-3.5 mb-4 text-[clamp(32px,3.4vw,44px)] font-normal leading-[1.05] tracking-[-0.025em] text-foreground">
             {t('comment.verif.title')}
           </h2>
         </div>
@@ -131,7 +131,7 @@ export function CommentDont({ locale }: { locale: Locale }) {
           <span className="text-[12px] font-semibold uppercase tracking-[0.14em] text-primary">
             {t('comment.dont.eyebrow')}
           </span>
-          <h2 className="mt-3.5 font-serif text-[clamp(32px,3.4vw,44px)] font-normal leading-[1.05] tracking-[-0.02em] text-foreground">
+          <h2 className="mt-3.5 text-[clamp(32px,3.4vw,44px)] font-normal leading-[1.05] tracking-[-0.02em] text-foreground">
             {t('comment.dont.title')}
           </h2>
           <p className="mt-3.5 max-w-[380px] text-[15.5px] leading-[1.6] text-foreground/70">
@@ -165,7 +165,7 @@ export function CommentFinalCta({ locale }: { locale: Locale }) {
     <section className="bg-background pb-16 lg:pb-20">
       <div className="mx-auto max-w-[1280px] px-6 lg:px-10">
         <div className="rounded-[28px] bg-[oklch(0.16_0.025_281)] px-8 py-14 text-center text-white sm:px-12 lg:py-16">
-          <h2 className="m-0 font-serif text-[clamp(28px,3.4vw,44px)] font-normal leading-[1.05] tracking-[-0.025em]">
+          <h2 className="m-0 text-[clamp(28px,3.4vw,44px)] font-normal leading-[1.05] tracking-[-0.025em]">
             {t('comment.finalCta.student.title')}
           </h2>
           <p className="mx-auto mb-7 mt-3 max-w-[560px] text-[15.5px] leading-[1.55] text-white/80">

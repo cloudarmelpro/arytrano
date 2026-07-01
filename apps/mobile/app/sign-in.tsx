@@ -80,7 +80,7 @@ export default function SignIn() {
             </Text>
           </Pressable>
 
-          <Text className="font-serif text-3xl text-foreground">
+          <Text className="text-3xl text-foreground">
             {t('signIn.title')}
           </Text>
           <Text className="mt-2 text-base text-muted-foreground">

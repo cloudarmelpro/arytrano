@@ -54,7 +54,7 @@ export default async function OwnerTermsPage() {
       <span className="mt-5 inline-block text-[12px] font-semibold uppercase tracking-[0.14em] text-primary">
         {t('onboarding.owner.terms.eyebrow')}
       </span>
-      <h1 className="mt-3.5 font-serif text-[clamp(28px,3.4vw,44px)] font-normal leading-[1.05] tracking-[-0.025em] text-foreground text-balance">
+      <h1 className="mt-3.5 text-[clamp(28px,3.4vw,44px)] font-normal leading-[1.05] tracking-[-0.025em] text-foreground text-balance">
         {firstName
           ? t('onboarding.owner.terms.title.named', { name: firstName })
           : t('onboarding.owner.terms.title')}
@@ -68,7 +68,7 @@ export default async function OwnerTermsPage() {
         <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-amber-800">
           {t('onboarding.owner.terms.highlight.eyebrow')}
         </span>
-        <h2 className="mt-2 font-serif text-[clamp(20px,2.2vw,26px)] font-normal leading-[1.2] tracking-[-0.018em] text-amber-950">
+        <h2 className="mt-2 text-[clamp(20px,2.2vw,26px)] font-normal leading-[1.2] tracking-[-0.018em] text-amber-950">
           {t('onboarding.owner.terms.highlight.title')}
         </h2>
         <p className="mt-3 text-[14.5px] leading-[1.55] text-amber-950/85">

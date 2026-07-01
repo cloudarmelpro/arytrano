@@ -86,7 +86,7 @@ export default async function LeaseDetailPage({
             {t('lease.detail.reference', { ref: refShort })}
           </span>
         </div>
-        <h1 className="mt-3 font-serif text-[clamp(28px,3.4vw,44px)] font-normal leading-[1.05] tracking-[-0.025em] text-foreground text-balance">
+        <h1 className="mt-3 text-[clamp(28px,3.4vw,44px)] font-normal leading-[1.05] tracking-[-0.025em] text-foreground text-balance">
           {lease.listing.title}
         </h1>
         <div className="mt-5 flex flex-wrap items-center gap-3">
@@ -169,7 +169,7 @@ export default async function LeaseDetailPage({
       <section className="mt-10" aria-labelledby="lease-detail-parties-heading">
         <h2
           id="lease-detail-parties-heading"
-          className="font-serif text-[clamp(20px,2.2vw,28px)] font-normal leading-[1.15] tracking-[-0.018em] text-foreground"
+          className="text-[clamp(20px,2.2vw,28px)] font-normal leading-[1.15] tracking-[-0.018em] text-foreground"
         >
           {t('lease.detail.parties.title')}
         </h2>
@@ -218,7 +218,7 @@ export default async function LeaseDetailPage({
           </span>
           <h2
             id="lease-tenant-action-heading"
-            className="mt-2 font-serif text-[clamp(22px,2.4vw,30px)] font-normal leading-[1.2] tracking-[-0.018em] text-foreground"
+            className="mt-2 text-[clamp(22px,2.4vw,30px)] font-normal leading-[1.2] tracking-[-0.018em] text-foreground"
           >
             {t('lease.tenant.title')}
           </h2>

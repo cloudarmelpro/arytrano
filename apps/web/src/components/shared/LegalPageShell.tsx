@@ -29,7 +29,7 @@ export async function LegalPageShell({
           <span className="text-[12px] font-semibold uppercase tracking-[0.14em] text-primary">
             {t(eyebrow)}
           </span>
-          <h1 className="mt-3 font-serif text-[clamp(32px,3.6vw,48px)] font-normal leading-[1.05] tracking-[-0.02em] text-foreground">
+          <h1 className="mt-3 text-[clamp(32px,3.6vw,48px)] font-normal leading-[1.05] tracking-[-0.02em] text-foreground">
             {t(title)}
           </h1>
           <p className="mt-3 text-[13.5px] font-medium text-muted-foreground">

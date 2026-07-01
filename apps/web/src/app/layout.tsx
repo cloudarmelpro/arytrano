@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { DM_Sans, DM_Serif_Display } from 'next/font/google'
+import { DM_Sans } from 'next/font/google'
 import { Toaster } from '@/components/ui/sonner'
 import { env } from '@/lib/env'
 import { LocaleProvider } from '@/lib/i18n/client'
@@ -22,13 +22,6 @@ const dmSans = DM_Sans({
   // shows immediately, DM Sans swaps in once downloaded. `optional`
   // would silently skip the custom font on slow connections; on a brand
   // site we prefer the brief FOIT-to-FOUT swap.
-  display: 'swap',
-})
-
-const dmSerif = DM_Serif_Display({
-  variable: '--font-dm-serif',
-  subsets: ['latin'],
-  weight: '400',
   display: 'swap',
 })
 
@@ -86,7 +79,7 @@ export default async function RootLayout({
   return (
     <html
       lang={locale}
-      className={`${dmSans.variable} ${dmSerif.variable} h-full antialiased`}
+      className={`${dmSans.variable} h-full antialiased`}
     >
       <body className="bg-background text-foreground min-h-full flex flex-col">
         <SkipToContent />

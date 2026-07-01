@@ -11,7 +11,7 @@ export function QuartiersQuizCta({ locale }: { locale: Locale }) {
           <span className="text-[12px] font-semibold uppercase tracking-[0.14em] text-primary">
             {t('quartiers.cta.eyebrow')}
           </span>
-          <h2 className="mx-auto mt-3 font-serif text-[clamp(28px,3.2vw,40px)] font-normal leading-[1.1] tracking-[-0.018em] text-foreground">
+          <h2 className="mx-auto mt-3 text-[clamp(28px,3.2vw,40px)] font-normal leading-[1.1] tracking-[-0.018em] text-foreground">
             {t('quartiers.cta.title')}
           </h2>
           <p className="mx-auto mt-3.5 max-w-[600px] text-[16px] leading-[1.55] text-foreground/70">

@@ -247,7 +247,7 @@ export function QuizWizard({
     <MotionConfig reducedMotion="user">
     <div className="mx-auto w-full max-w-[640px]">
       <header className="mb-10 text-center">
-        <h1 className="font-serif text-[clamp(30px,3.6vw,46px)] font-normal leading-[1.05] tracking-[-0.02em] text-foreground">
+        <h1 className="text-[clamp(30px,3.6vw,46px)] font-normal leading-[1.05] tracking-[-0.02em] text-foreground">
           {t('quiz.h1')}
         </h1>
         <p className="mx-auto mt-3 max-w-[520px] text-[15.5px] leading-[1.55] text-foreground/70">
@@ -268,7 +268,7 @@ export function QuizWizard({
             transition={{ duration: 0.25, ease: [0.4, 0, 0.2, 1] }}
           >
             <FieldSet>
-              <FieldLegend className="font-serif text-[clamp(24px,3vw,32px)] font-normal leading-[1.15] tracking-[-0.018em] text-foreground">
+              <FieldLegend className="text-[clamp(24px,3vw,32px)] font-normal leading-[1.15] tracking-[-0.018em] text-foreground">
                 {t(current.title)}
               </FieldLegend>
               <FieldDescription className="-mt-1 mb-2 text-[14px] text-foreground/70">

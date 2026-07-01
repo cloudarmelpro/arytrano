@@ -51,7 +51,7 @@ export default async function InventoryWizardPage({
         <span className="text-[12px] font-semibold uppercase tracking-[0.14em] text-primary">
           E-T27.2 · État des lieux
         </span>
-        <h1 className="mt-3 font-serif text-[clamp(28px,3.4vw,40px)] font-normal leading-[1.1] tracking-[-0.025em] text-foreground">
+        <h1 className="mt-3 text-[clamp(28px,3.4vw,40px)] font-normal leading-[1.1] tracking-[-0.025em] text-foreground">
           {data.listingTitle}
         </h1>
         <p className="mt-3 max-w-[640px] text-[14.5px] leading-[1.55] text-foreground/65">

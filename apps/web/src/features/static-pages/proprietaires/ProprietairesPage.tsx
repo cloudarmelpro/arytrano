@@ -137,7 +137,7 @@ function Hero({
           <span className="mt-5 inline-block text-[12px] font-semibold uppercase tracking-[0.14em] text-primary">
             {t('proprietaires.hero.eyebrow')}
           </span>
-          <h1 className="mt-3.5 font-serif text-[clamp(36px,4.4vw,64px)] font-normal leading-[1.05] tracking-[-0.025em] text-balance text-foreground">
+          <h1 className="mt-3.5 text-[clamp(36px,4.4vw,64px)] font-normal leading-[1.05] tracking-[-0.025em] text-balance text-foreground">
             {t('proprietaires.hero.title')}
           </h1>
           <p className="mt-6 max-w-[580px] text-[17px] leading-[1.6] text-foreground/65 sm:text-[18.5px]">
@@ -173,7 +173,7 @@ function Hero({
                     : ''
                 }`}
               >
-                <dd className="font-serif text-[clamp(40px,4.4vw,60px)] font-light leading-none tracking-[-0.035em] text-primary tabular-nums">
+                <dd className="text-[clamp(40px,4.4vw,60px)] font-light leading-none tracking-[-0.035em] text-primary tabular-nums">
                   {t(s.n)}
                 </dd>
                 <dt className="mt-3 text-[11px] font-semibold uppercase leading-[1.4] tracking-[0.14em] text-foreground/55">
@@ -240,7 +240,7 @@ function PublishPreview({ t }: { t: Translator }) {
 
       {/* Listing title + location */}
       <div className="px-5 pt-5 sm:px-6">
-        <h3 className="font-serif text-[clamp(20px,2.2vw,26px)] font-normal leading-[1.15] tracking-[-0.02em] text-foreground">
+        <h3 className="text-[clamp(20px,2.2vw,26px)] font-normal leading-[1.15] tracking-[-0.02em] text-foreground">
           {t('proprietaires.preview.field.typeV')}
         </h3>
         <p className="mt-1.5 text-[12.5px] font-medium text-foreground/65">
@@ -311,7 +311,7 @@ function PublishSteps({ t }: { t: Translator }) {
           <span className="text-[12px] font-semibold uppercase tracking-[0.14em] text-primary">
             {t('proprietaires.steps.eyebrow')}
           </span>
-          <h2 className="mt-3 font-serif text-[clamp(32px,3.4vw,44px)] font-normal leading-[1.05] tracking-[-0.02em] text-foreground">
+          <h2 className="mt-3 text-[clamp(32px,3.4vw,44px)] font-normal leading-[1.05] tracking-[-0.02em] text-foreground">
             {t('proprietaires.steps.title')}
           </h2>
         </header>
@@ -346,7 +346,7 @@ function Verification({ t }: { t: Translator }) {
           <span className="text-[12px] font-semibold uppercase tracking-[0.14em] text-primary">
             {t('proprietaires.verif.eyebrow')}
           </span>
-          <h2 className="mt-3.5 font-serif text-[clamp(32px,3.4vw,44px)] font-normal leading-[1.05] tracking-[-0.02em] text-foreground">
+          <h2 className="mt-3.5 text-[clamp(32px,3.4vw,44px)] font-normal leading-[1.05] tracking-[-0.02em] text-foreground">
             {t('proprietaires.verif.title')}
           </h2>
           <p className="mt-4 text-[16px] leading-[1.6] text-foreground/70">
@@ -431,7 +431,7 @@ function Pricing({ t }: { t: Translator }) {
           <span className="mt-5 inline-block text-[12px] font-semibold uppercase tracking-[0.14em] text-primary">
             {t('proprietaires.pricing.eyebrow')}
           </span>
-          <h2 className="mt-3 font-serif text-[clamp(40px,4.4vw,60px)] font-normal leading-[1.05] tracking-[-0.025em] text-foreground">
+          <h2 className="mt-3 text-[clamp(40px,4.4vw,60px)] font-normal leading-[1.05] tracking-[-0.025em] text-foreground">
             {t('proprietaires.pricing.title')}
           </h2>
           <p className="mx-auto mt-5 max-w-[620px] text-[16px] leading-[1.6] text-foreground/65">
@@ -447,7 +447,7 @@ function Pricing({ t }: { t: Translator }) {
               <span className="text-[12px] font-semibold uppercase tracking-[0.14em] text-foreground/55">
                 {t('proprietaires.pricing.publication.eyebrow')}
               </span>
-              <div className="mt-5 font-serif text-[clamp(56px,6vw,80px)] font-normal leading-none tracking-[-0.035em] text-foreground">
+              <div className="mt-5 text-[clamp(56px,6vw,80px)] font-normal leading-none tracking-[-0.035em] text-foreground">
                 {t('proprietaires.pricing.publication.price')}
               </div>
               <p className="mt-4 text-[14px] leading-[1.55] text-foreground/65">
@@ -455,7 +455,7 @@ function Pricing({ t }: { t: Translator }) {
               </p>
             </div>
             <div className="flex flex-col">
-              <h3 className="font-serif text-[clamp(22px,2.4vw,30px)] font-normal leading-[1.2] tracking-[-0.02em] text-foreground">
+              <h3 className="text-[clamp(22px,2.4vw,30px)] font-normal leading-[1.2] tracking-[-0.02em] text-foreground">
                 {t('proprietaires.pricing.publication.h3')}
               </h3>
               <ul className="mt-6 divide-y divide-border">
@@ -492,7 +492,7 @@ function Pricing({ t }: { t: Translator }) {
               <span className="text-[12px] font-semibold uppercase tracking-[0.14em] text-primary">
                 {t('proprietaires.pricing.success.eyebrow')}
               </span>
-              <div className="mt-5 font-serif text-[clamp(64px,7vw,96px)] font-normal leading-none tracking-[-0.04em] text-primary">
+              <div className="mt-5 text-[clamp(64px,7vw,96px)] font-normal leading-none tracking-[-0.04em] text-primary">
                 {t('proprietaires.pricing.success.price')}
               </div>
               <p className="mt-3 text-[18px] font-semibold leading-tight text-primary sm:text-[20px]">
@@ -506,7 +506,7 @@ function Pricing({ t }: { t: Translator }) {
               </p>
             </div>
             <div className="flex flex-col">
-              <h3 className="font-serif text-[clamp(22px,2.4vw,30px)] font-normal leading-[1.2] tracking-[-0.02em] text-foreground">
+              <h3 className="text-[clamp(22px,2.4vw,30px)] font-normal leading-[1.2] tracking-[-0.02em] text-foreground">
                 {t('proprietaires.pricing.success.h3')}
               </h3>
               <ul className="mt-6 divide-y divide-border">
@@ -544,7 +544,7 @@ function Pricing({ t }: { t: Translator }) {
             <span className="text-[12px] font-semibold uppercase tracking-[0.14em] text-foreground/55">
               {t('proprietaires.pricing.flow.eyebrow')}
             </span>
-            <h3 className="mt-3 font-serif text-[clamp(28px,3vw,40px)] font-normal leading-[1.1] tracking-[-0.02em] text-foreground">
+            <h3 className="mt-3 text-[clamp(28px,3vw,40px)] font-normal leading-[1.1] tracking-[-0.02em] text-foreground">
               {t('proprietaires.pricing.flow.title')}
             </h3>
           </header>
@@ -554,7 +554,7 @@ function Pricing({ t }: { t: Translator }) {
                 key={stepKey}
                 className="grid grid-cols-[auto_1fr] items-center gap-6 py-6 lg:gap-12 lg:py-8"
               >
-                <span className="font-serif text-[clamp(36px,4vw,56px)] font-light leading-none tracking-[-0.02em] text-primary tabular-nums">
+                <span className="text-[clamp(36px,4vw,56px)] font-light leading-none tracking-[-0.02em] text-primary tabular-nums">
                   {`0${i + 1}`}
                 </span>
                 <p className="text-[15px] leading-[1.55] text-foreground sm:text-[16px]">
@@ -573,7 +573,7 @@ function Pricing({ t }: { t: Translator }) {
               <span className="text-[12px] font-semibold uppercase tracking-[0.14em] text-primary">
                 {t('proprietaires.pricing.comparison.eyebrow')}
               </span>
-              <h3 className="mt-3 font-serif text-[clamp(26px,2.8vw,36px)] font-normal leading-[1.15] tracking-[-0.02em] text-foreground">
+              <h3 className="mt-3 text-[clamp(26px,2.8vw,36px)] font-normal leading-[1.15] tracking-[-0.02em] text-foreground">
                 {t('proprietaires.pricing.comparison.title')}
               </h3>
               <ul className="mt-8 divide-y divide-border">
@@ -607,7 +607,7 @@ function Pricing({ t }: { t: Translator }) {
             </div>
             {/* Right: massive savings pull-quote */}
             <div className="flex flex-col items-end">
-              <div className="flex items-baseline justify-end font-serif font-light leading-none tracking-[-0.045em] text-primary">
+              <div className="flex items-baseline justify-end font-light leading-none tracking-[-0.045em] text-primary">
                 <span className="text-[clamp(80px,10vw,160px)]">
                   {t('proprietaires.pricing.comparison.savingsPercent')}
                 </span>
@@ -636,7 +636,7 @@ function Faq({ t }: { t: Translator }) {
           <span className="text-[12px] font-semibold uppercase tracking-[0.14em] text-primary">
             {t('proprietaires.faq.eyebrow')}
           </span>
-          <h2 className="mt-3 font-serif text-[clamp(28px,3vw,40px)] font-normal leading-[1.05] tracking-[-0.02em] text-foreground">
+          <h2 className="mt-3 text-[clamp(28px,3vw,40px)] font-normal leading-[1.05] tracking-[-0.02em] text-foreground">
             {t('proprietaires.faq.title')}
           </h2>
         </header>
@@ -656,7 +656,7 @@ function FinalCta({ t }: { t: Translator }) {
     <section className="bg-background pb-20 lg:pb-24">
       <div className="mx-auto max-w-[1280px] px-6 lg:px-10">
         <div className="rounded-[28px] bg-[oklch(0.16_0.025_281)] px-8 py-16 text-center text-white sm:px-12">
-          <h2 className="m-0 font-serif text-[clamp(32px,3.6vw,48px)] font-normal leading-[1.05] tracking-[-0.025em]">
+          <h2 className="m-0 text-[clamp(32px,3.6vw,48px)] font-normal leading-[1.05] tracking-[-0.025em]">
             {t('proprietaires.finalCta.title')}
           </h2>
           <p className="mx-auto mb-7 mt-3.5 max-w-[560px] text-[16px] leading-[1.55] text-white/80">

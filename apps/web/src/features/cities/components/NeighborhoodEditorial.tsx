@@ -104,7 +104,7 @@ export function NeighborhoodEditorial({
   return (
     <section className="bg-background py-14 lg:py-16">
       <div className="mx-auto max-w-[1280px] px-6 lg:px-10">
-        <h2 className="font-serif text-[clamp(24px,2.8vw,36px)] font-normal leading-[1.1] tracking-[-0.02em] text-foreground">
+        <h2 className="text-[clamp(24px,2.8vw,36px)] font-normal leading-[1.1] tracking-[-0.02em] text-foreground">
           {locale === 'mg'
             ? `Mahafantatra an’i ${quartierName}`
             : `Découvrir ${quartierName}`}

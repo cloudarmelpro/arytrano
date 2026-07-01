@@ -111,7 +111,7 @@ export default function SavedSearches() {
       </View>
 
       <View className="px-5 pb-3">
-        <Text className="font-serif text-3xl text-foreground">
+        <Text className="text-3xl text-foreground">
           {t('savedSearches.title')}
         </Text>
       </View>

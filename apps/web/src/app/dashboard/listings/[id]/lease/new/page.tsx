@@ -62,7 +62,7 @@ export default async function NewLeasePage({
         <span className="mt-5 inline-block text-[12px] font-semibold uppercase tracking-[0.14em] text-primary">
           {t('lease.wizard.eyebrow')}
         </span>
-        <h1 className="mt-3.5 font-serif text-[clamp(32px,3.8vw,52px)] font-normal leading-[1.05] tracking-[-0.025em] text-foreground">
+        <h1 className="mt-3.5 text-[clamp(32px,3.8vw,52px)] font-normal leading-[1.05] tracking-[-0.025em] text-foreground">
           {t('lease.wizard.title')}
         </h1>
         <p className="mt-4 max-w-[540px] text-[16px] leading-[1.6] text-foreground/65">

@@ -58,7 +58,7 @@ export default function Profile() {
           </Text>
         </Pressable>
 
-        <Text className="font-serif text-3xl text-foreground">
+        <Text className="text-3xl text-foreground">
           {t('profile.title')}
         </Text>
 

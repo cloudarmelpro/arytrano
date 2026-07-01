@@ -156,7 +156,7 @@ export default function Home() {
     <SafeAreaView className="flex-1 bg-background" edges={['top']}>
       {/* Top bar — brand + auth chip */}
       <View className="flex-row items-center justify-between px-5 pb-3 pt-2">
-        <Text className="font-serif text-2xl text-foreground">
+        <Text className="text-2xl text-foreground">
           {t('common.appName')}
         </Text>
         {signedIn ? (

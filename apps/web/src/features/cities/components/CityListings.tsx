@@ -38,7 +38,7 @@ export function CityListings({
             <span className="text-[12px] font-semibold uppercase tracking-[0.14em] text-primary">
               {t('cityLanding.listings.eyebrow')}
             </span>
-            <h2 className="mt-2 font-serif text-[clamp(28px,3.4vw,42px)] font-normal leading-[1.1] tracking-[-0.02em] text-foreground">
+            <h2 className="mt-2 text-[clamp(28px,3.4vw,42px)] font-normal leading-[1.1] tracking-[-0.02em] text-foreground">
               {t('cityLanding.listings.title', { city: cityName })}
             </h2>
             <p className="mt-2 text-[14.5px] text-foreground/70">

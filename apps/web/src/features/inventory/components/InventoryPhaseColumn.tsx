@@ -86,7 +86,7 @@ export function InventoryPhaseColumn({
   return (
     <section className="flex flex-col gap-4">
       <header className="flex flex-wrap items-baseline justify-between gap-2">
-        <h2 className="font-serif text-[clamp(20px,2vw,26px)] font-normal leading-tight">
+        <h2 className="text-[clamp(20px,2vw,26px)] font-normal leading-tight">
           {title}
         </h2>
       </header>

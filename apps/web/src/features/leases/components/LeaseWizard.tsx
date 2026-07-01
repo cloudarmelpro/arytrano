@@ -94,7 +94,7 @@ export function LeaseWizard({
           </span>
           <h2
             id="lease-wizard-section-1-heading"
-            className="mt-2 font-serif text-[clamp(22px,2.4vw,30px)] font-normal leading-[1.15] tracking-[-0.02em] text-foreground"
+            className="mt-2 text-[clamp(22px,2.4vw,30px)] font-normal leading-[1.15] tracking-[-0.02em] text-foreground"
           >
             <span className="sr-only">
               {t('lease.wizard.progress', { current: 1, total: 3 })} —{' '}
@@ -156,7 +156,7 @@ export function LeaseWizard({
           </span>
           <h2
             id="lease-wizard-section-2-heading"
-            className="mt-2 font-serif text-[clamp(22px,2.4vw,30px)] font-normal leading-[1.15] tracking-[-0.02em] text-foreground"
+            className="mt-2 text-[clamp(22px,2.4vw,30px)] font-normal leading-[1.15] tracking-[-0.02em] text-foreground"
           >
             <span className="sr-only">
               {t('lease.wizard.progress', { current: 2, total: 3 })} —{' '}
@@ -285,7 +285,7 @@ export function LeaseWizard({
           </span>
           <h2
             id="lease-wizard-section-3-heading"
-            className="mt-2 font-serif text-[clamp(22px,2.4vw,30px)] font-normal leading-[1.15] tracking-[-0.02em] text-foreground"
+            className="mt-2 text-[clamp(22px,2.4vw,30px)] font-normal leading-[1.15] tracking-[-0.02em] text-foreground"
           >
             <span className="sr-only">
               {t('lease.wizard.progress', { current: 3, total: 3 })} —{' '}
@@ -312,7 +312,7 @@ export function LeaseWizard({
               <dt className="text-[14px] text-foreground/70">
                 {t('lease.fees.platform.label')}
               </dt>
-              <dd className="font-serif text-[clamp(24px,2.6vw,32px)] font-normal tabular-nums leading-none text-primary">
+              <dd className="text-[clamp(24px,2.6vw,32px)] font-normal tabular-nums leading-none text-primary">
                 {formatAriary(previewFees.platformFeeMGA)}
               </dd>
             </div>
