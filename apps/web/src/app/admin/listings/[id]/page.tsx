@@ -53,7 +53,15 @@ export default async function AdminListingDetailPage({
         >
           ← Toutes les annonces
         </Link>
-        <h1 className="text-2xl font-semibold text-foreground">{listing.title}</h1>
+        <div className="flex flex-wrap items-baseline justify-between gap-3">
+          <h1 className="text-2xl font-semibold text-foreground">{listing.title}</h1>
+          <Link
+            href={`/admin/listings/${listing.id}/edit`}
+            className="inline-flex h-9 items-center rounded-md border border-border bg-background px-3 text-xs font-semibold text-foreground hover:border-primary hover:text-primary"
+          >
+            Éditer l’annonce
+          </Link>
+        </div>
         <p className="text-sm text-muted-foreground">
           {listing.city.nameFr} · {listing.neighborhood.nameFr} · {listing.type}
         </p>

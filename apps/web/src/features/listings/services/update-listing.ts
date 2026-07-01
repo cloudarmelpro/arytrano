@@ -83,3 +83,68 @@ export async function updateListing(
 
   return updated
 }
+
+/**
+ * ADM-12 — admin edit path. Bypasses the ownerId check + the CGU
+ * gate (moderation trumps owner consent). Otherwise runs the same
+ * validation + slug rebuild + TRU-04 rescan as the owner path. The
+ * caller MUST have already resolved requireAdmin().
+ */
+export async function adminUpdateListing(
+  adminId: string,
+  listingId: string,
+  input: UpdateListingInput,
+): Promise<Listing> {
+  const existing = await prisma.listing.findFirst({
+    where: { id: listingId, status: { not: 'DELETED' } },
+    select: { id: true, title: true, cityId: true, ownerId: true },
+  })
+  if (!existing) throw errors.notFound('Annonce introuvable')
+
+  if (input.neighborhoodId) {
+    const cityId = input.cityId ?? existing.cityId
+    const neighborhood = await prisma.neighborhood.findFirst({
+      where: { id: input.neighborhoodId, cityId },
+      select: { id: true },
+    })
+    if (!neighborhood) {
+      throw errors.validation('Quartier introuvable ou ne correspond pas à la ville')
+    }
+  }
+
+  const data: Parameters<typeof prisma.listing.update>[0]['data'] = {
+    ...(input.title !== undefined && { title: input.title }),
+    ...(input.description !== undefined && { description: input.description }),
+    ...(input.type !== undefined && { type: input.type }),
+    ...(input.priceMonthlyMGA !== undefined && { priceMonthlyMGA: input.priceMonthlyMGA }),
+    ...(input.cautionMonths !== undefined && { cautionMonths: input.cautionMonths }),
+    ...(input.cityId !== undefined && { cityId: input.cityId }),
+    ...(input.neighborhoodId !== undefined && { neighborhoodId: input.neighborhoodId }),
+    ...(input.surfaceM2 !== undefined && { surfaceM2: input.surfaceM2 }),
+    ...(input.bedrooms !== undefined && { bedrooms: input.bedrooms }),
+    ...(input.bathrooms !== undefined && { bathrooms: input.bathrooms }),
+    ...(input.furnished !== undefined && { furnished: input.furnished }),
+    ...(input.amenities !== undefined && { amenities: { set: input.amenities } }),
+    ...(input.customAmenities !== undefined && {
+      customAmenities: { set: input.customAmenities },
+    }),
+  }
+  if (input.title && input.title !== existing.title) {
+    data.slug = buildSlug(input.title, existing.id)
+  }
+
+  const updated = await prisma.listing.update({
+    where: { id: existing.id },
+    data,
+  })
+
+  if (input.title !== undefined || input.description !== undefined) {
+    void autoFlagListingIfNeeded({
+      listingId: updated.id,
+      title: updated.title,
+      description: updated.description,
+    })
+  }
+
+  return updated
+}
