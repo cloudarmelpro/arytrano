@@ -44,13 +44,25 @@ export async function publishListing(ownerId: string, listingId: string): Promis
   // a verified number, but going PUBLISHED requires a successful OTP
   // round on the SAME phone currently on the User row. Editing the
   // phone clears phoneVerifiedAt elsewhere — we re-check here.
+  // TRU-06 — same idea for CIN: a listing can sit in DRAFT without any
+  // ID verification, but publishing requires the OwnerProfile row to
+  // be VERIFIED. We pull the flag in the same round-trip.
   const owner = await prisma.user.findUnique({
     where: { id: ownerId },
-    select: { phone: true, phoneVerifiedAt: true },
+    select: {
+      phone: true,
+      phoneVerifiedAt: true,
+      ownerProfile: { select: { verifiedAt: true } },
+    },
   })
   if (!owner?.phone?.trim() || !owner.phoneVerifiedAt) {
     throw errors.conflict(
       'Vérifie ton téléphone avant de publier ton annonce. Va dans Mon profil → Téléphone.',
+    )
+  }
+  if (!owner.ownerProfile?.verifiedAt) {
+    throw errors.conflict(
+      'Ta pièce d’identité doit être vérifiée avant de publier. Va dans /dashboard/verify-owner.',
     )
   }
 
