@@ -104,6 +104,11 @@ export const listPublicListingsQuerySchema = z
     // box (~3km square at MG latitudes) and apply as a WHERE clause.
     // Cheaper than haversine + works with the existing cursor pagination.
     nearUniversity: slugSchema,
+    // TEN-13 — "publiée dans les X derniers jours" filter. Slug-style
+    // values so the URL stays readable (`?publishedSince=7d`).
+    publishedSince: z
+      .enum(['24h', '7d', '30d'])
+      .optional(),
     // E-T14 full-text search. Bounded to 120 chars to keep the
     // ILIKE scan cheap until we promote to a tsvector GIN index.
     q: z
@@ -204,6 +209,17 @@ export async function listPublicListings(
   if (input.amenities && input.amenities.length > 0) {
     where.amenities = { hasEvery: input.amenities }
   }
+  // TEN-13 — freshness filter. Convert the slug window to an ISO date
+  // and constrain publishedAt. The status filter above already scopes
+  // to PUBLISHED, so unpublished rows never leak in even at 24h.
+  if (input.publishedSince) {
+    const hours =
+      input.publishedSince === '24h' ? 24
+        : input.publishedSince === '7d' ? 24 * 7
+          : 24 * 30
+    where.publishedAt = { gte: new Date(Date.now() - hours * 60 * 60 * 1000) }
+  }
+
   // TEN-11 — near-university bounding box. Resolve the slug to coords
   // once, then constrain the listing lat/lng to a ~3km square. The
   // bounding box is generous on the longitude side to compensate for

@@ -58,6 +58,7 @@ export function ListingFiltersSidebar({
   const { params, pending, updateMultiple, updateParam, reset } = useUrlFilters()
   const t = useT()
   const currentNearUni = params.get('nearUniversity') ?? ''
+  const currentPublishedSince = params.get('publishedSince') ?? ''
 
   const currentNeighborhood = params.get('neighborhood') ?? ''
   const urlPriceMin = clamp(Number(params.get('priceMin')) || PRICE_MIN, PRICE_MIN, PRICE_MAX)
@@ -363,6 +364,41 @@ export function ListingFiltersSidebar({
               )
             })}
           </ul>
+        </section>
+
+        {/* TEN-13 — Freshness filter. Chips instead of a select so the
+            options stay one-click-away. */}
+        <section className="flex flex-col gap-2 py-1.5">
+          <p className="text-[12px] font-semibold uppercase tracking-[0.08em] text-foreground/70">
+            Disponible depuis
+          </p>
+          <div className="flex flex-wrap gap-1.5">
+            {[
+              { value: '', label: 'Toutes' },
+              { value: '24h', label: '24 h' },
+              { value: '7d', label: '7 jours' },
+              { value: '30d', label: '30 jours' },
+            ].map((opt) => {
+              const active = currentPublishedSince === opt.value
+              return (
+                <button
+                  key={opt.value || 'all'}
+                  type="button"
+                  disabled={pending}
+                  onClick={() =>
+                    updateParam('publishedSince', opt.value || null)
+                  }
+                  className={`inline-flex h-8 items-center rounded-full border px-3 text-[12.5px] font-medium transition disabled:cursor-not-allowed disabled:opacity-50 ${
+                    active
+                      ? 'border-primary bg-primary text-primary-foreground'
+                      : 'border-border bg-background text-foreground/80 hover:border-primary/40'
+                  }`}
+                >
+                  {opt.label}
+                </button>
+              )
+            })}
+          </div>
         </section>
 
         {/* TEN-11 — Near university dropdown. Hidden when no universities

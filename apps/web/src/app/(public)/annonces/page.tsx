@@ -37,6 +37,7 @@ type SearchParams = Promise<{
   q?: string
   view?: string
   nearUniversity?: string
+  publishedSince?: string
 }>
 
 function hasAnyFilter(sp: Awaited<SearchParams>) {
@@ -53,7 +54,8 @@ function hasAnyFilter(sp: Awaited<SearchParams>) {
       sp.amenities ||
       sp.q ||
       sp.view ||
-      sp.nearUniversity,
+      sp.nearUniversity ||
+      sp.publishedSince,
   )
 }
 
@@ -135,6 +137,7 @@ export default async function PublicListingsPage({
     amenities: sp.amenities || undefined,
     q: sp.q || undefined,
     nearUniversity: sp.nearUniversity || undefined,
+    publishedSince: sp.publishedSince || undefined,
   })
   const query = parsed.success ? parsed.data : {}
 
