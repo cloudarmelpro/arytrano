@@ -150,6 +150,8 @@ model User {
   adminNotes          AdminNote[]      @relation("AdminNotesAuthored")
   // PAY-09 — payments this admin has marked REFUNDED.
   refundedPayments    Payment[]        @relation("PaymentRefundedBy")
+  // TRU-11 — blocklist entries created by this admin.
+  blocklistEntries    BlocklistEntry[] @relation("BlocklistCreatedBy")
 
   @@index([status, role])
 }
@@ -1515,6 +1517,31 @@ model WhatsAppAlert {
   // Broadcast queries hit `WHERE unsubscribedAt IS NULL`; a partial
   // index on the live subset keeps the cron fast as the table grows.
   @@index([unsubscribedAt])
+}
+
+// TRU-11 — admin-managed blocklist for abusive IPs, phones, and emails.
+// Consumed by requestPhoneOtp, createInterestLead, sign-in, sign-up.
+enum BlocklistKind {
+  IP_HASH
+  PHONE
+  EMAIL
+}
+
+model BlocklistEntry {
+  id          String        @id @default(cuid())
+  kind        BlocklistKind
+  /// For IP_HASH stores the sha256 hex (same shape as ipHash on the
+  /// rest of the codebase). For PHONE stores E.164. For EMAIL stores
+  /// lowercase.
+  value       String
+  reason      String?
+  createdById String?
+  createdBy   User?         @relation("BlocklistCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+  expiresAt   DateTime?
+  createdAt   DateTime      @default(now())
+
+  @@unique([kind, value])
+  @@index([expiresAt])
 }
 
 // TRU-09 / ADM-05 — Admin audit log.

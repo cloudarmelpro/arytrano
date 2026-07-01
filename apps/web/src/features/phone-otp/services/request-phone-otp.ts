@@ -8,6 +8,7 @@ import { rateLimiters } from '@/lib/rate-limit'
 import { sendSms, SmsSendError } from '@/lib/sms'
 import { env } from '@/lib/env'
 import { sendTransactionalEmail } from '@/lib/email/send-transactional'
+import { isBlocked } from '@/features/blocklist/server'
 import type { RequestPhoneOtpInput } from '../schemas'
 
 /**
@@ -43,6 +44,15 @@ export async function requestPhoneOtp(
   context: { ipHash: string | null },
 ): Promise<RequestPhoneOtpOutcome> {
   const phoneHash = hashPhone(input.phoneE164)
+
+  // TRU-11 — blocklist gate BEFORE any DB/SMS work. We collapse the
+  // reject to `rate_limited` so the caller doesn't get a differential
+  // signal about why (admin-block vs traffic-shape).
+  if (
+    await isBlocked({ ipHash: context.ipHash, phone: input.phoneE164 })
+  ) {
+    return { kind: 'rate_limited' }
+  }
 
   const rl = await rateLimiters.phoneOtpRequest(phoneHash, context.ipHash)
   if (!rl.success) {

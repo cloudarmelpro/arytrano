@@ -6,6 +6,7 @@ import { errors } from '@/lib/api/errors'
 import { hashPhone } from '@/lib/auth/hash-phone'
 import { rateLimiters } from '@/lib/rate-limit'
 import { hasRecentlyVerifiedPhone } from '@/features/phone-otp/server'
+import { isBlocked } from '@/features/blocklist/server'
 import type { CreateInterestLeadInput } from '../schemas'
 import { notifyOperatorsOnNewLead } from './notify-operators-on-new-lead'
 import { writeLeadActivity } from './write-lead-activity'
@@ -58,6 +59,14 @@ export async function createInterestLead(
   },
 ): Promise<CreateInterestLeadOutcome> {
   const tenantPhoneHash = hashPhone(input.tenantPhone)
+
+  // TRU-11 — admin blocklist gate BEFORE rate-limit. Collapse to
+  // rate_limited so the reject reason isn't observable.
+  if (
+    await isBlocked({ ipHash: context.ipHash, phone: input.tenantPhone })
+  ) {
+    return { kind: 'rate_limited' }
+  }
 
   // 1) Rate limit — fail CLOSED on null ipHash via the wrapper.
   const rl = await rateLimiters.leadSubmit(tenantPhoneHash, context.ipHash)
