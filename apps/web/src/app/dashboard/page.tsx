@@ -5,6 +5,8 @@ import { auth } from '@/features/auth'
 import { countOwnerListings } from '@/features/listings/server'
 import { countUserPublishedFavorites } from '@/features/favorites/server'
 import { computeOwnerWeeklyDigest } from '@/features/owner-digest/queries/compute-owner-weekly-digest'
+import { getOwnerOnboardingProgress } from '@/features/owner-onboarding/queries/get-onboarding-progress'
+import { OwnerOnboardingCard } from '@/features/owner-onboarding/components/OwnerOnboardingCard'
 import { getLocale } from '@/lib/i18n/get-locale'
 import { getT, type Translator } from '@/lib/i18n/translate'
 
@@ -26,12 +28,13 @@ export default async function DashboardPage() {
   // landing page. Skip owner-only queries for students.
   // OWN-13 — owners also get the 7d weekly snapshot (contacts / favorites
   // / views + top 3 listings) reused from the OWN-04 digest query.
-  const [ownerCounts, favoritesCount, ownerDigest] = await Promise.all([
+  const [ownerCounts, favoritesCount, ownerDigest, onboarding] = await Promise.all([
     isOwner
       ? countOwnerListings(user.id)
       : Promise.resolve({ total: 0, published: 0 }),
     countUserPublishedFavorites(user.id),
     isOwner ? computeOwnerWeeklyDigest(user.id) : Promise.resolve(null),
+    isOwner ? getOwnerOnboardingProgress(user.id) : Promise.resolve(null),
   ])
   const listingsCount = ownerCounts.total
   const publishedCount = ownerCounts.published
@@ -76,6 +79,9 @@ export default async function DashboardPage() {
           />
         )}
       </section>
+
+      {/* OWN-18 — first-time-owner checklist. Hidden once every step is done. */}
+      {isOwner && onboarding && <OwnerOnboardingCard progress={onboarding} />}
 
       {/* OWN-13 — 7-day portfolio KPI band + top 3 listings for owners.
           Sits above quick-actions so the first thing an owner sees on
