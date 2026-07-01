@@ -1,4 +1,5 @@
 import type { OwnerWeeklyDigestPayload } from '@/features/owner-digest/queries/compute-owner-weekly-digest'
+import { withUtm } from '@/lib/marketing/utm'
 
 /**
  * OWN-04 — Monday 08:00 Antananarivo weekly recap. Kept plain-vanilla
@@ -11,6 +12,13 @@ export function buildOwnerWeeklyDigestEmail(
   baseUrl: string,
 ): { subject: string; html: string; text: string } {
   const url = baseUrl.replace(/\/$/, '')
+  const utm = {
+    source: 'email',
+    medium: 'digest',
+    campaign: 'owner-weekly',
+  } as const
+  const linkDashboard = withUtm(`${url}/dashboard/listings`, utm)
+  const linkNotifPrefs = withUtm(`${url}/dashboard/notifications`, utm)
   const firstName = payload.name?.trim().split(/\s+/)[0] ?? null
   const greeting = firstName ? `Salut ${firstName},` : 'Salut,'
   const subject = `AryTrano — ${payload.totals.contacts7d} contact${
@@ -22,7 +30,7 @@ export function buildOwnerWeeklyDigestEmail(
       (l) => `
         <tr>
           <td style="padding:12px 8px;border-bottom:1px solid #eee;font-size:14px;">
-            <a href="${url}/${l.citySlug}/${l.neighborhoodSlug}/${l.slug}" style="color:#0b1;font-weight:600;">${escapeHtml(l.title)}</a>
+            <a href="${withUtm(`${url}/${l.citySlug}/${l.neighborhoodSlug}/${l.slug}`, utm)}" style="color:#0b1;font-weight:600;">${escapeHtml(l.title)}</a>
           </td>
           <td style="padding:12px 8px;border-bottom:1px solid #eee;text-align:right;font-family:monospace;font-size:14px;">${l.contacts7d}</td>
           <td style="padding:12px 8px;border-bottom:1px solid #eee;text-align:right;font-family:monospace;font-size:14px;color:#555;">${l.favorites7d}</td>
@@ -76,7 +84,7 @@ export function buildOwnerWeeklyDigestEmail(
       }
 
       <div style="margin-top:16px;">
-        <a href="${url}/dashboard/listings" style="display:inline-block;background:#0b1;color:#fff;padding:10px 20px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;">
+        <a href="${linkDashboard}" style="display:inline-block;background:#0b1;color:#fff;padding:10px 20px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;">
           Voir mes annonces
         </a>
       </div>
@@ -84,7 +92,7 @@ export function buildOwnerWeeklyDigestEmail(
       <p style="margin-top:32px;color:#888;font-size:12px;line-height:1.5;">
         Tu reçois cet email parce que tu as des annonces publiées sur
         AryTrano. Tu peux te désabonner de ces récaps hebdomadaires
-        depuis <a href="${url}/dashboard/notifications" style="color:#666;">tes préférences</a>.
+        depuis <a href="${linkNotifPrefs}" style="color:#666;">tes préférences</a>.
       </p>
     </div>
   </body>
@@ -101,9 +109,9 @@ export function buildOwnerWeeklyDigestEmail(
       ? `\n⚠️ ${payload.totals.expiringSoon} annonce(s) expirent dans 10 jours.`
       : '',
     '',
-    `Voir mes annonces : ${url}/dashboard/listings`,
+    `Voir mes annonces : ${linkDashboard}`,
     '',
-    `Désabonnement : ${url}/dashboard/notifications`,
+    `Désabonnement : ${linkNotifPrefs}`,
   ]
     .filter(Boolean)
     .join('\n')

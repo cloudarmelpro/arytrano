@@ -5,6 +5,7 @@ import { auth } from '@/features/auth'
 import { prisma } from '@/lib/db'
 import { listAdminNotes } from '@/features/admin-notes/server'
 import { AdminNotesPanel } from '@/features/admin-notes/components/AdminNotesPanel'
+import { SuspendUserPanel } from '@/features/admin/components/SuspendUserPanel'
 
 export const dynamic = 'force-dynamic'
 
@@ -33,6 +34,7 @@ export default async function AdminUserDetailPage({
         phoneVerifiedAt: true,
         role: true,
         status: true,
+        suspendedReason: true,
         createdAt: true,
         emailVerified: true,
         _count: {
@@ -101,6 +103,12 @@ export default async function AdminUserDetailPage({
           </dd>
         </div>
       </dl>
+
+      <SuspendUserPanel
+        userId={user.id}
+        status={user.status}
+        currentReason={user.suspendedReason}
+      />
 
       <AdminNotesPanel
         targetType="User"

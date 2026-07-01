@@ -79,6 +79,13 @@ model User {
   // finalises the row past this date. Users can cancel until then.
   deletionScheduledAt DateTime?
 
+  // ADM-03 — reason + timestamp when an admin flips status → SUSPENDED.
+  // Read on sign-in to surface a friendly reason instead of a silent
+  // "session expired". Cleared when status flips back to ACTIVE.
+  suspendedReason  String?
+  suspendedAt      DateTime?
+  suspendedBy      String?
+
   // COM-12 — hard-bounce tracking. After EMAIL_BOUNCE_HARD_THRESHOLD
   // (default 3) hard bounces in a row, set emailDisabledAt to now.
   // Senders gate on emailDisabledAt and skip the send to protect the

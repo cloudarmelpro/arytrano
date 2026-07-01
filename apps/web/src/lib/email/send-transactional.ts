@@ -26,6 +26,7 @@ export type TransactionalEventType =
   | 'saved-search-match'
   | 'owner-weekly-digest'
   | 'phone-otp-alert'
+  | 'account-suspended'
 
 /**
  * Wrap `sendEmail` with per-user-per-event rate limiting (T-034). Used by
