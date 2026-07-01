@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation'
 import { auth } from '@/features/auth'
 import { countOwnerListings } from '@/features/listings/server'
 import { countUserPublishedFavorites } from '@/features/favorites/server'
+import { computeOwnerWeeklyDigest } from '@/features/owner-digest/queries/compute-owner-weekly-digest'
 import { getLocale } from '@/lib/i18n/get-locale'
 import { getT, type Translator } from '@/lib/i18n/translate'
 
@@ -23,11 +24,14 @@ export default async function DashboardPage() {
 
   // Lightweight stats — only the counts the user cares about on their
   // landing page. Skip owner-only queries for students.
-  const [ownerCounts, favoritesCount] = await Promise.all([
+  // OWN-13 — owners also get the 7d weekly snapshot (contacts / favorites
+  // / views + top 3 listings) reused from the OWN-04 digest query.
+  const [ownerCounts, favoritesCount, ownerDigest] = await Promise.all([
     isOwner
       ? countOwnerListings(user.id)
       : Promise.resolve({ total: 0, published: 0 }),
     countUserPublishedFavorites(user.id),
+    isOwner ? computeOwnerWeeklyDigest(user.id) : Promise.resolve(null),
   ])
   const listingsCount = ownerCounts.total
   const publishedCount = ownerCounts.published
@@ -72,6 +76,54 @@ export default async function DashboardPage() {
           />
         )}
       </section>
+
+      {/* OWN-13 — 7-day portfolio KPI band + top 3 listings for owners.
+          Sits above quick-actions so the first thing an owner sees on
+          login is "did we get contacts this week ?". */}
+      {isOwner && ownerDigest && (
+        <section className="flex flex-col gap-4 rounded-xl border border-border bg-background p-5">
+          <header className="flex flex-wrap items-baseline justify-between gap-2">
+            <h2 className="text-base font-semibold text-foreground">
+              Ta semaine — 7 derniers jours
+            </h2>
+            <span className="text-[11px] uppercase tracking-wide text-foreground/55">
+              Mis à jour à l’instant
+            </span>
+          </header>
+          <div className="grid gap-3 sm:grid-cols-4">
+            <MiniKpi label="Contacts" value={ownerDigest.totals.contacts7d} />
+            <MiniKpi label="Favoris" value={ownerDigest.totals.favorites7d} />
+            <MiniKpi label="Vues" value={ownerDigest.totals.views7d} />
+            <MiniKpi
+              label="Expirent < 10 j"
+              value={ownerDigest.totals.expiringSoon}
+              warn={ownerDigest.totals.expiringSoon > 0}
+            />
+          </div>
+          {ownerDigest.topListings.length > 0 && (
+            <div className="flex flex-col gap-2 pt-1">
+              <p className="text-[11px] font-semibold uppercase tracking-wide text-foreground/55">
+                Top annonces
+              </p>
+              <ul className="flex flex-col divide-y divide-border">
+                {ownerDigest.topListings.map((l) => (
+                  <li key={l.id} className="flex items-center justify-between gap-3 py-2 text-sm">
+                    <Link
+                      href={`/${l.citySlug}/${l.neighborhoodSlug}/${l.slug}`}
+                      className="truncate text-foreground hover:text-primary hover:underline"
+                    >
+                      {l.title}
+                    </Link>
+                    <span className="shrink-0 font-mono text-[12px] text-foreground/70">
+                      {l.contacts7d} contact{l.contacts7d === 1 ? '' : 's'} · {l.views7d} vues
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </section>
+      )}
 
       {/* Quick actions */}
       <section className="flex flex-col gap-4">
@@ -120,6 +172,31 @@ export default async function DashboardPage() {
  *  Keeping them in-file (instead of a separate component) so the
  *  page reads top-to-bottom without hopping between files.
  * ============================================================ */
+
+function MiniKpi({
+  label,
+  value,
+  warn = false,
+}: {
+  label: string
+  value: number
+  warn?: boolean
+}) {
+  return (
+    <div
+      className={`flex flex-col rounded-lg border p-3 ${
+        warn
+          ? 'border-amber-300 bg-amber-50 text-amber-900'
+          : 'border-border bg-muted/30 text-foreground'
+      }`}
+    >
+      <span className="text-[10.5px] font-semibold uppercase tracking-wide opacity-70">
+        {label}
+      </span>
+      <span className="mt-0.5 font-mono text-2xl font-semibold">{value}</span>
+    </div>
+  )
+}
 
 function StatCard({
   label,
