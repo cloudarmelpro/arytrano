@@ -24,6 +24,7 @@ export type TransactionalEventType =
   | 'lease-terminated-owner'
   | 'lease-terminated-tenant'
   | 'saved-search-match'
+  | 'owner-weekly-digest'
 
 /**
  * Wrap `sendEmail` with per-user-per-event rate limiting (T-034). Used by
