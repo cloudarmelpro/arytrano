@@ -157,6 +157,8 @@ model User {
   refundedPayments    Payment[]        @relation("PaymentRefundedBy")
   // TRU-11 — blocklist entries created by this admin.
   blocklistEntries    BlocklistEntry[] @relation("BlocklistCreatedBy")
+  // OWN-12 — web push subscriptions attached to this user.
+  pushSubscriptions   PushSubscription[]
 
   @@index([status, role])
 }
@@ -1531,6 +1533,23 @@ model WhatsAppAlert {
   // Broadcast queries hit `WHERE unsubscribedAt IS NULL`; a partial
   // index on the live subset keeps the cron fast as the table grows.
   @@index([unsubscribedAt])
+}
+
+// OWN-12 — Web Push subscription. Each browser/device registration
+// produces one row; the same user can have multiple. `endpoint` is
+// unique so re-subscribing the same browser upserts cleanly.
+model PushSubscription {
+  id           String   @id @default(cuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  endpoint     String   @unique
+  p256dh       String
+  auth         String
+  userAgent    String?
+  createdAt    DateTime @default(now())
+  lastSeenAt   DateTime @default(now())
+
+  @@index([userId])
 }
 
 // TRU-11 — admin-managed blocklist for abusive IPs, phones, and emails.

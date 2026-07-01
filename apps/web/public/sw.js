@@ -132,3 +132,39 @@ self.addEventListener('fetch', (event) => {
     )
   }
 })
+
+// OWN-12 — Web Push event handler. The server sends a JSON payload
+// with { title, body, url? }. We display the notification and, on
+// click, focus / open a client window at the target URL.
+self.addEventListener('push', (event) => {
+  if (!event.data) return
+  let payload
+  try {
+    payload = event.data.json()
+  } catch {
+    return
+  }
+  const title = payload?.title ?? 'AryTrano'
+  const options = {
+    body: payload?.body ?? '',
+    icon: '/favicon.ico',
+    tag: payload?.tag,
+    data: { url: payload?.url ?? '/' },
+  }
+  event.waitUntil(self.registration.showNotification(title, options))
+})
+
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close()
+  const target = event.notification.data?.url ?? '/'
+  event.waitUntil(
+    self.clients
+      .matchAll({ type: 'window', includeUncontrolled: true })
+      .then((clients) => {
+        for (const c of clients) {
+          if (c.url.includes(target) && 'focus' in c) return c.focus()
+        }
+        return self.clients.openWindow(target)
+      }),
+  )
+})

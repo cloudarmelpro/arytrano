@@ -6,6 +6,7 @@ import { hashUa } from '@/lib/auth/request-info'
 import { rateLimiters } from '@/lib/rate-limit'
 import type { ContactChannel } from '../schemas/contact'
 import { notifyOwnerContact } from './notify-owner-contact'
+import { sendPushToUser } from '@/lib/push/web-push'
 
 export type RecordContactClickResult = {
   channel: ContactChannel
@@ -144,6 +145,15 @@ export async function recordContactClick(input: {
     listingId: listing.id,
     listingTitle: listing.title,
     channel: input.channel,
+  })
+
+  // OWN-12 — web push. Independent of the mobile Expo push above so
+  // desktop-only owners can also get the ring. Fire-and-forget.
+  void sendPushToUser(listing.owner.id, {
+    title: 'Nouveau contact sur ton annonce',
+    body: listing.title,
+    url: `/dashboard/listings`,
+    tag: `contact-${listing.id}`,
   })
 
   // Owner display name: first token only (privacy mirror of get-public-listing).

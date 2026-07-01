@@ -216,6 +216,17 @@ const EnvSchema = z.object({
   //   ADMIN_NOTIFICATIONS_EMAIL=ops@arytrano.com,founder@arytrano.com
   ADMIN_NOTIFICATIONS_EMAIL: z.string().optional(),
 
+  // --- Web Push (OWN-12) -----------------------------------
+  // VAPID keys used by web-push. Generate once:
+  //   npx web-push generate-vapid-keys
+  // Public key is exposed to the browser to subscribe. The private
+  // key stays server-side only. `NEXT_PUBLIC_VAPID_PUBLIC_KEY` is
+  // also public. Subject is a mailto:/URL used by push services to
+  // reach the app owner on abuse reports.
+  NEXT_PUBLIC_VAPID_PUBLIC_KEY: z.string().optional(),
+  VAPID_PRIVATE_KEY: z.string().optional(),
+  VAPID_SUBJECT: z.string().default('mailto:ops@arytrano.com'),
+
   // --- Email bounce webhook (COM-12) -----------------------
   // Shared secret used to authenticate inbound bounce reports from the
   // SMTP/ESP provider. The /api/webhooks/email-bounce route requires

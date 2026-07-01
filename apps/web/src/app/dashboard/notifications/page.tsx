@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
 import { auth, NotifPrefToggle } from '@/features/auth'
 import { getNotifPrefs } from '@/features/auth/server'
+import { PushSubscribeToggle } from '@/features/push/components/PushSubscribeToggle'
 
 export const metadata: Metadata = {
   title: 'Préférences de notifications',
@@ -27,6 +28,10 @@ export default async function NotificationsPrefsPage() {
           retirer pour des raisons légales (LEG-04).
         </p>
       </header>
+
+      {/* OWN-12 — browser push subscription. Hidden gracefully when
+          VAPID env is unset or the browser doesn't support PushManager. */}
+      <PushSubscribeToggle />
 
       <section className="flex flex-col rounded-lg border border-border bg-background p-5">
         <NotifPrefToggle
