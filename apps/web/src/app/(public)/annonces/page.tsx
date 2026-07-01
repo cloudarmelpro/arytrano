@@ -17,6 +17,7 @@ import {
 import { SaveSearchButton } from '@/features/search'
 import { listCitiesWithNeighborhoods } from '@/features/geo/server'
 import { listUniversities } from '@/features/universities/server'
+import { CompareFloatingBar } from '@/features/compare/components/CompareFloatingBar'
 import { listCitiesWithCounts } from '@/features/landing/server'
 import { getFavoritedListingIds } from '@/features/favorites/server'
 import { auth } from '@/features/auth'
@@ -383,6 +384,8 @@ export default async function PublicListingsPage({
           )}
         </main>
       </div>
+      {/* TEN-01 — sticky comparator bar visible whenever localStorage has picks. */}
+      <CompareFloatingBar />
     </div>
   )
 }

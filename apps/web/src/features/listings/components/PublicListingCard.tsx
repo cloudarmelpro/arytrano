@@ -1,6 +1,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { FavoriteButton, FavoriteSignInPrompt } from '@/features/favorites'
+import { CompareToggleButton } from '@/features/compare/components/CompareToggleButton'
 import { formatAriary } from '@/lib/format/currency'
 import type { Translator } from '@/lib/i18n/translate'
 import type { PublicListingCard as PublicListingCardData } from '../queries/list-public-listings'
@@ -75,6 +76,10 @@ export function PublicListingCard({
           ) : (
             <FavoriteSignInPrompt returnTo={href} ariaLabel={t('favorites.add')} />
           )}
+          {/* TEN-01 — compare toggle sits under the fav button, both above the stretched anchor. */}
+          <div className="absolute right-3 top-14 z-10">
+            <CompareToggleButton listingId={listing.id} variant="inline" />
+          </div>
           {listing.photo ? (
             <Image
               src={listing.photo.url}
