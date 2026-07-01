@@ -9,6 +9,7 @@ import {
   LoginEventsSection,
   NotificationsSection,
   TwoFactorSection,
+  PendingDeletionBanner,
 } from '@/features/auth'
 import { prisma } from '@/lib/db'
 import {
@@ -47,7 +48,11 @@ export default async function SettingsPage({
       countActiveRecoveryCodes(userId),
       prisma.user.findUnique({
         where: { id: userId },
-        select: { contactNotificationsEnabled: true, role: true },
+        select: {
+          contactNotificationsEnabled: true,
+          role: true,
+          deletionScheduledAt: true,
+        },
       }),
     ])
   const t = getT(locale)
@@ -66,6 +71,10 @@ export default async function SettingsPage({
         </h1>
         <p className="max-w-2xl text-sm text-muted-foreground">{t('settings.lead')}</p>
       </header>
+
+      {userPrefs?.deletionScheduledAt && (
+        <PendingDeletionBanner scheduledFor={userPrefs.deletionScheduledAt} />
+      )}
 
       {reason === 'admin-2fa-required' && !twofaEnabled ? (
         <div

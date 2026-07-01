@@ -30,3 +30,8 @@ export {
   type UpdateNotifPrefsActionState,
 } from './actions/update-notif-prefs'
 export { NotifPrefToggle } from './components/NotifPrefToggle'
+export {
+  deleteAccountAction,
+  cancelAccountDeletionAction,
+} from './actions/delete-account'
+export { PendingDeletionBanner } from './components/PendingDeletionBanner'

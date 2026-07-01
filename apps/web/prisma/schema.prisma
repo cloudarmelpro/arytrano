@@ -74,6 +74,11 @@ model User {
   listingExpirationAlertsEnabled Boolean @default(true)
   leaseUpdatesEnabled            Boolean @default(true)
 
+  // TRU-19 — self-service account deletion with a 30-day grace window.
+  // When the user requests deletion we set this timestamp; a cron
+  // finalises the row past this date. Users can cancel until then.
+  deletionScheduledAt DateTime?
+
   // COM-12 — hard-bounce tracking. After EMAIL_BOUNCE_HARD_THRESHOLD
   // (default 3) hard bounces in a row, set emailDisabledAt to now.
   // Senders gate on emailDisabledAt and skip the send to protect the

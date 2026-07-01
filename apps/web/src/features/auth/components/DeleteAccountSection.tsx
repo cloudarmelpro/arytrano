@@ -56,8 +56,14 @@ export function DeleteAccountSection() {
       formData.append('confirm', values.confirm)
       const result = await deleteAccountAction({ ok: false }, formData)
       if (result.ok) {
-        toast.success(t('deleteAccount.toast.success'))
-        return // Server Action redirects to /?goodbye=1
+        // TRU-19 — the action now SCHEDULES deletion for +30 days; the
+        // user stays signed in and can cancel from this page.
+        toast.success(
+          result.scheduledFor
+            ? `Compte programmé pour suppression le ${new Date(result.scheduledFor).toLocaleDateString('fr-FR')}. Tu peux annuler jusque-là.`
+            : t('deleteAccount.toast.success'),
+        )
+        return
       }
       const { message } = applyServerErrors(form, result)
       if (message) toast.error(message)
