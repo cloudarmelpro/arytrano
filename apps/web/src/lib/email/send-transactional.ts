@@ -29,6 +29,7 @@ export type TransactionalEventType =
   | 'account-suspended'
   | 'student-weekly-digest'
   | 'admin-broadcast'
+  | 'new-device-login'
 
 /**
  * Wrap `sendEmail` with per-user-per-event rate limiting (T-034). Used by
