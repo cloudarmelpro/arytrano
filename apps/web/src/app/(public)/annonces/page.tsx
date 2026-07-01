@@ -18,6 +18,10 @@ import { SaveSearchButton } from '@/features/search'
 import { listCitiesWithNeighborhoods } from '@/features/geo/server'
 import { listUniversities } from '@/features/universities/server'
 import { CompareFloatingBar } from '@/features/compare/components/CompareFloatingBar'
+import { recordSearchQuery } from '@/features/search-analytics/services/record-search-query'
+import { extractRequestInfo } from '@/lib/auth/request-info'
+import { headers } from 'next/headers'
+import { after } from 'next/server'
 import { listCitiesWithCounts } from '@/features/landing/server'
 import { getFavoritedListingIds } from '@/features/favorites/server'
 import { auth } from '@/features/auth'
@@ -172,6 +176,21 @@ export default async function PublicListingsPage({
     listUniversities(),
     auth(),
   ])
+
+  // ANA-09 — non-blocking search analytics tracking. Only recorded
+  // when the visitor actually typed something; drop paginated hits so
+  // we don't count the same query N times.
+  if (sp.q && !sp.cursor) {
+    const h = await headers()
+    const { ipHash } = extractRequestInfo(h)
+    after(async () => {
+      await recordSearchQuery({
+        q: sp.q!,
+        resultCount: items.length,
+        ipHash,
+      })
+    })
+  }
 
   // Merge counts into the cities list — order follows `listCitiesWith
   // Neighborhoods` (alphabetical) for stable tab order across renders.

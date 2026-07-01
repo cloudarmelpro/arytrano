@@ -1542,6 +1542,22 @@ model WhatsAppAlert {
   @@index([unsubscribedAt])
 }
 
+// ANA-09 — search query analytics. One row per non-trivial search on
+// /annonces. `q` is a lowercased trimmed copy of the visitor's query;
+// `resultCount` records how many listings matched at the time. Drives
+// the "top zero-result queries" report so we know what content to seed.
+model SearchQuery {
+  id           String   @id @default(cuid())
+  q            String
+  resultCount  Int
+  ipHash       String?
+  createdAt    DateTime @default(now())
+
+  @@index([q, createdAt])
+  @@index([resultCount, createdAt])
+  @@index([createdAt])
+}
+
 // OWN-12 — Web Push subscription. Each browser/device registration
 // produces one row; the same user can have multiple. `endpoint` is
 // unique so re-subscribing the same browser upserts cleanly.
