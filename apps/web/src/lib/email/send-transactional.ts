@@ -27,6 +27,7 @@ export type TransactionalEventType =
   | 'owner-weekly-digest'
   | 'phone-otp-alert'
   | 'account-suspended'
+  | 'student-weekly-digest'
 
 /**
  * Wrap `sendEmail` with per-user-per-event rate limiting (T-034). Used by
