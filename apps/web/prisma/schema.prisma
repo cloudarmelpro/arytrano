@@ -74,6 +74,11 @@ model User {
   listingExpirationAlertsEnabled Boolean @default(true)
   leaseUpdatesEnabled            Boolean @default(true)
 
+  // OWN-23 — public profile slug used on /proprio/<slug>. Nullable
+  // so students don't get one automatically; owners get it stamped
+  // on first CIN verification. Lowercase kebab.
+  publicSlug String? @unique
+
   // TRU-19 — self-service account deletion with a 30-day grace window.
   // When the user requests deletion we set this timestamp; a cron
   // finalises the row past this date. Users can cancel until then.
