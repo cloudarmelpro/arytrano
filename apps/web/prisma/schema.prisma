@@ -1655,6 +1655,22 @@ model BlocklistEntry {
 // future entities (Lead, Lease, Dispute…) without a schema bump. Notes
 // are visible only to admins; the author may edit/delete their own,
 // other admins can view but not mutate.
+// COM-10 — transactional email tracking events. One row per event
+// forwarded by the ESP webhook (delivered / opened / clicked /
+// bounced / complained). `messageId` is the ESP's own id;
+// `eventType` is lowercase.
+model EmailEvent {
+  id        String   @id @default(cuid())
+  messageId String
+  email     String
+  eventType String
+  metadata  Json?
+  createdAt DateTime @default(now())
+
+  @@index([messageId, createdAt])
+  @@index([email, eventType, createdAt])
+}
+
 // CON-13 — newsletter email opt-in captured from pop-up + footer.
 // Kept separate from User so anonymous visitors sign up too. `source`
 // tags where the row was captured for attribution.
