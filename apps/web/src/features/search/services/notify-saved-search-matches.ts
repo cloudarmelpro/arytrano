@@ -167,6 +167,26 @@ export async function notifySavedSearchMatches(
       )
     }
 
+    // --- Web push channel (TEN-14) ---------------------------------
+    // Independent of Expo: browsers get pinged via VAPID web-push
+    // regardless of whether the user has a mobile app installed.
+    // Fire-and-forget per recipient so a failing push doesn't stop
+    // the fan-out.
+    {
+      const { sendPushToUser } = await import('@/lib/push/web-push')
+      for (const m of matchesByUser.values()) {
+        void sendPushToUser(m.userId, {
+          title: m.locale === 'MG' ? 'Filazana vaovao' : 'Nouvelle annonce',
+          body:
+            m.locale === 'MG'
+              ? 'Misy filazana vaovao mifanaraka amin\'ny fitadiavanao.'
+              : 'Une nouvelle annonce correspond à ta recherche.',
+          url: `/annonces?utm_source=push&utm_medium=web&utm_campaign=saved-search`,
+          tag: `saved-search-${listing.id}`,
+        })
+      }
+    }
+
     // --- Email channel (E-T09 fallback) ----------------------------
     if (emailMatches.length > 0) {
       const baseUrl = env.AUTH_URL.replace(/\/$/, '')
