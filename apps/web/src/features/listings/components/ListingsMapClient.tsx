@@ -177,6 +177,29 @@ export function ListingsMapClient({
         minZoom={9}
         maxZoom={16}
         attributionPrefix={false}
+        // TEN-10 — broadcast bounds on every viewport change so the
+        // "Rechercher dans cette zone" button (mounted alongside)
+        // can offer a URL update. Custom event avoids prop-drilling
+        // through pigeon-maps.
+        onBoundsChanged={(payload: {
+          bounds?: {
+            ne: [number, number]
+            sw: [number, number]
+          }
+        }) => {
+          if (!payload.bounds) return
+          const { ne, sw } = payload.bounds
+          window.dispatchEvent(
+            new CustomEvent('arytrano:map-bounds', {
+              detail: {
+                swLat: sw[0],
+                swLng: sw[1],
+                neLat: ne[0],
+                neLng: ne[1],
+              },
+            }),
+          )
+        }}
         provider={STADIA_API_KEY ? stadiaTileProvider : undefined}
         attribution={
           // A11y — every `target="_blank"` link declares its

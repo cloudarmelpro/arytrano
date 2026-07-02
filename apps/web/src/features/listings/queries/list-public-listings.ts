@@ -109,6 +109,13 @@ export const listPublicListingsQuerySchema = z
     publishedSince: z
       .enum(['24h', '7d', '30d'])
       .optional(),
+    // TEN-10 — bounding box filter driven by the map viewport.
+    // Format: "swLat,swLng,neLat,neLng" — four floats, comma-separated.
+    // Parsed into a Prisma range filter on Listing.lat / .lng.
+    bbox: z
+      .string()
+      .regex(/^-?\d+(\.\d+)?,-?\d+(\.\d+)?,-?\d+(\.\d+)?,-?\d+(\.\d+)?$/)
+      .optional(),
     // E-T14 full-text search. Bounded to 120 chars to keep the
     // ILIKE scan cheap until we promote to a tsvector GIN index.
     q: z
@@ -209,6 +216,29 @@ export async function listPublicListings(
   if (input.amenities && input.amenities.length > 0) {
     where.amenities = { hasEvery: input.amenities }
   }
+  // TEN-10 — map viewport filter. Users pan/zoom the map, click
+  // "Rechercher dans cette zone", and we constrain listings to that
+  // bbox. Overrides any narrower geo filter (city, neighborhood)
+  // wouldn't be simultaneously meaningful anyway.
+  if (input.bbox) {
+    const [swLat, swLng, neLat, neLng] = input.bbox.split(',').map(Number)
+    if (
+      Number.isFinite(swLat) &&
+      Number.isFinite(swLng) &&
+      Number.isFinite(neLat) &&
+      Number.isFinite(neLng)
+    ) {
+      where.lat = {
+        gte: Math.min(swLat!, neLat!).toFixed(6),
+        lte: Math.max(swLat!, neLat!).toFixed(6),
+      }
+      where.lng = {
+        gte: Math.min(swLng!, neLng!).toFixed(6),
+        lte: Math.max(swLng!, neLng!).toFixed(6),
+      }
+    }
+  }
+
   // TEN-13 — freshness filter. Convert the slug window to an ISO date
   // and constrain publishedAt. The status filter above already scopes
   // to PUBLISHED, so unpublished rows never leak in even at 24h.

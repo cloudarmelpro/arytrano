@@ -18,6 +18,7 @@ import { SaveSearchButton } from '@/features/search'
 import { listCitiesWithNeighborhoods } from '@/features/geo/server'
 import { listUniversities } from '@/features/universities/server'
 import { CompareFloatingBar } from '@/features/compare/components/CompareFloatingBar'
+import { MapSearchThisAreaButton } from '@/features/listings/components/MapSearchThisAreaButton'
 import { recordSearchQuery } from '@/features/search-analytics/services/record-search-query'
 import { extractRequestInfo } from '@/lib/auth/request-info'
 import { headers } from 'next/headers'
@@ -43,6 +44,7 @@ type SearchParams = Promise<{
   view?: string
   nearUniversity?: string
   publishedSince?: string
+  bbox?: string
 }>
 
 function hasAnyFilter(sp: Awaited<SearchParams>) {
@@ -143,6 +145,7 @@ export default async function PublicListingsPage({
     q: sp.q || undefined,
     nearUniversity: sp.nearUniversity || undefined,
     publishedSince: sp.publishedSince || undefined,
+    bbox: sp.bbox || undefined,
   })
   const query = parsed.success ? parsed.data : {}
 
@@ -330,7 +333,8 @@ export default async function PublicListingsPage({
                 </p>
               </div>
             ) : (
-              <div className="overflow-hidden rounded-2xl border border-border">
+              <div className="relative overflow-hidden rounded-2xl border border-border">
+                <MapSearchThisAreaButton />
                 <ListingsMapClient
                   locale={locale}
                   listings={mapItems}
