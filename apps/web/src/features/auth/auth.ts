@@ -202,7 +202,12 @@ if (env.FACEBOOK_CLIENT_ID && env.FACEBOOK_CLIENT_SECRET) {
 export const authConfig = {
   adapter: PrismaAdapter(prisma),
   providers,
-  session: { strategy: 'jwt' },
+  // SEC-15 — session lifetime driven by env, refresh a quarter of the way in.
+  session: {
+    strategy: 'jwt',
+    maxAge: env.SESSION_MAX_AGE_DAYS * 24 * 60 * 60,
+    updateAge: Math.max(60 * 60, (env.SESSION_MAX_AGE_DAYS * 24 * 60 * 60) / 4),
+  },
   pages: {
     signIn: '/sign-in',
     error: '/auth-error',

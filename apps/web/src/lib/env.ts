@@ -216,6 +216,13 @@ const EnvSchema = z.object({
   //   ADMIN_NOTIFICATIONS_EMAIL=ops@arytrano.com,founder@arytrano.com
   ADMIN_NOTIFICATIONS_EMAIL: z.string().optional(),
 
+  // --- Session TTL (SEC-15) --------------------------------
+  // Auth.js JWT lifetime in DAYS. Default 30. Lower for high-value
+  // deployments (e.g. 7); higher if the user base complains about
+  // re-login friction. Refresh cadence (`updateAge`) auto-scales
+  // to a quarter of maxAge.
+  SESSION_MAX_AGE_DAYS: z.coerce.number().int().min(1).max(365).default(30),
+
   // --- Telegram auto-share (OWN-03) ------------------------
   // When both vars are set, publishListing fires a fire-and-forget
   // POST to the Telegram Bot API to broadcast the new annonce into
