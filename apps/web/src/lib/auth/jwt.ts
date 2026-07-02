@@ -21,7 +21,7 @@ export type TokenType = 'access' | 'refresh'
  */
 const appJwtPayloadSchema = z.object({
   sub: z.string().min(1),
-  role: z.enum(['STUDENT', 'OWNER', 'ADMIN']),
+  role: z.enum(['STUDENT', 'OWNER', 'ADMIN', 'MODERATOR', 'SUPPORT']),
   type: z.enum(['access', 'refresh']),
   ver: z.number().int().nonnegative(),
   iss: z.string().optional(),

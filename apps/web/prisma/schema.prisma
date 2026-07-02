@@ -219,6 +219,12 @@ enum UserRole {
   STUDENT
   OWNER
   ADMIN
+  // ADM-06 — permission tiers. MODERATOR can suspend / verify /
+  // moderate but cannot touch billing, secrets, or user role
+  // changes. SUPPORT sees only the admin surfaces (audit, notes,
+  // disputes) needed to reply to a user.
+  MODERATOR
+  SUPPORT
 }
 
 enum UserStatus {

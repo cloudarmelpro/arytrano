@@ -54,7 +54,14 @@ export async function getAdminStats(): Promise<AdminStats> {
     listings.total += c
   }
 
-  const users = { total: 0, OWNER: 0, STUDENT: 0, ADMIN: 0 }
+  const users = {
+    total: 0,
+    OWNER: 0,
+    STUDENT: 0,
+    ADMIN: 0,
+    MODERATOR: 0,
+    SUPPORT: 0,
+  }
   for (const row of usersByRole) {
     const c = row._count._all
     users[row.role] = c

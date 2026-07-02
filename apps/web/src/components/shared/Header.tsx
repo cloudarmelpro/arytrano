@@ -63,8 +63,8 @@ export async function Header() {
 
 function UtilityStrip({ t }: { t: Translator }) {
   return (
-    <div className="hidden bg-[oklch(0.16_0.04_277)] text-white/80 sm:block">
-      <div className="mx-auto flex max-w-[1280px] items-center justify-end gap-7 px-6 py-2 text-[12.5px] font-medium lg:px-10">
+    <div className="hidden bg-primary border-b border-white/10 text-white/80 sm:block">
+      <div className="mx-auto flex max-w-7xl items-center justify-end gap-2 px-6 py-2 text-[12.5px] font-medium lg:px-10">
         <Link
           href="/sign-up?role=OWNER"
           className="text-white/85 transition hover:text-white"
@@ -76,7 +76,7 @@ function UtilityStrip({ t }: { t: Translator }) {
           href="/#faq"
           className="inline-flex items-center gap-1.5 text-white/85 transition hover:text-white"
         >
-          <Icon name="help" size={14} /> {t('header.topbar.help')}
+          {t('header.topbar.help')}
         </Link>
         <span aria-hidden className="h-3.5 w-px bg-white/15" />
         <Link
@@ -101,7 +101,7 @@ function BrandRow({
     name: string | null
     email: string
     image: string | null
-    role: 'STUDENT' | 'OWNER' | 'ADMIN'
+    role: 'STUDENT' | 'OWNER' | 'ADMIN' | 'MODERATOR' | 'SUPPORT'
   } | null
 }) {
   return (

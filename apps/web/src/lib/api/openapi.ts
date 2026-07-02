@@ -392,7 +392,7 @@ const MeSchema = z
     id: z.string(),
     email: z.string().email(),
     name: z.string().nullable(),
-    role: z.enum(['STUDENT', 'OWNER', 'ADMIN']),
+    role: z.enum(['STUDENT', 'OWNER', 'ADMIN', 'MODERATOR', 'SUPPORT']),
     locale: z.enum(['fr-MG', 'mg']),
     avatarUrl: z.string().url().nullable(),
     phone: z.string().nullable(),

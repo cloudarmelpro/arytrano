@@ -19,7 +19,7 @@ export type PostDisputeMessageOutcome =
 export async function postDisputeMessage(
   input: PostDisputeMessageInput,
   userId: string,
-  userRole: 'STUDENT' | 'OWNER' | 'ADMIN',
+  userRole: 'STUDENT' | 'OWNER' | 'ADMIN' | 'MODERATOR' | 'SUPPORT',
 ): Promise<PostDisputeMessageOutcome> {
   const dispute = await prisma.dispute.findUnique({
     where: { id: input.disputeId },

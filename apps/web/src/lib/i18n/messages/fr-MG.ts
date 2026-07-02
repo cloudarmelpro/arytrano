@@ -1612,6 +1612,8 @@ export const frMG = {
   'role.STUDENT': 'Étudiant',
   'role.OWNER': 'Propriétaire',
   'role.ADMIN': 'Administrateur',
+  'role.MODERATOR': 'Modérateur',
+  'role.SUPPORT': 'Support',
 
   // Listing statuses
   'status.DRAFT': 'Brouillon',
@@ -1872,6 +1874,8 @@ export const frMG = {
   'dashboard.welcome.account.STUDENT': 'Compte étudiant.',
   'dashboard.welcome.account.OWNER': 'Compte propriétaire.',
   'dashboard.welcome.account.ADMIN': 'Compte administrateur.',
+  'dashboard.welcome.account.MODERATOR': 'Compte modérateur.',
+  'dashboard.welcome.account.SUPPORT': 'Compte support.',
   'dashboard.stats.totalListings': 'Mes annonces',
   'dashboard.stats.publishedHint': '{count} publiée(s)',
   'dashboard.stats.favorites': 'Favoris',

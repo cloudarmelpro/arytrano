@@ -1625,6 +1625,8 @@ export const mg: Record<MessageKey, string> = {
   'role.STUDENT': 'Mpianatra',
   'role.OWNER': 'Tompon-trano',
   'role.ADMIN': 'Mpitantana',
+  'role.MODERATOR': 'Mpanara-maso',
+  'role.SUPPORT': 'Support',
 
   // Listing statuses
   'status.DRAFT': 'Volavolan-kevitra',
@@ -1885,6 +1887,8 @@ export const mg: Record<MessageKey, string> = {
   'dashboard.welcome.account.STUDENT': 'Kaonty mpianatra.',
   'dashboard.welcome.account.OWNER': 'Kaonty tompon-trano.',
   'dashboard.welcome.account.ADMIN': 'Kaonty mpitantana.',
+  'dashboard.welcome.account.MODERATOR': 'Kaonty mpanara-maso.',
+  'dashboard.welcome.account.SUPPORT': 'Kaonty support.',
   'dashboard.stats.totalListings': 'Ny tranoko',
   'dashboard.stats.publishedHint': '{count} navoaka',
   'dashboard.stats.favorites': 'Tiana',
