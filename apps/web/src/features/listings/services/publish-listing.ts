@@ -8,6 +8,7 @@ import { sendTransactionalEmail } from '@/lib/email/send-transactional'
 import { buildListingPublishedEmail } from '@/lib/email/templates/listing-published'
 import { ownerTermsAcceptedFor } from '@/features/auth/server'
 import { notifySavedSearchMatches } from '@/features/search/server'
+import { broadcastListingToTelegram } from '@/lib/telegram/broadcast'
 
 /**
  * Listing TTL — 60 days from publication (T-049). Past this date the
@@ -145,6 +146,18 @@ export async function publishListing(ownerId: string, listingId: string): Promis
   // E-T22 push fanout — notify every saved-search subscriber whose
   // filters match this newly-published listing. Fire-and-forget,
   // never blocks the publish flow (errors swallowed internally).
+  // OWN-03 — auto-share the fresh publication to the Telegram channel.
+  // No-op when the bot env vars are unset, so dev / preview stay quiet.
+  void broadcastListingToTelegram({
+    title: listing.title,
+    citySlug: listing.city.slug,
+    neighborhoodSlug: listing.neighborhood.slug,
+    slug: listing.slug,
+    priceMonthlyMGA: listing.priceMonthlyMGA,
+    neighborhoodName: listing.neighborhood.nameFr,
+    cityName: listing.city.nameFr,
+  })
+
   void notifySavedSearchMatches({
     id: listing.id,
     slug: listing.slug,

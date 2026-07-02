@@ -216,6 +216,16 @@ const EnvSchema = z.object({
   //   ADMIN_NOTIFICATIONS_EMAIL=ops@arytrano.com,founder@arytrano.com
   ADMIN_NOTIFICATIONS_EMAIL: z.string().optional(),
 
+  // --- Telegram auto-share (OWN-03) ------------------------
+  // When both vars are set, publishListing fires a fire-and-forget
+  // POST to the Telegram Bot API to broadcast the new annonce into
+  // the regional channel. Left blank = feature disabled.
+  //   1. Create a bot with @BotFather → grab the token.
+  //   2. Add the bot as admin in the target channel.
+  //   3. Channel handle in the form "@arytrano_fianar".
+  TELEGRAM_BOT_TOKEN: z.string().optional(),
+  TELEGRAM_CHANNEL_ID: z.string().optional(),
+
   // --- Web Push (OWN-12) -----------------------------------
   // VAPID keys used by web-push. Generate once:
   //   npx web-push generate-vapid-keys
