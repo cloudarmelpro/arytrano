@@ -126,6 +126,7 @@ model User {
   reviews             Review[]
   reviewReactions     ReviewReaction[]
   favorites           Favorite[]
+  favoriteCollections FavoriteCollection[]
   savedSearches       SavedSearch[]
   payments            Payment[]
   loginEvents         LoginEvent[]
@@ -865,15 +866,37 @@ enum ReactionKind {
 // ============================================================
 
 model Favorite {
-  userId    String
-  listingId String
-  createdAt DateTime @default(now())
+  userId       String
+  listingId    String
+  // TEN-02 — nullable, null = "default" wish list. Non-null belongs
+  // to one of the user's FavoriteCollection rows.
+  collectionId String?
+  collection   FavoriteCollection? @relation(fields: [collectionId], references: [id], onDelete: SetNull)
+  createdAt    DateTime @default(now())
 
   user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
   listing Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
 
   @@id([userId, listingId])
   @@index([userId, createdAt(sort: Desc)])
+  @@index([collectionId])
+}
+
+// TEN-02 — student "wish lists". A user can group favorites by theme
+// (e.g. "Pour septembre", "Avec ma sœur"). Deletion cascades to
+// setting Favorite.collectionId back to null so the favorite itself
+// survives the list's removal.
+model FavoriteCollection {
+  id        String     @id @default(cuid())
+  userId    String
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name      String
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  favorites Favorite[]
+
+  @@index([userId, createdAt])
 }
 
 // ============================================================
