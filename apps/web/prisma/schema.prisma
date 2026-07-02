@@ -432,8 +432,9 @@ model Neighborhood {
   // so an admin can't smuggle invalid values into the ranking algo.
   quizProfile Json?
 
-  city     City      @relation(fields: [cityId], references: [id], onDelete: Restrict)
-  listings Listing[]
+  city         City                     @relation(fields: [cityId], references: [id], onDelete: Restrict)
+  listings     Listing[]
+  universities NeighborhoodUniversity[]
 
   @@unique([cityId, slug])
   @@index([cityId])
@@ -1618,6 +1619,23 @@ model BlocklistEntry {
 // future entities (Lead, Lease, Dispute…) without a schema bump. Notes
 // are visible only to admins; the author may edit/delete their own,
 // other admins can view but not mutate.
+// TEN-21 — explicit "this quartier is near this university" tags.
+// Simpler + more accurate than the TEN-11 lat/lng bounding box because
+// urban geography follows walking paths, not radial distance. The
+// two co-exist: TEN-11 covers the automatic fallback, TEN-21 lets us
+// promote specific quartiers when their reputation matters more than
+// their raw distance (e.g. "Anjoma is IPT-central even if it's 3km").
+model NeighborhoodUniversity {
+  neighborhoodId String
+  universityId   String
+  neighborhood   Neighborhood @relation(fields: [neighborhoodId], references: [id], onDelete: Cascade)
+  university     University   @relation(fields: [universityId], references: [id], onDelete: Cascade)
+  createdAt      DateTime     @default(now())
+
+  @@id([neighborhoodId, universityId])
+  @@index([universityId])
+}
+
 // TEN-11 — universities geocoded so search can filter "near IPNT".
 // Lat/lng is the campus centroid (admin building). A listing is
 // considered "near" when the haversine distance is below the search
@@ -1637,6 +1655,8 @@ model University {
   address String?
 
   createdAt DateTime @default(now())
+
+  neighborhoods NeighborhoodUniversity[]
 
   @@unique([slug])
   @@index([cityId])

@@ -250,27 +250,35 @@ export async function listPublicListings(
     where.publishedAt = { gte: new Date(Date.now() - hours * 60 * 60 * 1000) }
   }
 
-  // TEN-11 — near-university bounding box. Resolve the slug to coords
-  // once, then constrain the listing lat/lng to a ~3km square. The
-  // bounding box is generous on the longitude side to compensate for
-  // the latitude-dependent distortion (cos(-19°) ≈ 0.946).
+  // TEN-11 + TEN-21 — near-university filter. TEN-21 lets admins tag
+  // specific quartiers as "near university X"; when at least one such
+  // tag exists we ONLY consider tagged neighborhoods. When the tag
+  // list is empty we fall back to the TEN-11 lat/lng bounding box.
   if (input.nearUniversity) {
     const uni = await prisma.university.findUnique({
       where: { slug: input.nearUniversity },
-      select: { lat: true, lng: true },
+      select: { id: true, lat: true, lng: true },
     })
     if (uni) {
-      const lat = Number(uni.lat)
-      const lng = Number(uni.lng)
-      const DELTA_LAT = 0.027
-      const DELTA_LNG = 0.029
-      where.lat = {
-        gte: (lat - DELTA_LAT).toFixed(6),
-        lte: (lat + DELTA_LAT).toFixed(6),
-      }
-      where.lng = {
-        gte: (lng - DELTA_LNG).toFixed(6),
-        lte: (lng + DELTA_LNG).toFixed(6),
+      const tagged = await prisma.neighborhoodUniversity.findMany({
+        where: { universityId: uni.id },
+        select: { neighborhoodId: true },
+      })
+      if (tagged.length > 0) {
+        where.neighborhoodId = { in: tagged.map((t) => t.neighborhoodId) }
+      } else {
+        const lat = Number(uni.lat)
+        const lng = Number(uni.lng)
+        const DELTA_LAT = 0.027
+        const DELTA_LNG = 0.029
+        where.lat = {
+          gte: (lat - DELTA_LAT).toFixed(6),
+          lte: (lat + DELTA_LAT).toFixed(6),
+        }
+        where.lng = {
+          gte: (lng - DELTA_LNG).toFixed(6),
+          lte: (lng + DELTA_LNG).toFixed(6),
+        }
       }
     }
   }
