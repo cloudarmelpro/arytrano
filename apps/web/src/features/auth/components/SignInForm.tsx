@@ -44,6 +44,8 @@ export function SignInForm({
 
   const form = useForm<LoginInput>({
     resolver: zodResolver(loginSchema),
+    // EDT-04 — first-blur then continuous validation.
+    mode: 'onTouched',
     defaultValues: { email: '', password: '' },
   })
 

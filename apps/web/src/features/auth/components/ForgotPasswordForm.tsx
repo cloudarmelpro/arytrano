@@ -24,6 +24,7 @@ export function ForgotPasswordForm() {
 
   const form = useForm<ForgotPasswordInput>({
     resolver: zodResolver(forgotPasswordSchema),
+    mode: 'onTouched',
     defaultValues: { email: '' },
   })
 

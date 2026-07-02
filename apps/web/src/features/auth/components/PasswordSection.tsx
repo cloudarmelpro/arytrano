@@ -32,6 +32,7 @@ function AddPassword() {
 
   const form = useForm<SetPasswordInput>({
     resolver: zodResolver(setPasswordSchema),
+    mode: 'onTouched',
     defaultValues: { password: '' },
   })
 
@@ -100,6 +101,7 @@ function ChangePassword() {
 
   const form = useForm<ChangePasswordInput>({
     resolver: zodResolver(changePasswordSchema),
+    mode: 'onTouched',
     defaultValues: { currentPassword: '', newPassword: '' },
   })
 

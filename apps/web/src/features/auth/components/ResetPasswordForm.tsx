@@ -36,6 +36,7 @@ export function ResetPasswordForm({ token }: { token: string }) {
 
   const form = useForm<ResetPasswordValues>({
     resolver: zodResolver(resetPasswordClientSchema),
+    mode: 'onTouched',
     defaultValues: { password: '', confirm: '' },
   })
 

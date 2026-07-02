@@ -47,6 +47,7 @@ export function ProfileForm({ defaultValues }: ProfileFormProps) {
 
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(updateProfileSchema),
+    mode: 'onTouched',
     defaultValues: {
       name: defaultValues.name ?? '',
       phone: defaultValues.phone ?? '',

@@ -71,6 +71,8 @@ export function ListingForm(props: ListingFormProps) {
 
   const form = useForm<FormValues>({
     resolver: zodResolver(createListingSchema),
+    // EDT-04 — validate after the first blur then on every keystroke.
+    mode: 'onTouched',
     defaultValues:
       props.mode === 'edit'
         ? props.defaultValues

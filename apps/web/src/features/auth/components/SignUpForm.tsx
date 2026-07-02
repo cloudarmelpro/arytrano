@@ -46,6 +46,9 @@ export function SignUpForm({
 
   const form = useForm<SignUpFormValues>({
     resolver: zodResolver(signUpSchema),
+    // EDT-04 — validate after first blur then on every keystroke so
+    // password strength + email format light up as the user types.
+    mode: 'onTouched',
     // role is lifted to the parent SignUpClient — kept out of the form so
     // user input (email/password/name) is not reset when the parent re-renders.
     defaultValues: { email: '', password: '', name: '' },
