@@ -55,16 +55,17 @@ jobs:
         working-directory: apps/web
       - name: Vitest with coverage (informational on PR)
         working-directory: apps/web
-        run: |
-          set +e
-          npx vitest run --coverage.enabled --coverage.reporter=text --coverage.reporter=json-summary 2>&1 | tee /tmp/vitest.log
-          code=${PIPESTATUS[0]}
-          if [ "$code" -ne 0 ]; then
-            echo "::group::Last 80 lines of vitest output"
-            tail -n 80 /tmp/vitest.log | while IFS= read -r line; do echo "::error::$line"; done
-            echo "::endgroup::"
-          fi
-          exit "$code"
+        # `--reporter=github-actions` emits ::error:: per failing test
+        # with file+line prefix so the API annotations name the actual
+        # failure. Kept `--reporter=default` too so full output is
+        # still readable in the raw job log.
+        run: >-
+          npx vitest run
+          --reporter=default
+          --reporter=github-actions
+          --coverage.enabled
+          --coverage.reporter=text
+          --coverage.reporter=json-summary
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -137,8 +138,10 @@ jobs:
           npx prisma generate && npx next build 2>&1 | tee /tmp/build.log
           code=${PIPESTATUS[0]}
           if [ "$code" -ne 0 ]; then
-            echo "::group::Last 100 lines of build output"
-            tail -n 100 /tmp/build.log | while IFS= read -r line; do echo "::error::$line"; done
+            echo "::group::Error-looking lines from build (last 10 of matches)"
+            grep -Ei "(Error|Failed|Cannot|Missing|Module not found|Unable|✗|FAIL)" /tmp/build.log \
+              | tail -n 10 \
+              | while IFS= read -r line; do echo "::error::$line"; done
             echo "::endgroup::"
           fi
           exit "$code"
@@ -151,6 +154,12 @@ jobs:
         with:
           node-version: 22
           cache: npm
+      # Root install first — mobile symlinks @arytrano/shared via
+      # file:../../packages/shared, and shared's own zod peer dep must
+      # be present at that path or tsc collapses `z.infer<T>` to `any`
+      # inside every consumed schema, cascading through MoveInWindow /
+      # LeaseRow / MessageKey lookups.
+      - run: npm ci
       # apps/mobile is NOT in the root npm workspaces — its own install.
       - run: npm ci
         working-directory: apps/mobile
