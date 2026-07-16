@@ -10,8 +10,8 @@ node_modules
 !.yarn/releases
 !.yarn/versions
 
-# testing
-/coverage
+# testing (any depth — apps/web/coverage/, packages/*/coverage/)
+coverage/
 
 # next.js (any depth)
 .next/
