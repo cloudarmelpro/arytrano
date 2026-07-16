@@ -23,7 +23,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = env.AUTH_URL.replace(/\/$/, '')
   const staticLastMod = new Date(STATIC_PAGES_LAST_MODIFIED)
 
-  const [listings, cities, neighborhoods, freshnessRaw] = await Promise.all([
+  const [listings, cities, neighborhoods, freshnessRaw, universities, ownerProfiles] = await Promise.all([
     listSitemapListings(),
     listCitiesWithCounts(),
     // For the per-quartier landing pages (E-T11 B2) we need the
@@ -48,6 +48,20 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         city: { select: { slug: true } },
         neighborhood: { select: { slug: true } },
       },
+    }),
+    // Fable-audit P1-3 — universities are prime link-earners (student
+    // affairs sites, university partnership pages).
+    prisma.university.findMany({
+      select: { slug: true, createdAt: true },
+    }),
+    // Fable-audit P1-4 — active owner public profiles (OWN-23).
+    prisma.user.findMany({
+      where: {
+        status: 'ACTIVE',
+        role: { in: ['OWNER', 'ADMIN'] },
+        publicSlug: { not: null },
+      },
+      select: { publicSlug: true, createdAt: true },
     }),
   ])
 
@@ -126,7 +140,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // without an entry Googlebot only reaches it via the footer
     // anchor (which itself is rendered in many slow-rendered pages
     // and may not be picked up during a fast crawl).
-    ...['/legal/terms', '/legal/terms-owner', '/legal/privacy', '/legal/cookies', '/legal/mentions'].map(
+    // Fable-audit P1-5 — /press + /security were missing. /press is a
+    // link-earning page for journalists; /security is the responsible
+    // disclosure surface. Both deserve to be indexed.
+    ...['/legal/terms', '/legal/terms-owner', '/legal/privacy', '/legal/cookies', '/legal/mentions', '/press', '/security'].map(
       (path) => ({
         url: `${baseUrl}${path}`,
         lastModified: staticLastMod,
@@ -199,6 +216,31 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: l.updatedAt,
       changeFrequency: 'weekly',
       priority: 0.7,
+      alternates: { languages: languages(path) },
+    })
+  }
+
+  // Fable-audit P1-3 — MKT-17 co-branded university landings.
+  for (const u of universities) {
+    const path = `/universites/${u.slug}`
+    entries.push({
+      url: `${baseUrl}${path}`,
+      lastModified: u.createdAt,
+      changeFrequency: 'weekly',
+      priority: 0.75,
+      alternates: { languages: languages(path) },
+    })
+  }
+
+  // Fable-audit P1-4 — OWN-23 owner public profiles.
+  for (const o of ownerProfiles) {
+    if (!o.publicSlug) continue
+    const path = `/proprio/${o.publicSlug}`
+    entries.push({
+      url: `${baseUrl}${path}`,
+      lastModified: o.createdAt,
+      changeFrequency: 'weekly',
+      priority: 0.5,
       alternates: { languages: languages(path) },
     })
   }

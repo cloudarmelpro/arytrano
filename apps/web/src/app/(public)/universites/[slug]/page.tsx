@@ -6,6 +6,8 @@ import { prisma } from '@/lib/db'
 import { formatAriary } from '@/lib/format/currency'
 import { env } from '@/lib/env'
 import { safeJsonLd } from '@/lib/seo/safe-json-ld'
+import { ogDefaults } from '@/lib/seo/og-defaults'
+import { localeAlternates } from '@/lib/seo/alternates'
 
 export const dynamic = 'force-dynamic'
 
@@ -26,8 +28,11 @@ export async function generateMetadata({
   return {
     title,
     description: `Toutes les annonces AryTrano à proximité de ${uni.nameFr}. Logements vérifiés, contact direct propriétaire, paiement Mobile Money.`,
-    alternates: { canonical: `/universites/${slug}` },
+    // Fable-audit P1-3 — hreflang consistent with the rest of the site.
+    alternates: await localeAlternates(`/universites/${slug}`),
     openGraph: {
+      // Fable-audit P0-2 — spread ogDefaults so shares carry an image.
+      ...ogDefaults,
       title,
       type: 'website',
       url: `/universites/${slug}`,
@@ -103,12 +108,23 @@ export default async function UniversityLandingPage({
   })
 
   const baseUrl = env.AUTH_URL.replace(/\/$/, '')
+  // Fable-audit P2-6 — add geo + containedInPlace when we have coords.
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'CollegeOrUniversity',
     name: uni.nameFr,
     alternateName: uni.acronym,
     ...(uni.address ? { address: uni.address } : {}),
+    geo: {
+      '@type': 'GeoCoordinates',
+      latitude: Number(uni.lat),
+      longitude: Number(uni.lng),
+    },
+    containedInPlace: {
+      '@type': 'City',
+      name: uni.city.nameFr,
+      url: `${baseUrl}/villes/${uni.city.slug}`,
+    },
     url: `${baseUrl}/universites/${uni.slug}`,
   }
 
@@ -148,15 +164,19 @@ export default async function UniversityLandingPage({
           <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {listings.map((l) => (
               <li key={l.id}>
+                {/* Fable-audit P1-3 — no UTM on internal links (they'd
+                    self-pollute analytics + mint crawlable parameterized
+                    URLs). Attribution is captured on the entry to
+                    /universites/<slug>, not on the exit. */}
                 <Link
-                  href={`/${l.city.slug}/${l.neighborhood.slug}/${l.slug}?utm_source=uni&utm_medium=partnership&utm_campaign=${uni.slug}`}
+                  href={`/${l.city.slug}/${l.neighborhood.slug}/${l.slug}`}
                   className="group flex flex-col gap-2"
                 >
                   <div className="relative aspect-[4/3] overflow-hidden rounded-lg bg-muted ring-1 ring-border/60">
                     {l.photos[0]?.url ? (
                       <Image
                         src={l.photos[0].url}
-                        alt=""
+                        alt={l.title}
                         fill
                         sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
                         className="object-cover transition duration-300 group-hover:scale-105"

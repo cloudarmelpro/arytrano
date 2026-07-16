@@ -725,7 +725,7 @@ export const mg: Record<MessageKey, string> = {
   // Landing page (T-041 → T-051)
 
   // Meta
-  'landing.meta.title': 'AryTrano — Trano voamarina ho an\'ny mpianatra ao Fianarantsoa',
+  'landing.meta.title': 'Trano voamarina ho an\'ny mpianatra ao Fianarantsoa',
   'landing.meta.description':
     'Tadiavo trano ho mpianatra ao Fianarantsoa amin\'ny dokam-barotra voamarina. Fifandraisana mivantana amin\'ny tompon-trano amin\'ny WhatsApp. Vidiny Ariary.',
 
@@ -1338,7 +1338,7 @@ export const mg: Record<MessageKey, string> = {
   'cities.toliara.tagline': 'Atsimo-andrefana, oniversite + siansa an-dranomasina',
 
   // E-T11 B4 Hub /villes
-  'villesHub.meta.title': 'Tanàna rehetra — AryTrano',
+  'villesHub.meta.title': 'Tanàna rehetra',
   'villesHub.meta.description':
     'Trano hofaina ho an\'ny mpianatra ao Madagasikara : Fianarantsoa, Antananarivo, Toamasina, Mahajanga, Toliara. Filazana voamarina, fifandraisana mivantana amin\'ny tompony.',
   'villesHub.eyebrow': 'Faritra arakitrana AryTrano',
@@ -1350,7 +1350,7 @@ export const mg: Record<MessageKey, string> = {
   'villesHub.card.cta': 'Hijery ny tanàna',
 
   // E-T11 City landing /villes/[citySlug]
-  'cityLanding.meta.title': 'Trano hofaina ho an\'ny mpianatra ao {city} — AryTrano',
+  'cityLanding.meta.title': 'Trano hofaina ho an\'ny mpianatra ao {city}',
   'cityLanding.meta.description':
     'Filazana {count} mavitrika ao {city} — efitra, studio, apartemà ho an\'ny mpianatra. Resaka mivantana amin\'ny tompon-trano, tsy misy mpanelanelana.',
   'cityLanding.eyebrow': 'Tanàna',

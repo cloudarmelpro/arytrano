@@ -6,6 +6,8 @@ import { prisma } from '@/lib/db'
 import { formatAriary } from '@/lib/format/currency'
 import { env } from '@/lib/env'
 import { safeJsonLd } from '@/lib/seo/safe-json-ld'
+import { ogDefaults } from '@/lib/seo/og-defaults'
+import { localeAlternates } from '@/lib/seo/alternates'
 
 export const dynamic = 'force-dynamic'
 
@@ -22,13 +24,17 @@ export async function generateMetadata({
     select: { name: true, status: true },
   })
   if (!owner || owner.status !== 'ACTIVE') return { title: 'Profil introuvable' }
-  const display = owner.name ?? 'Propriétaire AryTrano'
+  const display = owner.name ?? 'Propriétaire'
+  // Fable-audit P0-1 — brand suffix comes from the layout template.
+  // Fable-audit P0-2 — spread ogDefaults so shares carry an image.
+  // Fable-audit P1-4 — hreflang via localeAlternates.
   return {
-    title: `${display} — Propriétaire AryTrano`,
+    title: `${display} — Propriétaire`,
     description: `Toutes les annonces publiées par ${display} sur AryTrano.`,
-    alternates: { canonical: `/proprio/${slug}` },
+    alternates: await localeAlternates(`/proprio/${slug}`),
     openGraph: {
-      title: `${display} — Propriétaire AryTrano`,
+      ...ogDefaults,
+      title: `${display} — Propriétaire`,
       type: 'profile',
       url: `/proprio/${slug}`,
     },
@@ -110,7 +116,7 @@ export default async function OwnerPublicProfilePage({
           {owner.image ? (
             <Image
               src={owner.image}
-              alt=""
+              alt={`Photo de profil de ${displayName}`}
               fill
               sizes="80px"
               className="object-cover"
@@ -150,7 +156,7 @@ export default async function OwnerPublicProfilePage({
                     {l.photos[0]?.url ? (
                       <Image
                         src={l.photos[0].url}
-                        alt=""
+                        alt={l.title}
                         fill
                         sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
                         className="object-cover transition duration-300 group-hover:scale-105"

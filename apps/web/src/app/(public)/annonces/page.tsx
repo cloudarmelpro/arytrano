@@ -62,7 +62,8 @@ function hasAnyFilter(sp: Awaited<SearchParams>) {
       sp.q ||
       sp.view ||
       sp.nearUniversity ||
-      sp.publishedSince,
+      sp.publishedSince ||
+      sp.bbox,
   )
 }
 
@@ -275,6 +276,11 @@ export default async function PublicListingsPage({
           /
           <span className="text-foreground">{pageTitle}</span>
         </nav>
+        {/* Fable-audit P1-1 — the search hub is a top-2 SEO surface and
+            was rendering zero h1 signal. */}
+        <h1 className="text-[clamp(24px,3vw,32px)] font-semibold leading-tight text-foreground">
+          {pageTitle}
+        </h1>
         {!filterActive && (
           <p className="max-w-2xl text-[14.5px] text-foreground/70">
             {t(items.length <= 1 ? 'annonces.count.one' : 'annonces.count.other', {

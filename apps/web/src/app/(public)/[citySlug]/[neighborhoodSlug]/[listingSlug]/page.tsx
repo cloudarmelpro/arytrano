@@ -135,10 +135,11 @@ export default async function PublicListingDetailPage({
       listingSlug,
     )
     if (status === 'UNAVAILABLE') {
-      // 308 — Google treats it equivalently to 301 for indexing decisions.
-      // Hand the visitor back to the catalog so they don't bounce off a
-      // dead URL while the owner is between tenants.
-      permanentRedirect('/annonces')
+      // Fable-audit P1-2 — redirect to the NEIGHBORHOOD landing so the
+      // geographic backlink equity earned by the listing consolidates
+      // where it belongs (previously fired to /annonces, dumping the
+      // signal into a generic catalog). 308 = SEO-preserving.
+      permanentRedirect(`/villes/${citySlug}/quartiers/${neighborhoodSlug}`)
     }
     notFound()
   }

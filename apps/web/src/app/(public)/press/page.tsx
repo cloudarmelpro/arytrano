@@ -2,14 +2,16 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import Image from 'next/image'
 import { env } from '@/lib/env'
+import { ogDefaults } from '@/lib/seo/og-defaults'
 
 export const metadata: Metadata = {
-  title: 'Press kit — AryTrano',
+  title: 'Press kit',
   description:
     'Logos, captures, fiche presse et contact dédié pour les journalistes couvrant AryTrano — la plateforme de logement étudiant à Madagascar.',
   alternates: { canonical: '/press' },
   openGraph: {
-    title: 'Press kit — AryTrano',
+    ...ogDefaults,
+    title: 'Press kit',
     description:
       'Tout ce qu’il faut pour parler d’AryTrano : logos haute résolution, fiche presse, captures, contact direct.',
     type: 'website',

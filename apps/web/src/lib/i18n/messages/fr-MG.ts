@@ -726,7 +726,7 @@ export const frMG = {
   // + featured listings + neighborhoods + how-it-works + owner CTA + FAQ.
 
   // Meta
-  'landing.meta.title': 'AryTrano — Logement étudiant vérifié à Fianarantsoa',
+  'landing.meta.title': 'Logement étudiant vérifié à Fianarantsoa',
   'landing.meta.description':
     'Trouve un logement étudiant à Fianarantsoa parmi des annonces vérifiées. Contact direct propriétaire en WhatsApp. Prix en Ariary.',
 
@@ -1330,7 +1330,7 @@ export const frMG = {
   'cities.toliara.tagline': 'Sud-Ouest, université + sciences marines',
 
   // E-T11 B4 Hub /villes
-  'villesHub.meta.title': 'Toutes les villes — AryTrano',
+  'villesHub.meta.title': 'Toutes les villes',
   'villesHub.meta.description':
     'Logement étudiant à Madagascar : Fianarantsoa, Antananarivo, Toamasina, Mahajanga, Toliara. Annonces vérifiées, contact direct propriétaire.',
   'villesHub.eyebrow': 'Couverture AryTrano',
@@ -1342,7 +1342,7 @@ export const frMG = {
   'villesHub.card.cta': 'Voir la ville',
 
   // E-T11 City landing /villes/[citySlug]
-  'cityLanding.meta.title': 'Logement étudiant à {city} — AryTrano',
+  'cityLanding.meta.title': 'Logement étudiant à {city}',
   'cityLanding.meta.description':
     '{count} annonces actives à {city} — chambres, studios et appartements pour étudiants. Contact direct propriétaire, sans intermédiaire.',
   'cityLanding.eyebrow': 'Ville',
@@ -2128,6 +2128,9 @@ export const frMG = {
   'admin.nav.audit': 'Journal d\'audit',
   'admin.nav.monitoring': 'Monitoring',
   'admin.nav.refunds': 'Remboursements',
+  // Fable-audit P0-1 — brand suffix moved to layout template.
+  // (kept placeholder for consistency; the real fix strips " — AryTrano"
+  // from the *.meta.title strings below and lets `template: '%s — AryTrano'` do the work.)
 
   // PWA offline fallback (E-T13)
   'offline.title': 'Tu sembles hors ligne',
