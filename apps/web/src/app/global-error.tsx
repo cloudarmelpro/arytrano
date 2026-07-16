@@ -25,7 +25,7 @@ export default function GlobalError({
     <html lang="fr">
       <body
         style={{
-          fontFamily: 'system-ui, -apple-system, sans-serif',
+          fontFamily: 'system-ui, -apple-system',
           margin: 0,
           padding: '60px 24px',
           textAlign: 'center',

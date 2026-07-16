@@ -68,7 +68,7 @@ export function ListingVideoPlayer({
             render={
               <button
                 type="button"
-                className="self-end rounded-full bg-white/95 px-4 py-2 text-sm font-semibold text-foreground shadow transition hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+                className="self-end rounded-xl cursor-pointer bg-white/95 px-4 py-2 text-sm font-semibold text-foreground shadow transition hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
               >
                 Fermer
               </button>

@@ -79,7 +79,7 @@ export function FavoriteButton({
         disabled={pending}
         aria-pressed={favorited}
         aria-label={label}
-        className="inline-flex h-9 items-center gap-1.5 rounded-md px-3 text-sm font-medium text-foreground underline-offset-4 transition hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-60"
+        className="inline-flex h-9 items-center gap-1.5 rounded-md text-sm font-medium text-foreground underline-offset-4 transition cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-60"
       >
         <HeartIcon filled={favorited} />
         <span>{favorited ? t('favorites.saved') : t('favorites.save')}</span>

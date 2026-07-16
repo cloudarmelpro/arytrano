@@ -45,7 +45,7 @@ export default async function ListingNotFound() {
           <line x1="9" y1="15" x2="15" y2="15" />
         </svg>
       </span>
-      <h1 className="mt-5 font-serif text-[clamp(26px,3.4vw,38px)] font-normal leading-[1.1] tracking-[-0.02em] text-foreground">
+      <h1 className="mt-5 text-[clamp(26px,3.4vw,38px)] font-normal leading-[1.1] tracking-[-0.02em] text-foreground">
         {t('listing.notFound.title')}
       </h1>
       <p className="mt-3 max-w-[520px] text-[15px] leading-[1.6] text-foreground/70">
@@ -54,13 +54,13 @@ export default async function ListingNotFound() {
       <div className="mt-8 flex flex-wrap justify-center gap-3">
         <Link
           href="/annonces"
-          className="inline-flex h-12 items-center rounded-xl bg-primary px-5 text-[14.5px] font-semibold text-primary-foreground transition hover:opacity-95"
+          className="inline-flex h-12 items-center rounded-xl bg-primary px-5 text-[14.5px] text-primary-foreground transition hover:opacity-95"
         >
           {t('listing.notFound.cta.search')}
         </Link>
         <Link
           href="/quartiers"
-          className="inline-flex h-12 items-center rounded-xl bg-muted/60 px-5 text-[14.5px] font-semibold text-foreground transition hover:bg-muted"
+          className="inline-flex h-12 items-center rounded-xl bg-muted/60 px-5 text-[14.5px] text-foreground transition hover:bg-muted"
         >
           {t('listing.notFound.cta.quartiers')}
         </Link>
