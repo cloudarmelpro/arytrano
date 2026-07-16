@@ -5,6 +5,7 @@ import { prisma } from '@/lib/db'
 import { rateLimiters } from '@/lib/rate-limit'
 import { extractRequestInfo } from '@/lib/auth/request-info'
 import { headers } from 'next/headers'
+import { generateUnsubscribeToken } from '@/features/alerts/services/generate-unsubscribe-token'
 
 const subscribeSchema = z.object({
   email: z.string().email(),
@@ -49,15 +50,27 @@ export async function subscribeNewsletterAction(
   }
 
   const email = parsed.data.email.trim().toLowerCase()
+  // Fable-audit L1 — stamp a stable unsubscribe token at creation so
+  // every future broadcast can include a one-click link and a
+  // `List-Unsubscribe` header. Existing rows without a token get one
+  // lazily on re-subscribe.
+  const existing = await prisma.newsletterSubscriber.findUnique({
+    where: { email },
+    select: { unsubscribeToken: true },
+  })
   await prisma.newsletterSubscriber.upsert({
     where: { email },
     create: {
       email,
       source: parsed.data.source ?? 'unspecified',
+      unsubscribeToken: generateUnsubscribeToken(),
     },
     update: {
       // Re-subscribing clears any prior unsubscribe.
       unsubscribedAt: null,
+      ...(existing?.unsubscribeToken
+        ? {}
+        : { unsubscribeToken: generateUnsubscribeToken() }),
     },
   })
   return { ok: true, message: 'Merci ! Tu recevras notre récap mensuel.' }

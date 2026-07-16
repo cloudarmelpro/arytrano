@@ -69,20 +69,27 @@ export function buildListingItemList(
     '@type': 'ItemList',
     name: input.name,
     numberOfItems: input.itemListElement.length,
+    // Fable-audit P2-2 — Schema.org ListItem has NO `offers` property;
+    // validators flagged it and Google silently dropped the price. Nest
+    // the offering inside a proper `item` (Accommodation), which does
+    // accept `offers`.
     itemListElement: input.itemListElement.map((item, idx) => ({
       '@type': 'ListItem',
       position: idx + 1,
-      url: item.url,
-      name: item.name,
-      ...(item.priceMGA !== undefined
-        ? {
-            offers: {
-              '@type': 'Offer',
-              priceCurrency: 'MGA',
-              price: item.priceMGA,
-            },
-          }
-        : {}),
+      item: {
+        '@type': 'Accommodation',
+        name: item.name,
+        url: item.url,
+        ...(item.priceMGA !== undefined
+          ? {
+              offers: {
+                '@type': 'Offer',
+                priceCurrency: 'MGA',
+                price: item.priceMGA,
+              },
+            }
+          : {}),
+      },
     })),
   }
 }

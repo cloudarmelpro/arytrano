@@ -105,10 +105,23 @@ export async function generateMetadata({
     alternates: await localeAlternates(canonicalPath),
     openGraph: {
       type: 'website',
+      siteName: 'AryTrano',
+      locale: locale === 'mg' ? 'mg_MG' : 'fr_MG',
+      alternateLocale: locale === 'mg' ? ['fr_MG'] : ['mg_MG'],
       title: `${typeLabel} à ${listing.neighborhood.nameFr}, ${listing.city.nameFr}`,
       description,
       url: canonicalPath,
       images: [{ url: ogImage, width: 1200, height: 630, alt: title }],
+    },
+    // Fable-audit P1-6 — twitter:image WINS over og:image on X. The
+    // root layout sets a generic brand image; without a per-listing
+    // override, every listing share on X showed the AryTrano card
+    // instead of the actual photo.
+    twitter: {
+      card: 'summary_large_image',
+      title: `${typeLabel} à ${listing.neighborhood.nameFr}, ${listing.city.nameFr}`,
+      description,
+      images: [ogImage],
     },
   }
 }
@@ -202,7 +215,12 @@ export default async function PublicListingDetailPage({
   // would break out of the script tag (stored XSS). See lib/seo/safe-json-ld.ts.
   // No `nonce` — JSON-LD is non-executable data; CSP script-src doesn't apply.
   const base = baseUrl()
-  const realEstateLd = buildRealEstateListingLd(listing, base)
+  // Fable-audit P2-1 — pass reviewStats so aggregateRating lands in
+  // the JSON-LD. Star snippets are the single cheapest CTR win.
+  const realEstateLd = buildRealEstateListingLd(listing, base, {
+    count: reviewStats.count,
+    average: reviewStats.average,
+  })
   const breadcrumbLd = buildBreadcrumbListLd(listing, base)
 
   return (

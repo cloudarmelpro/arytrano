@@ -86,9 +86,21 @@ export function buildBreadcrumbListLd(
  *
  * baseUrl: absolute origin (e.g. https://arytrano.com), no trailing slash.
  */
+/**
+ * Fable-audit P2-1 — aggregate rating passthrough. Star-rich SERP
+ * snippets are the single cheapest CTR win for classified listings.
+ * Only emitted when review count > 0 (Google rejects LD with 0-count
+ * aggregateRating).
+ */
+export type ReviewStatsForLd = {
+  count: number
+  average: number | null
+}
+
 export function buildRealEstateListingLd(
   listing: RealEstateListingForLd,
   baseUrl: string,
+  reviewStats?: ReviewStatsForLd,
 ) {
   const url = `${baseUrl}/${listing.city.slug}/${listing.neighborhood.slug}/${listing.slug}`
 
@@ -110,6 +122,17 @@ export function buildRealEstateListingLd(
     // RealEstateListing. `datePublished` is silently ignored in that context.
     ...(listing.publishedAt && { datePosted: listing.publishedAt.toISOString() }),
     ...(listing.photos.length > 0 && { image: listing.photos.map((p) => p.url) }),
+    // Fable-audit P2-1 — aggregateRating for star snippets. Skip when
+    // reviewStats is absent OR count is 0 (Google validator error).
+    ...(reviewStats && reviewStats.count > 0 && reviewStats.average !== null && {
+      aggregateRating: {
+        '@type': 'AggregateRating',
+        ratingValue: reviewStats.average,
+        reviewCount: reviewStats.count,
+        bestRating: 5,
+        worstRating: 1,
+      },
+    }),
     geo: {
       '@type': 'GeoCoordinates',
       latitude,

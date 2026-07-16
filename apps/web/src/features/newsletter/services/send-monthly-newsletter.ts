@@ -20,7 +20,7 @@ export async function sendMonthlyNewsletter(): Promise<{
 }> {
   const subs = await prisma.newsletterSubscriber.findMany({
     where: { unsubscribedAt: null },
-    select: { id: true, email: true },
+    select: { id: true, email: true, unsubscribeToken: true },
   })
   if (subs.length === 0) return { scanned: 0, sent: 0, failed: 0 }
 
@@ -78,11 +78,34 @@ export async function sendMonthlyNewsletter(): Promise<{
   let failed = 0
   for (const s of subs) {
     try {
+      // Fable-audit L1 — one-click unsubscribe link + RFC 8058 headers.
+      // Skip the send when a legacy subscriber has no token yet — the
+      // next subscribe cycle will lazily stamp one.
+      if (!s.unsubscribeToken) {
+        continue
+      }
+      const unsubUrl = `${baseUrl}/newsletter/unsubscribe/${encodeURIComponent(s.unsubscribeToken)}`
+      const htmlWithUnsub = html.replace(
+        '</div>\n</body></html>',
+        `<p style="color:#999;font-size:11px;line-height:1.5;margin-top:24px;">
+  Tu ne veux plus recevoir la newsletter mensuelle ?
+  <a href="${unsubUrl}" style="color:#666;">Désabonnement en un clic</a>.
+</p>
+</div>
+</body></html>`,
+      )
+      const textWithUnsub = `Top quartiers du mois : ${neighborhoods
+        .map((n) => n.nameFr)
+        .join(', ')}\n\n${baseUrl}/annonces\n\nDésabonnement : ${unsubUrl}`
       await sendEmail({
         to: s.email,
         subject: 'Top quartiers Madagascar — AryTrano',
-        html,
-        text: `Top quartiers du mois : ${neighborhoods.map((n) => n.nameFr).join(', ')}\n\n${baseUrl}/annonces`,
+        html: htmlWithUnsub,
+        text: textWithUnsub,
+        headers: {
+          'List-Unsubscribe': `<${unsubUrl}>, <mailto:unsubscribe@arytrano.com>`,
+          'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
+        },
       })
       sent += 1
     } catch (err) {

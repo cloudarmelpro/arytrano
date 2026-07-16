@@ -154,21 +154,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ),
   ]
 
-  // E-T07 multi-ville : each city gets its own /quartiers/<citySlug>
-  // page. Priority slightly lower than the (deprecated) /quartiers
-  // index since visitors typically reach these via the CitySelect
-  // on the landing or a direct search result. lastmod reflects the
-  // most recent publish in that city.
-  for (const city of cities) {
-    const path = `/quartiers/${city.slug}`
-    entries.push({
-      url: `${baseUrl}${path}`,
-      lastModified: maxPublishByCity.get(city.slug) ?? staticLastMod,
-      changeFrequency: 'weekly',
-      priority: 0.8,
-      alternates: { languages: languages(path) },
-    })
-  }
+  // Fable-audit P2-5 — /quartiers/{city} is now a 308 alias to
+  // /villes/{city}. Dropped from the sitemap so Google doesn't waste
+  // crawl budget on the redirect chain; the villes/{city} loop below
+  // is the canonical entry.
 
   // E-T11 city landing : /villes (hub) + /villes/<citySlug>. SEO-prio
   // pages targeting "logement étudiant à {city}" keywords — slightly

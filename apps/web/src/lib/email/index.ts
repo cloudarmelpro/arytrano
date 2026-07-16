@@ -33,6 +33,14 @@ export type SendEmailInput = {
   subject: string
   html: string
   text?: string
+  /**
+   * Fable-audit L1 — optional extra headers. Newsletter uses
+   * `List-Unsubscribe` + `List-Unsubscribe-Post` so Gmail/Yahoo can
+   * surface a one-click unsubscribe UI. Whitelist below prevents
+   * anything else being injected — the field is app-controlled so a
+   * closed set stays tight.
+   */
+  headers?: Partial<Record<'List-Unsubscribe' | 'List-Unsubscribe-Post', string>>
 }
 
 export async function sendEmail(input: SendEmailInput): Promise<{ id?: string; skipped?: true }> {
@@ -64,12 +72,24 @@ export async function sendEmail(input: SendEmailInput): Promise<{ id?: string; s
   // address pair) would re-open the CRLF vector. See TO_UNSAFE above.
   const safeTo = input.to.replace(TO_UNSAFE, '').trim()
 
+  // Fable-audit L1 — sanitize whitelisted headers (List-Unsubscribe
+   // etc.) the same way as subject/to before passing to nodemailer.
+  const safeHeaders: Record<string, string> = {}
+  if (input.headers) {
+    for (const [k, v] of Object.entries(input.headers)) {
+      if (typeof v === 'string') {
+        safeHeaders[k] = v.replace(/[\r\n]+/g, ' ').slice(0, 500)
+      }
+    }
+  }
+
   const result = await transport.sendMail({
     from,
     to: safeTo,
     subject: safeSubject,
     html: input.html,
     text: input.text ?? input.html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim(),
+    ...(Object.keys(safeHeaders).length > 0 && { headers: safeHeaders }),
   })
 
   return { id: result.messageId }

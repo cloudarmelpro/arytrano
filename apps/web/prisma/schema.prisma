@@ -1686,6 +1686,10 @@ model NewsletterSubscriber {
   locale        String    @default("fr-MG")
   source        String? // "popup" | "footer" | "landing" | admin
   unsubscribedAt DateTime?
+  /// Fable-audit L1 — one-click unsubscribe token embedded in every
+  /// broadcast + `List-Unsubscribe` header. 192-bit base64url, stable
+  /// per subscriber, cleared on re-subscribe.
+  unsubscribeToken String? @unique
   createdAt     DateTime  @default(now())
 
   @@index([unsubscribedAt])
