@@ -58,6 +58,20 @@ const forgotPasswordByIp = makeLimiter('forgot-ip', { requests: 10, window: '1 h
 // Registration: 5 accounts per IP per hour
 const registerLimiter = makeLimiter('register', { requests: 5, window: '1 h' })
 
+// Push subscription upsert (OWN-12). Fable-audit M3 — the web path
+// was missing the cap the mobile API path already has, so a signed-in
+// user could hammer prisma.pushSubscription.upsert unbounded.
+const pushSubscribeByUser = makeLimiter('push-subscribe-user', { requests: 10, window: '1 m' })
+
+// Newsletter subscribe (CON-13). Fable-audit H1 (2026-07-02) —
+// previously reused the forgotPassword limiter, which let an
+// unauthenticated attacker exhaust a victim's `forgot-email` bucket
+// (3/h) by POSTing the newsletter form with the victim's email, denying
+// them password recovery. Dedicated buckets close that gap while
+// keeping newsletter abuse at bay.
+const newsletterSubscribeByEmail = makeLimiter('newsletter-email', { requests: 3, window: '1 h' })
+const newsletterSubscribeByIp = makeLimiter('newsletter-ip', { requests: 20, window: '1 h' })
+
 // Listings — owner creates a DRAFT.
 // TRU-05 audit fix (2026-06-28) — was 10/1h alone which let an
 // attacker burst 240 listings/day. Two-layer cap : tight burst on
@@ -274,6 +288,24 @@ export const rateLimiters = {
 
   /** Registration — 5 / 1h / IP */
   register: (ipHash: string) => check(registerLimiter, ipHash),
+
+  /**
+   * Newsletter subscribe (CON-13) — 3 / 1h / email + 20 / 1h / IP.
+   * Fable-audit H1 fix : own bucket set instead of piggybacking on
+   * forgotPassword (attacker was denying a victim's password reset
+   * via the newsletter form).
+   */
+  /** Push subscription upsert (OWN-12) — 10/min/user. */
+  pushSubscribe: (userId: string) => check(pushSubscribeByUser, userId),
+
+  newsletterSubscribe: async (
+    email: string,
+    ipHash: string,
+  ): Promise<RateLimitResult> => {
+    const byEmail = await check(newsletterSubscribeByEmail, email.toLowerCase())
+    if (!byEmail.success) return byEmail
+    return check(newsletterSubscribeByIp, ipHash)
+  },
 
   /**
    * Create listing (DRAFT) — two-layer cap.

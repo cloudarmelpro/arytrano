@@ -51,14 +51,19 @@ export async function submitCinForVerification(
   if (file.type !== 'application/pdf') {
     const sniff = await sniffImage(buffer)
     if (!sniff.ok) {
-      console.warn('[submit-cin] magic-bytes rejected', { ownerId, reason: sniff.reason })
+      // Fable-audit M2 — no ownerId in prod logs.
+      if (process.env.NODE_ENV !== 'production') {
+        console.warn('[submit-cin] magic-bytes rejected', { ownerId, reason: sniff.reason })
+      }
       throw errors.validation('Fichier non reconnu comme image valide')
     }
   } else {
     // Minimal PDF signature check — first 4 bytes must be "%PDF".
     const head = buffer.subarray(0, 4).toString('ascii')
     if (head !== '%PDF') {
-      console.warn('[submit-cin] PDF header missing', { ownerId })
+      if (process.env.NODE_ENV !== 'production') {
+        console.warn('[submit-cin] PDF header missing', { ownerId })
+      }
       throw errors.validation('Fichier PDF invalide')
     }
   }
@@ -179,7 +184,10 @@ export async function submitSelfieForVerification(
   const buffer = Buffer.from(await file.arrayBuffer())
   const sniff = await sniffImage(buffer)
   if (!sniff.ok) {
-    console.warn('[submit-selfie] magic-bytes rejected', { ownerId, reason: sniff.reason })
+    // Fable-audit M2 — no ownerId in prod logs.
+    if (process.env.NODE_ENV !== 'production') {
+      console.warn('[submit-selfie] magic-bytes rejected', { ownerId, reason: sniff.reason })
+    }
     throw errors.validation('Fichier non reconnu comme image valide')
   }
 

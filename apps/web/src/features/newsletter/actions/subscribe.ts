@@ -36,7 +36,13 @@ export async function subscribeNewsletterAction(
   // Rate-limit by IP so a bot can't stuff the list.
   const h = await headers()
   const { ipHash } = extractRequestInfo(h)
-  const rl = await rateLimiters.forgotPassword(parsed.data.email, ipHash ?? 'noip:newsletter')
+  // Fable-audit H1 (2026-07-02) — dedicated limiter. Previously
+  // reused forgotPassword's `forgot-email` bucket, which an attacker
+  // could deplete to deny a victim's password reset.
+  const rl = await rateLimiters.newsletterSubscribe(
+    parsed.data.email,
+    ipHash ?? 'noip:newsletter',
+  )
   if (!rl.success) {
     // Return ok anyway so the response is uniform.
     return { ok: true, message: 'Merci !' }

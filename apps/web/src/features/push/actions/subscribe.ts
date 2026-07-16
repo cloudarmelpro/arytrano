@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 import { prisma } from '@/lib/db'
 import { auth } from '@/features/auth'
+import { rateLimiters } from '@/lib/rate-limit'
 
 const subscribeSchema = z.object({
   endpoint: z.string().url(),
@@ -30,22 +31,43 @@ export async function subscribePushAction(
   if (!parsed.success) {
     return { ok: false, message: 'Données invalides' }
   }
-  await prisma.pushSubscription.upsert({
+
+  // Fable-audit M3 — rate-limit the upsert so a session can't hammer
+  // the table unbounded.
+  const rl = await rateLimiters.pushSubscribe(session.user.id)
+  if (!rl.success) return { ok: false, message: 'Trop de tentatives.' }
+
+  // Fable-audit M3 — never re-parent an existing subscription to a
+  // different user. If a row exists for the endpoint that belongs to
+  // someone else, refuse silently (return ok so we don't leak that
+  // it exists). Own row → normal upsert; missing row → create.
+  const existing = await prisma.pushSubscription.findUnique({
     where: { endpoint: parsed.data.endpoint },
-    create: {
-      userId: session.user.id,
-      endpoint: parsed.data.endpoint,
-      p256dh: parsed.data.p256dh,
-      auth: parsed.data.auth,
-      userAgent: parsed.data.userAgent ?? null,
-    },
-    update: {
-      userId: session.user.id,
-      p256dh: parsed.data.p256dh,
-      auth: parsed.data.auth,
-      lastSeenAt: new Date(),
-    },
+    select: { userId: true, id: true },
   })
+  if (existing && existing.userId !== session.user.id) {
+    return { ok: true }
+  }
+  if (existing) {
+    await prisma.pushSubscription.update({
+      where: { id: existing.id },
+      data: {
+        p256dh: parsed.data.p256dh,
+        auth: parsed.data.auth,
+        lastSeenAt: new Date(),
+      },
+    })
+  } else {
+    await prisma.pushSubscription.create({
+      data: {
+        userId: session.user.id,
+        endpoint: parsed.data.endpoint,
+        p256dh: parsed.data.p256dh,
+        auth: parsed.data.auth,
+        userAgent: parsed.data.userAgent ?? null,
+      },
+    })
+  }
   revalidatePath('/dashboard/notifications')
   return { ok: true }
 }

@@ -154,11 +154,18 @@ export async function decryptOwnerCin(input: {
   // TODO (legal §6): persist a `CinAccessEvent` row recording the admin
   // who decrypted + the timestamp. Skipped in this batch — the model
   // doesn't exist yet and audit table is its own ticket.
-  console.info('[cin-access]', {
-    adminId: input.adminId,
-    ownerId: input.ownerId,
-    at: new Date().toISOString(),
-  })
+  //
+  // Fable-audit M2 (2026-07-02) — plaintext (adminId, ownerId) tuples
+  // MUST NOT ship to prod stdout. Correlating an admin to the specific
+  // citizen whose CIN they viewed belongs in the tamper-evident audit
+  // table, not the log stream. Gate behind dev-only until that ticket.
+  if (process.env.NODE_ENV !== 'production') {
+    console.info('[cin-access]', {
+      adminId: input.adminId,
+      ownerId: input.ownerId,
+      at: new Date().toISOString(),
+    })
+  }
 
   const bytes = decryptPii({
     ciphertext: Buffer.from(row.cinCiphertext),

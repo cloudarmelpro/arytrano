@@ -214,6 +214,26 @@ export const authConfig = {
     verifyRequest: '/verify-email',
   },
   callbacks: {
+    // Fable-audit M1 (2026-07-02) — SEC-02 TOTP is only enforced on the
+    // credentials sign-in path. An ADMIN who linked a Google account
+    // (allowDangerousEmailAccountLinking = true, same-email merge) could
+    // bypass the app's second factor entirely and rely on Google's own
+    // 2FA. Block every non-credentials provider for ADMIN accounts here.
+    // Admins must sign in via email+password so the TOTP challenge runs.
+    async signIn({ user, account }) {
+      if (account && account.provider !== 'credentials') {
+        // `user.id` is populated post-adapter-lookup. Fall back to email
+        // if the id isn't available yet (first OAuth link).
+        const found = await prisma.user.findFirst({
+          where: user.id ? { id: user.id } : { email: user.email ?? '' },
+          select: { role: true },
+        })
+        if (found?.role === 'ADMIN') {
+          return '/auth-error?error=admin_oauth_blocked'
+        }
+      }
+      return true
+    },
     async jwt({ token, user, trigger }) {
       // 1) Initial sign-in path — stamp the token from the User object
       //    that the provider returned. Capture tokenVersion at this

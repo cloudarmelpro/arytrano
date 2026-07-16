@@ -92,8 +92,16 @@ const EnvSchema = z.object({
     .url()
     .default('https://api.goalpay.pro/api/payement/service'),
 
-  // --- PII encryption (v0.5 — OwnerProfile.cin) -------------
-  PII_ENCRYPTION_KEY: base64Key32.optional(),
+  // --- PII encryption (v0.5 — OwnerProfile.cin + selfie) ----
+  // Fable-audit L2 — was `.optional()`. The CIN/selfie upload path
+  // fails closed at runtime (throws PiiKeyMissingError), but a missing
+  // key at deploy time silently shipped a fully broken identity
+  // verification feature. Fail at boot in prod instead.
+  PII_ENCRYPTION_KEY: isBuild
+    ? base64Key32.optional()
+    : isProd
+      ? base64Key32.refine((v) => !!v, 'PII_ENCRYPTION_KEY is required in production')
+      : base64Key32.optional(),
 
   // --- Email via Gmail SMTP --------------------------------
   // EMAIL_FROM can be a plain email or "Display Name <email>" format
