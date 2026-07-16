@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { auth, NotifPrefToggle } from '@/features/auth'
 import { getNotifPrefs } from '@/features/auth/server'
@@ -63,9 +64,9 @@ export default async function NotificationsPrefsPage() {
       <p className="text-xs text-muted-foreground">
         Conformément à LEG-04 (RGPD-MG), tu peux à tout moment exporter tes
         données ou supprimer ton compte depuis{' '}
-        <a href="/dashboard/settings" className="text-primary hover:underline">
+        <Link href="/dashboard/settings" className="text-primary hover:underline">
           /dashboard/settings
-        </a>
+        </Link>
         .
       </p>
     </div>

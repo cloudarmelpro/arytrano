@@ -1,6 +1,6 @@
 'use client'
 
-import { startTransition, useActionState, useRef, useState } from 'react'
+import { startTransition, useActionState, useEffect, useRef, useState } from 'react'
 import { useFormStatus } from 'react-dom'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
@@ -60,12 +60,23 @@ export function InventoryRoomCard({
     fields: undefined as Record<string, string[]> | undefined,
   })
 
-  // On upload success, append the URL to local list.
-  if (uploadState.ok && uploadState.url && !photoUrls.includes(uploadState.url)) {
-    setPhotoUrls((prev) => [...prev, uploadState.url!])
-    // Clear the file input so the same file can be re-picked.
-    if (fileInputRef.current) fileInputRef.current.value = ''
-  }
+  // On upload success, append the URL to local list + reset the file
+  // input so the same file can be re-picked. Guarded by a ref so a
+  // second commit with the same URL doesn't fire twice.
+  const lastAppendedRef = useRef<string | null>(null)
+  useEffect(() => {
+    if (
+      uploadState.ok &&
+      uploadState.url &&
+      lastAppendedRef.current !== uploadState.url
+    ) {
+      lastAppendedRef.current = uploadState.url
+      setPhotoUrls((prev) =>
+        prev.includes(uploadState.url!) ? prev : [...prev, uploadState.url!],
+      )
+      if (fileInputRef.current) fileInputRef.current.value = ''
+    }
+  }, [uploadState])
 
   function removePhoto(url: string) {
     setPhotoUrls((prev) => prev.filter((u) => u !== url))

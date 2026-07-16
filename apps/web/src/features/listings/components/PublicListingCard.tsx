@@ -57,9 +57,14 @@ export function PublicListingCard({
   const altFallback = `${typeLabel} à ${listing.neighborhood.nameFr}, ${listing.city.nameFr}`
   const alt = listing.photo?.altFr || altFallback
 
+  // Server-rendered component (no 'use client') — Date.now() runs once
+  // per request response, not per client render. React Compiler purity
+  // rule is a false positive on the server path.
+  // eslint-disable-next-line react-hooks/purity
+  const nowMs = Date.now()
   const isNew =
     listing.publishedAt !== null &&
-    Date.now() - new Date(listing.publishedAt).getTime() < NEW_LISTING_WINDOW_MS
+    nowMs - new Date(listing.publishedAt).getTime() < NEW_LISTING_WINDOW_MS
 
   const hasRating =
     listing.avgRating !== null && listing.avgRating !== undefined && listing.reviewCount > 0
