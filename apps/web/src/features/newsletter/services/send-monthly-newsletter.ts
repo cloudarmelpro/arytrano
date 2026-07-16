@@ -4,6 +4,7 @@ import { prisma } from '@/lib/db'
 import { env } from '@/lib/env'
 import { sendEmail } from '@/lib/email'
 import { withUtm } from '@/lib/marketing/utm'
+import { generateUnsubscribeToken } from '@/features/alerts/services/generate-unsubscribe-token'
 
 /**
  * MKT-08 — monthly newsletter fan-out. Ships the first working day
@@ -78,32 +79,48 @@ export async function sendMonthlyNewsletter(): Promise<{
   let failed = 0
   for (const s of subs) {
     try {
-      // Fable-audit L1 — one-click unsubscribe link + RFC 8058 headers.
-      // Skip the send when a legacy subscriber has no token yet — the
-      // next subscribe cycle will lazily stamp one.
-      if (!s.unsubscribeToken) {
-        continue
+      // Code-review 2026-07-16 — legacy rows created before the
+      // unsubscribeToken migration had NULL. Skipping them here (the
+      // previous behaviour) silently dropped the entire pre-migration
+      // list forever, since an already-subscribed user has no reason
+      // to re-submit the subscribe form. Stamp on-the-fly so every
+      // subscriber gets a stable token before their first broadcast.
+      let token = s.unsubscribeToken
+      if (!token) {
+        token = generateUnsubscribeToken()
+        await prisma.newsletterSubscriber.update({
+          where: { id: s.id },
+          data: { unsubscribeToken: token },
+        })
       }
-      const unsubUrl = `${baseUrl}/newsletter/unsubscribe/${encodeURIComponent(s.unsubscribeToken)}`
+      // Code-review 2026-07-16 — two URLs on purpose:
+      //   - visibleUrl  → GET confirm page (Server Action mutates)
+      //   - oneClickUrl → POST-only route for RFC 8058 header
+      // Same token, distinct paths so link-scanners hitting the
+      // visible URL only render the confirm page (no DB write) and
+      // Gmail/Yahoo hitting the header URL POST to a real handler.
+      const encoded = encodeURIComponent(token)
+      const visibleUrl = `${baseUrl}/newsletter/unsubscribe/${encoded}`
+      const oneClickUrl = `${baseUrl}/api/v1/newsletter/unsubscribe/${encoded}`
       const htmlWithUnsub = html.replace(
         '</div>\n</body></html>',
         `<p style="color:#999;font-size:11px;line-height:1.5;margin-top:24px;">
   Tu ne veux plus recevoir la newsletter mensuelle ?
-  <a href="${unsubUrl}" style="color:#666;">Désabonnement en un clic</a>.
+  <a href="${visibleUrl}" style="color:#666;">Désabonnement en un clic</a>.
 </p>
 </div>
 </body></html>`,
       )
       const textWithUnsub = `Top quartiers du mois : ${neighborhoods
         .map((n) => n.nameFr)
-        .join(', ')}\n\n${baseUrl}/annonces\n\nDésabonnement : ${unsubUrl}`
+        .join(', ')}\n\n${baseUrl}/annonces\n\nDésabonnement : ${visibleUrl}`
       await sendEmail({
         to: s.email,
         subject: 'Top quartiers Madagascar — AryTrano',
         html: htmlWithUnsub,
         text: textWithUnsub,
         headers: {
-          'List-Unsubscribe': `<${unsubUrl}>, <mailto:unsubscribe@arytrano.com>`,
+          'List-Unsubscribe': `<${oneClickUrl}>, <mailto:unsubscribe@arytrano.com>`,
           'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
         },
       })

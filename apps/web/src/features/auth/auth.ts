@@ -222,14 +222,26 @@ export const authConfig = {
     // Admins must sign in via email+password so the TOTP challenge runs.
     async signIn({ user, account }) {
       if (account && account.provider !== 'credentials') {
-        // `user.id` is populated post-adapter-lookup. Fall back to email
-        // if the id isn't available yet (first OAuth link).
-        const found = await prisma.user.findFirst({
-          where: user.id ? { id: user.id } : { email: user.email ?? '' },
-          select: { role: true },
-        })
-        if (found?.role === 'ADMIN') {
-          return '/auth-error?error=admin_oauth_blocked'
+        // Code-review 2026-07-16 — on first-time OAuth link Auth.js
+        // pre-populates `user.id` with a fresh crypto.randomUUID()
+        // (@auth/core OAuth callback), so an id-based lookup returns
+        // null and the guard used to no-op. Look up by email instead:
+        // that is the field allowDangerousEmailAccountLinking merges
+        // on, and the DB check is authoritative even before the merge.
+        // Id fallback only kicks in when the provider gave no email.
+        const where = user.email
+          ? { email: user.email }
+          : user.id
+            ? { id: user.id }
+            : null
+        if (where) {
+          const found = await prisma.user.findFirst({
+            where,
+            select: { role: true },
+          })
+          if (found?.role === 'ADMIN') {
+            return '/auth-error?error=admin_oauth_blocked'
+          }
         }
       }
       return true
