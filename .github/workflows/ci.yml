@@ -44,8 +44,17 @@ jobs:
       - run: npx prisma generate
         working-directory: apps/web
       - name: Vitest with coverage (informational on PR)
-        run: npx vitest run --coverage.enabled --coverage.reporter=text --coverage.reporter=json-summary
         working-directory: apps/web
+        run: |
+          set +e
+          npx vitest run --coverage.enabled --coverage.reporter=text --coverage.reporter=json-summary 2>&1 | tee /tmp/vitest.log
+          code=${PIPESTATUS[0]}
+          if [ "$code" -ne 0 ]; then
+            echo "::group::Last 80 lines of vitest output"
+            tail -n 80 /tmp/vitest.log | while IFS= read -r line; do echo "::error::$line"; done
+            echo "::endgroup::"
+          fi
+          exit "$code"
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -80,12 +89,13 @@ jobs:
         run: npx prisma migrate deploy
         working-directory: apps/web
       - name: Schema matches migrations (drift check)
-        # Prisma 7 renamed --to-schema-datamodel to --to-schema and
-        # dropped --shadow-database-url from `migrate diff` (no shadow
-        # DB needed for schema<>migrations comparison).
+        # Prisma 7 dropped --from-url + --shadow-database-url. Compare
+        # the live post-`migrate deploy` DB state against schema.prisma
+        # via --from-config-datasource → no shadow DB dance needed and
+        # any drift between the migrations and the schema surfaces here.
         run: >-
           npx prisma migrate diff
-          --from-migrations prisma/migrations
+          --from-config-datasource
           --to-schema prisma/schema.prisma
           --exit-code
         working-directory: apps/web
@@ -101,8 +111,18 @@ jobs:
       - run: npm ci
       # Skip `migrate deploy` — that's Vercel's job. next build tolerates
       # the dummy DATABASE_URL because NEXT_PHASE=phase-production-build.
-      - run: npx prisma generate && npx next build
+      - name: Next build
         working-directory: apps/web
+        run: |
+          set +e
+          npx prisma generate && npx next build 2>&1 | tee /tmp/build.log
+          code=${PIPESTATUS[0]}
+          if [ "$code" -ne 0 ]; then
+            echo "::group::Last 100 lines of build output"
+            tail -n 100 /tmp/build.log | while IFS= read -r line; do echo "::error::$line"; done
+            echo "::endgroup::"
+          fi
+          exit "$code"
 
   mobile-typecheck:
     runs-on: ubuntu-latest
@@ -115,5 +135,15 @@ jobs:
       # apps/mobile is NOT in the root npm workspaces — its own install.
       - run: npm ci
         working-directory: apps/mobile
-      - run: npm run typecheck
+      - name: Mobile tsc
         working-directory: apps/mobile
+        run: |
+          set +e
+          npm run typecheck 2>&1 | tee /tmp/mobile.log
+          code=${PIPESTATUS[0]}
+          if [ "$code" -ne 0 ]; then
+            echo "::group::Last 80 lines of tsc output"
+            tail -n 80 /tmp/mobile.log | while IFS= read -r line; do echo "::error::$line"; done
+            echo "::endgroup::"
+          fi
+          exit "$code"
