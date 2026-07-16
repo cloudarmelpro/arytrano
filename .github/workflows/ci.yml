@@ -41,6 +41,16 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
+      # npm's optionalDependencies bug (npm/cli#4828) — lockfile was
+      # regenerated on Windows so Linux platform binaries are pinned
+      # but not installed. Force-fetch what CI needs (mirrors the
+      # vercel.json installCommand pattern).
+      - run: |
+          npm install --no-save --force \
+            @rolldown/binding-linux-x64-gnu@1.0.2 \
+            @next/swc-linux-x64-gnu \
+            lightningcss-linux-x64-gnu \
+            @tailwindcss/oxide-linux-x64-gnu
       - run: npx prisma generate
         working-directory: apps/web
       - name: Vitest with coverage (informational on PR)
@@ -109,6 +119,15 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
+      # npm's optionalDependencies bug (npm/cli#4828) — force-fetch the
+      # Linux platform binaries the Windows-generated lockfile misses.
+      - run: |
+          npm install --no-save --force \
+            @next/swc-linux-x64-gnu \
+            lightningcss-linux-x64-gnu \
+            @tailwindcss/oxide-linux-x64-gnu \
+            @img/sharp-linux-x64 \
+            @img/sharp-libvips-linux-x64
       # Skip `migrate deploy` — that's Vercel's job. next build tolerates
       # the dummy DATABASE_URL because NEXT_PHASE=phase-production-build.
       - name: Next build
@@ -139,11 +158,13 @@ jobs:
         working-directory: apps/mobile
         run: |
           set +e
-          npm run typecheck 2>&1 | tee /tmp/mobile.log
+          # `--pretty false` prints file:line:col prefix on every diagnostic
+          # so the ::error:: dump below actually names the offending file.
+          npx tsc --noEmit --pretty false 2>&1 | tee /tmp/mobile.log
           code=${PIPESTATUS[0]}
           if [ "$code" -ne 0 ]; then
-            echo "::group::Last 80 lines of tsc output"
-            tail -n 80 /tmp/mobile.log | while IFS= read -r line; do echo "::error::$line"; done
+            echo "::group::Full tsc output"
+            while IFS= read -r line; do echo "::error::$line"; done < /tmp/mobile.log
             echo "::endgroup::"
           fi
           exit "$code"

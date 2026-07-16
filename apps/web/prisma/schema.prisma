@@ -175,6 +175,10 @@ model User {
   pushSubscriptions   PushSubscription[]
 
   @@index([status, role])
+  // TRU-19 cron `finalize-scheduled-deletions` scans by this column
+  // — created in the TRU-19 migration but the model was missing the
+  // declaration so `prisma migrate diff` flagged drift.
+  @@index([deletionScheduledAt])
 }
 
 /**
