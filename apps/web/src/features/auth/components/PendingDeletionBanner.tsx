@@ -3,7 +3,7 @@
 import { useTransition } from 'react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
-import { cancelAccountDeletionAction } from '@/features/auth'
+import { cancelAccountDeletionAction } from '@/features/auth/actions/delete-account'
 
 /**
  * TRU-19 — banner shown on /dashboard/settings while a deletion is
