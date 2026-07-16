@@ -14,6 +14,7 @@ env:
   # the runtime boot; next build runs in NEXT_PHASE=phase-production-build.
   DATABASE_URL: postgresql://ci:ci@localhost:5432/arytrano_ci
   AUTH_SECRET: ci-only-not-a-real-secret-32-chars-min
+  AUTH_URL: http://localhost:3000
 
 jobs:
   lint-typecheck:
@@ -55,17 +56,23 @@ jobs:
         working-directory: apps/web
       - name: Vitest with coverage (informational on PR)
         working-directory: apps/web
-        # `--reporter=github-actions` emits ::error:: per failing test
-        # with file+line prefix so the API annotations name the actual
-        # failure. Kept `--reporter=default` too so full output is
-        # still readable in the raw job log.
-        run: >-
-          npx vitest run
-          --reporter=default
-          --reporter=github-actions
-          --coverage.enabled
-          --coverage.reporter=text
-          --coverage.reporter=json-summary
+        run: |
+          set +e
+          npx vitest run \
+            --reporter=default \
+            --reporter=github-actions \
+            --coverage.enabled \
+            --coverage.reporter=text \
+            --coverage.reporter=json-summary 2>&1 | tee /tmp/vitest.log
+          code=${PIPESTATUS[0]}
+          if [ "$code" -ne 0 ]; then
+            echo "::group::Error-looking lines from vitest (last 10 matches)"
+            grep -Ei "(Error|Failed|FAIL|Cannot|Missing|✗|Unhandled|Startup)" /tmp/vitest.log \
+              | tail -n 10 \
+              | while IFS= read -r line; do echo "::error::$line"; done
+            echo "::endgroup::"
+          fi
+          exit "$code"
       - uses: actions/upload-artifact@v4
         if: always()
         with:
