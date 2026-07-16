@@ -1,0 +1,117 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  # Dummy — lib/env.ts only requires a syntactically valid URL outside
+  # the runtime boot; next build runs in NEXT_PHASE=phase-production-build.
+  DATABASE_URL: postgresql://ci:ci@localhost:5432/arytrano_ci
+  AUTH_SECRET: ci-only-not-a-real-secret-32-chars-min
+
+jobs:
+  lint-typecheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      # tsc needs the generated Prisma client types
+      - run: npx prisma generate
+        working-directory: apps/web
+      - run: npm run lint -w @arytrano/web
+      - run: npm run typecheck -w @arytrano/web
+      - run: npm run typecheck -w @arytrano/shared
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx prisma generate
+        working-directory: apps/web
+      - name: Vitest with coverage (informational on PR)
+        run: npx vitest run --coverage.enabled --coverage.reporter=text --coverage.reporter=json-summary
+        working-directory: apps/web
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage-summary
+          path: apps/web/coverage/coverage-summary.json
+
+  migrate-check:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: ci
+          POSTGRES_PASSWORD: ci
+          POSTGRES_DB: arytrano_ci
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd="pg_isready -U ci"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx prisma validate
+        working-directory: apps/web
+      - name: Migrations apply cleanly from scratch
+        run: npx prisma migrate deploy
+        working-directory: apps/web
+      - name: Schema matches migrations (drift check)
+        run: >-
+          npx prisma migrate diff
+          --from-migrations prisma/migrations
+          --to-schema-datamodel prisma/schema.prisma
+          --shadow-database-url "$DATABASE_URL"
+          --exit-code
+        working-directory: apps/web
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      # Skip `migrate deploy` — that's Vercel's job. next build tolerates
+      # the dummy DATABASE_URL because NEXT_PHASE=phase-production-build.
+      - run: npx prisma generate && npx next build
+        working-directory: apps/web
+
+  mobile-typecheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      # apps/mobile is NOT in the root npm workspaces — its own install.
+      - run: npm ci
+        working-directory: apps/mobile
+      - run: npm run typecheck
+        working-directory: apps/mobile

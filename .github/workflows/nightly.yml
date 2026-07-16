@@ -1,0 +1,58 @@
+name: Nightly
+
+on:
+  schedule:
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+
+env:
+  DATABASE_URL: postgresql://ci:ci@localhost:5432/arytrano_ci
+  AUTH_SECRET: ci-only-not-a-real-secret-32-chars-min
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm audit --audit-level=high
+      - run: npm audit --audit-level=high
+        working-directory: apps/mobile
+
+  coverage-gate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx prisma generate
+        working-directory: apps/web
+      # Ratchet: start at current reality, +5pts/month, promote to PR gate
+      # once the auth/listings/admin coverage gaps are paid down.
+      - name: Vitest coverage with thresholds
+        run: >-
+          npx vitest run
+          --coverage.enabled
+          --coverage.thresholds.lines=45
+          --coverage.thresholds.functions=45
+          --coverage.thresholds.branches=40
+        working-directory: apps/web
+
+  lighthouse:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: treosh/lighthouse-ci-action@v12
+        with:
+          urls: |
+            https://arytrano.com/
+            https://arytrano.com/annonces
+            https://arytrano.com/villes
+          uploadArtifacts: true
+          temporaryPublicStorage: true
